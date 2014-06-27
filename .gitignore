@@ -1,10 +1,13 @@
-# ignore emacs autorecovery files
+# emacs autorecovery files
 \#*
-# ignore tilde-ending files
+# tilde-ending files
 *\~
-# ignore emacs undo-tree files
+# emacs undo-tree files
 *.~undo-tree~
-# ignore emacs jump-to-definition
+# emacs jump-to-definition
 TAGS
-# ignore vim temp file
+# vim temp files
 *.swp
+# user-specific files
+ido.last
+saveplace
