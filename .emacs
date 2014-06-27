@@ -1,9 +1,6 @@
 ;; NOTE THAT THE ~ EXPANSION TO HOME DIRECTORY DOES NOT WORK WHEN CHROOTED
 ;; AND ABSOLUTE PATHS ARE REQUIRED
 
-;; cause it was bothering me each time emacs started up
-(put 'whitespace-style 'safe-local-variable (lambda (xx) t))
-
 ;; start emacs up in a plain old terminal
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
