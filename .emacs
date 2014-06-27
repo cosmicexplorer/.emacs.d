@@ -330,8 +330,8 @@ searches all buffers."
 						 '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
 ;; parenthesis matching and more
-;; turn autopair mode on
-(autopair-mode t)
+;; turn pair parens on
+(electric-pair-mode t)
 ;; match parens when cursor on top
 (show-paren-mode t)
 ;; integrate highlight-parentheses with autopair mode
