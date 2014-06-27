@@ -108,7 +108,7 @@ buffer. Tries to look for a URL at point.
 ;;;;;;  731863 887000))
 ;;; Generated autoloads from highlight-parentheses/highlight-parentheses.el
 
-(autoload 'highlight-parentheses-mode "highlight-parentheses/highlight-parentheses" "\
+(autoload 'highlight-parentheses-mode "~/.emacs.d/el-get/highlight-parentheses/highlight-parentheses" "\
 Minor mode to highlight the surrounding parentheses.
 
 \(fn &optional ARG)" t nil)
