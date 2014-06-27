@@ -88,10 +88,6 @@
 	(let ((tags-revert-without-query t))  ; don't query, revert silently
 		(visit-tags-table default-directory nil)))
 
-;; cask stuff
-(require 'cask "~/.cask/cask.el")
-(cask-initialize)
-
 ;; cpplint
 (eval-after-load 'flycheck
 	'(progn
