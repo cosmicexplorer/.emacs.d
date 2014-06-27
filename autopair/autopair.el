@@ -182,9 +182,9 @@
 (require 'cl-lib)
 (require 'paren)
 
-(defgroup autopair nil
-  "Automagically pair braces and quotes"
-  :group 'convenience)
+;; (defgroup autopair nil
+;;  "Automagically pair braces and quotes"
+;;  :group 'convenience)
 
 ;; variables
 (defcustom autopair-pair-criteria 'help-balance
