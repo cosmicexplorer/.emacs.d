@@ -1,3 +1,0 @@
-(:name mic-paren
-       :description "Advanced highlighting of matching parentheses."
-       :type emacswiki)

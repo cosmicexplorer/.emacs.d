@@ -1,4 +1,0 @@
-(:name flyspell-lazy
-       :description "Improve Emacs flyspell responsiveness using idle timers."
-       :type github
-       :pkgname "rolandwalker/flyspell-lazy")

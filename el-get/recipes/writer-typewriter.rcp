@@ -1,4 +1,0 @@
-(:name writer-typewriter
-       :description "Emacs Keyclicks And Typewriter Simulation"
-       :type http
-       :url "http://www.bobnewell.net/writer-typewriter.el")

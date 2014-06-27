@@ -215,18 +215,34 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
 	(insert "\t"))
 
 ;; add el-get functionality
-(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
-(unless (require 'el-get nil 'noerror)
-	(with-current-buffer
-			;; (url-retrieve-synchronously
-			;; "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
-			(find-file-noselect "~/.emacs.d/el-get/el-get-install.el") ; so that we don't have to use the internet to load up emacs lol
-	  (goto-char (point-max))
-	  (eval-print-last-sexp)
-	  (revert-buffer nil t))							; discard changes to el-get-install.el
-	(kill-buffer "el-get-install.el"))		; close buffer
-(add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
-(el-get 'sync)
+;; (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
+;; (unless (require 'el-get nil 'noerror)
+;; 	(with-current-buffer
+;; 			;; (url-retrieve-synchronously
+;;			;; "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
+;;			(find-file-noselect "~/.emacs.d/el-get/el-get-install.el") ; so that we don't have to use the internet to load up emacs lol
+;;	  (goto-char (point-max))
+;;	  (eval-print-last-sexp)
+;;	  (revert-buffer nil t))							; discard changes to el-get-install.el
+;;	(kill-buffer "el-get-install.el"))		; close buffer
+;;(add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
+;;(el-get 'sync)
+
+;; above left in case el-get needs to be added again
+
+;;; add stuff that used to be in el-get
+;; php-mode
+(add-to-list 'load-path "~/.emacs.d/php-mode")
+(require 'php-mode)
+;; go-mode
+(add-to-list 'load-path "~/.emacs.d/go-mode")
+(require 'go-mode)
+;; dired-xattr
+(add-to-list 'load-path "~/.emacs.d/dired-xattr")
+(require 'dired-xattr)
+;; yasnippet
+(add-to-list 'load-path "~/.emacs.d/yasnippet")
+(require 'yasnippet)
 
 ;; adds undo-tree functionality
 (require 'undo-tree)
@@ -278,6 +294,8 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
 ;; show line numbers
 (linum-mode)
 ;; make them relative
+(add-to-list 'load-path "~/.emacs.d/linum-relative")
+(require 'linum-relative)
 (setq linum-format 'linum-relative)
 ;; NOTE THAT I TOTALLY CHANGED LINUM-RELATIVE.EL
 ;; SO FOR COPYING THIS DEFINITELY CHECK THAT OUT
@@ -335,6 +353,8 @@ searches all buffers."
 ;; match parens when cursor on top
 (show-paren-mode t)
 ;; integrate highlight-parentheses with autopair mode
+(add-to-list 'load-path "~/.emacs.d/highlight-parentheses")
+(require 'highlight-parentheses)
 (highlight-parentheses-mode t)
 
 ;; tab correctly

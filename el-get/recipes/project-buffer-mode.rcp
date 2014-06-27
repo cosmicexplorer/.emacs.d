@@ -1,5 +1,0 @@
-(:name project-buffer-mode
-       :description "Generic mode to browse project file."
-       :type git
-       :url "git://repo.or.cz/project-buffer-mode.git"
-       :load-path ("." "plugins" "extensions"))

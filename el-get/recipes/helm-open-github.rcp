@@ -1,5 +1,0 @@
-(:name helm-open-github
-       :description "Utilities of Opening Github Page."
-       :type github
-       :pkgname "syohex/emacs-helm-open-github"
-       :depends (helm gh))

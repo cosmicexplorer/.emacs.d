@@ -1,7 +1,5 @@
 ./driver
 ./driver
-./driver
-./driver
 ./open_all_project_files.sh 
 cd ~
 cd vanderbilt_sim/
@@ -126,3 +124,5 @@ grep -r -l "evil-with-single-undo" . | grep *
 $(grep -r -l "evil-with-single-undo" .)
 echo $(grep -r -l "evil-with-single-undo" .)
 grep -r -l "evil-with-single-undo" .
+kill emacs
+killall emacs

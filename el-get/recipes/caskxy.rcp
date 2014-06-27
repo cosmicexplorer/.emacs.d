@@ -1,6 +1,0 @@
-(:name caskxy
-       :website "https://github.com/aki2o/caskxy"
-       :description "Control Cask in Emacs"
-       :type github
-       :pkgname "aki2o/caskxy"
-       :depends (log4e yaxception))

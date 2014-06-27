@@ -1,4 +1,0 @@
-(:name wcheck-mode
-       :description "General interface for text checkers."
-       :type github
-       :pkgname "tlikonen/wcheck-mode")

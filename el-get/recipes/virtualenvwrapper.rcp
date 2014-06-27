@@ -1,5 +1,0 @@
-(:name virtualenvwrapper
-       :type github
-       :website "https://github.com/porterjamesj/virtualenvwrapper.el"
-       :description "virtualenv tool for emacs"
-       :pkgname "porterjamesj/virtualenvwrapper.el")

@@ -1,5 +1,0 @@
-(:name rbenv
-       :description "Emacs integration for rbenv"
-       :type github
-       :pkgname "senny/rbenv.el"
-       :compile "rbenv.el")

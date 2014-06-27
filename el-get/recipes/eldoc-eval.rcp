@@ -1,4 +1,0 @@
-(:name eldoc-eval
-       :description "Enable eldoc support when minibuffer is in use."
-       :type github
-       :pkgname "thierryvolpiatto/eldoc-eval")

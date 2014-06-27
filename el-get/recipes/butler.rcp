@@ -1,5 +1,0 @@
-(:name butler
-       :description "Client for Jenkins."
-       :type github
-       :pkgname "AshtonKem/Butler"
-       :depends (json deferred))

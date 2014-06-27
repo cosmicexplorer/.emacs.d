@@ -1,5 +1,0 @@
-(:name font-utils
-       :depends (persistent-soft pcache)
-       :type github
-       :description "Set faces based on available fonts"
-       :pkgname "rolandwalker/font-utils")

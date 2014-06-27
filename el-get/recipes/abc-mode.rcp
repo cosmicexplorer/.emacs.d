@@ -1,5 +1,0 @@
-(:name abc-mode
-       :description "Major mode for editing abc music files"
-       :website "https://github.com/mkjunker/abc-mode"
-       :type github
-       :pkgname "mkjunker/abc-mode")

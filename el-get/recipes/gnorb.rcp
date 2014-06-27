@@ -1,4 +1,0 @@
-(:name gnorb
-       :description "Glue code between the Org, Gnus, and BBDB packages for Emacs"
-       :type github
-       :pkgname "girzel/gnorb")

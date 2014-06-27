@@ -1,4 +1,0 @@
-(:name pcache
-       :description "persistent caching for Emacs"
-       :type github
-       :pkgname "sigma/pcache")
