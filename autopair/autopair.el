@@ -184,7 +184,8 @@
 
 (defgroup autopair nil
   "Automagically pair braces and quotes"
-  :group 'convenience)
+;;  :group 'convenience)
+    )
 
 ;; variables
 (defcustom autopair-pair-criteria 'help-balance
