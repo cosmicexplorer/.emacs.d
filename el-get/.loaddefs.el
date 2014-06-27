@@ -3,38 +3,6 @@
 ;;; Code:
 
 
-;;;### (autoloads nil "autopair/autopair" "autopair/autopair.el"
-;;;;;;  (21360 1444 624423 827000))
-;;; Generated autoloads from autopair/autopair.el
-
-(autoload 'autopair-mode "autopair/autopair" "\
-Automagically pair braces and quotes like in TextMate.
-
-\(fn &optional ARG)" t nil)
-
-(defvar autopair-global-mode nil "\
-Non-nil if Autopair-Global mode is enabled.
-See the command `autopair-global-mode' for a description of this minor mode.
-Setting this variable directly does not take effect;
-either customize it (see the info node `Easy Customization')
-or call the function `autopair-global-mode'.")
-
-(custom-autoload 'autopair-global-mode "autopair/autopair" nil)
-
-(autoload 'autopair-global-mode "autopair/autopair" "\
-Toggle Autopair mode in all buffers.
-With prefix ARG, enable Autopair-Global mode if ARG is positive;
-otherwise, disable it.  If called from Lisp, enable the mode if
-ARG is omitted or nil.
-
-Autopair mode is enabled in all buffers where
-`autopair-on' would do it.
-See `autopair-mode' for more information on Autopair mode.
-
-\(fn &optional ARG)" t nil)
-
-;;;***
-
 ;;;### (autoloads nil "dired-xattr/dired-xattr" "dired-xattr/dired-xattr.el"
 ;;;;;;  (21360 22115 928226 690000))
 ;;; Generated autoloads from dired-xattr/dired-xattr.el
