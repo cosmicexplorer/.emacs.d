@@ -339,10 +339,13 @@ searches all buffers."
 ;; http://www.mew.org/~kazu/proj/ghc-mod/en/preparation.html
 (setq ghc-debug t)
 
-;; MELPA
-(require 'package)
-(add-to-list 'package-archives
-						 '("melpa" . "http://melpa.milkbox.net/packages/") t)
+;; add magit
+(add-to-list 'load-path "~/.emacs.d/git-modes")
+(add-to-list 'load-path "~/.emacs.d/magit")
+(eval-after-load 'info
+                   '(progn (info-initialize)
+                                     (add-to-list 'Info-directory-list "/path/to/magit/")))
+(require 'magit)
 
 ;; parenthesis matching and more
 ;; turn pair parens on
