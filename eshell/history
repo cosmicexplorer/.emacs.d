@@ -1,0 +1,128 @@
+./driver
+./driver
+./driver
+./driver
+./open_all_project_files.sh 
+cd ~
+cd vanderbilt_sim/
+git pull
+cd ..
+rm -rf vanderbilt_sim/
+git clone https://github.com/gswagner/vanderbilt_sim.git
+cd vanderbilt_sim/
+ls
+git fetch
+git branch
+cd ..
+cd hmt-swarms/SwarmSim/
+ls
+./open_all_project_files.sh 
+git pull
+./open_all_project_files.sh 
+./open_all_project_files.sh 
+cd hmt-swarms/SwarmSim/
+cd bin
+./driver 
+./driver 
+./driver 
+../open_all_project_files.sh 
+cd ..
+./open_all_project_files.sh 
+bin/driver
+bin/driver
+bin/driver
+bin/driver
+bin/driver
+bin/driver
+bin/driver
+bin/driver
+rm n*
+ls
+make clean
+bin/driver
+bin/driver
+bin/driver
+bin/driver
+bin/driver
+bin/driver
+bin/driver
+bin/driver
+make clean
+bin/driver
+bin/driver
+make clean
+./open_all_project_files.sh 
+cd hmt-swarms/SwarmSim/
+./open_all_project_files.sh 
+cd hmt-swarms/SwarmSim/
+./open_all_project_files.sh 
+cd ~
+ls s*
+ls
+ls S*
+sudo mv Sublime\ Text\ 2/ /usr/bin
+cd .emacs.d/el-get
+ls
+ls -a
+cd ~
+cd hmt-swarms/SwarmSim/
+./open_all_project_files.sh 
+cd ~
+cd .emacs.d
+grep -r -l ido-enable-flex-matching
+grep -r -l ido .
+grep -r -l ido-enable-flex-matching .
+grep -r -l ido .
+grep -r -l ido . | grep ido
+cd ~/hmt-swarms/SwarmSim/
+./open_all_project_files.sh 
+cd ~
+cd .emacs.d
+git clone https://github.com/emacs-helm/helm.git
+git clone https://github.com/ShingoFukuyama/helm-swoop.git
+cd heml
+cd helm
+ls
+make
+cd ~/hmt-swarms/SwarmSim/
+cd hmt-swarms/SwarmSim/
+./open_all_project_files.sh
+bin/driver
+bin/driver
+bin/driver
+bin/driver
+bin/driver
+bin/driver
+cd hmt-swarms/SwarmSim/
+./open_all_project_files.sh
+cd ~
+git clone https://github.com/ShingoFukuyama/helm-swoop.git
+rm -rf helm-swoop/
+cd .emacs.d
+git clone https://github.com/ShingoFukuyama/helm-swoop.git
+rm ~/.emacs.elc
+rm test.org
+cd .emacs.d
+cd /tmp/.X11-unix && for x in X*; do echo ":${x#X}"; done
+cd .emacs.d
+git clone https://github.com/magnars/multiple-cursors.el.git
+cd multiple-cursors.el/
+ls
+cd ..
+git init
+git add .
+ls
+ls -a
+rm -r .git/
+ls
+mv ~/.emacs .
+cd .emacs.d
+cd evil
+ls
+grep -r -l "evil-start-undo-step" .
+grep -r -l "evil-start-undo-step" .
+grep -r -l "evil-with-single-undo" .
+grep -r -l "evil-with-single-undo" . | grep *
+$(grep -r -l "evil-with-single-undo" .)
+echo $(grep -r -l "evil-with-single-undo" .)
+grep -r -l "evil-with-single-undo" .
