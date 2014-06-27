@@ -4,7 +4,7 @@
 cause i spent a while getting my emacs perfect and it might help somebody else
 
 ## embedded systems
-In my experience this does not work 
+In my experience this does
 
 #### Appropriate Commands:
 1. ```emacs -l ~/emacs.d/.emacs```
