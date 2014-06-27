@@ -4,7 +4,7 @@
 
 
 ;;;### (autoloads nil "dired-xattr/dired-xattr" "dired-xattr/dired-xattr.el"
-;;;;;;  (21360 22115 928226 690000))
+;;;;;;  (21385 12361 82102 0))
 ;;; Generated autoloads from dired-xattr/dired-xattr.el
 
 (autoload 'dired-xattr-add-overlay "dired-xattr/dired-xattr" "\
@@ -19,8 +19,8 @@ directory of if buffer has more that
 
 ;;;***
 
-;;;### (autoloads nil "go-mode/go-mode" "go-mode/go-mode.el" (21360
-;;;;;;  3918 688400 233000))
+;;;### (autoloads nil "go-mode/go-mode" "go-mode/go-mode.el" (21385
+;;;;;;  12359 948913 0))
 ;;; Generated autoloads from go-mode/go-mode.el
 
 (autoload 'go-mode "go-mode/go-mode" "\
@@ -104,8 +104,8 @@ buffer. Tries to look for a URL at point.
 ;;;***
 
 ;;;### (autoloads nil "highlight-parentheses/highlight-parentheses"
-;;;;;;  "highlight-parentheses/highlight-parentheses.el" (21360 1004
-;;;;;;  44428 29000))
+;;;;;;  "highlight-parentheses/highlight-parentheses.el" (21421 266
+;;;;;;  731863 887000))
 ;;; Generated autoloads from highlight-parentheses/highlight-parentheses.el
 
 (autoload 'highlight-parentheses-mode "highlight-parentheses/highlight-parentheses" "\
@@ -113,10 +113,31 @@ Minor mode to highlight the surrounding parentheses.
 
 \(fn &optional ARG)" t nil)
 
+(defvar global-highlight-parentheses-mode nil "\
+Non-nil if Global-Highlight-Parentheses mode is enabled.
+See the command `global-highlight-parentheses-mode' for a description of this minor mode.
+Setting this variable directly does not take effect;
+either customize it (see the info node `Easy Customization')
+or call the function `global-highlight-parentheses-mode'.")
+
+(custom-autoload 'global-highlight-parentheses-mode "highlight-parentheses/highlight-parentheses" nil)
+
+(autoload 'global-highlight-parentheses-mode "highlight-parentheses/highlight-parentheses" "\
+Toggle Highlight-Parentheses mode in all buffers.
+With prefix ARG, enable Global-Highlight-Parentheses mode if ARG is positive;
+otherwise, disable it.  If called from Lisp, enable the mode if
+ARG is omitted or nil.
+
+Highlight-Parentheses mode is enabled in all buffers where
+`(lambda nil (highlight-parentheses-mode 1))' would do it.
+See `highlight-parentheses-mode' for more information on Highlight-Parentheses mode.
+
+\(fn &optional ARG)" t nil)
+
 ;;;***
 
 ;;;### (autoloads nil "php-mode/php-mode" "php-mode/php-mode.el"
-;;;;;;  (21360 39851 752057 548000))
+;;;;;;  (21385 12360 333586 0))
 ;;; Generated autoloads from php-mode/php-mode.el
 
 (let ((loads (get 'php 'custom-loads))) (if (member '"php-mode/php-mode" loads) nil (put 'php 'custom-loads (cons '"php-mode/php-mode" loads))))
@@ -140,7 +161,7 @@ Major mode for editing PHP code.
 ;;;***
 
 ;;;### (autoloads nil "yasnippet/yasnippet" "yasnippet/yasnippet.el"
-;;;;;;  (21360 33778 96115 471000))
+;;;;;;  (21385 12363 140094 0))
 ;;; Generated autoloads from yasnippet/yasnippet.el
 
 (autoload 'yas-minor-mode "yasnippet/yasnippet" "\
@@ -179,13 +200,6 @@ Yas minor mode is enabled in all buffers where
 See `yas-minor-mode' for more information on Yas minor mode.
 
 \(fn &optional ARG)" t nil)
-
-;;;***
-
-;;;### (autoloads nil nil ("autopair/autopair-tests.el" "doc-view-fit-to-page/doc-view-fit-page.el"
-;;;;;;  "linum-relative/linum-relative.el" "php-mode/php-mode-test.el"
-;;;;;;  "yasnippet/yasnippet-debug.el" "yasnippet/yasnippet-tests.el")
-;;;;;;  (21365 21255 983425 871000))
 
 ;;;***
 
