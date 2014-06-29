@@ -243,8 +243,7 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
 
 ;; adds undo-tree functionality
 (require 'undo-tree)
-;;(global-undo-tree-mode t)
-;;(undo-tree-mode)
+(global-undo-tree-mode)
 ;; persist across file saves
 (setq undo-tree-auto-save-history t)
 ;; show diffs in undo tree visualizer
@@ -289,7 +288,7 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
 
 
 ;; show line numbers
-(linum-mode)
+(global-linum-mode)
 ;; make them relative
 (add-to-list 'load-path "~/.emacs.d/linum-relative")
 (require 'linum-relative)
@@ -636,17 +635,6 @@ searches all buffers."
 
 ;; TOGGLE RELATIVE LINUM
 (global-set-key (kbd "C-x C-l") 'linum-relative-toggle)
-
-;;;;; load all this shit cause emacs is too dumb to do it itself
-;;;;; reload .emacs upon every mode change ugh
-(add-hook 'after-change-major-mode-hook
-					(lambda ()
-						(load-file "~/.emacs.d/.emacs")
-						(setq linum-format 'linum-relative)
-						(global-undo-tree-mode t)
-						(setq undo-tree-auto-save-history t))) ;; cause for some reason these don't work
-;; consider adding something for when emacs starts up (emacs-startup-hook???)
-;; in case this doesn't work; for unmarked files, for example, maybe
 
 ;; makes it so relative numbering STAYS ON after minibuffer exited
 (add-hook 'minibuffer-exit-hook

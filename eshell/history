@@ -1,22 +1,3 @@
-./driver
-./driver
-./open_all_project_files.sh 
-cd ~
-cd vanderbilt_sim/
-git pull
-cd ..
-rm -rf vanderbilt_sim/
-git clone https://github.com/gswagner/vanderbilt_sim.git
-cd vanderbilt_sim/
-ls
-git fetch
-git branch
-cd ..
-cd hmt-swarms/SwarmSim/
-ls
-./open_all_project_files.sh 
-git pull
-./open_all_project_files.sh 
 ./open_all_project_files.sh 
 cd hmt-swarms/SwarmSim/
 cd bin
@@ -126,3 +107,22 @@ echo $(grep -r -l "evil-with-single-undo" .)
 grep -r -l "evil-with-single-undo" .
 kill emacs
 killall emacs
+mkdir yo-stuff
+ls
+cd yo-stuff/
+ls
+wget yoapp.s3.amazonaws.com/js/yo.css
+wget fonts.googleapis.com/css?family=Montserrat:400
+ls
+ls
+ls
+mv css?family=Montserrat:400 cssshit
+curl
+curl http://javascripting.tumblr.com
+curl http://javascripting.tumblr.com?username=DANNY
+curl http://javascripting.tumblr.com/?username=DANNY
+curl yo-test/test.html?username=D
+curl ./yo-test/test.html?username=D
+curl localhost:yo-test/test.html?username=D
+curl localhost://yo-test/test.html?username=D
+curl 127.0.0.1://yo-test/test.html?username=D
