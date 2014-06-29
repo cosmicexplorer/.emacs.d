@@ -636,6 +636,16 @@ searches all buffers."
 ;; TOGGLE RELATIVE LINUM
 (global-set-key (kbd "C-x C-l") 'linum-relative-toggle)
 
+;; do backups well and put them into a separate folder
+(setq backup-directory-alist `(("." . "~/.emacs.d/autosaved-files")))
+(setq backup-by-copying t)
+(setq delete-old-versions t
+			kept-new-versions 6
+			kept-old-versions 2
+			version-control t)
+;; do the same thing for undo-tree history
+(setq undo-tree-history-directory-alist `(("." . "~/.emacs.d/undo-tree-history")))
+
 ;; makes it so relative numbering STAYS ON after minibuffer exited
 (add-hook 'minibuffer-exit-hook
 					(lambda ()
