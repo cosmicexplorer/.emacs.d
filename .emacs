@@ -174,44 +174,15 @@
 	(let ((tags-revert-without-query t))  ; don't query, revert silently
 		(visit-tags-table default-directory nil)))
 
-;; cpplint
-(eval-after-load 'flycheck
-	'(progn
-		 (require 'flycheck-google-cpplint)
-		 ;; Add Google C++ Style checker.
-		 ;; In default, syntax checked by Clang and Cppcheck.
-		 ;;		 (flycheck-add-next-checker 'c/c++-googlelint
-		 (flycheck-add-next-checker 'c/c++-clang
-																'(warnings-only . c/c++-googlelint))))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(flycheck-c/c++-googlelint-executable "/usr/local/bin/cpplint.py")
- '(flycheck-googlelint-filter "-whitespace,+whitespace/braces")
- '(flycheck-googlelint-linelength "120")
- '(flycheck-googlelint-root "project/src")
- '(flycheck-googlelint-verbose "3")
- '(safe-local-variable-values
-	 (quote
-		((eval ignore-errors "Write-contents-functions is a buffer-local alternative to before-save-hook"
-					 (add-hook
-						(quote write-contents-functions)
-						(lambda nil
-							(delete-trailing-whitespace)
-							nil))
-					 (require
-						(quote whitespace))
-					 "Sometimes the mode needs to be toggled off and on."
-					 (whitespace-mode 0)
-					 (whitespace-mode 1))
-		 (whitespace-line-column . 80)
-		 (whitespace-style face trailing lines-tail)))))
-
-
 ;; turn on flycheck
-;; (flycheck-mode) ;; none of that fucking shit for now maybe later when i want to shoot myself
+;; i have never found this at all useful
+;; (add-to-list 'load-path "~/.emacs.d/flycheck")
+;; (require 'flycheck)
+;; (global-flycheck-mode)
+;; (add-hook 'c++-mode-hook
+;; 					(lambda ()
+;; 						(flycheck-select-checker 'c/c++-clang)
+;; 						(add-to-list 'flycheck-clang-include-path (expand-file-name "/opt/Qt/5.3/gcc_64/include/"))))
 
 ;; https://stackoverflow.com/questions/7494203/how-do-i-m-x-replace-string-across-all-buffers-in-emacs
 ;; global search and replace
@@ -691,7 +662,7 @@ searches all buffers."
 (global-set-key (kbd "M-p") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-M-n") 'mc/unmark-next-like-this)
 (global-set-key (kbd "C-M-p") 'mc/unmark-previous-like-this)
-(global-set-key (kbd "C-c C-a") 'mc/mark-all-like-this)
+(global-set-key (kbd "C-c C-M-a") 'mc/mark-all-like-this)
 
 ;; icicle-locate allows for much easier file location, using the OS's indexes
 ;; (global-set-key (kbd "C-x M-l") 'icicle-locate) ; nonfunctional right now
