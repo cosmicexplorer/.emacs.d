@@ -14,3 +14,5 @@ saveplace
 # eshell history
 eshell/history
 eshell/lastdir
+# user-specific semanticdb
+semanticdb/*

@@ -12,19 +12,107 @@
 				 (not (server-running-p)))
     (server-start))
 
+;; i hate cedet so much
+;; still haven't gotten Qt and Boost to work correctly with autocompletion
+;; then again autocompletion is really a lot more important with user-produced classes
+;; than with well-documented external tools like Qt and Boost
+;; but still it's quite annoying
+;;;;; CEDET stuff
+;; gnu global tagging
+;; (load-file "~/.emacs.d/lisp/gtags.el")
+;; (require 'gtags)
+
+;;;;; turn on cedet and semantic mode
+;; http://alexott.net/en/writings/emacs-devenv/EmacsCedet.html
+;; http://cxwangyi.wordpress.com/2010/08/21/using-cedet-with-emacs/
+(unless (featurep 'cedet)
+    (add-to-list 'load-path "~/.emacs.d/cedet")
+    (load-file "~/.emacs.d/cedet/cedet-devel-load.el"))
+
+;; (global-ede-mode t)
+(require 'semantic)
+(require 'semantic/ia) ;; name completion and tag display
+(require 'semantic/bovine/gcc) ;; use system include files
+(require 'semantic/bovine/clang) ;; same for clang
+(require 'semantic/bovine/c)
+(require 'cedet-files)
+(require 'semantic/db) ;; not sure if required, think not
+
+(setq semantic-ectag-program "/usr/bin/etags")
+
+;;;;;; C/C++
+;; include Qt and others
+(defun c-mode-semantic-hook ()
+	(semantic-add-system-include "/opt/Qt/5.3/gcc_64/include/" 'c++-mode)
+	(semantic-add-system-include "/usr/include/boost/" 'c++-mode)
+	(add-to-list 'semantic-lex-c-preprocessor-symbol-file "/opt/Qt/5.3/gcc_64/include/QtCore/qconfig.h")
+	(add-to-list 'semantic-lex-c-preprocessor-symbol-file "/opt/Qt/5.3/gcc_64/include/QtCore/qconfig-dist.h")
+	(add-to-list 'semantic-lex-c-preprocessor-symbol-file "/opt/Qt/5.3/gcc_64/include/QtCore/qglobal.h"))
+
+(add-hook 'c-mode-common-hook 'c-mode-semantic-hook)
+
+
+(hs-minor-mode) ;; C-c @ C-c for folding up code blocks!!!
+;; minibuffer always gets pissy at me about it lol
+(add-hook 'prog-mode-hook #'hs-minor-mode)
+
+(global-semanticdb-minor-mode t)
+(global-cedet-m3-minor-mode t)
+(set-default 'semantic-case-fold t)
+(global-semantic-highlight-func-mode t)
+(global-semantic-stickyfunc-mode t)
+(global-semantic-decoration-mode t)
+(global-semantic-idle-local-symbol-highlight-mode t)
+(global-semantic-idle-scheduler-mode t)
+(global-semantic-idle-completions-mode t)
+(global-semantic-idle-summary-mode t)
+(semantic-load-enable-excessive-code-helpers)
+
+(setq-mode-local cpp-mode semanticdb-find-default-throttle
+								 '(project local unloaded system recursive)) 
+
+(defun add-tags-semantic-hook ()
+	(imenu-add-to-menubar "TAGS"))
+(add-hook 'semantic-init-hooks 'add-tags-semantic-hook)
+
+;; if you want to enable support for gnu global
+(when (cedet-gnu-global-version-check t)
+	(semanticdb-enable-gnu-global-databases 'c-mode)
+	(semanticdb-enable-gnu-global-databases 'c++-mode))
+
+;; enable ctags for some languages:
+;;  Unix Shell, Perl, Pascal, Tcl, Fortran, Asm
+(when (cedet-ectag-version-check t)
+	  (semantic-load-enable-primary-ectags-support))
+
+(defun keybindings-cedet-hook ()
+	(local-set-key [(control return)] 'semantic-ia-complete-symbol)
+	(local-set-key "\C-c?" 'semantic-ia-complete-symbol-menu)
+	(local-set-key "\C-c>" 'semantic-complete-analyze-inline)
+	(local-set-key "\C-c=" 'semantic-decoration-include-visit)
+	(local-set-key "\C-cj" 'semantic-ia-fast-jump)
+	(local-set-key "\C-cq" 'semantic-ia-show-doc)
+	(local-set-key "\C-cs" 'semantic-ia-show-summary)
+	(local-set-key "\C-cp" 'semantic-analyze-proto-impl-toggle)
+	)
+(add-hook 'c-mode-common-hook 'keybindings-cedet-hook)
+;; control return: whatever the symbol you are typing, this hot key automatically complete it for you.
+;; C-c?: another way to complete the symbol you are typing
+;; C-c>: when you typed . or -> after an object name, use this key to show possible public member functions or data members.
+;; C-cj: jump to the definition of the symbol under cursor
+;; C-cs: show a summary about the symbol under cursor
+;; C-cq: show the document of the symbol under cursor
+;; C-c=: visit the header file under cursor
+;; C-cp: toggle between the implementation and a prototype of symbol under cursor
+;; C-ce: when your cursor is in the scope of a class or one of its member function, list all methods in the class
+;; C-cC-r: show references of the symbol under cursor
+
+(semantic-mode t) ;; GO GO GO
+
+
 ;; add multiple cursor stuff
 (add-to-list 'load-path "~/.emacs.d/multiple-cursors.el")
 (require 'multiple-cursors)
-
-;; attempt to implement vim-like undo scrounged from evil-mode
-;; (add-hook 'pre-command-hook #'evil-insert-repeat-hook)
-;; (evil-start-undo-step t)
-;; (remove-hook 'pre-command-hook #'evil-insert-repeat-hook)
-;; (setq evil-insert-repeat-info evil-repeat-info)
-;; (evil-set-marker ?^ nil t)
-;; (evil-end-undo-step t)
-;; (when evil-move-cursor-back
-;; 	(evil-move-cursor-back))
 
 ;; for like real scrolling
 (xterm-mouse-mode)
@@ -342,13 +430,14 @@ searches all buffers."
 (add-to-list 'load-path "~/.emacs.d/git-modes")
 (add-to-list 'load-path "~/.emacs.d/magit")
 (eval-after-load 'info
-                   '(progn (info-initialize)
-                                     (add-to-list 'Info-directory-list "/path/to/magit/")))
+	'(progn (info-initialize)
+					(add-to-list 'Info-directory-list "/path/to/magit/")))
 (require 'magit)
 
 ;; parenthesis matching and more
 ;; turn pair parens on
 (electric-pair-mode t)
+(add-to-list 'electric-pair-pairs '(?\{ . ?\}))
 ;; match parens when cursor on top
 (show-paren-mode t)
 ;; integrate highlight-parentheses with autopair mode
@@ -669,91 +758,6 @@ searches all buffers."
 ;; sudo open file with C-x C-f /sudo::/path/to/file
 ;; more tramp stuff
 (set-default 'tramp-default-proxies-alist (quote ((".*" "\\`root\\'" "/ssh:%h:"))))
-
-;; CEDET stuff that i'm not using rn
-;; gnu global tagging
-;; (load-file "~/.emacs.d/lisp/gtags.el")
-;; (require 'gtags)
-
-;;;;; turn on cedet and semantic mode
-;; http://alexott.net/en/writings/emacs-devenv/EmacsCedet.html
-;; http://cxwangyi.wordpress.com/2010/08/21/using-cedet-with-emacs/
-;; (unless (featurep 'cedet)
-;;     (add-to-list 'load-path "~/.emacs.d/cedet")
-;;     (load-file "~/.emacs.d/cedet/cedet-devel-load.el"))
-
-;; (global-ede-mode t)
-;; (require 'semantic)
-;; (require 'semantic/ia) ;; name completion and tag display
-;; (require 'semantic/bovine/gcc) ;; use system include files
-;; (require 'semantic/bovine/c)
-;; (require 'semantic/db) ;; not sure if required, think not
-;; ;; include Qt
-;; (semantic-reset-system-include 'c-mode)
-;; (semantic-reset-system-include 'c++-mode)
-;; (setq qt5-base-dir "/opt/Qt/5.3/gcc_64/include")
-;; (semantic-add-system-include "/opt/Qt/5.3/gcc_64/include/Qt/")
-;; (semantic-add-system-include "/opt/Qt/5.3/gcc_64/include/QtGui/")
-;; (semantic-add-system-include "/opt/Qt/5.3/gcc_64/include/QtCore/")
-;; (semantic-add-system-include "/opt/Qt/5.3/gcc_64/include/QtTest/")
-;; (semantic-add-system-include "/opt/Qt/5.3/gcc_64/include/QtNetwork/")
-;; (semantic-add-system-include "/opt/Qt/5.3/gcc_64/include/QtSvg/")
-;; (semantic-add-system-include "/opt/Qt/5.3/gcc_64/include/QtWidgets/") 
-;; ;; (semantic-add-system-include "/usr/include/boost/")
-;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt5-base-dir "/QtCore/qconfig.h"))
-;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt5-base-dir "/QtCore/qconfig-dist.h"))
-;; (add-to-list 'semantic-lex-c-preprocessor-symbol-file (concat qt5-base-dir "/QtCore/qglobal.h"))
-
-;; ;; (hs-minor-mode) ;; C-c @ C-c for folding up code blocks!!!
-
-;; (global-semanticdb-minor-mode t)
-;; (global-cedet-m3-minor-mode t)
-;; (set-default 'semantic-case-fold t)
-;; (global-semantic-highlight-func-mode t)
-;; (global-semantic-stickyfunc-mode t)
-;; (global-semantic-decoration-mode t)
-;; (global-semantic-idle-local-symbol-highlight-mode t)
-;; (global-semantic-idle-scheduler-mode t)
-;; (global-semantic-idle-completions-mode t)
-;; (global-semantic-idle-summary-mode t)
-
-;; (defun add-tags-semantic-hook ()
-;; 	(imenu-add-to-menubar "TAGS"))
-;; (add-hook 'semantic-init-hooks 'add-tags-semantic-hook)
-
-;; ;; if you want to enable support for gnu global
-;; (when (cedet-gnu-global-version-check t)
-;; 	(semanticdb-enable-gnu-global-databases 'c-mode)
-;; 	(semanticdb-enable-gnu-global-databases 'c++-mode))
-
-;; ;; enable ctags for some languages:
-;; ;;  Unix Shell, Perl, Pascal, Tcl, Fortran, Asm
-;; (when (cedet-ectag-version-check t)
-;; 	  (semantic-load-enable-primary-ectags-support))
-
-;; (defun keybindings-cedet-hook ()
-;; 	(local-set-key [(control return)] 'semantic-ia-complete-symbol)
-;; 	(local-set-key "\C-c?" 'semantic-ia-complete-symbol-menu)
-;; 	(local-set-key "\C-c>" 'semantic-complete-analyze-inline)
-;; 	(local-set-key "\C-c=" 'semantic-decoration-include-visit)
-;; 	(local-set-key "\C-cj" 'semantic-ia-fast-jump)
-;; 	(local-set-key "\C-cq" 'semantic-ia-show-doc)
-;; 	(local-set-key "\C-cs" 'semantic-ia-show-summary)
-;; 	(local-set-key "\C-cp" 'semantic-analyze-proto-impl-toggle)
-;; 	)
-;; (add-hook 'c-mode-common-hook 'keybindings-cedet-hook)
-;; ;; control return: whatever the symbol you are typing, this hot key automatically complete it for you.
-;; ;; C-c?: another way to complete the symbol you are typing
-;; ;; C-c>: when you typed . or -> after an object name, use this key to show possible public member functions or data members.
-;; ;; C-cj: jump to the definition of the symbol under cursor
-;; ;; C-cs: show a summary about the symbol under cursor
-;; ;; C-cq: show the document of the symbol under cursor
-;; ;; C-c=: visit the header file under cursor
-;; ;; C-cp: toggle between the implementation and a prototype of symbol under cursor
-;; ;; C-ce: when your cursor is in the scope of a class or one of its member function, list all methods in the class
-;; ;; C-cC-r: show references of the symbol under cursor
-
-;; (semantic-mode t) ;; GO GO GO
 
 ;; add org-mode stuff
 (define-key global-map "\C-cl" 'org-store-link)

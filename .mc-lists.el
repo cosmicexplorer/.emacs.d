@@ -3,11 +3,13 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+				smart-tab
 				))
 
 (setq mc/cmds-to-run-once
       '(
 				autopair-newline
 				beginning-of-buffer
+				electric-pair-backward-delete-char-untabify
 				end-of-buffer
 				))
