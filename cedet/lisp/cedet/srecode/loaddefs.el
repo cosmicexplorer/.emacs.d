@@ -278,7 +278,7 @@ Adds the following:
 
 ;;;### (autoloads nil nil ("args.el" "ctxt.el" "dictionary.el" "extract.el"
 ;;;;;;  "fields.el" "filters.el" "find.el" "semantic.el" "srt-wy.el"
-;;;;;;  "table.el") (21412 34195 484337 436000))
+;;;;;;  "table.el") (21424 34853 983617 701000))
 
 ;;;***
 

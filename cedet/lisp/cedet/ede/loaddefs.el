@@ -350,7 +350,7 @@ Argument NEWVERSION is the version number to use in the current project.
 ;;;;;;  "proj-aux.el" "proj-comp.el" "proj-elisp.el" "proj-info.el"
 ;;;;;;  "proj-misc.el" "proj-obj.el" "proj-prog.el" "proj-scheme.el"
 ;;;;;;  "proj-shared.el" "proj.el" "project-am.el" "shell.el" "source.el"
-;;;;;;  "srecode.el") (21412 34195 206022 537000))
+;;;;;;  "srecode.el") (21424 34853 534359 179000))
 
 ;;;***
 
