@@ -1,5 +1,6 @@
 ;; NOTE THAT THE ~ EXPANSION TO HOME DIRECTORY DOES NOT WORK WHEN CHROOTED
 ;; AND ABSOLUTE PATHS ARE REQUIRED
+;; but if you're using emacs when chrooted you're a clown anyway so lol
 
 ;; start emacs up in a plain old terminal
 (setq inhibit-startup-echo-area-message t)
