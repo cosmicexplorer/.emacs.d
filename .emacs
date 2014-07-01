@@ -3,6 +3,7 @@
 ;; but if you're using emacs when chrooted you're a clown anyway so lol
 
 ;; start emacs up in a plain old terminal
+;; and stop the dumb "intro to emacs" buffer
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 
@@ -13,16 +14,17 @@
 				 (not (server-running-p)))
     (server-start))
 
-;; i hate cedet so much
+;; add minimap functionality like sublime
+;; let's make this work later
+;; (add-to-list 'load-path "~/.emacs.d/minimap")
+;; (require 'minimap)
+;; (minimap-mode)
+
+;;;;; CEDET stuff
 ;; still haven't gotten Qt and Boost to work correctly with autocompletion
 ;; then again autocompletion is really a lot more important with user-produced classes
 ;; than with well-documented external tools like Qt and Boost
 ;; but still it's quite annoying
-;;;;; CEDET stuff
-;; gnu global tagging
-;; (load-file "~/.emacs.d/lisp/gtags.el")
-;; (require 'gtags)
-
 ;;;;; turn on cedet and semantic mode
 ;; http://alexott.net/en/writings/emacs-devenv/EmacsCedet.html
 ;; http://cxwangyi.wordpress.com/2010/08/21/using-cedet-with-emacs/
@@ -39,18 +41,19 @@
 (require 'cedet-files)
 (require 'semantic/db) ;; not sure if required, think not
 
-(setq semantic-ectag-program "/usr/bin/etags")
+;; (setq semantic-ectag-program "/usr/bin/etags")
 
 ;;;;;; C/C++
 ;; include Qt and others
-(defun c-mode-semantic-hook ()
-	(semantic-add-system-include "/opt/Qt/5.3/gcc_64/include/" 'c++-mode)
-	(semantic-add-system-include "/usr/include/boost/" 'c++-mode)
-	(add-to-list 'semantic-lex-c-preprocessor-symbol-file "/opt/Qt/5.3/gcc_64/include/QtCore/qconfig.h")
-	(add-to-list 'semantic-lex-c-preprocessor-symbol-file "/opt/Qt/5.3/gcc_64/include/QtCore/qconfig-dist.h")
-	(add-to-list 'semantic-lex-c-preprocessor-symbol-file "/opt/Qt/5.3/gcc_64/include/QtCore/qglobal.h"))
+;; doesn't work lol
+;; (defun c-mode-semantic-hook ()
+;; 	(semantic-add-system-include "/opt/Qt/5.3/gcc_64/include/" 'c++-mode)
+;; 	(semantic-add-system-include "/usr/include/boost/" 'c++-mode)
+;; 	(add-to-list 'semantic-lex-c-preprocessor-symbol-file "/opt/Qt/5.3/gcc_64/include/QtCore/qconfig.h")
+;; 	(add-to-list 'semantic-lex-c-preprocessor-symbol-file "/opt/Qt/5.3/gcc_64/include/QtCore/qconfig-dist.h")
+;; 	(add-to-list 'semantic-lex-c-preprocessor-symbol-file "/opt/Qt/5.3/gcc_64/include/QtCore/qglobal.h"))
 
-(add-hook 'c-mode-common-hook 'c-mode-semantic-hook)
+;; (add-hook 'c-mode-common-hook 'c-mode-semantic-hook)
 
 
 (hs-minor-mode) ;; C-c @ C-c for folding up code blocks!!!
@@ -75,11 +78,6 @@
 (defun add-tags-semantic-hook ()
 	(imenu-add-to-menubar "TAGS"))
 (add-hook 'semantic-init-hooks 'add-tags-semantic-hook)
-
-;; if you want to enable support for gnu global
-(when (cedet-gnu-global-version-check t)
-	(semanticdb-enable-gnu-global-databases 'c-mode)
-	(semanticdb-enable-gnu-global-databases 'c++-mode))
 
 ;; enable ctags for some languages:
 ;;  Unix Shell, Perl, Pascal, Tcl, Fortran, Asm
@@ -707,26 +705,8 @@ searches all buffers."
 ;; do the same thing for undo-tree history
 (setq undo-tree-history-directory-alist `(("." . "~/.emacs.d/undo-tree-history")))
 
-;; makes it so relative numbering STAYS ON after minibuffer exited
-(add-hook 'minibuffer-exit-hook
-					(lambda ()
-						(setq linum-format 'linum-relative)))
-(add-hook 'compilation-mode-hook
-					(lambda ()
-						(setq linum-format 'linum-relative)))
-(add-hook 'gdb-mode-hook
-					(lambda ()
-						(setq linum-format 'linum-relative)))
-
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-
 ;; sudo open file with C-x C-f /sudo::/path/to/file
 ;; more tramp stuff
 (set-default 'tramp-default-proxies-alist (quote ((".*" "\\`root\\'" "/ssh:%h:"))))
