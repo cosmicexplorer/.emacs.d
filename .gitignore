@@ -12,7 +12,6 @@ TAGS
 ido.last
 saveplace
 # eshell history
-eshell/history
-eshell/lastdir
+eshell/*
 # user-specific semanticdb
 semanticdb/*

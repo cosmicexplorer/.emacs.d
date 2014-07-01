@@ -14,11 +14,23 @@
 				 (not (server-running-p)))
     (server-start))
 
-;; add minimap functionality like sublime
-;; let's make this work later
-;; (add-to-list 'load-path "~/.emacs.d/minimap")
-;; (require 'minimap)
-;; (minimap-mode)
+;;;; graphic-only stuff
+;; dependent on current frame, so added to after frame hook
+;; turn off toolbar
+(when (display-graphic-p)
+	;; graphical-only stuff
+	(progn
+		(tool-bar-mode nil)
+		;; add sublime-like minimap and smooth scrolling through sublimity
+		(add-to-list 'load-path "~/.emacs.d/sublimity")
+		(require 'sublimity)
+		(require 'sublimity-map)
+		(setq sublimity-map-size 40)
+		(setq sublimity-map-fraction 0.5)
+		(setq sublimity-map-text-scale -30)
+		(sublimity-map-set-delay .5)
+		(sublimity-mode 1)
+		))
 
 ;;;;; CEDET stuff
 ;; still haven't gotten Qt and Boost to work correctly with autocompletion

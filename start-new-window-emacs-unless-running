@@ -1,5 +1,5 @@
 if pidof -x "emacs" ; then # if emacs already running
-    emacsclient -nw -c $@ # $@ is all arguments passed, adds to running emacs sesh with new window
+    emacsclient -nw -n -c $@ # $@ is all arguments passed, adds to running emacs sesh with new window
 else
     \emacs -nw -l ~/.emacs.d/.emacs -nw $@ # else start it up
 fi
