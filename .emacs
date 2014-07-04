@@ -35,9 +35,13 @@
 		(sublimity-mode 1)
 		))
 
-;; make c-mode comment like a normal person instead of auto block comments
+;; format comments like a normal person
 (add-hook 'c-mode-hook (lambda () (setq comment-start "// "
 																				comment-end   "")))
+(add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; "
+																					 comment-end "")))
+(add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; "
+																					 comment-end "")))
 
 ;; load w3m web browser
 (add-to-list 'load-path "~/.emacs.d/emacs-w3m")
@@ -726,6 +730,7 @@ searches all buffers."
 
 ;; make <backtab> force tab
 (global-set-key (kbd "<backtab>") 'force-insert-tab)
+(global-set-key (kbd "C-c t") 'force-insert-tab) ; for modes like markdown-mode where S-tab overridden
 
 ;; open file with wildcards
 ;;(global-set-key (kbd "C-c o") 'open-file-with-wildcards)
