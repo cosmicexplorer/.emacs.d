@@ -14,6 +14,9 @@
 				 (not (server-running-p)))
     (server-start))
 
+;; important for many things
+(require 'cl)
+
 ;;;; graphic-only stuff
 ;; dependent on current frame, so added to after frame hook
 ;; turn off toolbar
@@ -25,12 +28,27 @@
 		(add-to-list 'load-path "~/.emacs.d/sublimity")
 		(require 'sublimity)
 		(require 'sublimity-map)
-		(setq sublimity-map-size 40)
-		(setq sublimity-map-fraction 0.5)
+		(setq sublimity-map-size 20)
+		(setq sublimity-map-fraction .2)
 		(setq sublimity-map-text-scale -30)
-		(sublimity-map-set-delay .5)
+		(sublimity-map-set-delay 1)
 		(sublimity-mode 1)
 		))
+
+;; make c-mode comment like a normal person instead of auto block comments
+(add-hook 'c-mode-hook (lambda () (setq comment-start "// "
+																				comment-end   "")))
+
+;; load w3m web browser
+(add-to-list 'load-path "~/.emacs.d/emacs-w3m")
+(require 'w3m-load)
+(setq w3m-use-cookies t)
+(setq w3m-coding-system 'utf-8
+			w3m-file-coding-system 'utf-8
+			w3m-file-name-coding-system 'utf-8
+			w3m-input-coding-system 'utf-8
+			w3m-output-coding-system 'utf-8
+			w3m-terminal-coding-system 'utf-8)
 
 ;;;;; CEDET stuff
 ;; still haven't gotten Qt and Boost to work correctly with autocompletion
@@ -377,7 +395,6 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
 				(revert-buffer t t t) )))
 	(message "Refreshed open files.") )
 
-(require 'cl)
 (defcustom search-all-buffers-ignored-files (list (rx-to-string '(and bos (or ".bash_history" "TAGS") eos)))
   "Files to ignore when searching buffers via \\[search-all-buffers]."
   :type 'editable-list)
@@ -593,6 +610,8 @@ searches all buffers."
 
 ;;;;; keybindings
 ;; FIND CURRENT KEYBINDINGS WITH C-h b !!!!!
+;; use C-h k to look at the current key sequence being entered!
+;; this is useful when creating new keybindings
 
 ;; since eval-expression uses just the alt key but unity sucks
 ;;(global-set-key (kbd "C-M-z") 'eval-expression)
@@ -607,6 +626,10 @@ searches all buffers."
 (global-set-key (kbd "C-x f") 'helm-multi-swoop-all) ; find regexp in ALL open buffers
 (global-set-key (kbd "C-x j") 'helm-multi-swoop)		 ; find regexp is SOME open buffers
 (global-set-key (kbd "C-x b") 'helm-buffers-list) ; find among open buffers
+
+;; after killing C-x o with helm,
+;; let's make sure we do have buffer switching in the event of terminal-only editing
+(global-set-key (kbd "C-x /") 'other-window)
 
 ;;; split-window management
 ;; open and close
@@ -625,10 +648,17 @@ searches all buffers."
 (global-set-key (kbd "C-x !") 'balance-windows) ;; make all windows same height
 ;;; move among panes in a way that isn't totally fucked
 (setq windmove-wrap-around t)
+;; original meta
 (global-set-key (kbd "C-M-<left>")	'windmove-left)
 (global-set-key (kbd "C-M-<right>") 'windmove-right)
 (global-set-key (kbd "C-M-<up>")	'windmove-up)
 (global-set-key (kbd "C-M-<down>")	'windmove-down)
+;; terminal in ubuntu doesn't allow above keybindings; probably because M-<left> and M-<right> switch tty
+;; which is cool i guess??? very annoying though
+(global-set-key (kbd "C-c <left>")	'windmove-left)
+(global-set-key (kbd "C-c <right>") 'windmove-right)
+(global-set-key (kbd "C-c <up>")	'windmove-up)
+(global-set-key (kbd "C-c <down>")	'windmove-down)
 
 ;; visualize undo-tree
 (global-set-key (kbd "C-x t") 'undo-tree-visualize)
