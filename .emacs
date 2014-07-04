@@ -23,16 +23,16 @@
 (when (display-graphic-p)
 	;; graphical-only stuff
 	(progn
-		(tool-bar-mode nil)
-		;; add sublime-like minimap and smooth scrolling through sublimity
-		(add-to-list 'load-path "~/.emacs.d/sublimity")
-		(require 'sublimity)
-		(require 'sublimity-map)
-		(setq sublimity-map-size 20)
-		(setq sublimity-map-fraction .2)
-		(setq sublimity-map-text-scale -30)
-		(sublimity-map-set-delay 1)
-		(sublimity-mode 1)
+		;; add sublime-like minimap through sublimity
+		;; (add-to-list 'load-path "~/.emacs.d/sublimity")
+		;; (require 'sublimity)
+		;; (require 'sublimity-map)
+		;; (setq sublimity-map-size 20)
+		;; (setq sublimity-map-fraction .2)
+		;; (setq sublimity-map-text-scale -30)
+		;; (sublimity-map-set-delay 1)
+		;; (sublimity-mode 1)
+		;; removed for now cause i'm not a huge fan
 		))
 
 ;; format comments like a normal person
