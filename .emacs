@@ -54,7 +54,7 @@
 			(cons '("SConscript" . python-mode) auto-mode-alist))
 
 ;; load w3m web browser
-(add-to-list 'load-path "~/.emacs.d/emacs-w3m")
+(add-to-list 'load-path "~/.emacs.d/w3m")
 (require 'w3m-load)
 (setq w3m-use-cookies t)
 (setq w3m-coding-system 'utf-8
