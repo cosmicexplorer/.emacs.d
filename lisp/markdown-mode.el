@@ -3174,7 +3174,7 @@ Assumes match data is available for `markdown-regex-italic'."
     (define-key map (kbd "<tab>") 'markdown-cycle)
     (define-key map (kbd "<S-iso-lefttab>") 'markdown-shifttab)
     (define-key map (kbd "<S-tab>")  'markdown-shifttab)
-    (define-key map (kbd "<backtab>") 'markdown-shifttab)
+    (define-key map (kbd "C-c C-t") 'markdown-shifttab)
     ;; Header navigation
     (define-key map (kbd "C-c C-n") 'outline-next-visible-heading)
     (define-key map (kbd "C-c C-p") 'outline-previous-visible-heading)

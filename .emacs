@@ -2,8 +2,7 @@
 ;; AND ABSOLUTE PATHS ARE REQUIRED
 ;; but if you're using emacs when chrooted you're a clown anyway so lol
 
-;; start emacs up in a plain old terminal
-;; and stop the dumb "intro to emacs" buffer
+;; stop the dumb "intro to emacs" buffer
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 
@@ -16,6 +15,11 @@
 
 ;; important for many things
 (require 'cl)
+
+;; spell check
+;; except i don't want it for now lol
+;; (add-hook 'text-mode-hook 'flyspell-mode)
+;; (add-hook 'prog-mode-hook 'flyspell-prog-mode)
 
 ;;;; graphic-only stuff
 ;; dependent on current frame, so added to after frame hook
@@ -35,13 +39,19 @@
 		;; removed for now cause i'm not a huge fan
 		))
 
+;;;;; random per-language editing things
 ;; format comments like a normal person
-(add-hook 'c-mode-hook (lambda () (setq comment-start "// "
-																				comment-end   "")))
-(add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; "
-																					 comment-end "")))
-(add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; "
-																					 comment-end "")))
+(add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
+(add-hook 'r-mode-hook (lambda () (setq comment-start "## " comment-end   "")))
+(add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
+(add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
+(add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
+(setq c-hanging-semi&comma-criteria nil) ;; stop inserting newlines after semicolons i don't like them
+(subword-mode)													 ;; turn camel-case on
+(setq auto-mode-alist										 ;; use python-mode for scons files
+			(cons '("SConstruct" . python-mode) auto-mode-alist))
+(setq auto-mode-alist
+			(cons '("SConscript" . python-mode) auto-mode-alist))
 
 ;; load w3m web browser
 (add-to-list 'load-path "~/.emacs.d/emacs-w3m")
@@ -369,6 +379,7 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
 (load "~/.emacs.d/ESS/lisp/ess-site")
 (setq inferior-julia-program-name "/usr/bin/julia-basic")
 (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/")
+(ess-toggle-underscore nil)	;; underscore means underscore
 
 ;; adds haskell functionality
 																				;(load "/usr/share/emacs-snapshot/site-lisp/haskell-mode/haskell-site-file")
@@ -496,7 +507,9 @@ searches all buffers."
 				 ("julia" (filename . "\\.jl\\'")) ;; because just detecting julia-mode doesn't work fsr
 				 ("r" (or (filename . "\\.R\\'")
 									(filename . "\\.r\\'")))
-				 ("header" (filename . "\\.h\\'"))
+				 ("cmake" (mode . cmake-mode))
+				 ("text" (filename . "\\.txt\\'"))
+				 ("c header" (filename . "\\.h\\'"))
 				 ("c" (mode . c-mode))
 				 ("c++" (mode . c++-mode))
 				 ("java" (mode . java-mode))
@@ -701,12 +714,35 @@ searches all buffers."
 (global-set-key (kbd "C-x C-d") 'dired)
 
 ;; multiple cursors fun!!!
-(global-set-key (kbd "C-c C-l") 'mc/edit-lines)
+(global-set-key (kbd "C-x C-l") 'mc/edit-lines)
 (global-set-key (kbd "M-n") 'mc/mark-next-like-this)
 (global-set-key (kbd "M-p") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-M-n") 'mc/unmark-next-like-this)
 (global-set-key (kbd "C-M-p") 'mc/unmark-previous-like-this)
-(global-set-key (kbd "C-c C-M-a") 'mc/mark-all-like-this)
+(global-set-key (kbd "C-x C-a") 'mc/mark-all-like-this)
+
+(setq mc-mark-all-on t)
+(defun unset-mc-mark-all ()
+	"unset mc/mark-all-like-this from C-x C-a to use gdb"
+	(interactive)
+	(global-unset-key (kbd "C-x C-a"))
+	(setq mc-mark-all-on nil)
+	)
+(defun set-mc-mark-all ()
+	"set mc/mark-all-like-this to C-x C-a when not using gdb"
+	(interactive)
+	(global-set-key (kbd "C-x C-a") 'mc/mark-all-like-this)
+	(setq mc-mark-all-on t)
+	)
+(defun toggle-mc-mark-all ()
+	"turn mc/mark-all-like-this on or off as required"
+	(interactive)
+	(if mc-mark-all-on
+			(unset-mc-mark-all)
+		(set-mc-mark-all)
+			)
+	)
+(global-set-key (kbd "C-x C-M-a") 'toggle-mc-mark-all)
 
 ;; icicle-locate allows for much easier file location, using the OS's indexes
 ;; (global-set-key (kbd "C-x M-l") 'icicle-locate) ; nonfunctional right now
@@ -740,7 +776,7 @@ searches all buffers."
 (global-set-key (kbd "C-x M-c") 'toggle-letter-case)
 
 ;; TOGGLE RELATIVE LINUM
-(global-set-key (kbd "C-x C-l") 'linum-relative-toggle)
+(global-set-key (kbd "C-c C-l") 'linum-relative-toggle)
 
 ;; do backups well and put them into a separate folder
 (setq backup-directory-alist `(("." . "~/.emacs.d/autosaved-files")))

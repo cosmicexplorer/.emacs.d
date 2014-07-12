@@ -3,13 +3,19 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+				c-electric-star
+				c-toggle-electric-state
+				force-insert-tab
 				smart-tab
+				toggle-letter-case
 				))
 
 (setq mc/cmds-to-run-once
       '(
 				autopair-newline
 				beginning-of-buffer
+				electric-pair-backward-delete-char
 				electric-pair-backward-delete-char-untabify
 				end-of-buffer
+				smart-compile
 				))

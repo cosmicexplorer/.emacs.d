@@ -1,4 +1,4 @@
-;; -*- emacs-lisp -*- <14/06/25 12:32:21 /home/danny/.emacs.d/tramp>
+;; -*- emacs-lisp -*- <14/07/06 01:02:15 /home/cosmicexplorer/.emacs.d/tramp>
 ;; Tramp connection history.  Don't change this file.
 ;; You can delete it, forcing Tramp to reapply the checks.
 
@@ -19,5 +19,11 @@
 	("gid-integer" 0)
 	("uid-integer" 0)
 	("ls" "/bin/ls --color=never"))
- (["scp" nil "sudo" nil nil]
+ (["scp" nil "ssh" nil nil]
+	nil)
+ (["ssh" "cosmicexplorer" "129.59.34.149" nil nil]
+	nil)
+ (["scp" nil "scp" nil nil]
+	nil)
+ (["ssh" nil "spacerocket" nil nil]
 	nil))

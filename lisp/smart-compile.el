@@ -86,7 +86,7 @@
   (nxhtml-mode        . (browse-url-of-buffer))
   (html-helper-mode   . (browse-url-of-buffer))
   (octave-mode        . (run-octave))
-  (c-mode             . "clang -Wall -Wextra -Werror %f -o %n")
+  (c-mode             . "clang -Wall -Wextra -Werror %f -o %n -lm")
   (c++-mode           . "clang++ -std=c++11 -Wall -Wextra -Werror %f -o %n")
   ("\\.m\\'"          . "gcc -O2 %f -lobjc -lpthread -o %n") ;; objective-c
   (java-mode          . "javac %f")
@@ -107,6 +107,7 @@
   ("\\.r\\'"          . "Rscript %f") ;; redirects to stdout
   (go-mode            . (go-fmt-file-and-compile))
   (qmake-mode         . "/opt/Qt/5.3/gcc_64/bin/qmake")
+	(cmake-mode					. "cmake %d")
 )  "Alist of filename patterns vs corresponding format control strings.
 Each element looks like (REGEXP . STRING) or (MAJOR-MODE . STRING).
 Visiting a file whose name matches REGEXP specifies STRING as the
@@ -118,6 +119,7 @@ The following %-sequences will be replaced by:
   %f  file name without directory  ( netscape.bin )
   %n  file name without extension  ( netscape )
   %e  extension of file name       ( bin )
+  %d  directory without filename   ( /usr/local/bin )
 
   %o  value of `smart-compile-option-string'  ( \"user-defined\" ).
 
@@ -142,12 +144,15 @@ evaluate FUNCTION instead of running a compilation command.
            (file-name-nondirectory (buffer-file-name))))
   ("%e" . (or (file-name-extension (buffer-file-name)) ""))
   ("%o" . smart-compile-option-string)
-;;   ("%U" . (user-login-name))
+	("%d" . (file-name-directory (buffer-file-name)))
+  ("%U" . (user-login-name))
   ))
 (put 'smart-compile-replace-alist 'risky-local-variable t)
 
 (defvar smart-compile-check-makefile t)
 (make-variable-buffer-local 'smart-compile-check-makefile)
+(defvar smart-compile-check-scons-files t)
+(make-variable-buffer-local 'smart-compile-check-scons-files)
 
 (defcustom smart-compile-make-program "make "
   "The command by which to invoke the make program."
@@ -189,16 +194,37 @@ which is defined in `smart-compile-alist'."
      ;; make?
      ((and smart-compile-check-makefile
            (or (file-readable-p "Makefile")
-               (file-readable-p "makefile")))
+               (file-readable-p "makefile")
+							 (file-readable-p "../Makefile")
+							 (file-readable-p "../makefile")))
       (if (y-or-n-p "Makefile is found.  Try 'make'? ")
           (progn
-            (set (make-local-variable 'compile-command) "make ")
+						(if (or (file-readable-p "../Makefile")
+										(file-readable-p "../makefile"))
+								(set (make-local-variable 'compile-command) "make -C .. -k ")
+								(set (make-local-variable 'compile-command) "make -k ")
+								)
             (call-interactively 'compile)
             (setq not-yet nil)
             )
         (setq smart-compile-check-makefile nil)))
 
-     ) ;; end of (cond ...)
+
+		((and smart-compile-check-scons-files
+					(or (file-readable-p "SConstruct")
+							(file-readable-p "../SConstruct"))) ;; if found in parent dir
+		 (if (y-or-n-p "scons files are found. Try 'scons'? ")
+				 (progn
+					 (if (file-readable-p "../SConstruct")
+							 (set (make-local-variable 'compile-command) "scons -C .. -k ") ;; go to above dir
+							 (set (make-local-variable 'compile-command) "scons -k ")
+							 )
+					 (call-interactively 'compile)
+					 (setq not-yet nil)
+					 )
+			 (setq smart-compile-check-scons-files nil)))
+
+		) ;; end of (cond ...)
 
     ;; compile
     (let( (alist smart-compile-alist) 
