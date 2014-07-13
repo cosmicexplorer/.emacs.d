@@ -53,8 +53,14 @@
 (setq auto-mode-alist
 			(cons '("SConscript" . python-mode) auto-mode-alist))
 
+
+;; fix selection issues in xterm
+(if (equal "xterm" (tty-type))
+		(define-key input-decode-map "\e[1;2A" [S-up])
+	)
+
 ;; load w3m web browser
-(add-to-list 'load-path "~/.emacs.d/emacs-w3m")
+(add-to-list 'load-path "~/.emacs.d/w3m")
 (require 'w3m-load)
 (setq w3m-use-cookies t)
 (setq w3m-coding-system 'utf-8
