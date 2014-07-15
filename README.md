@@ -3,7 +3,11 @@
 
 cause i spent a while getting my emacs perfect and it might help somebody else
 
-## no submodules?
+#### for use
+1. start emacs with the '-l' option to load the .emacs file within this repository. you can alias it: ```alias emacs='emacs -l ~/.emacs.d/.emacs'```
+2. .sbclrc loads things for sbcl usage; make the .sbclrc within your home directory (the one sbcl reads from when it starts) read ```(load "~/.emacs.d/.sbcl")``` to load everything contained within there
+
+#### no submodules?
 Why not use submodules to contain git repositories of all dependencies?
 
 1. Submodules are hard and annoying and nobody wants to spend the time learning how to use them, and to set them up. This repository is made to be installed and used immediately without any setup.
