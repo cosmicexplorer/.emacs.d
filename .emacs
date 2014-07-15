@@ -2,9 +2,10 @@
 ;; AND ABSOLUTE PATHS ARE REQUIRED
 ;; but if you're using emacs when chrooted you're a clown anyway so lol
 
-;; stop the dumb "intro to emacs" buffer
+;; stop the intro to emacs buffer
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
+(menu-bar-mode -1) ;; remove menu bar for another line of space
 
 ;; starts emacs in server form so i can use emacsclient to add files
 ;; but only if server not already started
@@ -818,6 +819,7 @@ searches all buffers."
 		 (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)
 		 (define-key haskell-mode-map (kbd "C-c M-.") nil)
 		 (define-key haskell-mode-map (kbd "C-c C-d") nil)))
+(defalias 'haskell-repl (symbol-function 'haskell-process-do-info)) ;; cause i can never find this lol
 
 ;; do backups well and put them into a separate folder
 (setq backup-directory-alist `(("." . "~/.emacs.d/autosaved-files")))
