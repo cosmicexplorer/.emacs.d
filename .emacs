@@ -23,10 +23,10 @@
 (add-to-list 'load-path "~/.emacs.d/slime")
 (require 'slime-autoloads)
 ;; Set your lisp system and, optionally, some contribs
-(setq inferior-lisp-program "/usr/bin/sbcl")
+(setq inferior-lisp-program "sbcl")
 (setq slime-contribs '(slime-fancy))
 (add-to-list 'slime-contribs 'slime-repl)
-;; (slime)	;; start slime!
+(load (expand-file-name "~/quicklisp/slime-helper.el")) ;; add quicklisp!
 (add-hook 'lisp-mode-hook (lambda ()
 														(slime-mode)
 														;; (fix-paredit-keybindings)
