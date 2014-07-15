@@ -16,6 +16,38 @@
 ;; important for many things
 (require 'cl)
 
+
+;; setup slime
+;; setup load-path and autoloads
+(add-to-list 'load-path "~/.emacs.d/slime")
+(require 'slime-autoloads)
+;; Set your lisp system and, optionally, some contribs
+(setq inferior-lisp-program "/usr/bin/sbcl")
+(setq slime-contribs '(slime-fancy))
+(add-to-list 'slime-contribs 'slime-repl)
+;; (slime)	;; start slime!
+(add-hook 'lisp-mode-hook (lambda ()
+														(slime-mode)
+														;; (fix-paredit-keybindings)
+														))
+
+;; haskell mode
+(add-to-list 'load-path "~/.emacs.d/haskell-mode/")
+(require 'haskell-mode-autoloads)
+(add-to-list 'Info-default-directory-list "~/.emacs.d/haskell-mode/")
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+
+;; paredit
+; not for now, apologies
+;; (add-to-list 'load-path "~/.emacs.d/paredit")
+;; (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+;; (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+;; (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+;; (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+;; (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+;; (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+;; (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+
 ;; spell check
 ;; except i don't want it for now lol
 ;; (add-hook 'text-mode-hook 'flyspell-mode)
@@ -53,7 +85,6 @@
 (setq auto-mode-alist
 			(cons '("SConscript" . python-mode) auto-mode-alist))
 
-
 ;; fix selection issues in xterm
 (if (equal "xterm" (tty-type))
 		(define-key input-decode-map "\e[1;2A" [S-up])
@@ -78,18 +109,18 @@
 ;;;;; turn on cedet and semantic mode
 ;; http://alexott.net/en/writings/emacs-devenv/EmacsCedet.html
 ;; http://cxwangyi.wordpress.com/2010/08/21/using-cedet-with-emacs/
-(unless (featurep 'cedet)
-    (add-to-list 'load-path "~/.emacs.d/cedet")
-    (load-file "~/.emacs.d/cedet/cedet-devel-load.el"))
+;; (unless (featurep 'cedet)
+;;     (add-to-list 'load-path "~/.emacs.d/cedet")
+;;     (load-file "~/.emacs.d/cedet/cedet-devel-load.el"))
 
-;; (global-ede-mode t)
-(require 'semantic)
-(require 'semantic/ia) ;; name completion and tag display
-(require 'semantic/bovine/gcc) ;; use system include files
-(require 'semantic/bovine/clang) ;; same for clang
-(require 'semantic/bovine/c)
-(require 'cedet-files)
-(require 'semantic/db) ;; not sure if required, think not
+;; ;; (global-ede-mode t)
+;; (require 'semantic)
+;; (require 'semantic/ia) ;; name completion and tag display
+;; (require 'semantic/bovine/gcc) ;; use system include files
+;; (require 'semantic/bovine/clang) ;; same for clang
+;; (require 'semantic/bovine/c)
+;; (require 'cedet-files)
+;; (require 'semantic/db) ;; not sure if required, think not
 
 ;; (setq semantic-ectag-program "/usr/bin/etags")
 
@@ -110,53 +141,53 @@
 ;; minibuffer always gets pissy at me about it lol
 (add-hook 'prog-mode-hook #'hs-minor-mode)
 
-(global-semanticdb-minor-mode t)
-(global-cedet-m3-minor-mode t)
-(set-default 'semantic-case-fold t)
-(global-semantic-highlight-func-mode t)
-(global-semantic-stickyfunc-mode t)
-(global-semantic-decoration-mode t)
-(global-semantic-idle-local-symbol-highlight-mode t)
-(global-semantic-idle-scheduler-mode t)
-(global-semantic-idle-completions-mode t)
-(global-semantic-idle-summary-mode t)
-(semantic-load-enable-excessive-code-helpers)
+;; (global-semanticdb-minor-mode t)
+;; (global-cedet-m3-minor-mode t)
+;; (set-default 'semantic-case-fold t)
+;; (global-semantic-highlight-func-mode t)
+;; (global-semantic-stickyfunc-mode t)
+;; (global-semantic-decoration-mode t)
+;; (global-semantic-idle-local-symbol-highlight-mode t)
+;; (global-semantic-idle-scheduler-mode t)
+;; (global-semantic-idle-completions-mode t)
+;; (global-semantic-idle-summary-mode t)
+;; (semantic-load-enable-excessive-code-helpers)
 
-(setq-mode-local cpp-mode semanticdb-find-default-throttle
-								 '(project local unloaded system recursive)) 
+;; (setq-mode-local cpp-mode semanticdb-find-default-throttle
+;; 								 '(project local unloaded system recursive)) 
 
-(defun add-tags-semantic-hook ()
-	(imenu-add-to-menubar "TAGS"))
-(add-hook 'semantic-init-hooks 'add-tags-semantic-hook)
+;; (defun add-tags-semantic-hook ()
+;; 	(imenu-add-to-menubar "TAGS"))
+;; (add-hook 'semantic-init-hooks 'add-tags-semantic-hook)
 
-;; enable ctags for some languages:
-;;  Unix Shell, Perl, Pascal, Tcl, Fortran, Asm
-(when (cedet-ectag-version-check t)
-	  (semantic-load-enable-primary-ectags-support))
+;; ;; enable ctags for some languages:
+;; ;;  Unix Shell, Perl, Pascal, Tcl, Fortran, Asm
+;; (when (cedet-ectag-version-check t)
+;; 	  (semantic-load-enable-primary-ectags-support))
 
-(defun keybindings-cedet-hook ()
-	(local-set-key [(control return)] 'semantic-ia-complete-symbol)
-	(local-set-key "\C-c?" 'semantic-ia-complete-symbol-menu)
-	(local-set-key "\C-c>" 'semantic-complete-analyze-inline)
-	(local-set-key "\C-c=" 'semantic-decoration-include-visit)
-	(local-set-key "\C-cj" 'semantic-ia-fast-jump)
-	(local-set-key "\C-cq" 'semantic-ia-show-doc)
-	(local-set-key "\C-cs" 'semantic-ia-show-summary)
-	(local-set-key "\C-cp" 'semantic-analyze-proto-impl-toggle)
-	)
-(add-hook 'c-mode-common-hook 'keybindings-cedet-hook)
-;; control return: whatever the symbol you are typing, this hot key automatically complete it for you.
-;; C-c?: another way to complete the symbol you are typing
-;; C-c>: when you typed . or -> after an object name, use this key to show possible public member functions or data members.
-;; C-cj: jump to the definition of the symbol under cursor
-;; C-cs: show a summary about the symbol under cursor
-;; C-cq: show the document of the symbol under cursor
-;; C-c=: visit the header file under cursor
-;; C-cp: toggle between the implementation and a prototype of symbol under cursor
-;; C-ce: when your cursor is in the scope of a class or one of its member function, list all methods in the class
-;; C-cC-r: show references of the symbol under cursor
+;; (defun keybindings-cedet-hook ()
+;; 	(local-set-key [(control return)] 'semantic-ia-complete-symbol)
+;; 	(local-set-key "\C-c?" 'semantic-ia-complete-symbol-menu)
+;; 	(local-set-key "\C-c>" 'semantic-complete-analyze-inline)
+;; 	(local-set-key "\C-c=" 'semantic-decoration-include-visit)
+;; 	(local-set-key "\C-cj" 'semantic-ia-fast-jump)
+;; 	(local-set-key "\C-cq" 'semantic-ia-show-doc)
+;; 	(local-set-key "\C-cs" 'semantic-ia-show-summary)
+;; 	(local-set-key "\C-cp" 'semantic-analyze-proto-impl-toggle)
+;; 	)
+;; (add-hook 'c-mode-common-hook 'keybindings-cedet-hook)
+;; ;; control return: whatever the symbol you are typing, this hot key automatically complete it for you.
+;; ;; C-c?: another way to complete the symbol you are typing
+;; ;; C-c>: when you typed . or -> after an object name, use this key to show possible public member functions or data members.
+;; ;; C-cj: jump to the definition of the symbol under cursor
+;; ;; C-cs: show a summary about the symbol under cursor
+;; ;; C-cq: show the document of the symbol under cursor
+;; ;; C-c=: visit the header file under cursor
+;; ;; C-cp: toggle between the implementation and a prototype of symbol under cursor
+;; ;; C-ce: when your cursor is in the scope of a class or one of its member function, list all methods in the class
+;; ;; C-cC-r: show references of the symbol under cursor
 
-(semantic-mode t) ;; GO GO GO
+;; (semantic-mode t) ;; GO GO GO
 
 
 ;; add multiple cursor stuff
@@ -693,7 +724,7 @@ searches all buffers."
 (global-set-key (kbd "C-x C-k") 'close-and-kill-this-pane)
 
 ;; smart-compile stuff!!!!
-(global-set-key (kbd "C-x c") 'smart-compile)
+(global-set-key (kbd "C-c C-k") 'smart-compile)
 
 ;; translate stuff into hex (and back??)
 (global-set-key (kbd "C-x h") 'hexl-mode)
@@ -725,30 +756,7 @@ searches all buffers."
 (global-set-key (kbd "M-p") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-M-n") 'mc/unmark-next-like-this)
 (global-set-key (kbd "C-M-p") 'mc/unmark-previous-like-this)
-(global-set-key (kbd "C-x C-a") 'mc/mark-all-like-this)
-
-(setq mc-mark-all-on t)
-(defun unset-mc-mark-all ()
-	"unset mc/mark-all-like-this from C-x C-a to use gdb"
-	(interactive)
-	(global-unset-key (kbd "C-x C-a"))
-	(setq mc-mark-all-on nil)
-	)
-(defun set-mc-mark-all ()
-	"set mc/mark-all-like-this to C-x C-a when not using gdb"
-	(interactive)
-	(global-set-key (kbd "C-x C-a") 'mc/mark-all-like-this)
-	(setq mc-mark-all-on t)
-	)
-(defun toggle-mc-mark-all ()
-	"turn mc/mark-all-like-this on or off as required"
-	(interactive)
-	(if mc-mark-all-on
-			(unset-mc-mark-all)
-		(set-mc-mark-all)
-			)
-	)
-(global-set-key (kbd "C-x C-M-a") 'toggle-mc-mark-all)
+(global-set-key (kbd "C-c C-a") 'mc/mark-all-like-this)
 
 ;; icicle-locate allows for much easier file location, using the OS's indexes
 ;; (global-set-key (kbd "C-x M-l") 'icicle-locate) ; nonfunctional right now
@@ -782,7 +790,34 @@ searches all buffers."
 (global-set-key (kbd "C-x M-c") 'toggle-letter-case)
 
 ;; TOGGLE RELATIVE LINUM
-(global-set-key (kbd "C-c C-l") 'linum-relative-toggle)
+;; (global-set-key (kbd "C-c C-l") 'linum-relative-toggle)
+;; fixed now, so unused
+
+;; slime completion so it doesn't intersect with Alt-Tab window switching lol
+;; (global-set-key (kbd "M-<tab>") 'slime-fuzzy-complete-symbol)
+;;; don't think the above does anything
+;; fix paredit probs with C-M-<arrow> to switch windows
+;; (defun fix-paredit-keybindings ()
+;; 	(interactive)
+;; 	(define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
+;; 	(define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
+;; 	(define-key paredit-mode-map (kbd "C-<right>") nil)	; remove key here
+;; 	(define-key paredit-mode-map (kbd "C-<left>") nil)) ; remove key here
+;; (global-set-key (kbd "C-c C-f") 'fix-paredit-keybindings)
+
+(eval-after-load "haskell-mode"
+	'(define-key haskell-mode-map (kbd "C-c C-k") 'haskell-compile))
+
+(eval-after-load "haskell-mode"
+	'(progn
+		 (define-key haskell-mode-map (kbd "C-x C-d") nil)
+		 (define-key haskell-mode-map (kbd "C-c C-z") 'haskell-interactive-switch)
+		 (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
+		 (define-key haskell-mode-map (kbd "C-c C-b") 'haskell-interactive-switch)
+		 (define-key haskell-mode-map (kbd "C-c C-t") 'haskell-process-do-type)
+		 (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)
+		 (define-key haskell-mode-map (kbd "C-c M-.") nil)
+		 (define-key haskell-mode-map (kbd "C-c C-d") nil)))
 
 ;; do backups well and put them into a separate folder
 (setq backup-directory-alist `(("." . "~/.emacs.d/autosaved-files")))
