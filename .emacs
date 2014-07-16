@@ -6,6 +6,7 @@
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 (menu-bar-mode -1) ;; remove menu bar for another line of space
+(setq-default indent-tabs-mode nil)	;; fix indentation issues
 
 ;; starts emacs in server form so i can use emacsclient to add files
 ;; but only if server not already started
@@ -26,10 +27,10 @@
 (setq inferior-lisp-program "sbcl")
 (setq slime-contribs '(slime-fancy))
 (add-to-list 'slime-contribs 'slime-repl)
-(load (expand-file-name "~/quicklisp/slime-helper.el")) ;; add quicklisp!
+(load (expand-file-name "~/.emacs.d/quicklisp/slime-helper.el")) ;; add quicklisp!
 (add-hook 'lisp-mode-hook (lambda ()
 														(slime-mode)
-														;; (fix-paredit-keybindings)
+														(fix-paredit-keybindings) ; bound to C-c C-f 
 														))
 
 ;; haskell mode
@@ -39,15 +40,15 @@
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 
 ;; paredit
-; not for now, apologies
-;; (add-to-list 'load-path "~/.emacs.d/paredit")
-;; (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-;; (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-;; (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-;; (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-;; (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-;; (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-;; (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+;; not for now, apologies
+(add-to-list 'load-path "~/.emacs.d/paredit")
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 
 ;; spell check
 ;; except i don't want it for now lol
@@ -225,7 +226,7 @@
 																		(bury-buffer))))
 (add-to-list 'load-path "~/.emacs.d/helm-swoop")
 (require 'helm-swoop)
-	
+
 ;; add appropriate stuff to path
 (setenv "PATH" (concat (getenv "PATH") ":/opt/Qt/5.3/gcc_64/bin")) ;; add qmake
 (setq exec-path (append exec-path '("/opt/Qt/5.3/gcc_64/bin"))) ;; add qmake
@@ -617,10 +618,10 @@ searches all buffers."
 
 ;; Switching to ibuffer puts the cursor on the most recent buffer
 (defadvice ibuffer (around ibuffer-point-to-most-recent) ()
-					 "Open ibuffer with cursor pointed to most recent buffer name"
-					 (let ((recent-buffer-name (buffer-name)))
-						 ad-do-it
-						 (ibuffer-jump-to-buffer recent-buffer-name)))
+  "Open ibuffer with cursor pointed to most recent buffer name"
+  (let ((recent-buffer-name (buffer-name)))
+    ad-do-it
+    (ibuffer-jump-to-buffer recent-buffer-name)))
 (ad-activate 'ibuffer)
 
 
@@ -798,13 +799,19 @@ searches all buffers."
 ;; (global-set-key (kbd "M-<tab>") 'slime-fuzzy-complete-symbol)
 ;;; don't think the above does anything
 ;; fix paredit probs with C-M-<arrow> to switch windows
-;; (defun fix-paredit-keybindings ()
-;; 	(interactive)
-;; 	(define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
-;; 	(define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
-;; 	(define-key paredit-mode-map (kbd "C-<right>") nil)	; remove key here
-;; 	(define-key paredit-mode-map (kbd "C-<left>") nil)) ; remove key here
-;; (global-set-key (kbd "C-c C-f") 'fix-paredit-keybindings)
+(defun fix-paredit-keybindings ()
+	(interactive)
+	(define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
+	(define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
+	(define-key paredit-mode-map (kbd "C-<right>") nil) ; remove key here (slurp-forward)
+  (define-key paredit-mode-map (kbd "C-<left>") nil) ; remove key here (slurp-backward)
+  (define-key paredit-mode-map (kbd "M-s") nil) ; remove key here (splice-sexp)
+  (define-key paredit-mode-map (kbd "C-M-d") 'paredit-splice-sexp)
+  (define-key paredit-mode-map (kbd "M-s M-<right>") 'paredit-forward-slurp-sexp)
+  (define-key paredit-mode-map (kbd "M-s M-<left>") 'paredit-backward-slurp-sexp)
+  (define-key paredit-mode-map (kbd "M-s C-M-<right>") 'paredit-forward-barf-sexp)
+  (define-key paredit-mode-map (kbd "M-s C-M-<left>") 'paredit-backward-barf-sexp))
+(global-set-key (kbd "C-c C-f") 'fix-paredit-keybindings)
 
 (eval-after-load "haskell-mode"
 	'(define-key haskell-mode-map (kbd "C-c C-k") 'haskell-compile))
