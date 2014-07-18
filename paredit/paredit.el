@@ -1180,7 +1180,7 @@ This is expected to be called only in `paredit-comment-dwim'; do not
                  (paredit-indent-sexps))))
           (t
            ;; Margin comment
-           ;; (indent-to comment-column 1) ; 1 -> force one leading space
+           (indent-to comment-column 1) ; 1 -> force one leading space
            ;; (insert ?\; )))))
            ;; unfortunately the above doesn't do what i want so i replaced it
            ;; seems dumb to not just do it this way anyways lol

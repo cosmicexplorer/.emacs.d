@@ -40,7 +40,6 @@
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 
 ;; paredit
-;; not for now, apologies
 (add-to-list 'load-path "~/.emacs.d/paredit")
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
@@ -49,6 +48,12 @@
 (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+;; create parens and add adjacent two elements to sexp created by parens
+(defun paredit-create-sexp-slurp-both-sides ()
+  (interactive)
+  (paredit-open-parenthesis) ; adds closing paren too thanks to electric pair (or maybe it's paredit itself)
+  (paredit-forward-slurp-sexp)
+  (paredit-backward-slurp-sexp))        ; front and back added
 
 ;; spell check
 ;; except i don't want it for now lol
@@ -803,14 +808,15 @@ searches all buffers."
 	(interactive)
 	(define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
 	(define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
-	(define-key paredit-mode-map (kbd "C-<right>") nil) ; remove key here (slurp-forward)
-  (define-key paredit-mode-map (kbd "C-<left>") nil) ; remove key here (slurp-backward)
-  (define-key paredit-mode-map (kbd "M-s") nil) ; remove key here (splice-sexp)
-  (define-key paredit-mode-map (kbd "C-M-d") 'paredit-splice-sexp)
-  (define-key paredit-mode-map (kbd "M-s M-<right>") 'paredit-forward-slurp-sexp)
-  (define-key paredit-mode-map (kbd "M-s M-<left>") 'paredit-backward-slurp-sexp)
-  (define-key paredit-mode-map (kbd "M-s C-M-<right>") 'paredit-forward-barf-sexp)
-  (define-key paredit-mode-map (kbd "M-s C-M-<left>") 'paredit-backward-barf-sexp))
+	(define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key here (slurp-forward)
+  (define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward) ; remove key here (slurp-backward)
+  (define-key paredit-mode-map (kbd "M-a") nil) ; kill this, it's a global but it's annoying and i don't use it
+  (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-create-sexp-slurp-both-sides)
+  (global-set-key (kbd "RET") 'newline-and-indent) ; set as global because define-key doesn't work, not sure why
+  (define-key paredit-mode-map (kbd "M-a M-<right>") 'paredit-forward-slurp-sexp)
+  (define-key paredit-mode-map (kbd "M-a M-<left>") 'paredit-backward-slurp-sexp)
+  (define-key paredit-mode-map (kbd "C-M-a C-M-<right>") 'paredit-forward-barf-sexp)
+  (define-key paredit-mode-map (kbd "C-M-a C-M-<left>") 'paredit-backward-barf-sexp))
 (global-set-key (kbd "C-c C-f") 'fix-paredit-keybindings)
 
 (eval-after-load "haskell-mode"
