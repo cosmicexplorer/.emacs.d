@@ -85,7 +85,8 @@
       (cons '("SConscript" . python-mode) auto-mode-alist))
 (setq-default c-basic-offset 2
 							tab-width 2
-							indent-tabs-mode t)
+							indent-tabs-mode t
+							c-default-style "stroustrup")
 (add-hook 'cc-mode-hook '(lambda ()			; not automatically making newlines in brackets
 						   (local-set-key (kbd "RET") 'newline-and-indent-fix-cc-mode)))
 ;;;;; load utilities
