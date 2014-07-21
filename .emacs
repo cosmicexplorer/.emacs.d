@@ -16,13 +16,13 @@
 (setq-default indent-tabs-mode nil)	;; fix indentation issues
 ;; fix selection issues in xterm (can't hold down shift and up arrow to highlight stuff)
 (if (equal "xterm" (tty-type))
-		(define-key input-decode-map "\e[1;2A" [S-up]))
+    (define-key input-decode-map "\e[1;2A" [S-up]))
 
 ;; starts emacs in server form so i can use emacsclient to add files
 ;; but only if server not already started
 (require 'server)
 (if (and (fboundp 'server-running-p)
-				 (not (server-running-p)))
+         (not (server-running-p)))
     (server-start))
 
 ;; important for many things
@@ -38,9 +38,9 @@
 (setq backup-directory-alist `(("." . "~/.emacs.d/autosaved-files")))
 (setq backup-by-copying t)
 (setq delete-old-versions t
-			kept-new-versions 6
-			kept-old-versions 2
-			version-control t)
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)
 ;; do the same thing for undo-tree history
 (setq undo-tree-history-directory-alist `(("." . "~/.emacs.d/undo-tree-history")))
 
@@ -90,9 +90,9 @@
 (setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after semicolons i don't like them
 (subword-mode)													 ; turn camel-case on
 (setq auto-mode-alist                ; use python-mode for scons files
-			(cons '("SConstruct" . python-mode) auto-mode-alist))
+      (cons '("SConstruct" . python-mode) auto-mode-alist))
 (setq auto-mode-alist
-			(cons '("SConscript" . python-mode) auto-mode-alist))
+      (cons '("SConscript" . python-mode) auto-mode-alist))
 
 ;;;;; load utilities
 ;; load w3m web browser
@@ -100,11 +100,11 @@
 (require 'w3m-load)
 (setq w3m-use-cookies t)
 (setq w3m-coding-system 'utf-8
-			w3m-file-coding-system 'utf-8
-			w3m-file-name-coding-system 'utf-8
-			w3m-input-coding-system 'utf-8
-			w3m-output-coding-system 'utf-8
-			w3m-terminal-coding-system 'utf-8)
+      w3m-file-coding-system 'utf-8
+      w3m-file-name-coding-system 'utf-8
+      w3m-input-coding-system 'utf-8
+      w3m-output-coding-system 'utf-8
+      w3m-terminal-coding-system 'utf-8)
 
 (hs-minor-mode) ;; C-c @ C-c for folding up code blocks!!!
 (add-hook 'prog-mode-hook #'hs-minor-mode)
@@ -124,16 +124,16 @@
 (helm-mode t)
 ;; add pcomplete with helm support to eshell
 (add-hook 'eshell-mode-hook
-					#'(lambda ()
-							(define-key eshell-mode-map
-								[remap eshell-pcomplete]
-								'helm-esh-pcomplete)))
+          #'(lambda ()
+              (define-key eshell-mode-map
+                [remap eshell-pcomplete]
+                'helm-esh-pcomplete)))
 
 ;; autoload eshell at start so helm plays nice (this doesn't affect load time at all i've checked)
 (add-hook 'emacs-startup-hook #'(lambda ()
-																	(let ((default-directory (getenv "HOME")))
-																		(command-execute 'eshell)
-																		(bury-buffer))))
+                                  (let ((default-directory (getenv "HOME")))
+                                    (command-execute 'eshell)
+                                    (bury-buffer))))
 (add-to-list 'load-path "~/.emacs.d/helm-swoop")
 (require 'helm-swoop)
 
@@ -144,17 +144,13 @@
 (require 'revbufs)
 
 (autoload 'markdown-mode "markdown-mode"
-	"Major mode for editing Markdown files" t)
+  "Major mode for editing Markdown files" t)
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
 ;; adds smart-compile functionality
 (require 'smart-compile)
-
-;; sets term to zsh
-(setq shell-file-name "zsh")
-(setq explicit-shell-file-name "zsh")
 
 ;; adds evil vim layer, but doesn't turn it on
 (add-to-list 'load-path "~/.emacs.d/evil/")
@@ -187,8 +183,8 @@
 
 ;; adds dired-x functionality
 (add-hook 'dired-load-hook
-					(lambda ()
-						(load "dired-x")))
+          (lambda ()
+            (load "dired-x")))
 
 ;; adds julia functionality
 (load "~/.emacs.d/ESS/lisp/ess-site")
@@ -211,8 +207,8 @@
 (add-to-list 'load-path "~/.emacs.d/git-modes")
 (add-to-list 'load-path "~/.emacs.d/magit")
 (eval-after-load 'info
-	'(progn (info-initialize)
-					(add-to-list 'Info-directory-list "/path/to/magit/")))
+  '(progn (info-initialize)
+          (add-to-list 'Info-directory-list "/path/to/magit/")))
 (require 'magit)
 
 ;; parenthesis matching and more
@@ -257,63 +253,63 @@
 ;; you can add different groups too, not just home, in case you ever want to (lol)
 (setq ibuffer-saved-filter-groups
       '(("home"
-				 ("emacs-config" (or (filename . ".emacs.d")
-														 (filename . "emacs-config")
-														 (filename . ".emacs")))
-				 ("doc-view" (mode . doc-view-mode))
-				 ("web" (or (mode . html-mode)
-										(mode . css-mode)
-										(mode . html-helper-mode)
-										(mode . nxhtml-mode)
-										(mode . php-mode)))
-				 ("subversion" (name . "\*svn"))
-				 ("magit" (name . "\*magit\*"))
-				 ("git" (name . "\*git"))
-				 ("helm" (or (name . "*helm\*")
-										 (name . "*Helm\*")))
-				 ("help" (or (name . "\*Help\*")
-										 (name . "\*help\*")
-										 (name . "\*Apropos\*")
-										 (name . "\*apropos\*")
-										 (name . "\*Info\*")
-										 (name . "\*info\*")
-										 (name . "\*doc\*")))
-				 ("makefile" (or (filename . "\\Makefile\\'")
-												 (filename . "\\makefile\\'")))
-				 ("readme" (or (filename . "\\README\\'")
-											 (filename . "\\readme\\'")))
-				 ("dired" (mode . dired-mode))
-				 ("julia" (filename . "\\.jl\\'")) ;; because just detecting julia-mode doesn't work fsr
-				 ("r" (or (filename . "\\.R\\'")
-									(filename . "\\.r\\'")))
-				 ("cmake" (mode . cmake-mode))
-				 ("text" (filename . "\\.txt\\'"))
-				 ("c header" (filename . "\\.h\\'"))
-				 ("c" (mode . c-mode))
-				 ("c++" (mode . c++-mode))
-				 ("java" (mode . java-mode))
-				 ("python" (mode . python-mode))
-				 ("markdown" (mode . markdown-mode))
-				 ("emacs-lisp" (mode . emacs-lisp-mode)) ;; emacs-config filter mostly blocks this but it's whatever
-				 ("lisp" (mode . lisp-mode))
-				 ("go" (mode . go-mode))
-				 ("javascript" (mode . js-mode))
-				 ("perl" (mode . perl-mode))
-				 ("haskell" (mode . haskell-mode))
-				 ("fortran" (mode . fortran-mode))
-				 ("ada" (mode . ada-mode))
-				 ("ruby" (mode . ruby-mode))
-				 ("hex" (mode . hexl-mode))
-				 ("qmake" (mode . qmake-mode))
-				 ("emacs-system" (name . "*\**")) ;; down here cause it was taking my php files fsr
-				 )
-				)
+         ("emacs-config" (or (filename . ".emacs.d")
+                             (filename . "emacs-config")
+                             (filename . ".emacs")))
+         ("doc-view" (mode . doc-view-mode))
+         ("web" (or (mode . html-mode)
+                    (mode . css-mode)
+                    (mode . html-helper-mode)
+                    (mode . nxhtml-mode)
+                    (mode . php-mode)))
+         ("subversion" (name . "\*svn"))
+         ("magit" (name . "\*magit\*"))
+         ("git" (name . "\*git"))
+         ("helm" (or (name . "*helm\*")
+                     (name . "*Helm\*")))
+         ("help" (or (name . "\*Help\*")
+                     (name . "\*help\*")
+                     (name . "\*Apropos\*")
+                     (name . "\*apropos\*")
+                     (name . "\*Info\*")
+                     (name . "\*info\*")
+                     (name . "\*doc\*")))
+         ("makefile" (or (filename . "\\Makefile\\'")
+                         (filename . "\\makefile\\'")))
+         ("readme" (or (filename . "\\README\\'")
+                       (filename . "\\readme\\'")))
+         ("dired" (mode . dired-mode))
+         ("julia" (filename . "\\.jl\\'")) ;; because just detecting julia-mode doesn't work fsr
+         ("r" (or (filename . "\\.R\\'")
+                  (filename . "\\.r\\'")))
+         ("cmake" (mode . cmake-mode))
+         ("text" (filename . "\\.txt\\'"))
+         ("c header" (filename . "\\.h\\'"))
+         ("c" (mode . c-mode))
+         ("c++" (mode . c++-mode))
+         ("java" (mode . java-mode))
+         ("python" (mode . python-mode))
+         ("markdown" (mode . markdown-mode))
+         ("emacs-lisp" (mode . emacs-lisp-mode)) ;; emacs-config filter mostly blocks this but it's whatever
+         ("lisp" (mode . lisp-mode))
+         ("go" (mode . go-mode))
+         ("javascript" (mode . js-mode))
+         ("perl" (mode . perl-mode))
+         ("haskell" (mode . haskell-mode))
+         ("fortran" (mode . fortran-mode))
+         ("ada" (mode . ada-mode))
+         ("ruby" (mode . ruby-mode))
+         ("hex" (mode . hexl-mode))
+         ("qmake" (mode . qmake-mode))
+         ("emacs-system" (name . "*\**")) ;; down here cause it was taking my php files fsr
+         )
+        )
       )
 
 (add-hook 'ibuffer-mode-hook
-					'(lambda ()
-						 (ibuffer-auto-mode t) ;; automatically updates buffer list
-						 (ibuffer-switch-to-saved-filter-groups "home")))
+          '(lambda ()
+             (ibuffer-auto-mode t) ;; automatically updates buffer list
+             (ibuffer-switch-to-saved-filter-groups "home")))
 
 (setq ibuffer-expert t) ;; only prompt when modified buffer is killed
 (setq ibuffer-show-empty-filter-groups nil) ;; only show full filter groups
@@ -411,7 +407,7 @@
 
 ;; gofmt!!!
 (add-hook 'go-mode-hook
-					(lambda () (local-set-key (kbd "C-c f") 'go-fmt-file)))
+          (lambda () (local-set-key (kbd "C-c f") 'go-fmt-file)))
 
 ;; add forward regexp search cause it's pretty useful!
 (global-set-key (kbd "C-x M-r") 'search-forward-regexp)
@@ -443,19 +439,19 @@
 
 ;; allow for backtab to force '\t'
 (defun force-insert-tab ()
-	"insert tab character"
-	(interactive)
-	(insert "\t"))
+  "insert tab character"
+  (interactive)
+  (insert "\t"))
 
 ;; from http://www.emacswiki.org/emacs/RevertBuffer
 (defun revert-all-buffers ()
-	"Refreshes all open buffers from their respective files."
-	(interactive)
-	(dolist (buf (buffer-list))
-		(with-current-buffer buf
-			(when (and (buffer-file-name) (file-exists-p (buffer-file-name)) (not (buffer-modified-p)))
-				(revert-buffer t t t) )))
-	(message "Refreshed open files.") )
+  "Refreshes all open buffers from their respective files."
+  (interactive)
+  (dolist (buf (buffer-list))
+    (with-current-buffer buf
+      (when (and (buffer-file-name) (file-exists-p (buffer-file-name)) (not (buffer-modified-p)))
+        (revert-buffer t t t) )))
+  (message "Refreshed open files.") )
 
 (defcustom search-all-buffers-ignored-files (list (rx-to-string '(and bos (or ".bash_history" "TAGS") eos)))
   "Files to ignore when searching buffers via \\[search-all-buffers]."
@@ -467,7 +463,7 @@
 prefix > 1 (i.e., if you type C-u \\[search-all-buffers]),
 searches all buffers."
   (interactive (list (grep-read-regexp)
-										 current-prefix-arg))
+                     current-prefix-arg))
   (message "Regexp is %s; prefix is %s" regexp prefix)
   (multi-occur
    (if (member prefix '(4 (4)))
@@ -489,9 +485,9 @@ searches all buffers."
 (defun kill-dired-buffers ()
   (interactive)
   (mapc (lambda (buffer)
-					(when (eq 'dired-mode (buffer-local-value 'major-mode buffer))
-						(kill-buffer buffer)))
-				(buffer-list)))
+          (when (eq 'dired-mode (buffer-local-value 'major-mode buffer))
+            (kill-buffer buffer)))
+        (buffer-list)))
 
 ;; open new file (i wrote this!!!)
 (defun open-new-file ()
@@ -500,7 +496,7 @@ searches all buffers."
    (generate-new-buffer ;; creates new buffer with given name
     (generate-new-buffer-name
      (read-string "new filename: " ;; reads from minibuffer, with given default value
-									nil nil "*newbuf*")))) ;; with default title *newbuf*
+                  nil nil "*newbuf*")))) ;; with default title *newbuf*
   (normal-mode))
 
 ;; Switching to ibuffer puts the cursor on the most recent buffer
@@ -514,31 +510,31 @@ searches all buffers."
 ;; stolen from the ergo emacs guy (http://ergoemacs.org/emacs/modernization_upcase-word.html)
 ;; like normally everything he's put up is super underwhelming but this sees some use
 (defun toggle-letter-case ()
-	"Toggle the letter case of current word or text selection.
+  "Toggle the letter case of current word or text selection.
 Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
-	(interactive)
-	(let (p1 p2 (deactivate-mark nil) (case-fold-search nil))
-		(if (region-active-p)
-				(setq p1 (region-beginning) p2 (region-end))
-			(let ((bds (bounds-of-thing-at-point 'word)))
-				(setq p1 (car bds) p2 (cdr bds))))
-		(when (not (eq last-command this-command))
-			(save-excursion
-				(goto-char p1)
-				(cond
-				 ((looking-at "[[:lower:]][[:lower:]]") (put this-command 'state "all lower"))
-				 ((looking-at "[[:upper:]][[:upper:]]") (put this-command 'state "all caps"))
-				 ((looking-at "[[:upper:]][[:lower:]]") (put this-command 'state "init caps"))
-				 ((looking-at "[[:lower:]]") (put this-command 'state "all lower"))
-				 ((looking-at "[[:upper:]]") (put this-command 'state "all caps"))
-				 (t (put this-command 'state "all lower")))))
-		(cond
-		 ((string= "all lower" (get this-command 'state))
-			(upcase-initials-region p1 p2) (put this-command 'state "init caps"))
-		 ((string= "init caps" (get this-command 'state))
-			(upcase-region p1 p2) (put this-command 'state "all caps"))
-		 ((string= "all caps" (get this-command 'state))
-			(downcase-region p1 p2) (put this-command 'state "all lower")))))
+  (interactive)
+  (let (p1 p2 (deactivate-mark nil) (case-fold-search nil))
+    (if (region-active-p)
+        (setq p1 (region-beginning) p2 (region-end))
+      (let ((bds (bounds-of-thing-at-point 'word)))
+        (setq p1 (car bds) p2 (cdr bds))))
+    (when (not (eq last-command this-command))
+      (save-excursion
+        (goto-char p1)
+        (cond
+         ((looking-at "[[:lower:]][[:lower:]]") (put this-command 'state "all lower"))
+         ((looking-at "[[:upper:]][[:upper:]]") (put this-command 'state "all caps"))
+         ((looking-at "[[:upper:]][[:lower:]]") (put this-command 'state "init caps"))
+         ((looking-at "[[:lower:]]") (put this-command 'state "all lower"))
+         ((looking-at "[[:upper:]]") (put this-command 'state "all caps"))
+         (t (put this-command 'state "all lower")))))
+    (cond
+     ((string= "all lower" (get this-command 'state))
+      (upcase-initials-region p1 p2) (put this-command 'state "init caps"))
+     ((string= "init caps" (get this-command 'state))
+      (upcase-region p1 p2) (put this-command 'state "all caps"))
+     ((string= "all caps" (get this-command 'state))
+      (downcase-region p1 p2) (put this-command 'state "all lower")))))
 
 ;;; get and update the current number of lines within the buffer
 (defvar my-mode-line-buffer-line-count nil)
@@ -547,17 +543,17 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
 (make-variable-buffer-local 'integer-buffer-line-count)
 
 (setq-default mode-line-format
-							'("  " mode-line-modified
-								(list 'line-number-mode "  ")
-								(:eval (when line-number-mode
-												 (let ((str "L%l"))
-													 (when (and (not (buffer-modified-p)) my-mode-line-buffer-line-count)
-														 (setq str (concat str "/" my-mode-line-buffer-line-count)))
-													 str)))
-								"  %p"
-								(list 'column-number-mode "	 C%c")
-								"  " mode-line-buffer-identification
-								"  " mode-line-modes))
+              '("  " mode-line-modified
+                (list 'line-number-mode "  ")
+                (:eval (when line-number-mode
+                         (let ((str "L%l"))
+                           (when (and (not (buffer-modified-p)) my-mode-line-buffer-line-count)
+                             (setq str (concat str "/" my-mode-line-buffer-line-count)))
+                           str)))
+                "  %p"
+                (list 'column-number-mode "	 C%c")
+                "  " mode-line-buffer-identification
+                "  " mode-line-modes))
 
 (defun my-mode-line-count-lines ()
   (setq integer-buffer-line-count (count-lines (point-min) (point-max)))
@@ -576,17 +572,15 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
   (indent-region (point-min) (point-max) nil)
   (untabify (point-min) (point-max)))
 
-(add-hook 'slime-mode-hook 'smart-tab-mode-off)
 (add-hook 'slime-mode-hook 'fix-lisp-keybindings)
 ;; get useful keybindings for lisp editing
 (defun fix-lisp-keybindings ()
   "Adds about three million personalized keybindings for lisp editing with SLIME and Paredit.
 Not for the faint of heart."
-	(interactive)
-  (define-key slime-mode-map (kbd "TAB") 'slime-fuzzy-complete-symbol)
-	(define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
-	(define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
-	(define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key here (slurp-forward)
+  (interactive)
+  (define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
+  (define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
+  (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key here (slurp-forward)
   (define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward) ; remove key here (slurp-backward)
   (define-key paredit-mode-map (kbd "M-a") nil) ; kill this, it's a global but it's annoying and i don't use it
   (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-create-sexp-slurp-both-sides)
@@ -611,16 +605,16 @@ Breaks the rules a little bit, but makes me a lot less insane."
     (paredit-backward-delete)))
 
 (eval-after-load "haskell-mode"
-	'(define-key haskell-mode-map (kbd "C-c C-k") 'haskell-compile))
+  '(define-key haskell-mode-map (kbd "C-c C-k") 'haskell-compile))
 (eval-after-load "haskell-mode"
-	'(progn
-		 (define-key haskell-mode-map (kbd "C-x C-d") nil)
-		 (define-key haskell-mode-map (kbd "C-c C-z") 'haskell-interactive-switch)
-		 (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
-		 (define-key haskell-mode-map (kbd "C-c C-b") 'haskell-interactive-switch)
-		 (define-key haskell-mode-map (kbd "C-c C-t") 'haskell-process-do-type)
-		 (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)
-		 (define-key haskell-mode-map (kbd "C-c M-.") nil)
-		 (define-key haskell-mode-map (kbd "C-c C-d") nil)))
+  '(progn
+     (define-key haskell-mode-map (kbd "C-x C-d") nil)
+     (define-key haskell-mode-map (kbd "C-c C-z") 'haskell-interactive-switch)
+     (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
+     (define-key haskell-mode-map (kbd "C-c C-b") 'haskell-interactive-switch)
+     (define-key haskell-mode-map (kbd "C-c C-t") 'haskell-process-do-type)
+     (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)
+     (define-key haskell-mode-map (kbd "C-c M-.") nil)
+     (define-key haskell-mode-map (kbd "C-c C-d") nil)))
 ;;; cause i can never figure out how to just get to the REPL lol
 (defalias 'haskell-repl (symbol-function 'haskell-process-do-info))
