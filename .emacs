@@ -6,8 +6,6 @@
 ;;;;; specific sections are demarcated by five semicolons, like this line
 ;;; do a global search through all such marks to go through all major sections
 
-;;; TODO: add ghc-mode if i ever get into haskell
-
 ;;;;; globally useful things
 ;; stop the intro to emacs buffer
 (setq inhibit-startup-echo-area-message t)
@@ -19,19 +17,16 @@
     (define-key input-decode-map "\e[1;2A" [S-up]))
 
 ;; starts emacs in server form so i can use emacsclient to add files
-;; but only if server not already started
+;; but only if server isn't already started
 (require 'server)
 (if (and (fboundp 'server-running-p)
          (not (server-running-p)))
     (server-start))
 
-;; important for many things
-(require 'cl)
-
 ;;; so i can sudo edit files with C-x C-f /sudo::/path/to/file
 (require 'tramp)
 
-;;; have normal delete/selection
+;;; have normal delete/selection (type over selected text to delete)
 (delete-selection-mode 1)
 
 ;; do backups well and put them into a separate folder
@@ -67,12 +62,6 @@
 (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-;; create parens and add adjacent two elements to sexp created by parens
-(defun paredit-create-sexp-slurp-both-sides ()
-  (interactive)
-  (paredit-open-parenthesis) ; adds closing paren too thanks to electric pair (or maybe it's paredit itself)
-  (paredit-forward-slurp-sexp)
-  (paredit-backward-slurp-sexp))        ; front and back added
 
 ;; haskell mode
 (add-to-list 'load-path "~/.emacs.d/haskell-mode/")
@@ -88,7 +77,7 @@
 (add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after semicolons i don't like them
-(subword-mode)													 ; turn camel-case on
+(subword-mode)                           ; turn camel-case on
 (setq auto-mode-alist                ; use python-mode for scons files
       (cons '("SConstruct" . python-mode) auto-mode-alist))
 (setq auto-mode-alist
@@ -107,7 +96,7 @@
       w3m-terminal-coding-system 'utf-8)
 
 (hs-minor-mode) ;; C-c @ C-c for folding up code blocks!!!
-(add-hook 'prog-mode-hook #'hs-minor-mode)
+(add-hook 'prog-mode-hook #'hs-minor-mode) ; add to all programming modes
 
 (add-to-list 'load-path "~/.emacs.d/multiple-cursors.el")
 (require 'multiple-cursors)
@@ -165,9 +154,6 @@
 ;; dired-xattr
 (add-to-list 'load-path "~/.emacs.d/dired-xattr")
 (require 'dired-xattr)
-;; yasnippet
-(add-to-list 'load-path "~/.emacs.d/yasnippet")
-(require 'yasnippet)
 
 ;; adds undo-tree functionality
 (require 'undo-tree)
@@ -196,6 +182,13 @@
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 
+;(add-to-list 'exec-path "~/.cabal/bin")
+(add-to-list 'load-path "~/.emacs.d/ghc-4.1.5")
+(require 'ghc)
+(autoload 'ghc-init "ghc" nil t)
+(autoload 'ghc-debug "ghc" nil t)
+(add-hook 'haskell-mode-hook (lambda () (ghc-init)))
+
 ;; show line numbers
 (global-linum-mode)
 ;; make them relative
@@ -220,20 +213,6 @@
 ;;; rainbow delimiters!
 (require 'rainbow-delimiters)
 (global-rainbow-delimiters-mode)
-
-;; ;; tab correctly
-;; (defun generate-tab-stops (&optional width max)
-;;   "Return a sequence suitable for `tab-stop-list'."
-;;   (let* ((max-column (or max 200))
-;; 				 (tab-width (or width tab-width))
-;; 				 (count (/ max-column tab-width)))
-;;     (number-sequence tab-width (* tab-width count) tab-width)))
-
-;; (setq-default tab-width 2)
-;; (setq-default tab-stop-list (generate-tab-stops))
-
-;; set for different modes (usually done in file itself)
-;; (setq-default c-basic-offset 2)
 
 ;;; allow for ido usage for better C-x b buffer search n stuff
 (require 'ido)
@@ -265,8 +244,6 @@
          ("subversion" (name . "\*svn"))
          ("magit" (name . "\*magit\*"))
          ("git" (name . "\*git"))
-         ("helm" (or (name . "*helm\*")
-                     (name . "*Helm\*")))
          ("help" (or (name . "\*Help\*")
                      (name . "\*help\*")
                      (name . "\*Apropos\*")
@@ -274,6 +251,9 @@
                      (name . "\*Info\*")
                      (name . "\*info\*")
                      (name . "\*doc\*")))
+
+         ("helm" (or (name . "*helm\*")
+                     (name . "*Helm\*")))
          ("makefile" (or (filename . "\\Makefile\\'")
                          (filename . "\\makefile\\'")))
          ("readme" (or (filename . "\\README\\'")
@@ -555,22 +535,30 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
                 "  " mode-line-buffer-identification
                 "  " mode-line-modes))
 
-(defun my-mode-line-count-lines ()
+(defun count-lines-in-buffer ()
   (setq integer-buffer-line-count (count-lines (point-min) (point-max)))
   (setq my-mode-line-buffer-line-count (int-to-string integer-buffer-line-count)))
 
-(add-hook 'find-file-hook 'my-mode-line-count-lines)
-(add-hook 'after-save-hook 'my-mode-line-count-lines)
-(add-hook 'after-revert-hook 'my-mode-line-count-lines)
-(add-hook 'dired-after-readin-hook 'my-mode-line-count-lines)
+(add-hook 'find-file-hook 'count-lines-in-buffer)
+(add-hook 'after-save-hook 'count-lines-in-buffer)
+(add-hook 'after-revert-hook 'count-lines-in-buffer)
+(add-hook 'dired-after-readin-hook 'count-lines-in-buffer)
 
 ;; function to indent whole buffer
-(defun iwb ()
+(defun indent-whole-buffer ()
   "indent whole buffer"
   (interactive)
   (delete-trailing-whitespace)
   (indent-region (point-min) (point-max) nil)
   (untabify (point-min) (point-max)))
+
+;; create parens and add adjacent two elements to sexp created by parens
+(defun paredit-create-sexp-slurp-both-sides ()
+  (interactive)
+  (paredit-open-parenthesis) ; adds closing paren too thanks to electric pair (or maybe it's paredit itself)
+  (paredit-forward-slurp-sexp)
+  (paredit-backward-slurp-sexp))        ; front and back added
+
 
 (add-hook 'slime-mode-hook 'fix-lisp-keybindings)
 ;; get useful keybindings for lisp editing
