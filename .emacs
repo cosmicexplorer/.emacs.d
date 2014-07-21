@@ -244,16 +244,18 @@
          ("subversion" (name . "\*svn"))
          ("magit" (name . "\*magit\*"))
          ("git" (name . "\*git"))
-         ("help" (or (name . "\*Help\*")
-                     (name . "\*help\*")
-                     (name . "\*Apropos\*")
-                     (name . "\*apropos\*")
-                     (name . "\*Info\*")
-                     (name . "\*info\*")
-                     (name . "\*doc\*")))
-
-         ("helm" (or (name . "*helm\*")
-                     (name . "*Helm\*")))
+         ("helm" (or (name . "helm")
+                     (name . "Helm")))
+         ("documentation"
+          (or
+           (name . "help")
+           (name . "Help")
+           (name . "Apropos")
+           (name . "apropos")
+           (name . "Info")
+           (name . "info")
+           (name . "doc")
+           (name . "Doc")))
          ("makefile" (or (filename . "\\Makefile\\'")
                          (filename . "\\makefile\\'")))
          ("readme" (or (filename . "\\README\\'")
@@ -281,10 +283,8 @@
          ("ruby" (mode . ruby-mode))
          ("hex" (mode . hexl-mode))
          ("qmake" (mode . qmake-mode))
-         ("emacs-system" (name . "*\**")) ;; down here cause it was taking my php files fsr
-         )
-        )
-      )
+         ("emacs-system" (name . "\*+\*"))
+         ("default" (name . "*")))))
 
 (add-hook 'ibuffer-mode-hook
           '(lambda ()
