@@ -3,19 +3,28 @@
 
 (setq mc/cmds-to-run-for-all
       '(
-				c-electric-star
-				c-toggle-electric-state
-				force-insert-tab
-				smart-tab
-				toggle-letter-case
-				))
+        autopair-newline
+        backspace-delete-highlight-paredit
+        beginning-of-buffer
+        c-electric-star
+        c-toggle-electric-state
+        electric-pair-backward-delete-char
+        electric-pair-backward-delete-char-untabify
+        end-of-buffer
+        force-insert-tab
+        paredit-backward
+        paredit-forward-delete
+        paredit-forward-slurp-sexp
+        paredit-open-round
+        paredit-semicolon
+        paredit-splice-sexp
+        slime-eval-last-expression
+        slime-space
+        smart-compile
+        smart-tab
+        toggle-letter-case
+        ))
 
 (setq mc/cmds-to-run-once
       '(
-				autopair-newline
-				beginning-of-buffer
-				electric-pair-backward-delete-char
-				electric-pair-backward-delete-char-untabify
-				end-of-buffer
-				smart-compile
-				))
+        ))

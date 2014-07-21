@@ -1,17 +1,16 @@
 # emacs autorecovery files
 \#*
-# tilde-ending files
-*\~
-# emacs undo-tree files
-*.~undo-tree~
-# emacs jump-to-definition
-TAGS
 # vim temp files
 *.swp
-# user-specific files
+# user-specific files for certain extensions
 ido.last
 saveplace
+.mc-lists.el
+undo-tree-history/
+autosaved-files/
+auto-save-list/
 # eshell history
 eshell/*
-# user-specific semanticdb
-semanticdb/*
+# cached files for quicklisp
+quicklisp/cache/
+quicklisp/tmp/

@@ -1,12 +1,22 @@
-;; NOTE THAT THE ~ EXPANSION TO HOME DIRECTORY DOES NOT WORK WHEN CHROOTED
-;; AND ABSOLUTE PATHS ARE REQUIRED
-;; but if you're using emacs when chrooted you're a clown anyway so lol
+;;; note that the ~ expansion to home directory does not work when sudo/chrooted and absolute paths are required
+;;; i have changed quite a few files besides just this one and if you wish to upgrade them
+;;; you'll have to re-add those changes for the whole frail system to work
+;;; alternatively you can just email me that an update occurred in some package and i'll add it and push the changes
 
+;;;;; specific sections are demarcated by five semicolons, like this line
+;;; do a global search through all such marks to go through all major sections
+
+;;; TODO: add ghc-mode if i ever get into haskell
+
+;;;;; globally useful things
 ;; stop the intro to emacs buffer
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 (menu-bar-mode -1) ;; remove menu bar for another line of space
 (setq-default indent-tabs-mode nil)	;; fix indentation issues
+;; fix selection issues in xterm (can't hold down shift and up arrow to highlight stuff)
+(if (equal "xterm" (tty-type))
+		(define-key input-decode-map "\e[1;2A" [S-up]))
 
 ;; starts emacs in server form so i can use emacsclient to add files
 ;; but only if server not already started
@@ -18,7 +28,23 @@
 ;; important for many things
 (require 'cl)
 
+;;; so i can sudo edit files with C-x C-f /sudo::/path/to/file
+(require 'tramp)
 
+;;; have normal delete/selection
+(delete-selection-mode 1)
+
+;; do backups well and put them into a separate folder
+(setq backup-directory-alist `(("." . "~/.emacs.d/autosaved-files")))
+(setq backup-by-copying t)
+(setq delete-old-versions t
+			kept-new-versions 6
+			kept-old-versions 2
+			version-control t)
+;; do the same thing for undo-tree history
+(setq undo-tree-history-directory-alist `(("." . "~/.emacs.d/undo-tree-history")))
+
+;;;;; setup specific modes for specific filetypes
 ;; setup slime
 ;; setup load-path and autoloads
 (add-to-list 'load-path "~/.emacs.d/slime")
@@ -28,16 +54,9 @@
 (setq slime-contribs '(slime-fancy))
 (add-to-list 'slime-contribs 'slime-repl)
 (load (expand-file-name "~/.emacs.d/quicklisp/slime-helper.el")) ;; add quicklisp!
-(add-hook 'lisp-mode-hook (lambda ()
-														(slime-mode)
-														(fix-paredit-keybindings) ; bound to C-c C-f 
-														))
-
-;; haskell mode
-(add-to-list 'load-path "~/.emacs.d/haskell-mode/")
-(require 'haskell-mode-autoloads)
-(add-to-list 'Info-default-directory-list "~/.emacs.d/haskell-mode/")
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+(add-hook 'emacs-lisp-mode-hook 'fix-lisp-keybindings)
+(add-hook 'lisp-mode-hook 'slime-mode)
+(add-hook 'lisp-mode-hook 'fix-lisp-keybindings)
 
 ;; paredit
 (add-to-list 'load-path "~/.emacs.d/paredit")
@@ -55,28 +74,11 @@
   (paredit-forward-slurp-sexp)
   (paredit-backward-slurp-sexp))        ; front and back added
 
-;; spell check
-;; except i don't want it for now lol
-;; (add-hook 'text-mode-hook 'flyspell-mode)
-;; (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-
-;;;; graphic-only stuff
-;; dependent on current frame, so added to after frame hook
-;; turn off toolbar
-(when (display-graphic-p)
-	;; graphical-only stuff
-	(progn
-		;; add sublime-like minimap through sublimity
-		;; (add-to-list 'load-path "~/.emacs.d/sublimity")
-		;; (require 'sublimity)
-		;; (require 'sublimity-map)
-		;; (setq sublimity-map-size 20)
-		;; (setq sublimity-map-fraction .2)
-		;; (setq sublimity-map-text-scale -30)
-		;; (sublimity-map-set-delay 1)
-		;; (sublimity-mode 1)
-		;; removed for now cause i'm not a huge fan
-		))
+;; haskell mode
+(add-to-list 'load-path "~/.emacs.d/haskell-mode/")
+(require 'haskell-mode-autoloads)
+(add-to-list 'Info-default-directory-list "~/.emacs.d/haskell-mode/")
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 
 ;;;;; random per-language editing things
 ;; format comments like a normal person
@@ -85,18 +87,14 @@
 (add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
-(setq c-hanging-semi&comma-criteria nil) ;; stop inserting newlines after semicolons i don't like them
-(subword-mode)													 ;; turn camel-case on
-(setq auto-mode-alist										 ;; use python-mode for scons files
+(setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after semicolons i don't like them
+(subword-mode)													 ; turn camel-case on
+(setq auto-mode-alist                ; use python-mode for scons files
 			(cons '("SConstruct" . python-mode) auto-mode-alist))
 (setq auto-mode-alist
 			(cons '("SConscript" . python-mode) auto-mode-alist))
 
-;; fix selection issues in xterm
-(if (equal "xterm" (tty-type))
-		(define-key input-decode-map "\e[1;2A" [S-up])
-	)
-
+;;;;; load utilities
 ;; load w3m web browser
 (add-to-list 'load-path "~/.emacs.d/w3m")
 (require 'w3m-load)
@@ -108,96 +106,9 @@
 			w3m-output-coding-system 'utf-8
 			w3m-terminal-coding-system 'utf-8)
 
-;;;;; CEDET stuff
-;; still haven't gotten Qt and Boost to work correctly with autocompletion
-;; then again autocompletion is really a lot more important with user-produced classes
-;; than with well-documented external tools like Qt and Boost
-;; but still it's quite annoying
-;;;;; turn on cedet and semantic mode
-;; http://alexott.net/en/writings/emacs-devenv/EmacsCedet.html
-;; http://cxwangyi.wordpress.com/2010/08/21/using-cedet-with-emacs/
-;; (unless (featurep 'cedet)
-;;     (add-to-list 'load-path "~/.emacs.d/cedet")
-;;     (load-file "~/.emacs.d/cedet/cedet-devel-load.el"))
-
-;; ;; (global-ede-mode t)
-;; (require 'semantic)
-;; (require 'semantic/ia) ;; name completion and tag display
-;; (require 'semantic/bovine/gcc) ;; use system include files
-;; (require 'semantic/bovine/clang) ;; same for clang
-;; (require 'semantic/bovine/c)
-;; (require 'cedet-files)
-;; (require 'semantic/db) ;; not sure if required, think not
-
-;; (setq semantic-ectag-program "/usr/bin/etags")
-
-;;;;;; C/C++
-;; include Qt and others
-;; doesn't work lol
-;; (defun c-mode-semantic-hook ()
-;; 	(semantic-add-system-include "/opt/Qt/5.3/gcc_64/include/" 'c++-mode)
-;; 	(semantic-add-system-include "/usr/include/boost/" 'c++-mode)
-;; 	(add-to-list 'semantic-lex-c-preprocessor-symbol-file "/opt/Qt/5.3/gcc_64/include/QtCore/qconfig.h")
-;; 	(add-to-list 'semantic-lex-c-preprocessor-symbol-file "/opt/Qt/5.3/gcc_64/include/QtCore/qconfig-dist.h")
-;; 	(add-to-list 'semantic-lex-c-preprocessor-symbol-file "/opt/Qt/5.3/gcc_64/include/QtCore/qglobal.h"))
-
-;; (add-hook 'c-mode-common-hook 'c-mode-semantic-hook)
-
-
 (hs-minor-mode) ;; C-c @ C-c for folding up code blocks!!!
-;; minibuffer always gets pissy at me about it lol
 (add-hook 'prog-mode-hook #'hs-minor-mode)
 
-;; (global-semanticdb-minor-mode t)
-;; (global-cedet-m3-minor-mode t)
-;; (set-default 'semantic-case-fold t)
-;; (global-semantic-highlight-func-mode t)
-;; (global-semantic-stickyfunc-mode t)
-;; (global-semantic-decoration-mode t)
-;; (global-semantic-idle-local-symbol-highlight-mode t)
-;; (global-semantic-idle-scheduler-mode t)
-;; (global-semantic-idle-completions-mode t)
-;; (global-semantic-idle-summary-mode t)
-;; (semantic-load-enable-excessive-code-helpers)
-
-;; (setq-mode-local cpp-mode semanticdb-find-default-throttle
-;; 								 '(project local unloaded system recursive)) 
-
-;; (defun add-tags-semantic-hook ()
-;; 	(imenu-add-to-menubar "TAGS"))
-;; (add-hook 'semantic-init-hooks 'add-tags-semantic-hook)
-
-;; ;; enable ctags for some languages:
-;; ;;  Unix Shell, Perl, Pascal, Tcl, Fortran, Asm
-;; (when (cedet-ectag-version-check t)
-;; 	  (semantic-load-enable-primary-ectags-support))
-
-;; (defun keybindings-cedet-hook ()
-;; 	(local-set-key [(control return)] 'semantic-ia-complete-symbol)
-;; 	(local-set-key "\C-c?" 'semantic-ia-complete-symbol-menu)
-;; 	(local-set-key "\C-c>" 'semantic-complete-analyze-inline)
-;; 	(local-set-key "\C-c=" 'semantic-decoration-include-visit)
-;; 	(local-set-key "\C-cj" 'semantic-ia-fast-jump)
-;; 	(local-set-key "\C-cq" 'semantic-ia-show-doc)
-;; 	(local-set-key "\C-cs" 'semantic-ia-show-summary)
-;; 	(local-set-key "\C-cp" 'semantic-analyze-proto-impl-toggle)
-;; 	)
-;; (add-hook 'c-mode-common-hook 'keybindings-cedet-hook)
-;; ;; control return: whatever the symbol you are typing, this hot key automatically complete it for you.
-;; ;; C-c?: another way to complete the symbol you are typing
-;; ;; C-c>: when you typed . or -> after an object name, use this key to show possible public member functions or data members.
-;; ;; C-cj: jump to the definition of the symbol under cursor
-;; ;; C-cs: show a summary about the symbol under cursor
-;; ;; C-cq: show the document of the symbol under cursor
-;; ;; C-c=: visit the header file under cursor
-;; ;; C-cp: toggle between the implementation and a prototype of symbol under cursor
-;; ;; C-ce: when your cursor is in the scope of a class or one of its member function, list all methods in the class
-;; ;; C-cC-r: show references of the symbol under cursor
-
-;; (semantic-mode t) ;; GO GO GO
-
-
-;; add multiple cursor stuff
 (add-to-list 'load-path "~/.emacs.d/multiple-cursors.el")
 (require 'multiple-cursors)
 
@@ -217,14 +128,8 @@
 							(define-key eshell-mode-map
 								[remap eshell-pcomplete]
 								'helm-esh-pcomplete)))
-;; fix sudo pcomplete
-(defun pcomplete/sudo ()
-	(let ((prec (pcomplete-arg 'last -1)))
-		(cond ((string= "sudo" prec)
-					 (while (pcomplete-here*
-									 (funcall pcomplete-command-completion-function)
-									 (pcomplete-arg 'last) t))))))
-;; autoload eshell at start so helm plays nice
+
+;; autoload eshell at start so helm plays nice (this doesn't affect load time at all i've checked)
 (add-hook 'emacs-startup-hook #'(lambda ()
 																	(let ((default-directory (getenv "HOME")))
 																		(command-execute 'eshell)
@@ -232,64 +137,9 @@
 (add-to-list 'load-path "~/.emacs.d/helm-swoop")
 (require 'helm-swoop)
 
-;; add appropriate stuff to path
-(setenv "PATH" (concat (getenv "PATH") ":/opt/Qt/5.3/gcc_64/bin")) ;; add qmake
-(setq exec-path (append exec-path '("/opt/Qt/5.3/gcc_64/bin"))) ;; add qmake
-
-;; add tags n stuff
-;;  Jonas.Jarnestrom<at>ki.ericsson.se A smarter
-;;  find-tag that automagically reruns etags when it cant find a
-;;  requested item and then makes a new try to locate it.
-;;  Fri Mar 15 09:52:14 2002    
-(defadvice find-tag (around refresh-etags activate)
-	"Rerun etags and reload tags if tag not found and redo find-tag.              
-   If buffer is modified, ask about save before running etags."
-	(let ((extension (file-name-extension (buffer-file-name))))
-		(condition-case err
-				ad-do-it
-			(error (and (buffer-modified-p)
-									(not (ding))
-									(y-or-n-p "Buffer is modified, save it? ")
-									(save-buffer))
-						 (er-refresh-etags extension)
-						 ad-do-it))))
-(defun er-refresh-etags (&optional extension)
-	"Run etags on all peer files in current dir and reload them silently."
-	(interactive)
-	(shell-command (format "etags *.%s" (or extension "el")))
-	(let ((tags-revert-without-query t))  ; don't query, revert silently
-		(visit-tags-table default-directory nil)))
-
-;; turn on flycheck
-;; i have never found this at all useful
-;; (add-to-list 'load-path "~/.emacs.d/flycheck")
-;; (require 'flycheck)
-;; (global-flycheck-mode)
-;; (add-hook 'c++-mode-hook
-;; 					(lambda ()
-;; 						(flycheck-select-checker 'c/c++-clang)
-;; 						(add-to-list 'flycheck-clang-include-path (expand-file-name "/opt/Qt/5.3/gcc_64/include/"))))
-
-;; https://stackoverflow.com/questions/7494203/how-do-i-m-x-replace-string-across-all-buffers-in-emacs
-;; global search and replace
-;; M-x ibuffer <RET> t U
-;; OR C-x C-b t U
-
-;; M-g g GOTO goes to go to a line number go to line
-
-;; lets me fucking use wildcards if i want to god damn
-;; cause ido-mode is great but doesn't allow that in C-x C-f
-;; doesn't work, i'll just use eshell
-;;(defun open-file-with-wildcards ()
-;;	(interactive)
-;;	(shell-command
-;;	 (concatenate 'string "emacsclient -n "
-;;								(read-string "filename wildcard: " nil nil "*")))) ;; reads from minibuf, default *
-
 ;; adds appropriate areas to load path
-;; in this case for undo-tree and smart-tab
+;; in this case for undo-tree, smart-tab, revbufs, others
 (add-to-list 'load-path "~/.emacs.d/lisp")
-
 ;; allow for save buffer reversion when files are being edited by external tools
 (require 'revbufs)
 
@@ -299,81 +149,17 @@
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
-(defun toggle-letter-case ()
-	"Toggle the letter case of current word or text selection.
-Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
-	(interactive)
-	(let (p1 p2 (deactivate-mark nil) (case-fold-search nil))
-		(if (region-active-p)
-				(setq p1 (region-beginning) p2 (region-end))
-			(let ((bds (bounds-of-thing-at-point 'word) ) )
-				(setq p1 (car bds) p2 (cdr bds)) ) )
-
-		(when (not (eq last-command this-command))
-			(save-excursion
-				(goto-char p1)
-				(cond
-				 ((looking-at "[[:lower:]][[:lower:]]") (put this-command 'state "all lower"))
-				 ((looking-at "[[:upper:]][[:upper:]]") (put this-command 'state "all caps") )
-				 ((looking-at "[[:upper:]][[:lower:]]") (put this-command 'state "init caps") )
-				 ((looking-at "[[:lower:]]") (put this-command 'state "all lower"))
-				 ((looking-at "[[:upper:]]") (put this-command 'state "all caps") )
-				 (t (put this-command 'state "all lower") ) ) ) )
-
-		(cond
-		 ((string= "all lower" (get this-command 'state))
-			(upcase-initials-region p1 p2) (put this-command 'state "init caps"))
-		 ((string= "init caps" (get this-command 'state))
-			(upcase-region p1 p2) (put this-command 'state "all caps"))
-		 ((string= "all caps" (get this-command 'state))
-			(downcase-region p1 p2) (put this-command 'state "all lower")) )
-		) )
-
-;; adds icicles!!! yeah!!!
-;; except i don't want it rn oops lol
-;;(add-to-list 'load-path "~/.emacs.d/lisp/icicles")
-;;(require 'icicles)
-;;(icicle-mode)
-
 ;; adds smart-compile functionality
 (require 'smart-compile)
 
-;; treat cl files as C files (for now since we're doing OpenCL and not common lisp)
-(setq auto-mode-alist (cons '("\.cl$" . c-mode) auto-mode-alist))
-
-;; sets shell to zsh, hopefully, when i use it and not the emacs shell
+;; sets term to zsh
 (setq shell-file-name "zsh")
 (setq explicit-shell-file-name "zsh")
 
-;; adds evil vim layer
+;; adds evil vim layer, but doesn't turn it on
 (add-to-list 'load-path "~/.emacs.d/evil/")
 (require 'evil)
-;; start up with evil on
-;; (evil-mode 1) ; left off rn cause i'm not quite feelin it
 
-;; allow for backtab => forced'\t'
-(defun force-insert-tab ()
-	"insert tab character"
-	(interactive)
-	(insert "\t"))
-
-;; add el-get functionality
-;; (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
-;; (unless (require 'el-get nil 'noerror)
-;; 	(with-current-buffer
-;; 			;; (url-retrieve-synchronously
-;;			;; "https://raw.github.com/dimitri/el-get/master/el-get-install.el"
-;;			(find-file-noselect "~/.emacs.d/el-get/el-get-install.el") ; so that we don't have to use the internet to load up emacs lol
-;;	  (goto-char (point-max))
-;;	  (eval-print-last-sexp)
-;;	  (revert-buffer nil t))							; discard changes to el-get-install.el
-;;	(kill-buffer "el-get-install.el"))		; close buffer
-;;(add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
-;;(el-get 'sync)
-
-;; above left in case el-get needs to be added again
-
-;;; add stuff that used to be in el-get
 ;; php-mode
 (add-to-list 'load-path "~/.emacs.d/php-mode")
 (require 'php-mode)
@@ -394,12 +180,6 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
 (setq undo-tree-auto-save-history t)
 ;; show diffs in undo tree visualizer
 (setq undo-tree-visualizer-diff t)
-;; destroy undo tree diff visualizer when undo tree visualizer is killed
-;; doesn't work (just go backk to orig buffer and press space to throw all that away)
-;; (add-hook 'kill-buffer-hook
-;; 					(lambda ()
-;; 						(if (equal (buffer-name) "*undo-tree*")
-;; 								(kill-buffer "*undo-tree Diff*"))))
 
 ;; adds smart-tab (tab completion) functionality
 (require 'smart-tab)
@@ -408,16 +188,7 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
 ;; adds dired-x functionality
 (add-hook 'dired-load-hook
 					(lambda ()
-						(load "dired-x")
-						;; Set dired-x global variables here.  For example:
-						;; (setq dired-guess-shell-gnutar "gtar")
-						;; (setq dired-x-hands-off-my-keys nil)
-						))
-(add-hook 'dired-mode-hook
-					(lambda ()
-						;; Set dired-x buffer-local variables here.	 For example:
-						;; (dired-omit-mode 1)
-						))
+						(load "dired-x")))
 
 ;; adds julia functionality
 (load "~/.emacs.d/ESS/lisp/ess-site")
@@ -426,13 +197,8 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
 (ess-toggle-underscore nil)	;; underscore means underscore
 
 ;; adds haskell functionality
-																				;(load "/usr/share/emacs-snapshot/site-lisp/haskell-mode/haskell-site-file")
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-;; pick one of the following three indentations
-;;(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-;;(add-hook 'haskell-mode-hook 'turn-on-haskell-simple-indent)
-
 
 ;; show line numbers
 (global-linum-mode)
@@ -440,49 +206,6 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
 (add-to-list 'load-path "~/.emacs.d/linum-relative")
 (require 'linum-relative)
 (setq linum-format 'linum-relative)
-;; NOTE THAT I TOTALLY CHANGED LINUM-RELATIVE.EL
-;; SO FOR COPYING THIS DEFINITELY CHECK THAT OUT
-;; IF YOU WANT TO EMULATE THIS BEHAVIOR
-
-;; from http://www.emacswiki.org/emacs/RevertBuffer
-(defun revert-all-buffers ()
-	"Refreshes all open buffers from their respective files."
-	(interactive)
-	(dolist (buf (buffer-list))
-		(with-current-buffer buf
-			(when (and (buffer-file-name) (file-exists-p (buffer-file-name)) (not (buffer-modified-p)))
-				(revert-buffer t t t) )))
-	(message "Refreshed open files.") )
-
-(defcustom search-all-buffers-ignored-files (list (rx-to-string '(and bos (or ".bash_history" "TAGS") eos)))
-  "Files to ignore when searching buffers via \\[search-all-buffers]."
-  :type 'editable-list)
-
-(require 'grep)
-(defun search-all-buffers (regexp prefix)
-  "Searches file-visiting buffers for occurence of REGEXP.	With
-prefix > 1 (i.e., if you type C-u \\[search-all-buffers]),
-searches all buffers."
-  (interactive (list (grep-read-regexp)
-										 current-prefix-arg))
-  (message "Regexp is %s; prefix is %s" regexp prefix)
-  (multi-occur
-   (if (member prefix '(4 (4)))
-       (buffer-list)
-     (remove-if
-      (lambda (b) (some (lambda (rx) (string-match rx  (file-name-nondirectory (buffer-file-name b)))) search-all-buffers-ignored-files))
-      (remove-if-not 'buffer-file-name (buffer-list))))
-   regexp))
-
-;; GHC-mode for haskell
-;; http://www.mew.org/~kazu/proj/ghc-mod/en/preparation.html
-(add-to-list 'load-path "~/.cabal/share/ghc-mod-4.1.1")
-																				;(require 'ghc)
-(autoload 'ghc-init "ghc" nil t)
-(autoload 'ghc-debug "ghc" nil t)
-(add-hook 'haskell-mode-hook (lambda () (ghc-init)))
-;; http://www.mew.org/~kazu/proj/ghc-mod/en/preparation.html
-(setq ghc-debug t)
 
 ;; add magit
 (add-to-list 'load-path "~/.emacs.d/git-modes")
@@ -498,24 +221,36 @@ searches all buffers."
 (add-to-list 'electric-pair-pairs '(?\{ . ?\}))
 ;; match parens when cursor on top
 (show-paren-mode t)
-;; integrate highlight-parentheses with autopair mode
-(add-to-list 'load-path "~/.emacs.d/highlight-parentheses")
-(require 'highlight-parentheses)
-(highlight-parentheses-mode t)
+;;; rainbow delimiters!
+(require 'rainbow-delimiters)
+(global-rainbow-delimiters-mode)
 
-;; tab correctly
-(defun generate-tab-stops (&optional width max)
-  "Return a sequence suitable for `tab-stop-list'."
-  (let* ((max-column (or max 200))
-				 (tab-width (or width tab-width))
-				 (count (/ max-column tab-width)))
-    (number-sequence tab-width (* tab-width count) tab-width)))
+;; ;; tab correctly
+;; (defun generate-tab-stops (&optional width max)
+;;   "Return a sequence suitable for `tab-stop-list'."
+;;   (let* ((max-column (or max 200))
+;; 				 (tab-width (or width tab-width))
+;; 				 (count (/ max-column tab-width)))
+;;     (number-sequence tab-width (* tab-width count) tab-width)))
 
-(setq-default tab-width 2)
-(setq-default tab-stop-list (generate-tab-stops))
+;; (setq-default tab-width 2)
+;; (setq-default tab-stop-list (generate-tab-stops))
 
 ;; set for different modes (usually done in file itself)
-(setq-default c-basic-offset 2)
+;; (setq-default c-basic-offset 2)
+
+;;; allow for ido usage for better C-x b buffer search n stuff
+(require 'ido)
+(ido-mode t)
+(setq ido-enable-flex-matching t)				; makes searching fuzzier
+
+;; when opening a file the cursor will be at the last saved position
+(require 'saveplace)
+(setq save-place-file "~/.emacs.d/saveplace")
+(setq-default save-place t)
+
+;; qmake-mode
+(load "~/.emacs.d/lisp/qmake.el")
 
 ;;;;; ibuffer stuff
 ;;;; re: http://martinowen.net/blog/2010/02/03/tips-for-emacs-ibuffer.html
@@ -583,105 +318,14 @@ searches all buffers."
 (setq ibuffer-expert t) ;; only prompt when modified buffer is killed
 (setq ibuffer-show-empty-filter-groups nil) ;; only show full filter groups
 
-;;; allow for ido usage for better C-x b buffer search n stuff
-(require 'ido)
-(ido-mode t)
-(setq ido-enable-flex-matching t)				; makes searching fuzzier
-
-;; kill current buffer and close pane
-(defun close-and-kill-this-pane ()
-  "If there are multiple windows, then close this pane and kill the buffer in it also."
-  (interactive)
-  (kill-this-buffer)
-  (if (not (one-window-p))
-      (delete-window)))
-
-;; kill all active dired buffers at once
-(defun kill-dired-buffers ()
-  (interactive)
-  (mapc (lambda (buffer)
-					(when (eq 'dired-mode (buffer-local-value 'major-mode buffer))
-						(kill-buffer buffer)))
-				(buffer-list)))
-
-;; open new file (i wrote this!!!)
-(defun open-new-file ()
-  (interactive)
-  (switch-to-buffer ;; switches to operating buffer
-   (generate-new-buffer ;; creates new buffer with given name
-    (generate-new-buffer-name
-     (read-string "new filename: " ;; reads from minibuffer, with given default value
-									nil nil "*newbuf*")))) ;; with default title *newbuf*
-  (normal-mode))
-
-;; when opening a file the cursor will be at the last saved position
-(require 'saveplace)
-(setq save-place-file "~/.emacs.d/saveplace")
-(setq-default save-place t)
-
-;;; ibuffer hacks
-
-;; Switching to ibuffer puts the cursor on the most recent buffer
-(defadvice ibuffer (around ibuffer-point-to-most-recent) ()
-  "Open ibuffer with cursor pointed to most recent buffer name"
-  (let ((recent-buffer-name (buffer-name)))
-    ad-do-it
-    (ibuffer-jump-to-buffer recent-buffer-name)))
-(ad-activate 'ibuffer)
-
-
-;;; get and update the current number of lines within the buffer
-(defvar my-mode-line-buffer-line-count nil)
-(make-variable-buffer-local 'my-mode-line-buffer-line-count)
-(defvar integer-buffer-line-count nil)
-(make-variable-buffer-local 'integer-buffer-line-count)
-
-(setq-default mode-line-format
-							'("  " mode-line-modified
-								(list 'line-number-mode "  ")
-								(:eval (when line-number-mode
-												 (let ((str "L%l"))
-													 (when (and (not (buffer-modified-p)) my-mode-line-buffer-line-count)
-														 (setq str (concat str "/" my-mode-line-buffer-line-count)))
-													 str)))
-								"  %p"
-								(list 'column-number-mode "	 C%c")
-								"  " mode-line-buffer-identification
-								"  " mode-line-modes))
-
-(defun my-mode-line-count-lines ()
-  (setq integer-buffer-line-count (count-lines (point-min) (point-max)))
-  (setq my-mode-line-buffer-line-count (int-to-string integer-buffer-line-count)))
-
-(add-hook 'find-file-hook 'my-mode-line-count-lines)
-(add-hook 'after-save-hook 'my-mode-line-count-lines)
-(add-hook 'after-revert-hook 'my-mode-line-count-lines)
-(add-hook 'dired-after-readin-hook 'my-mode-line-count-lines)
-
-;; function to indent whole buffer
-(defun iwb ()
-  "indent whole buffer"
-  (interactive)
-  (delete-trailing-whitespace)
-  (indent-region (point-min) (point-max) nil)
-  (untabify (point-min) (point-max)))
-
-;; qmake-mode
-(load "~/.emacs.d/lisp/qmake.el")
-
 ;;;;; keybindings
 ;; FIND CURRENT KEYBINDINGS WITH C-h b !!!!!
 ;; use C-h k to look at the current key sequence being entered!
 ;; this is useful when creating new keybindings
 
 ;; since eval-expression uses just the alt key but unity sucks
-;;(global-set-key (kbd "C-M-z") 'eval-expression)
 ;; ESC-: DOES THIS ALREADY
 
-;; (global-set-key (kbd "C-x C-f") 'helm-find-files) ; override normal find with helm find
-;; (global-set-key (kbd "C-x C-f") 'helm-find) ; recursive helm find
-;; (global-set-key (kbd "C-x C-M-f") 'ido-find-file)	; "uncertain find;" searches up and down recursively
-;; defaults to above, where it will be kept
 ;; the below can also be applied over multiple lines with C-u [number] M-x helm-swoop RET
 (global-set-key (kbd "C-x o") 'helm-swoop)				; find regexp in file, more interactively than above
 (global-set-key (kbd "C-x f") 'helm-multi-swoop-all) ; find regexp in ALL open buffers
@@ -689,7 +333,7 @@ searches all buffers."
 (global-set-key (kbd "C-x b") 'helm-buffers-list) ; find among open buffers
 
 ;; after killing C-x o with helm,
-;; let's make sure we do have buffer switching in the event of terminal-only editing
+;; let's make sure we do have buffer switching in the event of non-graphical terminal-only editing
 (global-set-key (kbd "C-x /") 'other-window)
 
 ;;; split-window management
@@ -765,9 +409,6 @@ searches all buffers."
 (global-set-key (kbd "C-M-p") 'mc/unmark-previous-like-this)
 (global-set-key (kbd "C-c C-a") 'mc/mark-all-like-this)
 
-;; icicle-locate allows for much easier file location, using the OS's indexes
-;; (global-set-key (kbd "C-x M-l") 'icicle-locate) ; nonfunctional right now
-
 ;; gofmt!!!
 (add-hook 'go-mode-hook
 					(lambda () (local-set-key (kbd "C-c f") 'go-fmt-file)))
@@ -780,7 +421,6 @@ searches all buffers."
 (global-set-key (kbd "C-c i") 'iwb)
 
 ;; remember that M-= gets word counts!
-
 
 ;; search all open buffers for regexp
 (global-set-key (kbd "C-c M-r") 'search-all-buffers)
@@ -796,16 +436,154 @@ searches all buffers."
 ;; toggle letter casing from ALLCAPS to InitialCase to alllowercase
 (global-set-key (kbd "C-x M-c") 'toggle-letter-case)
 
-;; TOGGLE RELATIVE LINUM
-;; (global-set-key (kbd "C-c C-l") 'linum-relative-toggle)
-;; fixed now, so unused
+;;;;; my own functions! used throughout this file
+;;; some of these are mine, some are heavily adapated from emacswiki, some are copy/paste from emacswiki
+;;; if you wrote something and want me to put your name by it (which would be hilarious cause that means
+;;; someone else is actually using this file) email me and i'll add accreditation immediately
 
-;; slime completion so it doesn't intersect with Alt-Tab window switching lol
-;; (global-set-key (kbd "M-<tab>") 'slime-fuzzy-complete-symbol)
-;;; don't think the above does anything
-;; fix paredit probs with C-M-<arrow> to switch windows
-(defun fix-paredit-keybindings ()
+;; allow for backtab to force '\t'
+(defun force-insert-tab ()
+	"insert tab character"
 	(interactive)
+	(insert "\t"))
+
+;; from http://www.emacswiki.org/emacs/RevertBuffer
+(defun revert-all-buffers ()
+	"Refreshes all open buffers from their respective files."
+	(interactive)
+	(dolist (buf (buffer-list))
+		(with-current-buffer buf
+			(when (and (buffer-file-name) (file-exists-p (buffer-file-name)) (not (buffer-modified-p)))
+				(revert-buffer t t t) )))
+	(message "Refreshed open files.") )
+
+(defcustom search-all-buffers-ignored-files (list (rx-to-string '(and bos (or ".bash_history" "TAGS") eos)))
+  "Files to ignore when searching buffers via \\[search-all-buffers]."
+  :type 'editable-list)
+
+(require 'grep)
+(defun search-all-buffers (regexp prefix)
+  "Searches file-visiting buffers for occurence of REGEXP.	With
+prefix > 1 (i.e., if you type C-u \\[search-all-buffers]),
+searches all buffers."
+  (interactive (list (grep-read-regexp)
+										 current-prefix-arg))
+  (message "Regexp is %s; prefix is %s" regexp prefix)
+  (multi-occur
+   (if (member prefix '(4 (4)))
+       (buffer-list)
+     (remove-if
+      (lambda (b) (some (lambda (rx) (string-match rx  (file-name-nondirectory (buffer-file-name b)))) search-all-buffers-ignored-files))
+      (remove-if-not 'buffer-file-name (buffer-list))))
+   regexp))
+
+;; kill current buffer and close pane
+(defun close-and-kill-this-pane ()
+  "If there are multiple windows, then close this pane and kill the buffer in it also."
+  (interactive)
+  (kill-this-buffer)
+  (if (not (one-window-p))
+      (delete-window)))
+
+;; kill all active dired buffers at once
+(defun kill-dired-buffers ()
+  (interactive)
+  (mapc (lambda (buffer)
+					(when (eq 'dired-mode (buffer-local-value 'major-mode buffer))
+						(kill-buffer buffer)))
+				(buffer-list)))
+
+;; open new file (i wrote this!!!)
+(defun open-new-file ()
+  (interactive)
+  (switch-to-buffer ;; switches to operating buffer
+   (generate-new-buffer ;; creates new buffer with given name
+    (generate-new-buffer-name
+     (read-string "new filename: " ;; reads from minibuffer, with given default value
+									nil nil "*newbuf*")))) ;; with default title *newbuf*
+  (normal-mode))
+
+;; Switching to ibuffer puts the cursor on the most recent buffer
+(defadvice ibuffer (around ibuffer-point-to-most-recent) ()
+  "Open ibuffer with cursor pointed to most recent buffer name"
+  (let ((recent-buffer-name (buffer-name)))
+    ad-do-it
+    (ibuffer-jump-to-buffer recent-buffer-name)))
+(ad-activate 'ibuffer)
+
+;; stolen from the ergo emacs guy (http://ergoemacs.org/emacs/modernization_upcase-word.html)
+;; like normally everything he's put up is super underwhelming but this sees some use
+(defun toggle-letter-case ()
+	"Toggle the letter case of current word or text selection.
+Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
+	(interactive)
+	(let (p1 p2 (deactivate-mark nil) (case-fold-search nil))
+		(if (region-active-p)
+				(setq p1 (region-beginning) p2 (region-end))
+			(let ((bds (bounds-of-thing-at-point 'word)))
+				(setq p1 (car bds) p2 (cdr bds))))
+		(when (not (eq last-command this-command))
+			(save-excursion
+				(goto-char p1)
+				(cond
+				 ((looking-at "[[:lower:]][[:lower:]]") (put this-command 'state "all lower"))
+				 ((looking-at "[[:upper:]][[:upper:]]") (put this-command 'state "all caps"))
+				 ((looking-at "[[:upper:]][[:lower:]]") (put this-command 'state "init caps"))
+				 ((looking-at "[[:lower:]]") (put this-command 'state "all lower"))
+				 ((looking-at "[[:upper:]]") (put this-command 'state "all caps"))
+				 (t (put this-command 'state "all lower")))))
+		(cond
+		 ((string= "all lower" (get this-command 'state))
+			(upcase-initials-region p1 p2) (put this-command 'state "init caps"))
+		 ((string= "init caps" (get this-command 'state))
+			(upcase-region p1 p2) (put this-command 'state "all caps"))
+		 ((string= "all caps" (get this-command 'state))
+			(downcase-region p1 p2) (put this-command 'state "all lower")))))
+
+;;; get and update the current number of lines within the buffer
+(defvar my-mode-line-buffer-line-count nil)
+(make-variable-buffer-local 'my-mode-line-buffer-line-count)
+(defvar integer-buffer-line-count nil)
+(make-variable-buffer-local 'integer-buffer-line-count)
+
+(setq-default mode-line-format
+							'("  " mode-line-modified
+								(list 'line-number-mode "  ")
+								(:eval (when line-number-mode
+												 (let ((str "L%l"))
+													 (when (and (not (buffer-modified-p)) my-mode-line-buffer-line-count)
+														 (setq str (concat str "/" my-mode-line-buffer-line-count)))
+													 str)))
+								"  %p"
+								(list 'column-number-mode "	 C%c")
+								"  " mode-line-buffer-identification
+								"  " mode-line-modes))
+
+(defun my-mode-line-count-lines ()
+  (setq integer-buffer-line-count (count-lines (point-min) (point-max)))
+  (setq my-mode-line-buffer-line-count (int-to-string integer-buffer-line-count)))
+
+(add-hook 'find-file-hook 'my-mode-line-count-lines)
+(add-hook 'after-save-hook 'my-mode-line-count-lines)
+(add-hook 'after-revert-hook 'my-mode-line-count-lines)
+(add-hook 'dired-after-readin-hook 'my-mode-line-count-lines)
+
+;; function to indent whole buffer
+(defun iwb ()
+  "indent whole buffer"
+  (interactive)
+  (delete-trailing-whitespace)
+  (indent-region (point-min) (point-max) nil)
+  (untabify (point-min) (point-max)))
+
+(add-hook 'slime-mode-hook 'smart-tab-mode-off)
+(add-hook 'slime-mode-hook 'fix-lisp-keybindings)
+;; get useful keybindings for lisp editing
+(defun fix-lisp-keybindings ()
+  "Adds about three million personalized keybindings for lisp editing with SLIME and Paredit.
+Not for the faint of heart."
+	(interactive)
+  (define-key slime-mode-map (kbd "TAB") 'slime-fuzzy-complete-symbol)
 	(define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
 	(define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
 	(define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key here (slurp-forward)
@@ -816,12 +594,24 @@ searches all buffers."
   (define-key paredit-mode-map (kbd "M-a M-<right>") 'paredit-forward-slurp-sexp)
   (define-key paredit-mode-map (kbd "M-a M-<left>") 'paredit-backward-slurp-sexp)
   (define-key paredit-mode-map (kbd "C-M-a C-M-<right>") 'paredit-forward-barf-sexp)
-  (define-key paredit-mode-map (kbd "C-M-a C-M-<left>") 'paredit-backward-barf-sexp))
-(global-set-key (kbd "C-c C-f") 'fix-paredit-keybindings)
+  (define-key paredit-mode-map (kbd "C-M-a C-M-<left>") 'paredit-backward-barf-sexp)
+  (define-key paredit-mode-map (kbd "C-x C-l") 'mc/edit-lines) ; so that multiple-cursors can use these
+  (define-key paredit-mode-map (kbd "M-n") 'mc/mark-next-like-this)
+  (define-key paredit-mode-map (kbd "M-p") 'mc/mark-previous-like-this)
+  (define-key paredit-mode-map (kbd "C-M-n") 'mc/unmark-next-like-this)
+  (define-key paredit-mode-map (kbd "C-M-p") 'mc/unmark-previous-like-this)
+  (define-key paredit-mode-map (kbd "C-c C-a") 'mc/mark-all-like-this)
+  (define-key paredit-mode-map (kbd "DEL") 'backspace-delete-highlight-paredit))
+(defun backspace-delete-highlight-paredit ()
+  "Makes it so that backspace deletes all highlighted text in paredit mode.
+Breaks the rules a little bit, but makes me a lot less insane."
+  (interactive)
+  (if (use-region-p)                    ; if a region is selected
+      (delete-region (region-beginning) (region-end))
+    (paredit-backward-delete)))
 
 (eval-after-load "haskell-mode"
 	'(define-key haskell-mode-map (kbd "C-c C-k") 'haskell-compile))
-
 (eval-after-load "haskell-mode"
 	'(progn
 		 (define-key haskell-mode-map (kbd "C-x C-d") nil)
@@ -832,25 +622,5 @@ searches all buffers."
 		 (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)
 		 (define-key haskell-mode-map (kbd "C-c M-.") nil)
 		 (define-key haskell-mode-map (kbd "C-c C-d") nil)))
-(defalias 'haskell-repl (symbol-function 'haskell-process-do-info)) ;; cause i can never find this lol
-
-;; do backups well and put them into a separate folder
-(setq backup-directory-alist `(("." . "~/.emacs.d/autosaved-files")))
-(setq backup-by-copying t)
-(setq delete-old-versions t
-			kept-new-versions 6
-			kept-old-versions 2
-			version-control t)
-;; do the same thing for undo-tree history
-(setq undo-tree-history-directory-alist `(("." . "~/.emacs.d/undo-tree-history")))
-
-(put 'downcase-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
-;; sudo open file with C-x C-f /sudo::/path/to/file
-;; more tramp stuff
-(set-default 'tramp-default-proxies-alist (quote ((".*" "\\`root\\'" "/ssh:%h:"))))
-
-;; add org-mode stuff
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-ca" 'org-agenda)
-(setq org-log-done t)
+;;; cause i can never figure out how to just get to the REPL lol
+(defalias 'haskell-repl (symbol-function 'haskell-process-do-info))
