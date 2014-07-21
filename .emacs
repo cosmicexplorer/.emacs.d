@@ -77,12 +77,17 @@
 (add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after semicolons i don't like them
+(setq c-default-style "gnu" c-basic-offset 2)
 (subword-mode)                           ; turn camel-case on
 (setq auto-mode-alist                ; use python-mode for scons files
       (cons '("SConstruct" . python-mode) auto-mode-alist))
 (setq auto-mode-alist
       (cons '("SConscript" . python-mode) auto-mode-alist))
-
+(setq-default c-basic-offset 2
+							tab-width 2
+							indent-tabs-mode t)
+(add-hook 'cc-mode-hook '(lambda ()			; not automatically making newlines in brackets
+						   (local-set-key (kbd "RET") 'newline-and-indent-fix-cc-mode)))
 ;;;;; load utilities
 ;; load w3m web browser
 (add-to-list 'load-path "~/.emacs.d/w3m")
@@ -559,11 +564,22 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
   (paredit-forward-slurp-sexp)
   (paredit-backward-slurp-sexp))        ; front and back added
 
+(defun newline-and-indent-fix-cc-mode ()
+  "cc-mode's indentation procedures upon adding a new bracket started screwing up. This fixes it."
+  (interactive)
+  (if (and (char-equal (preceding-char) ?{) ; if looking at bracket beginning
+           (char-equal (following-char) ?}))  ; and bracket ending
+      (progn
+        (newline-and-indent)
+        (previous-line)
+        (move-end-of-line nil)
+        (newline-and-indent))
+    (newline-and-indent)))
 
 (add-hook 'slime-mode-hook 'fix-lisp-keybindings)
 ;; get useful keybindings for lisp editing
 (defun fix-lisp-keybindings ()
-  "Adds about three million personalized keybindings for lisp editing with SLIME and Paredit.
+  "Changes about three million personalized keybindings for lisp editing with SLIME and Paredit.
 Not for the faint of heart."
   (interactive)
   (define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
