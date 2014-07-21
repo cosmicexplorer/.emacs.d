@@ -1,7 +1,7 @@
 .emacs.d
 ============
 
-Because I've gone through hell and back to make this the best editor on the planet. If I say I've "set up" something, it means I downloaded it from the brilliant people who spent their valuable time to make it and ingraciously shoved it into my own unified configuration.
+Because I've gone through hell and back to make this the best editor on the planet. If I say I've "set up" something, it means I downloaded it from the brilliant people who spent their valuable time to make it and ingraciously shoved it into my own unified configuration. The most meaningful contribution I've done is find usable non-conflicting keybindings for all of these.
 
 #### Major functionality already set up:
 
@@ -13,7 +13,7 @@ Because I've gone through hell and back to make this the best editor on the plan
 * [markdown-mode](http://jblevins.org/projects/markdown-mode/)
 * [evil](https://gitorious.org/evil/pages/Home)
 * [smart-compile](http://www.emacswiki.org/emacs/SmartCompile)
-* various language major modes, such as [go-mode](http://golang.org/misc/emacs/go-mode.el) [php-mode](http://sourceforge.net/projects/php-mode/), and R and Julia through [ESS](http://ess.r-project.org/), and [qmake-mode](https://code.google.com/p/qmake-mode/source/browse/qmake.el)
+* various language major modes, such as [go-mode](http://golang.org/misc/emacs/go-mode.el), [php-mode](http://sourceforge.net/projects/php-mode/), R and Julia through [ESS](http://ess.r-project.org/), and [qmake-mode](https://code.google.com/p/qmake-mode/source/browse/qmake.el)
 * [linum](http://www.logic.at/prolog/linum/linum.html) line numbering (modified somewhat)
 * [magit](https://github.com/magit/magit)
 * [saveplace](http://www.emacswiki.org/emacs/SavePlace)
