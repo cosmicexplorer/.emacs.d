@@ -106,7 +106,7 @@
   ("\\.R\\'"          . "Rscript %f") ;; redirects to stdout
   ("\\.r\\'"          . "Rscript %f") ;; redirects to stdout
   (go-mode            . (go-fmt-file-and-compile))
-  (qmake-mode         . "/opt/Qt/5.3/gcc_64/bin/qmake")
+  (qmake-mode         . "qmake")
 	(cmake-mode					. "cmake %d")
 )  "Alist of filename patterns vs corresponding format control strings.
 Each element looks like (REGEXP . STRING) or (MAJOR-MODE . STRING).

@@ -78,7 +78,6 @@ when we don't have to indent."
 
 (defcustom smart-tab-completion-functions-alist
   '((emacs-lisp-mode . lisp-complete-symbol)
-    (lisp-mode . slime-fuzzy-complete-symbol)
     (text-mode       . dabbrev-completion))
   "A-list of major modes in which to use a mode specific completion function.
 If current major mode is not found in this alist, fall back to
