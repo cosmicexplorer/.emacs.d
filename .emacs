@@ -87,8 +87,12 @@
 							tab-width 2
 							indent-tabs-mode t
 							c-default-style "stroustrup")
-(add-hook 'cc-mode-hook '(lambda ()			; not automatically making newlines in brackets
-						   (local-set-key (kbd "RET") 'newline-and-indent-fix-cc-mode)))
+;; not automatically making newlines in brackets
+(add-hook 'c-initialization-hook '(lambda ()
+																		(define-key c-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)
+																		(define-key c++-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)
+																		(define-key java-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)))
+
 ;;;;; load utilities
 ;; load w3m web browser
 (add-to-list 'load-path "~/.emacs.d/w3m")
@@ -558,13 +562,6 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
   (indent-region (point-min) (point-max) nil)
   (untabify (point-min) (point-max)))
 
-;; create parens and add adjacent two elements to sexp created by parens
-(defun paredit-create-sexp-slurp-both-sides ()
-  (interactive)
-  (paredit-open-parenthesis) ; adds closing paren too thanks to electric pair (or maybe it's paredit itself)
-  (paredit-forward-slurp-sexp)
-  (paredit-backward-slurp-sexp))        ; front and back added
-
 (defun newline-and-indent-fix-cc-mode ()
   "cc-mode's indentation procedures upon adding a new bracket started screwing up. This fixes it."
   (interactive)
@@ -577,6 +574,23 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
         (newline-and-indent))
     (newline-and-indent)))
 
+;(shell-command-to-string (concatenate 'string "echo " "pcmanfm"))
+(defvar string-kill-ring (car kill-ring))
+(car kill-ring)
+;(shell-command-to-string (concatenate 'string "echo \'" string-kill-ring "\' | xclip -i -selection clipboard"))
+;;; requires xclip
+;(defun copy-string-to-x-clipboard ()
+;	
+;	)
+(defun kill-selected-region-default (&optional lines)
+	"When selection highlighted, C-k stores all characters in the kill ring,
+instead of just the final line."
+	(interactive "p")	; gets beg and end from emacs as args
+	(if (use-region-p)							; if region selected
+			(kill-region (region-beginning) (region-end))
+		(kill-line lines)))
+(global-set-key (kbd "C-k") 'kill-selected-region-default)
+
 (add-hook 'slime-mode-hook 'fix-lisp-keybindings)
 ;; get useful keybindings for lisp editing
 (defun fix-lisp-keybindings ()
@@ -588,7 +602,8 @@ Not for the faint of heart."
   (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key here (slurp-forward)
   (define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward) ; remove key here (slurp-backward)
   (define-key paredit-mode-map (kbd "M-a") nil) ; kill this, it's a global but it's annoying and i don't use it
-  (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-create-sexp-slurp-both-sides)
+  (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-add-parens-both-sides)
+	(define-key paredit-mode-map (kbd "M-a M-s") 'paredit-remove-function-wrapper)
   (global-set-key (kbd "RET") 'newline-and-indent) ; set as global because define-key doesn't work, not sure why
   (define-key paredit-mode-map (kbd "M-a M-<right>") 'paredit-forward-slurp-sexp)
   (define-key paredit-mode-map (kbd "M-a M-<left>") 'paredit-backward-slurp-sexp)
@@ -600,14 +615,66 @@ Not for the faint of heart."
   (define-key paredit-mode-map (kbd "C-M-n") 'mc/unmark-next-like-this)
   (define-key paredit-mode-map (kbd "C-M-p") 'mc/unmark-previous-like-this)
   (define-key paredit-mode-map (kbd "C-c C-a") 'mc/mark-all-like-this)
-  (define-key paredit-mode-map (kbd "DEL") 'backspace-delete-highlight-paredit))
-(defun backspace-delete-highlight-paredit ()
+  (define-key paredit-mode-map (kbd "DEL") 'paredit-backspace-delete-highlight))
+;; create parens and add adjacent two elements to sexp created by parens
+(defun paredit-add-parens-both-sides ()
+	;; add to this later; slurp all sexps until closing paren would be very helpful i think
+  (interactive)
+	(let ((sel-beg nil) (sel-end nil))
+		(if (use-region-p)
+				(setq sel-beg (region-beginning) sel-end (region-end))
+			(progn
+				(paredit-forward)
+				(setq sel-end (point))
+				(paredit-backward)
+				(setq sel-beg (point))))
+		(message (number-to-string sel-beg))
+		(goto-char sel-beg)
+		(paredit-open-parenthesis) ; adds closing paren too thanks to electric pair (or maybe it's paredit itself)
+	;	(paredit-forward-slurp-sexp)
+		))
+(defun paredit-backspace-delete-highlight ()
   "Makes it so that backspace deletes all highlighted text in paredit mode.
 Breaks the rules a little bit, but makes me a lot less insane."
   (interactive)
   (if (use-region-p)                    ; if a region is selected
       (delete-region (region-beginning) (region-end))
     (paredit-backward-delete)))
+(defun paredit-remove-function-wrapper ()
+	;; this one is very imperative, not so lispy
+	;; it's really useful though so hopefully history will forgive me
+	"Removes all arguments to the left of point within sexp, and removes enclosing parentheses."
+	(interactive)
+	(let ((sel-beg nil) (sel-end nil)) ; set beginning and end of selection
+		(if (use-region-p)
+				(setq sel-beg (region-beginning) sel-end (region-end))
+			(progn
+				(paredit-forward)
+				(setq sel-end (point))
+				(paredit-backward)
+				(setq sel-beg (point))))
+		(goto-char sel-beg)
+		(let ((paren-counter 0))
+			(loop until (and (char-equal (preceding-char) 40) ; 40 is open parenthesis
+											 (= paren-counter 0))
+						do (progn
+								 (if (char-equal (preceding-char) 41) ; 41 is closed parenthesis
+										 (incf paren-counter))
+								 (if (char-equal (preceding-char) 40)	; open paren
+										 (decf paren-counter))
+								 (paredit-backward-delete)
+								 (decf sel-end))))
+		(goto-char sel-end)
+		(let ((paren-counter 0))
+			(loop until (and (char-equal (following-char) 41)	; closed paren
+											 (= paren-counter 0))
+						do (progn
+								 (if (char-equal (following-char) 40)	; open paren
+										 (incf paren-counter))
+								 (if (char-equal (following-char) 41)	; closed paren
+										 (decf paren-counter))
+								 (paredit-forward-delete))))
+		(paredit-splice-sexp)))
 
 (eval-after-load "haskell-mode"
   '(define-key haskell-mode-map (kbd "C-c C-k") 'haskell-compile))

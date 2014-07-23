@@ -40,6 +40,7 @@ These aren't actually required to run it, just to use certain modes. Email me ab
 1. [sbcl](http://sbcl.org) (for slime usage)
 2. [R](http://www.r-project.org) and [julia](http://julialang.org) languages (for ESS)
 3. [ghc-mod](http://www.mew.org/~kazu/proj/ghc-mod/en/)
+4. [xclip](http://sourceforge.net/projects/xclip/) for pasting to clipboard. [this](http://www.techrepublic.com/blog/windows-and-office/automate-vistas-clip-command-line-utility/) may be appropriate for Windows.
 
 #### Design decisions
 
