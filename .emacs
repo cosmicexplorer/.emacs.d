@@ -574,14 +574,11 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
         (newline-and-indent))
     (newline-and-indent)))
 
-;(shell-command-to-string (concatenate 'string "echo " "pcmanfm"))
-(defvar string-kill-ring (car kill-ring))
-(car kill-ring)
-;(shell-command-to-string (concatenate 'string "echo \'" string-kill-ring "\' | xclip -i -selection clipboard"))
-;;; requires xclip
-;(defun copy-string-to-x-clipboard ()
-;	
-;	)
+;; (defun copy-region-to-x-clipboard (start end)
+;; 	"execute region in an inferior shell"
+;; 	(interactive "r")
+;; 	(shell-command-to-string (concatenate 'string "zsh -c echo \'" (format "%s" (buffer-substring-no-properties (region-beginning) (region-end))) "\' | xclip -i -selection clipboard")))
+
 (defun kill-selected-region-default (&optional lines)
 	"When selection highlighted, C-k stores all characters in the kill ring,
 instead of just the final line."
@@ -602,7 +599,7 @@ Not for the faint of heart."
   (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key here (slurp-forward)
   (define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward) ; remove key here (slurp-backward)
   (define-key paredit-mode-map (kbd "M-a") nil) ; kill this, it's a global but it's annoying and i don't use it
-  (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-add-parens-both-sides)
+  (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-add-parens-in-front)
 	(define-key paredit-mode-map (kbd "M-a M-s") 'paredit-remove-function-wrapper)
   (global-set-key (kbd "RET") 'newline-and-indent) ; set as global because define-key doesn't work, not sure why
   (define-key paredit-mode-map (kbd "M-a M-<right>") 'paredit-forward-slurp-sexp)
@@ -616,8 +613,9 @@ Not for the faint of heart."
   (define-key paredit-mode-map (kbd "C-M-p") 'mc/unmark-previous-like-this)
   (define-key paredit-mode-map (kbd "C-c C-a") 'mc/mark-all-like-this)
   (define-key paredit-mode-map (kbd "DEL") 'paredit-backspace-delete-highlight))
+
 ;; create parens and add adjacent two elements to sexp created by parens
-(defun paredit-add-parens-both-sides ()
+(defun paredit-add-parens-in-front ()
 	;; add to this later; slurp all sexps until closing paren would be very helpful i think
   (interactive)
 	(let ((sel-beg nil) (sel-end nil))

@@ -27,7 +27,7 @@ Because I've gone through hell and back to make this the best editor on the plan
 2. Lisp setup (not required if you don't use lisp)
 	* If not using sbcl, change ```(setq inferior-lisp-program "sbcl")``` to the command calling your preferred compiler.
 	* .sbclrc loads things for slime; make the .sbclrc within your home directory (the one sbcl reads from when it starts) read ```(load "~/.emacs.d/.sbcl")``` to load everything contained within there.
-    * If sbcl does not recognize quicklisp packages, ensure that .sbclrc points to the correct location of the 'setup.lisp' file (for me it's in ```~/.emacs.d/quicklisp/setup.lisp```).
+    * If sbcl does not recogni[]M#B@ze quicklisp packages, ensure that .sbclrc points to the correct location of the 'setup.lisp' file (for me it's in ```~/.emacs.d/quicklisp/setup.lisp```).
     * Make sure that the .sbclrc in your home folder (or if it doesn't exist, make one) has the line ```(add-to-list 'exec-path "~/.cabal/bin")```.
     * If you're not using sbcl, that's cool too: look at the documentation [here](http://www.quicklisp.org/beta/) to set up your preferred lisp compiler.
 	* If things are not working (e.g. autocompletion, eldoc) in ```lisp-mode```, start slime using ```M-x slime```.
@@ -40,7 +40,6 @@ These aren't actually required to run it, just to use certain modes. Email me ab
 1. [sbcl](http://sbcl.org) (for slime usage)
 2. [R](http://www.r-project.org) and [julia](http://julialang.org) languages (for ESS)
 3. [ghc-mod](http://www.mew.org/~kazu/proj/ghc-mod/en/)
-4. [xclip](http://sourceforge.net/projects/xclip/) for pasting to clipboard. [this](http://www.techrepublic.com/blog/windows-and-office/automate-vistas-clip-command-line-utility/) may be appropriate for Windows.
 
 #### Design decisions
 
