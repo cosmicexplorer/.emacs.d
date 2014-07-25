@@ -6,12 +6,19 @@
 				autopair-newline
 				backspace-delete-highlight-paredit
 				beginning-of-buffer
+				c-electric-colon
+				c-electric-lt-gt
+				c-electric-paren
+				c-electric-semi&comma
 				c-electric-star
 				c-toggle-electric-state
+				comment-dwim
 				electric-pair-backward-delete-char
 				electric-pair-backward-delete-char-untabify
 				end-of-buffer
 				force-insert-tab
+				kill-selected-region-default
+				newline-and-indent-fix-cc-mode
 				paredit-backward
 				paredit-backward-barf-sexp
 				paredit-forward-barf-sexp

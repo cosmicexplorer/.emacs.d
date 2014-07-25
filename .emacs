@@ -172,6 +172,8 @@
 (setq undo-tree-auto-save-history t)
 ;; show diffs in undo tree visualizer
 (setq undo-tree-visualizer-diff t)
+;;; large undos oh man
+(setq undo-outer-limit 50000000)
 
 ;; adds smart-tab (tab completion) functionality
 (require 'smart-tab)
@@ -326,6 +328,8 @@
 ;; open and close
 (global-set-key (kbd "C-x <down>") 'split-window-below)
 (global-set-key (kbd "C-x <right>") 'split-window-right)
+(global-set-key (kbd "C-x <left>") 'split-window-horizontally)
+(global-set-key (kbd "C-x <up>") 'split-window-vertically)
 (global-set-key (kbd "C-x C-<down>") 'split-window-below)
 (global-set-key (kbd "C-x C-<right>") 'split-window-right)
 (global-set-key (kbd "C-x e") 'delete-other-windows) ;; "expand"
@@ -393,7 +397,7 @@
 (global-set-key (kbd "M-p") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-M-n") 'mc/unmark-next-like-this)
 (global-set-key (kbd "C-M-p") 'mc/unmark-previous-like-this)
-(global-set-key (kbd "C-c C-a") 'mc/mark-all-like-this)
+(global-set-key (kbd "C-x C-a") 'mc/mark-all-like-this)
 
 ;; gofmt!!!
 (add-hook 'go-mode-hook
@@ -563,21 +567,24 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
   (untabify (point-min) (point-max)))
 
 (defun newline-and-indent-fix-cc-mode ()
-  "cc-mode's indentation procedures upon adding a new bracket started screwing up. This fixes it."
+  "cc-mode's indentation procedures upon adding a new bracket or paren are annoying. This fixes that."
   (interactive)
-  (if (and (char-equal (preceding-char) ?{) ; if looking at bracket beginning
-           (char-equal (following-char) ?}))  ; and bracket ending
-      (progn
-        (newline-and-indent)
-        (previous-line)
-        (move-end-of-line nil)
-        (newline-and-indent))
-    (newline-and-indent)))
-
-;; (defun copy-region-to-x-clipboard (start end)
-;; 	"execute region in an inferior shell"
-;; 	(interactive "r")
-;; 	(shell-command-to-string (concatenate 'string "zsh -c echo \'" (format "%s" (buffer-substring-no-properties (region-beginning) (region-end))) "\' | xclip -i -selection clipboard")))
+  (cond ((and (char-equal (preceding-char) ?{) ; if looking at bracket beginning
+							(char-equal (following-char) ?}))	; and bracket ending
+				 (progn
+					 (newline-and-indent)
+					 (previous-line)
+					 (move-end-of-line nil)
+					 (newline-and-indent)))
+				((char-equal (following-char) 41)	 ; close paren
+				 (progn
+					 (newline-and-indent)
+					 (insert "t")									; filler character for tabbing
+					 (backward-char)
+					 (smart-tab)
+					 (delete-forward-char 1)))
+				(t
+				 (newline-and-indent))))
 
 (defun kill-selected-region-default (&optional lines)
 	"When selection highlighted, C-k stores all characters in the kill ring,
@@ -585,7 +592,9 @@ instead of just the final line."
 	(interactive "p")	; gets beg and end from emacs as args
 	(if (use-region-p)							; if region selected
 			(kill-region (region-beginning) (region-end))
-		(kill-line lines)))
+		(if (= lines 1)
+				(kill-line)
+			(kill-line lines))))
 (global-set-key (kbd "C-k") 'kill-selected-region-default)
 
 (add-hook 'slime-mode-hook 'fix-lisp-keybindings)
@@ -611,7 +620,7 @@ Not for the faint of heart."
   (define-key paredit-mode-map (kbd "M-p") 'mc/mark-previous-like-this)
   (define-key paredit-mode-map (kbd "C-M-n") 'mc/unmark-next-like-this)
   (define-key paredit-mode-map (kbd "C-M-p") 'mc/unmark-previous-like-this)
-  (define-key paredit-mode-map (kbd "C-c C-a") 'mc/mark-all-like-this)
+  (define-key paredit-mode-map (kbd "C-x C-a") 'mc/mark-all-like-this)
   (define-key paredit-mode-map (kbd "DEL") 'paredit-backspace-delete-highlight))
 
 ;; create parens and add adjacent two elements to sexp created by parens
@@ -641,7 +650,8 @@ Breaks the rules a little bit, but makes me a lot less insane."
 (defun paredit-remove-function-wrapper ()
 	;; this one is very imperative, not so lispy
 	;; it's really useful though so hopefully history will forgive me
-	"Removes all arguments to the left of point within sexp, and removes enclosing parentheses."
+	"Removes all arguments to the left of point within sexp, and removes enclosing parentheses.
+CURRENTLY BROKEN"
 	(interactive)
 	(let ((sel-beg nil) (sel-end nil)) ; set beginning and end of selection
 		(if (use-region-p)

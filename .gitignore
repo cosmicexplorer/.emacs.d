@@ -14,3 +14,5 @@ eshell/*
 # cached files for quicklisp
 quicklisp/cache/
 quicklisp/tmp/
+# tramp file
+tramp
