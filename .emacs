@@ -311,8 +311,7 @@
 ;; use C-h k to look at the current key sequence being entered!
 ;; this is useful when creating new keybindings
 
-;; since eval-expression uses just the alt key but unity sucks
-;; ESC-: DOES THIS ALREADY
+;; C-Spc to start selection (set mark) in terminal!
 
 ;; the below can also be applied over multiple lines with C-u [number] M-x helm-swoop RET
 (global-set-key (kbd "C-x o") 'helm-swoop)				; find regexp in file, more interactively than above
@@ -607,6 +606,10 @@ Not for the faint of heart."
   (define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
   (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key here (slurp-forward)
   (define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward) ; remove key here (slurp-backward)
+	(define-key paredit-mode-map (kbd "C-c <left>")	'windmove-left)
+	(define-key paredit-mode-map (kbd "C-c <right>") 'windmove-right)
+	(define-key paredit-mode-map (kbd "C-c <up>")	'windmove-up)
+	(define-key paredit-mode-map (kbd "C-c <down>")	'windmove-down)
   (define-key paredit-mode-map (kbd "M-a") nil) ; kill this, it's a global but it's annoying and i don't use it
   (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-add-parens-in-front)
 	(define-key paredit-mode-map (kbd "M-a M-s") 'paredit-remove-function-wrapper)
