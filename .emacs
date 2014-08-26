@@ -1,7 +1,7 @@
 ;;; note that the ~ expansion to home directory does not work when sudo/chrooted and absolute paths are required
-;;; i have changed quite a few files besides just this one and if you wish to upgrade them
+;;; i've changed quite a few files besides just this one and if you wish to upgrade the associated external packages
 ;;; you'll have to re-add those changes for the whole frail system to work
-;;; alternatively you can just email me that an update occurred in some package and i'll add it and push the changes
+;;; alternatively you can just email me that an update occurred in some package and i'll merge and push the changes
 
 ;;;;; specific sections are demarcated by five semicolons, like this line
 ;;; do a global search through all such marks to go through all major sections
@@ -72,12 +72,13 @@
 ;;;;; random per-language editing things
 ;; format comments like a normal person
 (add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
-(add-hook 'r-mode-hook (lambda () (setq comment-start "## " comment-end   "")))
+(add-hook 'r-mode-hook (lambda () (setq comment-start "# " comment-end   "")))
 (add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after semicolons i don't like them
-(setq c-default-style "gnu" c-basic-offset 2)
+(setq c-default-style "gnu"
+	  c-basic-offset 2)
 (subword-mode)                           ; turn camel-case on
 (setq auto-mode-alist                ; use python-mode for scons files
       (cons '("SConstruct" . python-mode) auto-mode-alist))
@@ -92,6 +93,8 @@
 																		(define-key c-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)
 																		(define-key c++-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)
 																		(define-key java-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)))
+(global-font-lock-mode 1)               ; turn on syntax highlighting
+(setq font-lock-maximum-decoration t)   ; turn it ALL the way on
 
 ;;;;; load utilities
 ;; load w3m web browser
@@ -110,6 +113,9 @@
 
 (add-to-list 'load-path "~/.emacs.d/multiple-cursors.el")
 (require 'multiple-cursors)
+
+;;; for code formatting
+(load "~/.emacs.d/clang-format.el")
 
 ;; for like real scrolling
 (xterm-mouse-mode)
@@ -295,8 +301,14 @@
          ("ruby" (mode . ruby-mode))
          ("hex" (mode . hexl-mode))
          ("qmake" (mode . qmake-mode))
-         ("emacs-system" (name . "\*+\*"))
-         ("default" (name . "*")))))
+         ("emacs-system" (or (name . "\*eshell\*")
+														 (name . "\*scratch\*")
+														 (name . "\*Messages\*")
+														 (name . "\*Compile-Log\*")
+														 (name . "\*ESS\*")
+														 (name . "\*compilation\*")
+														 (name . "\*Backtrace\*")))
+         ("default" (name . "")))))
 
 (add-hook 'ibuffer-mode-hook
           '(lambda ()
@@ -310,6 +322,7 @@
 ;; FIND CURRENT KEYBINDINGS WITH C-h b !!!!!
 ;; use C-h k to look at the current key sequence being entered!
 ;; this is useful when creating new keybindings
+;;; C-x C-z to suspend!
 
 ;; C-Spc to start selection (set mark) in terminal!
 
@@ -397,6 +410,7 @@
 (global-set-key (kbd "C-M-n") 'mc/unmark-next-like-this)
 (global-set-key (kbd "C-M-p") 'mc/unmark-previous-like-this)
 (global-set-key (kbd "C-x C-a") 'mc/mark-all-like-this)
+(define-key gud-mode-map (kbd "C-x C-a C-w") nil)	; because gdb hass dumb keybindings
 
 ;; gofmt!!!
 (add-hook 'go-mode-hook

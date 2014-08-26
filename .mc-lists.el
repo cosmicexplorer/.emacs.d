@@ -19,6 +19,7 @@
 				force-insert-tab
 				kill-selected-region-default
 				newline-and-indent-fix-cc-mode
+				paredit-backslash
 				paredit-backspace-delete-highlight
 				paredit-backward
 				paredit-backward-barf-sexp
