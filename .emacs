@@ -39,6 +39,14 @@
 ;; do the same thing for undo-tree history
 (setq undo-tree-history-directory-alist `(("." . "~/.emacs.d/undo-tree-history")))
 
+;;; highlight cursor when over 80 chars
+(add-to-list 'load-path "~/.emacs.d/lisp")
+(require 'highlight-80+)
+(add-hook 'prog-mode-hook #'highlight-80+-mode)
+(add-hook 'prog-mode-hook #'auto-fill-mode)
+(add-hook 'prog-mode-hook #'(lambda ()
+                              (set-fill-column 80)))
+
 ;;;;; setup specific modes for specific filetypes
 ;; setup slime
 ;; setup load-path and autoloads
@@ -76,23 +84,20 @@
 (add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
+(add-hook 'asm-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after semicolons i don't like them
 (setq c-default-style "gnu"
-	  c-basic-offset 2)
+      c-basic-offset 2)
 (subword-mode)                           ; turn camel-case on
 (setq auto-mode-alist                ; use python-mode for scons files
       (cons '("SConstruct" . python-mode) auto-mode-alist))
 (setq auto-mode-alist
       (cons '("SConscript" . python-mode) auto-mode-alist))
-(setq-default c-basic-offset 2
-							tab-width 2
-							indent-tabs-mode t
-							c-default-style "stroustrup")
 ;; not automatically making newlines in brackets
 (add-hook 'c-initialization-hook '(lambda ()
-																		(define-key c-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)
-																		(define-key c++-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)
-																		(define-key java-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)))
+                                    (define-key c-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)
+                                    (define-key c++-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)
+                                    (define-key java-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)))
 (global-font-lock-mode 1)               ; turn on syntax highlighting
 (setq font-lock-maximum-decoration t)   ; turn it ALL the way on
 
@@ -200,7 +205,7 @@
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
 
-;(add-to-list 'exec-path "~/.cabal/bin")
+                                        ;(add-to-list 'exec-path "~/.cabal/bin")
 (add-to-list 'load-path "~/.emacs.d/ghc-4.1.5")
 (require 'ghc)
 (autoload 'ghc-init "ghc" nil t)
@@ -302,12 +307,12 @@
          ("hex" (mode . hexl-mode))
          ("qmake" (mode . qmake-mode))
          ("emacs-system" (or (name . "\*eshell\*")
-														 (name . "\*scratch\*")
-														 (name . "\*Messages\*")
-														 (name . "\*Compile-Log\*")
-														 (name . "\*ESS\*")
-														 (name . "\*compilation\*")
-														 (name . "\*Backtrace\*")))
+                             (name . "\*scratch\*")
+                             (name . "\*Messages\*")
+                             (name . "\*Compile-Log\*")
+                             (name . "\*ESS\*")
+                             (name . "\*compilation\*")
+                             (name . "\*Backtrace\*")))
          ("default" (name . "")))))
 
 (add-hook 'ibuffer-mode-hook
@@ -583,31 +588,31 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
   "cc-mode's indentation procedures upon adding a new bracket or paren are annoying. This fixes that."
   (interactive)
   (cond ((and (char-equal (preceding-char) ?{) ; if looking at bracket beginning
-							(char-equal (following-char) ?}))	; and bracket ending
-				 (progn
-					 (newline-and-indent)
-					 (previous-line)
-					 (move-end-of-line nil)
-					 (newline-and-indent)))
-				((char-equal (following-char) 41)	 ; close paren
-				 (progn
-					 (newline-and-indent)
-					 (insert "t")									; filler character for tabbing
-					 (backward-char)
-					 (smart-tab)
-					 (delete-forward-char 1)))
-				(t
-				 (newline-and-indent))))
+              (char-equal (following-char) ?}))	; and bracket ending
+         (progn
+           (newline-and-indent)
+           (previous-line)
+           (move-end-of-line nil)
+           (newline-and-indent)))
+        ((char-equal (following-char) 41)	 ; close paren
+         (progn
+           (newline-and-indent)
+           (insert "t")									; filler character for tabbing
+           (backward-char)
+           (smart-tab)
+           (delete-forward-char 1)))
+        (t
+         (newline-and-indent))))
 
 (defun kill-selected-region-default (&optional lines)
-	"When selection highlighted, C-k stores all characters in the kill ring,
+  "When selection highlighted, C-k stores all characters in the kill ring,
 instead of just the final line."
-	(interactive "p")	; gets beg and end from emacs as args
-	(if (use-region-p)							; if region selected
-			(kill-region (region-beginning) (region-end))
-		(if (= lines 1)
-				(kill-line)
-			(kill-line lines))))
+  (interactive "p")	; gets beg and end from emacs as args
+  (if (use-region-p)							; if region selected
+      (kill-region (region-beginning) (region-end))
+    (if (= lines 1)
+        (kill-line)
+      (kill-line lines))))
 (global-set-key (kbd "C-k") 'kill-selected-region-default)
 
 (add-hook 'slime-mode-hook 'fix-lisp-keybindings)
@@ -620,13 +625,13 @@ Not for the faint of heart."
   (define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
   (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key here (slurp-forward)
   (define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward) ; remove key here (slurp-backward)
-	(define-key paredit-mode-map (kbd "C-c <left>")	'windmove-left)
-	(define-key paredit-mode-map (kbd "C-c <right>") 'windmove-right)
-	(define-key paredit-mode-map (kbd "C-c <up>")	'windmove-up)
-	(define-key paredit-mode-map (kbd "C-c <down>")	'windmove-down)
+  (define-key paredit-mode-map (kbd "C-c <left>")	'windmove-left)
+  (define-key paredit-mode-map (kbd "C-c <right>") 'windmove-right)
+  (define-key paredit-mode-map (kbd "C-c <up>")	'windmove-up)
+  (define-key paredit-mode-map (kbd "C-c <down>")	'windmove-down)
   (define-key paredit-mode-map (kbd "M-a") nil) ; kill this, it's a global but it's annoying and i don't use it
   (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-add-parens-in-front)
-	(define-key paredit-mode-map (kbd "M-a M-s") 'paredit-remove-function-wrapper)
+  (define-key paredit-mode-map (kbd "M-a M-s") 'paredit-remove-function-wrapper)
   (global-set-key (kbd "RET") 'newline-and-indent) ; set as global because define-key doesn't work, not sure why
   (define-key paredit-mode-map (kbd "M-a M-<right>") 'paredit-forward-slurp-sexp)
   (define-key paredit-mode-map (kbd "M-a M-<left>") 'paredit-backward-slurp-sexp)
@@ -642,21 +647,21 @@ Not for the faint of heart."
 
 ;; create parens and add adjacent two elements to sexp created by parens
 (defun paredit-add-parens-in-front ()
-	;; add to this later; slurp all sexps until closing paren would be very helpful i think
+  ;; add to this later; slurp all sexps until closing paren would be very helpful i think
   (interactive)
-	(let ((sel-beg nil) (sel-end nil))
-		(if (use-region-p)
-				(setq sel-beg (region-beginning) sel-end (region-end))
-			(progn
-				(paredit-forward)
-				(setq sel-end (point))
-				(paredit-backward)
-				(setq sel-beg (point))))
-		(message (number-to-string sel-beg))
-		(goto-char sel-beg)
-		(paredit-open-parenthesis) ; adds closing paren too thanks to electric pair (or maybe it's paredit itself)
-	;	(paredit-forward-slurp-sexp)
-		))
+  (let ((sel-beg nil) (sel-end nil))
+    (if (use-region-p)
+        (setq sel-beg (region-beginning) sel-end (region-end))
+      (progn
+        (paredit-forward)
+        (setq sel-end (point))
+        (paredit-backward)
+        (setq sel-beg (point))))
+    (message (number-to-string sel-beg))
+    (goto-char sel-beg)
+    (paredit-open-parenthesis) ; adds closing paren too thanks to electric pair (or maybe it's paredit itself)
+                                        ;	(paredit-forward-slurp-sexp)
+    ))
 (defun paredit-backspace-delete-highlight ()
   "Makes it so that backspace deletes all highlighted text in paredit mode.
 Breaks the rules a little bit, but makes me a lot less insane."
@@ -665,41 +670,41 @@ Breaks the rules a little bit, but makes me a lot less insane."
       (delete-region (region-beginning) (region-end))
     (paredit-backward-delete)))
 (defun paredit-remove-function-wrapper ()
-	;; this one is very imperative, not so lispy
-	;; it's really useful though so hopefully history will forgive me
-	"Removes all arguments to the left of point within sexp, and removes enclosing parentheses.
+  ;; this one is very imperative, not so lispy
+  ;; it's really useful though so hopefully history will forgive me
+  "Removes all arguments to the left of point within sexp, and removes enclosing parentheses.
 CURRENTLY BROKEN"
-	(interactive)
-	(let ((sel-beg nil) (sel-end nil)) ; set beginning and end of selection
-		(if (use-region-p)
-				(setq sel-beg (region-beginning) sel-end (region-end))
-			(progn
-				(paredit-forward)
-				(setq sel-end (point))
-				(paredit-backward)
-				(setq sel-beg (point))))
-		(goto-char sel-beg)
-		(let ((paren-counter 0))
-			(loop until (and (char-equal (preceding-char) 40) ; 40 is open parenthesis
-											 (= paren-counter 0))
-						do (progn
-								 (if (char-equal (preceding-char) 41) ; 41 is closed parenthesis
-										 (incf paren-counter))
-								 (if (char-equal (preceding-char) 40)	; open paren
-										 (decf paren-counter))
-								 (paredit-backward-delete)
-								 (decf sel-end))))
-		(goto-char sel-end)
-		(let ((paren-counter 0))
-			(loop until (and (char-equal (following-char) 41)	; closed paren
-											 (= paren-counter 0))
-						do (progn
-								 (if (char-equal (following-char) 40)	; open paren
-										 (incf paren-counter))
-								 (if (char-equal (following-char) 41)	; closed paren
-										 (decf paren-counter))
-								 (paredit-forward-delete))))
-		(paredit-splice-sexp)))
+  (interactive)
+  (let ((sel-beg nil) (sel-end nil)) ; set beginning and end of selection
+    (if (use-region-p)
+        (setq sel-beg (region-beginning) sel-end (region-end))
+      (progn
+        (paredit-forward)
+        (setq sel-end (point))
+        (paredit-backward)
+        (setq sel-beg (point))))
+    (goto-char sel-beg)
+    (let ((paren-counter 0))
+      (loop until (and (char-equal (preceding-char) 40) ; 40 is open parenthesis
+                       (= paren-counter 0))
+            do (progn
+                 (if (char-equal (preceding-char) 41) ; 41 is closed parenthesis
+                     (incf paren-counter))
+                 (if (char-equal (preceding-char) 40)	; open paren
+                     (decf paren-counter))
+                 (paredit-backward-delete)
+                 (decf sel-end))))
+    (goto-char sel-end)
+    (let ((paren-counter 0))
+      (loop until (and (char-equal (following-char) 41)	; closed paren
+                       (= paren-counter 0))
+            do (progn
+                 (if (char-equal (following-char) 40)	; open paren
+                     (incf paren-counter))
+                 (if (char-equal (following-char) 41)	; closed paren
+                     (decf paren-counter))
+                 (paredit-forward-delete))))
+    (paredit-splice-sexp)))
 
 (eval-after-load "haskell-mode"
   '(define-key haskell-mode-map (kbd "C-c C-k") 'haskell-compile))
@@ -715,3 +720,11 @@ CURRENTLY BROKEN"
      (define-key haskell-mode-map (kbd "C-c C-d") nil)))
 ;;; cause i can never figure out how to just get to the REPL lol
 (defalias 'haskell-repl (symbol-function 'haskell-process-do-info))
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(fill-column 80)
+ '(org-support-shift-select (quote always)))

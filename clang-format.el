@@ -48,7 +48,7 @@
                              "-length" (number-to-string (- end begin))
                              "-cursor" (number-to-string (1- (point)))
                              "-assume-filename" (buffer-file-name)
-                             ;"-style" style
+                             "-style" "file"
 														 )
       (goto-char (point-min))
       (let ((json-output (json-read-from-string

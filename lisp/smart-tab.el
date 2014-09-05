@@ -78,7 +78,7 @@ when we don't have to indent."
 
 (defcustom smart-tab-completion-functions-alist
   '((emacs-lisp-mode . lisp-complete-symbol)
-		(lisp-mode . lisp-complete-symbol)
+    (lisp-mode . lisp-complete-symbol)
     (text-mode       . dabbrev-completion))
   "A-list of major modes in which to use a mode specific completion function.
 If current major mode is not found in this alist, fall back to
@@ -132,17 +132,15 @@ the text at point."
   (if smart-tab-debug
       (message "default"))
   (if (use-region-p)
-			(if (or (eq (with-current-buffer (current-buffer) major-mode) 'c-mode)
-							(eq (with-current-buffer (current-buffer) major-mode) 'c++-mode))
-					(clang-format-region)
-				(indent-region (region-beginning)
-											 (region-end)))
-		(if (or (eq (with-current-buffer (current-buffer) major-mode) 'c-mode)
-						(eq (with-current-buffer (current-buffer) major-mode) 'c++-mode))
-				(clang-format-line)			
-			(indent-for-tab-command))))
-
-(with-current-buffer (current-buffer) major-mode)
+      (if (or (eq (with-current-buffer (current-buffer) major-mode) 'c-mode)
+              (eq (with-current-buffer (current-buffer) major-mode) 'c++-mode))
+          (clang-format-region)
+        (indent-region (region-beginning)
+                       (region-end)))
+    (if (or (eq (with-current-buffer (current-buffer) major-mode) 'c-mode)
+            (eq (with-current-buffer (current-buffer) major-mode) 'c++-mode))
+        (clang-format-line)
+      (indent-for-tab-command))))
 
 ;;;###autoload
 (defun smart-tab (&optional prefix)
@@ -166,7 +164,7 @@ active)."
 ;;;###autoload
 (defun smart-tab-mode-on ()
   "Turn on `smart-tab-mode'."
-    (smart-tab-mode 1))
+  (smart-tab-mode 1))
 
 (defun smart-tab-mode-off ()
   "Turn off `smart-tab-mode'."

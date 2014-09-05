@@ -39,4 +39,5 @@
 
 (setq mc/cmds-to-run-once
       '(
+				undo-tree-visualize
 				))
