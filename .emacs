@@ -1,8 +1,10 @@
-;;; note that the ~ expansion to home directory does not work when sudo/chrooted and absolute paths are required
-;;; i've changed quite a few files besides just this one and if you wish to upgrade the associated external packages
+;;; note that the ~ expansion to home directory does not work when sudo/chrooted
+;;; and absolute paths are required
+;;; i've changed quite a few files besides just this one and if you wish to
+;;; upgrade the associated external packages 
 ;;; you'll have to re-add those changes for the whole frail system to work
-;;; alternatively you can just email me that an update occurred in some package and i'll merge and push the changes
-
+;;; alternatively you can just email me that an update occurred in some package
+;;; and i'll merge and push the changes 
 ;;;;; specific sections are demarcated by five semicolons, like this line
 ;;; do a global search through all such marks to go through all major sections
 
@@ -12,7 +14,8 @@
 (setq inhibit-startup-message t)
 (menu-bar-mode -1) ;; remove menu bar for another line of space
 (setq-default indent-tabs-mode nil)	;; fix indentation issues
-;; fix selection issues in xterm (can't hold down shift and up arrow to highlight stuff)
+;; fix selection issues in xterm (can't hold down shift and up arrow to
+;; highlight stuff)
 (if (equal "xterm" (tty-type))
     (define-key input-decode-map "\e[1;2A" [S-up]))
 
@@ -37,7 +40,8 @@
       kept-old-versions 2
       version-control t)
 ;; do the same thing for undo-tree history
-(setq undo-tree-history-directory-alist `(("." . "~/.emacs.d/undo-tree-history")))
+(setq undo-tree-history-directory-alist `(("."
+                                           . "~/.emacs.d/undo-tree-history")))
 
 ;;; highlight cursor when over 80 chars
 (add-to-list 'load-path "~/.emacs.d/lisp")
@@ -56,14 +60,15 @@
 (setq inferior-lisp-program "sbcl")
 (setq slime-contribs '(slime-fancy))
 (add-to-list 'slime-contribs 'slime-repl)
-(load (expand-file-name "~/.emacs.d/quicklisp/slime-helper.el")) ;; add quicklisp!
+(load (expand-file-name "~/.emacs.d/quicklisp/slime-helper.el")) ;; quicklisp
 (add-hook 'emacs-lisp-mode-hook 'fix-lisp-keybindings)
 (add-hook 'lisp-mode-hook 'slime-mode)
 (add-hook 'lisp-mode-hook 'fix-lisp-keybindings)
 
 ;; paredit
 (add-to-list 'load-path "~/.emacs.d/paredit")
-(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of
+Lisp code." t)
 (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
 (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
 (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
@@ -82,22 +87,47 @@
 (add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
 (add-hook 'r-mode-hook (lambda () (setq comment-start "# " comment-end   "")))
 (add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
-(add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
+(add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; " comment-end
+                                                 "")))
 (add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (add-hook 'asm-mode-hook (lambda () (setq comment-start "# " comment-end "")))
-(setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after semicolons i don't like them
+(setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after
+                                        ; semicolons i don't like that 
 (setq c-default-style "gnu"
       c-basic-offset 2)
-(subword-mode)                           ; turn camel-case on
-(setq auto-mode-alist                ; use python-mode for scons files
+(subword-mode)                          ; turn camel-case on
+(setq auto-mode-alist                   ; use python-mode for scons files
       (cons '("SConstruct" . python-mode) auto-mode-alist))
 (setq auto-mode-alist
       (cons '("SConscript" . python-mode) auto-mode-alist))
-;; not automatically making newlines in brackets
-(add-hook 'c-initialization-hook '(lambda ()
-                                    (define-key c-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)
-                                    (define-key c++-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)
-                                    (define-key java-mode-map (kbd "RET") 'newline-and-indent-fix-cc-mode)))
+
+;;;;; FIX DUMB SEMICOLONS WITH CC-MODE AND USE CLANG-FORMAT FOR EVERYTHING
+(defun add-keybinding-to-mode-maps (keys-pressed func-to-call-quoted
+                                                 &rest mode-maps-list)
+  "Adds function to a given list of mode maps upon pressing a given key."
+  (interactive)
+  (loop for mode-map in mode-maps-list
+        do (define-key mode-map (kbd keys-pressed) func-to-call-quoted)))
+(defun insert-semicolon ()
+  (interactive)
+  (insert-char 59))
+(defun insert-open-paren ()
+  (interactive)
+  (insert-char 40)
+  (electric-p)
+  )
+(defun insert-close-paren ()
+  (interactive)
+  (insert-char 41))
+(setq c-electric-flag nil)
+(add-hook
+ 'c-initialization-hook '(lambda ()
+                           (add-keybinding-to-mode-maps
+                            "RET" 'newline-and-indent-fix-cc-mode
+                            c-mode-map
+                            c++-mode-map
+                            java-mode-map)))
+;;; syntax highlighting
 (global-font-lock-mode 1)               ; turn on syntax highlighting
 (setq font-lock-maximum-decoration t)   ; turn it ALL the way on
 
@@ -139,7 +169,8 @@
                 [remap eshell-pcomplete]
                 'helm-esh-pcomplete)))
 
-;; autoload eshell at start so helm plays nice (this doesn't affect load time at all i've checked)
+;; autoload eshell at start so helm plays nice (this doesn't affect load time at
+;; all i've checked)
 (add-hook 'emacs-startup-hook #'(lambda ()
                                   (let ((default-directory (getenv "HOME")))
                                     (command-execute 'eshell)
@@ -240,7 +271,8 @@
 ;;; allow for ido usage for better C-x b buffer search n stuff
 (require 'ido)
 (ido-mode t)
-(setq ido-enable-flex-matching t)				; makes searching fuzzier
+(setq ido-enable-flex-matching t)       ; makes
+                                        ; searching fuzzier
 
 ;; when opening a file the cursor will be at the last saved position
 (require 'saveplace)
@@ -252,7 +284,8 @@
 
 ;;;;; ibuffer stuff
 ;;;; re: http://martinowen.net/blog/2010/02/03/tips-for-emacs-ibuffer.html
-;; you can add different groups too, not just home, in case you ever want to (lol)
+;; you can add different groups too, not just home, in case you ever want to
+;; (lol)
 (setq ibuffer-saved-filter-groups
       '(("home"
          ("emacs-config" (or (filename . ".emacs.d")
@@ -284,7 +317,8 @@
          ("readme" (or (filename . "\\README\\'")
                        (filename . "\\readme\\'")))
          ("dired" (mode . dired-mode))
-         ("julia" (filename . "\\.jl\\'")) ;; because just detecting julia-mode doesn't work fsr
+         ("julia" (filename . "\\.jl\\'")) ;; because just detecting julia-mode
+         ;; doesn't work fsr
          ("r" (or (filename . "\\.R\\'")
                   (filename . "\\.r\\'")))
          ("cmake" (mode . cmake-mode))
@@ -295,7 +329,8 @@
          ("java" (mode . java-mode))
          ("python" (mode . python-mode))
          ("markdown" (mode . markdown-mode))
-         ("emacs-lisp" (mode . emacs-lisp-mode)) ;; emacs-config filter mostly blocks this but it's whatever
+         ("emacs-lisp" (mode . emacs-lisp-mode)) ;; emacs-config filter mostly
+         ;; blocks this but it's whatever
          ("lisp" (mode . lisp-mode))
          ("go" (mode . go-mode))
          ("javascript" (mode . js-mode))
@@ -331,14 +366,19 @@
 
 ;; C-Spc to start selection (set mark) in terminal!
 
-;; the below can also be applied over multiple lines with C-u [number] M-x helm-swoop RET
-(global-set-key (kbd "C-x o") 'helm-swoop)				; find regexp in file, more interactively than above
-(global-set-key (kbd "C-x f") 'helm-multi-swoop-all) ; find regexp in ALL open buffers
-(global-set-key (kbd "C-x j") 'helm-multi-swoop)		 ; find regexp is SOME open buffers
+;; the below can also be applied over multiple lines with
+;; C-u [number] M-x helm-swoop RET
+(global-set-key (kbd "C-x o") 'helm-swoop) ; find regexp in file, more
+                                        ; interactively than above
+(global-set-key (kbd "C-x f") 'helm-multi-swoop-all) ; find regexp in ALL open
+                                        ; buffers
+(global-set-key (kbd "C-x j") 'helm-multi-swoop)		 ; find regexp
+                                        ; is SOME open buffers
 (global-set-key (kbd "C-x b") 'helm-buffers-list) ; find among open buffers
 
 ;; after killing C-x o with helm,
-;; let's make sure we do have buffer switching in the event of non-graphical terminal-only editing
+;; let's make sure we do have buffer switching in the event of non-graphical
+;; terminal-only editing
 (global-set-key (kbd "C-x /") 'other-window)
 
 ;;; split-window management
@@ -356,7 +396,8 @@
 (global-set-key (kbd "C-x <end>") 'shrink-window) ;; decrease window height
 (global-set-key (kbd "C-x <prior>") 'enlarge-window-horizontally)
 (global-set-key (kbd "C-x <next>") 'shrink-window-horizontally)
-(global-set-key (kbd "C-x RET") 'shrink-window-if-larger-than-buffer) ;; shrink window to fit content
+(global-set-key (kbd "C-x RET") 'shrink-window-if-larger-than-buffer) ;; shrink
+;; window to fit content
 (global-set-key (kbd "C-x !") 'balance-windows) ;; make all windows same height
 ;;; move among panes in a way that isn't totally fucked
 (setq windmove-wrap-around t)
@@ -365,7 +406,8 @@
 (global-set-key (kbd "C-M-<right>") 'windmove-right)
 (global-set-key (kbd "C-M-<up>")	'windmove-up)
 (global-set-key (kbd "C-M-<down>")	'windmove-down)
-;; terminal in ubuntu doesn't allow above keybindings; probably because M-<left> and M-<right> switch tty
+;; terminal in ubuntu doesn't allow above keybindings; probably because M-<left>
+;; and M-<right> switch tty
 ;; which is cool i guess??? very annoying though
 (global-set-key (kbd "C-c <left>")	'windmove-left)
 (global-set-key (kbd "C-c <right>") 'windmove-right)
@@ -399,7 +441,8 @@
 ;; kill all active dired buffers at once
 (global-set-key (kbd "C-x M-d") 'kill-dired-buffers)
 
-;; open new file with given filename from minibuffer, or blank filename (cross your fingers)
+;; open new file with given filename from minibuffer, or blank filename (cross
+;; your fingers)
 (global-set-key (kbd "C-x C-n") 'open-new-file)
 
 ;; go to normal mode; i.e. quickly format everything pretty
@@ -415,15 +458,10 @@
 (global-set-key (kbd "C-M-n") 'mc/unmark-next-like-this)
 (global-set-key (kbd "C-M-p") 'mc/unmark-previous-like-this)
 (global-set-key (kbd "C-x C-a") 'mc/mark-all-like-this)
-(define-key gud-mode-map (kbd "C-x C-a C-w") nil)	; because gdb hass dumb keybindings
 
 ;; gofmt!!!
 (add-hook 'go-mode-hook
           (lambda () (local-set-key (kbd "C-c f") 'go-fmt-file)))
-
-;; add forward regexp search cause it's pretty useful!
-(global-set-key (kbd "C-x M-r") 'search-forward-regexp)
-;; don't forget regexp-builder to see interactively how many hits the regexp is getting!
 
 ;; indent all lines in a file in case copy/pasting screws up somehow
 (global-set-key (kbd "C-c i") 'iwb)
@@ -435,7 +473,8 @@
 
 ;; make <backtab> force tab
 (global-set-key (kbd "<backtab>") 'force-insert-tab)
-(global-set-key (kbd "C-c t") 'force-insert-tab) ; for modes like markdown-mode where S-tab overridden
+(global-set-key (kbd "C-c t") 'force-insert-tab) ; for modes like markdown-mode
+                                        ; where S-tab overridden
 
 ;; open file with wildcards
 ;;(global-set-key (kbd "C-c o") 'open-file-with-wildcards)
@@ -445,9 +484,11 @@
 (global-set-key (kbd "C-x M-c") 'toggle-letter-case)
 
 ;;;;; my own functions! used throughout this file
-;;; some of these are mine, some are heavily adapated from emacswiki, some are copy/paste from emacswiki
-;;; if you wrote something and want me to put your name by it (which would be hilarious cause that means
-;;; someone else is actually using this file) email me and i'll add accreditation immediately
+;;; some of these are mine, some are heavily adapated from emacswiki, some are
+;;; copy/paste from emacswiki
+;;; if you wrote something and want me to put your name by it (which would be
+;;; hilarious cause that means someone else is actually using this file email me
+;;; and i'll add accreditation immediately
 
 ;; allow for backtab to force '\t'
 (defun force-insert-tab ()
@@ -461,11 +502,17 @@
   (interactive)
   (dolist (buf (buffer-list))
     (with-current-buffer buf
-      (when (and (buffer-file-name) (file-exists-p (buffer-file-name)) (not (buffer-modified-p)))
+      (when (and (buffer-file-name) (file-exists-p (buffer-file-name))
+                 (not
+                  (buffer-modified-p)))
         (revert-buffer t t t) )))
   (message "Refreshed open files.") )
 
-(defcustom search-all-buffers-ignored-files (list (rx-to-string '(and bos (or ".bash_history" "TAGS") eos)))
+(defcustom search-all-buffers-ignored-files (list (rx-to-string
+                                                   '(and bos (or
+                                                              ".bash_history"
+                                                              "TAGS")
+                                                         eos))) 
   "Files to ignore when searching buffers via \\[search-all-buffers]."
   :type 'editable-list)
 
@@ -481,13 +528,16 @@ searches all buffers."
    (if (member prefix '(4 (4)))
        (buffer-list)
      (remove-if
-      (lambda (b) (some (lambda (rx) (string-match rx  (file-name-nondirectory (buffer-file-name b)))) search-all-buffers-ignored-files))
+      (lambda (b) (some (lambda (rx) (string-match rx  (file-name-nondirectory
+                                                        (buffer-file-name b))))
+                        search-all-buffers-ignored-files))
       (remove-if-not 'buffer-file-name (buffer-list))))
    regexp))
 
 ;; kill current buffer and close pane
 (defun close-and-kill-this-pane ()
-  "If there are multiple windows, then close this pane and kill the buffer in it also."
+  "If there are multiple windows, then close this pane and kill the buffer in it
+also."
   (interactive)
   (kill-this-buffer)
   (if (not (one-window-p))
@@ -507,7 +557,8 @@ searches all buffers."
   (switch-to-buffer ;; switches to operating buffer
    (generate-new-buffer ;; creates new buffer with given name
     (generate-new-buffer-name
-     (read-string "new filename: " ;; reads from minibuffer, with given default value
+     (read-string "new filename: " ;; reads from minibuffer, with given default
+                  ;; value
                   nil nil "*newbuf*")))) ;; with default title *newbuf*
   (normal-mode))
 
@@ -519,8 +570,10 @@ searches all buffers."
     (ibuffer-jump-to-buffer recent-buffer-name)))
 (ad-activate 'ibuffer)
 
-;; stolen from the ergo emacs guy (http://ergoemacs.org/emacs/modernization_upcase-word.html)
-;; like normally everything he's put up is super underwhelming but this sees some use
+;; stolen from the ergo emacs guy
+;; (http://ergoemacs.org/emacs/modernization_upcase-word.html)
+;; like normally everything he's put up is super underwhelming but this sees
+;; some use
 (defun toggle-letter-case ()
   "Toggle the letter case of current word or text selection.
 Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
@@ -534,9 +587,12 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
       (save-excursion
         (goto-char p1)
         (cond
-         ((looking-at "[[:lower:]][[:lower:]]") (put this-command 'state "all lower"))
-         ((looking-at "[[:upper:]][[:upper:]]") (put this-command 'state "all caps"))
-         ((looking-at "[[:upper:]][[:lower:]]") (put this-command 'state "init caps"))
+         ((looking-at "[[:lower:]][[:lower:]]") (put this-command 'state "all
+lower"))
+         ((looking-at "[[:upper:]][[:upper:]]") (put this-command 'state "all
+caps"))
+         ((looking-at "[[:upper:]][[:lower:]]") (put this-command 'state "init
+caps"))
          ((looking-at "[[:lower:]]") (put this-command 'state "all lower"))
          ((looking-at "[[:upper:]]") (put this-command 'state "all caps"))
          (t (put this-command 'state "all lower")))))
@@ -559,8 +615,10 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
                 (list 'line-number-mode "  ")
                 (:eval (when line-number-mode
                          (let ((str "L%l"))
-                           (when (and (not (buffer-modified-p)) my-mode-line-buffer-line-count)
-                             (setq str (concat str "/" my-mode-line-buffer-line-count)))
+                           (when (and (not (buffer-modified-p))
+                                      my-mode-line-buffer-line-count)
+                             (setq str (concat str "/"
+                                               my-mode-line-buffer-line-count)))
                            str)))
                 "  %p"
                 (list 'column-number-mode "	 C%c")
@@ -569,7 +627,8 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
 
 (defun count-lines-in-buffer ()
   (setq integer-buffer-line-count (count-lines (point-min) (point-max)))
-  (setq my-mode-line-buffer-line-count (int-to-string integer-buffer-line-count)))
+  (setq my-mode-line-buffer-line-count (int-to-string
+                                        integer-buffer-line-count)))
 
 (add-hook 'find-file-hook 'count-lines-in-buffer)
 (add-hook 'after-save-hook 'count-lines-in-buffer)
@@ -585,30 +644,22 @@ Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
   (untabify (point-min) (point-max)))
 
 (defun newline-and-indent-fix-cc-mode ()
-  "cc-mode's indentation procedures upon adding a new bracket or paren are annoying. This fixes that."
+  "cc-mode's indentation procedures upon adding a new bracket or paren are
+annoying. This fixes that."
   (interactive)
-  (cond ((and (char-equal (preceding-char) ?{) ; if looking at bracket beginning
-              (char-equal (following-char) ?}))	; and bracket ending
-         (progn
-           (newline-and-indent)
-           (previous-line)
-           (move-end-of-line nil)
-           (newline-and-indent)))
-        ((char-equal (following-char) 41)	 ; close paren
-         (progn
-           (newline-and-indent)
-           (insert "t")									; filler character for tabbing
-           (backward-char)
-           (smart-tab)
-           (delete-forward-char 1)))
-        (t
-         (newline-and-indent))))
+  (insert-char 97)
+  (insert-char 59)                      ; insert comment
+  (clang-format-line)                   ; clang-formats previous line (i
+                                        ; personally think this is an incredibly
+                                        ; clever solution)
+  (delete-backward-char 2)
+  )
 
 (defun kill-selected-region-default (&optional lines)
   "When selection highlighted, C-k stores all characters in the kill ring,
 instead of just the final line."
   (interactive "p")	; gets beg and end from emacs as args
-  (if (use-region-p)							; if region selected
+  (if (use-region-p)    ; if region selected
       (kill-region (region-beginning) (region-end))
     (if (= lines 1)
         (kill-line)
@@ -618,26 +669,35 @@ instead of just the final line."
 (add-hook 'slime-mode-hook 'fix-lisp-keybindings)
 ;; get useful keybindings for lisp editing
 (defun fix-lisp-keybindings ()
-  "Changes about three million personalized keybindings for lisp editing with SLIME and Paredit.
-Not for the faint of heart."
+  "Changes about three million personalized keybindings for lisp editing with
+SLIME and Paredit. Not for the faint of heart."
   (interactive)
   (define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
   (define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
-  (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key here (slurp-forward)
-  (define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward) ; remove key here (slurp-backward)
+  (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key
+                                        ; here (slurp-forward)
+  (define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward) ; remove key
+                                        ; here (slurp-backward)
   (define-key paredit-mode-map (kbd "C-c <left>")	'windmove-left)
   (define-key paredit-mode-map (kbd "C-c <right>") 'windmove-right)
   (define-key paredit-mode-map (kbd "C-c <up>")	'windmove-up)
   (define-key paredit-mode-map (kbd "C-c <down>")	'windmove-down)
-  (define-key paredit-mode-map (kbd "M-a") nil) ; kill this, it's a global but it's annoying and i don't use it
+  (define-key paredit-mode-map (kbd "M-a") nil) ; kill this, it's a global but
+                                        ; it's annoying and i don't use it
   (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-add-parens-in-front)
   (define-key paredit-mode-map (kbd "M-a M-s") 'paredit-remove-function-wrapper)
-  (global-set-key (kbd "RET") 'newline-and-indent) ; set as global because define-key doesn't work, not sure why
-  (define-key paredit-mode-map (kbd "M-a M-<right>") 'paredit-forward-slurp-sexp)
-  (define-key paredit-mode-map (kbd "M-a M-<left>") 'paredit-backward-slurp-sexp)
-  (define-key paredit-mode-map (kbd "C-M-a C-M-<right>") 'paredit-forward-barf-sexp)
-  (define-key paredit-mode-map (kbd "C-M-a C-M-<left>") 'paredit-backward-barf-sexp)
-  (define-key paredit-mode-map (kbd "C-x C-l") 'mc/edit-lines) ; so that multiple-cursors can use these
+  (global-set-key (kbd "RET") 'newline-and-indent) ; set as global because
+                                        ; define-key doesn't work, not sure why
+  (define-key paredit-mode-map (kbd "M-a M-<right>")
+    'paredit-forward-slurp-sexp)
+  (define-key paredit-mode-map (kbd "M-a M-<left>")
+    'paredit-backward-slurp-sexp)
+  (define-key paredit-mode-map (kbd "C-M-a C-M-<right>")
+    'paredit-forward-barf-sexp)
+  (define-key paredit-mode-map (kbd "C-M-a C-M-<left>")
+    'paredit-backward-barf-sexp)
+  (define-key paredit-mode-map (kbd "C-x C-l") 'mc/edit-lines) ; so that
+                                        ; multiple-cursors can use these
   (define-key paredit-mode-map (kbd "M-n") 'mc/mark-next-like-this)
   (define-key paredit-mode-map (kbd "M-p") 'mc/mark-previous-like-this)
   (define-key paredit-mode-map (kbd "C-M-n") 'mc/unmark-next-like-this)
@@ -647,7 +707,8 @@ Not for the faint of heart."
 
 ;; create parens and add adjacent two elements to sexp created by parens
 (defun paredit-add-parens-in-front ()
-  ;; add to this later; slurp all sexps until closing paren would be very helpful i think
+  ;; add to this later; slurp all sexps until closing paren would be very
+  ;; helpful i think
   (interactive)
   (let ((sel-beg nil) (sel-end nil))
     (if (use-region-p)
@@ -659,7 +720,8 @@ Not for the faint of heart."
         (setq sel-beg (point))))
     (message (number-to-string sel-beg))
     (goto-char sel-beg)
-    (paredit-open-parenthesis) ; adds closing paren too thanks to electric pair (or maybe it's paredit itself)
+    (paredit-open-parenthesis) ; adds closing paren too thanks to electric pair
+                                        ; (or maybe it's paredit itself)
                                         ;	(paredit-forward-slurp-sexp)
     ))
 (defun paredit-backspace-delete-highlight ()
@@ -672,8 +734,8 @@ Breaks the rules a little bit, but makes me a lot less insane."
 (defun paredit-remove-function-wrapper ()
   ;; this one is very imperative, not so lispy
   ;; it's really useful though so hopefully history will forgive me
-  "Removes all arguments to the left of point within sexp, and removes enclosing parentheses.
-CURRENTLY BROKEN"
+  "Removes all arguments to the left of point within sexp, and removes enclosing
+parentheses. CURRENTLY BROKEN"
   (interactive)
   (let ((sel-beg nil) (sel-end nil)) ; set beginning and end of selection
     (if (use-region-p)
