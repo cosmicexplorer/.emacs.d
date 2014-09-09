@@ -32,9 +32,9 @@
 				paredit-splice-sexp
 				slime-eval-last-expression
 				slime-space
-				smart-compile
-				smart-tab
+                                smart-tab
 				toggle-letter-case
+				self-insert-command
 				))
 
 (setq mc/cmds-to-run-once

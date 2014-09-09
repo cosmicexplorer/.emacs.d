@@ -87,10 +87,11 @@ Lisp code." t)
 (add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
 (add-hook 'r-mode-hook (lambda () (setq comment-start "# " comment-end   "")))
 (add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
-(add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; " comment-end
-                                                 "")))
+(add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; "
+                                                 comment-end "")))
 (add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (add-hook 'asm-mode-hook (lambda () (setq comment-start "# " comment-end "")))
+
 (setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after
                                         ; semicolons i don't like that 
 (setq c-default-style "gnu"
@@ -789,4 +790,5 @@ parentheses. CURRENTLY BROKEN"
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(fill-column 80)
- '(org-support-shift-select (quote always)))
+ '(org-support-shift-select (quote always))
+ '(asm-comment-char ?#))
