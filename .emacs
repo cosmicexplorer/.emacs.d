@@ -1,10 +1,10 @@
 ;;; note that the ~ expansion to home directory does not work when sudo/chrooted
 ;;; and absolute paths are required
 ;;; i've changed quite a few files besides just this one and if you wish to
-;;; upgrade the associated external packages 
+;;; upgrade the associated external packages
 ;;; you'll have to re-add those changes for the whole frail system to work
 ;;; alternatively you can just email me that an update occurred in some package
-;;; and i'll merge and push the changes 
+;;; and i'll merge and push the changes
 ;;;;; specific sections are demarcated by five semicolons, like this line
 ;;; do a global search through all such marks to go through all major sections
 
@@ -13,7 +13,16 @@
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 (menu-bar-mode -1) ;; remove menu bar for another line of space
-(setq-default indent-tabs-mode nil)	;; fix indentation issues
+;;; indentation silliness
+(add-hook'after-change-major-mode-hook  ; show whitespace
+ '(lambda ()
+    (setq show-trailing-whitespace t)))
+(setq-default indent-tabs-mode nil)	;; use spaces not tabs
+(setq tab-width 4)
+(setq-default c-basic-offset 4) ;; cc-mode uses this instead of tab-width
+;; Remove trailing whitespace from a line
+(setq-default nuke-trailing-whitespace-p t)
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 ;; fix selection issues in xterm (can't hold down shift and up arrow to
 ;; highlight stuff)
 (if (equal "xterm" (tty-type))
@@ -50,6 +59,7 @@
 (add-hook 'prog-mode-hook #'auto-fill-mode)
 (add-hook 'prog-mode-hook #'(lambda ()
                               (set-fill-column 80)))
+(require 'misc-cmds)
 
 ;;;;; setup specific modes for specific filetypes
 ;; setup slime
@@ -93,7 +103,7 @@ Lisp code." t)
 (add-hook 'asm-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 
 (setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after
-                                        ; semicolons i don't like that 
+                                        ; semicolons i don't like that
 (setq c-default-style "gnu"
       c-basic-offset 2)
 (subword-mode)                          ; turn camel-case on
@@ -513,7 +523,7 @@ Lisp code." t)
                                                    '(and bos (or
                                                               ".bash_history"
                                                               "TAGS")
-                                                         eos))) 
+                                                         eos)))
   "Files to ignore when searching buffers via \\[search-all-buffers]."
   :type 'editable-list)
 
