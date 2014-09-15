@@ -10,7 +10,8 @@ undo-tree-history/
 autosaved-files/
 auto-save-list/
 # eshell history
-eshell/*
+eshell/history
+eshell/lastdir
 # cached files for quicklisp
 quicklisp/cache/
 quicklisp/tmp/
