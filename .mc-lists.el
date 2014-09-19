@@ -40,6 +40,7 @@
 
 (setq mc/cmds-to-run-once
       '(
+        smart-compile
         helm-swoop
         undo-tree-visualize
         ))

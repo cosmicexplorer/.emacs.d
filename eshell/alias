@@ -1,4 +1,6 @@
+alias ls ls -a $*
+alias sl ls -a $*
+alias l ls -a $*
+alias s ls -a $*
 alias ec emacsclient -n $*
-alias s ls $*
-alias l ls $*
-alias sl ls $*
+alias emacs emacsclient -n $*

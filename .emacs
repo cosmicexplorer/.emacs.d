@@ -104,8 +104,7 @@ Lisp code." t)
 
 (setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after
                                         ; semicolons i don't like that
-(setq c-default-style "gnu"
-      c-basic-offset 2)
+(setq c-default-style "gnu")
 (subword-mode)                          ; turn camel-case on
 (setq auto-mode-alist                   ; use python-mode for scons files
       (cons '("SConstruct" . python-mode) auto-mode-alist))
@@ -119,17 +118,6 @@ Lisp code." t)
   (interactive)
   (loop for mode-map in mode-maps-list
         do (define-key mode-map (kbd keys-pressed) func-to-call-quoted)))
-(defun insert-semicolon ()
-  (interactive)
-  (insert-char 59))
-(defun insert-open-paren ()
-  (interactive)
-  (insert-char 40)
-  (electric-p)
-  )
-(defun insert-close-paren ()
-  (interactive)
-  (insert-char 41))
 (setq c-electric-flag nil)
 (add-hook
  'c-initialization-hook '(lambda ()
@@ -138,6 +126,7 @@ Lisp code." t)
                             c-mode-map
                             c++-mode-map
                             java-mode-map)))
+(c-set-offset 'innamespace 0)
 ;;; syntax highlighting
 (global-font-lock-mode 1)               ; turn on syntax highlighting
 (setq font-lock-maximum-decoration t)   ; turn it ALL the way on
@@ -486,6 +475,8 @@ Lisp code." t)
 (global-set-key (kbd "<backtab>") 'force-insert-tab)
 (global-set-key (kbd "C-c t") 'force-insert-tab) ; for modes like markdown-mode
                                         ; where S-tab overridden
+(define-key c-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j) ; for brackets
+(define-key c++-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j) ; for brackets
 
 ;; open file with wildcards
 ;;(global-set-key (kbd "C-c o") 'open-file-with-wildcards)
@@ -493,6 +484,10 @@ Lisp code." t)
 
 ;; toggle letter casing from ALLCAPS to InitialCase to alllowercase
 (global-set-key (kbd "C-x M-c") 'toggle-letter-case)
+
+;;; recognize camel case
+(global-set-key (kbd "C-<right>") 'camel-case-right-word)
+(global-set-key (kbd "C-<left>") 'camel-case-left-word)
 
 ;;;;; my own functions! used throughout this file
 ;;; some of these are mine, some are heavily adapated from emacswiki, some are
@@ -665,6 +660,76 @@ annoying. This fixes that."
                                         ; clever solution)
   (delete-backward-char 2)
   )
+
+(defun move-point-to-beginning-of-line ()
+  (interactive)
+  (goto-char (line-beginning-position)))
+
+(defun move-point-to-end-of-line ()
+  (interactive)
+  (goto-char (line-end-position)))
+
+(defun newline-and-indent-ctrl-j ()
+  (interactive)
+  (let ((chars-from-end-of-line (- (line-end-position) (point))))
+    (newline-and-indent)
+    (insert-char 97)                    ; insert a
+    (insert-char 59)                    ; insert semicolon
+    (move-point-to-beginning-of-line)
+    (c-indent-command)
+    (move-point-to-end-of-line)
+    (backward-char chars-from-end-of-line)
+    (if (/= chars-from-end-of-line 0)
+        (progn
+          (newline-and-indent)
+          (move-point-to-beginning-of-line)
+          (backward-char)))
+    (delete-backward-char 2)))          ; removes a and semicolon
+
+(defun string-is-capitalized-p (str)
+    (let ((case-fold-search nil))
+          (string-match-p "\\`[A-Z]*\\'" str)))
+
+(defun char-is-capitalized-p (char)
+    (let ((case-fold-search nil)
+          (str-from-char (string char)))
+          (string-match-p "\\`[A-Z]*\\'" str-from-char)))
+
+(defun camel-case-right-word ()
+  (interactive)
+  (let ((cur-point (point))
+        fin-point
+        cap-letter-index)
+    (right-word)
+    (setq fin-point (point)
+          cap-letter-index (- fin-point cur-point))
+    ;; check if string is all caps; if so, skip
+    (if (not (string-is-capitalized-p (buffer-substring cur-point fin-point)))
+        (progn
+          (loop for letter-index from 1 to (- fin-point cur-point)
+                while (= cap-letter-index (- fin-point cur-point))
+                do (if (char-is-capitalized-p
+                        (char-after (+ cur-point letter-index)))
+                       (setq cap-letter-index letter-index)))
+          (goto-char (+ cur-point cap-letter-index))))))
+
+(defun camel-case-left-word ()
+  (interactive)
+  (let ((cur-point (point))
+        fin-point
+        cap-letter-index)
+    (right-word -1)              ; used because left-word is screwy, same effect
+    (setq fin-point (point)
+          cap-letter-index (- fin-point cur-point))
+    ;; check if string is all caps; if so, skip
+    (if (not (string-is-capitalized-p (buffer-substring cur-point fin-point)))
+        (progn
+          (loop for letter-index from -1 downto (- fin-point cur-point)
+                while (= cap-letter-index (- fin-point cur-point))
+                do (if (char-is-capitalized-p
+                        (char-after (+ cur-point letter-index)))
+                       (setq cap-letter-index letter-index)))
+          (goto-char (+ cur-point cap-letter-index))))))
 
 (defun kill-selected-region-default (&optional lines)
   "When selection highlighted, C-k stores all characters in the kill ring,
