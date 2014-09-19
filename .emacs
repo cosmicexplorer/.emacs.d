@@ -13,6 +13,8 @@
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 (menu-bar-mode -1) ;; remove menu bar for another line of space
+(transient-mark-mode 0)                 ; turn that off lol
+(setq shift-select-mode t)
 ;;; indentation silliness
 (add-hook'after-change-major-mode-hook  ; show whitespace
  '(lambda ()
@@ -655,11 +657,8 @@ annoying. This fixes that."
   (interactive)
   (insert-char 97)
   (insert-char 59)                      ; insert comment
-  (clang-format-line)                   ; clang-formats previous line (i
-                                        ; personally think this is an incredibly
-                                        ; clever solution)
-  (delete-backward-char 2)
-  )
+  (clang-format-line)                   ; clang-formats previous line
+  (delete-backward-char 2))
 
 (defun move-point-to-beginning-of-line ()
   (interactive)
@@ -696,7 +695,7 @@ annoying. This fixes that."
           (string-match-p "\\`[A-Z]*\\'" str-from-char)))
 
 (defun camel-case-right-word ()
-  (interactive)
+  (interactive "^")                     ; highlights region if shifted
   (let ((cur-point (point))
         fin-point
         cap-letter-index)
@@ -714,7 +713,7 @@ annoying. This fixes that."
           (goto-char (+ cur-point cap-letter-index))))))
 
 (defun camel-case-left-word ()
-  (interactive)
+  (interactive "^")                     ; highlights region if shifted
   (let ((cur-point (point))
         fin-point
         cap-letter-index)
