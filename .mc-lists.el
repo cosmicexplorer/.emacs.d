@@ -13,13 +13,17 @@
         c-electric-semi&comma
         c-electric-star
         c-toggle-electric-state
+        camel-case-left-word
+        camel-case-right-word
         comment-dwim
         electric-pair-backward-delete-char
         electric-pair-backward-delete-char-untabify
         end-of-buffer
         force-insert-tab
         kill-selected-region-default
+        newline-and-indent-ctrl-j
         newline-and-indent-fix-cc-mode
+        org-self-insert-command
         paredit-backslash
         paredit-backspace-delete-highlight
         paredit-backward
@@ -40,7 +44,7 @@
 
 (setq mc/cmds-to-run-once
       '(
-        smart-compile
         helm-swoop
+        smart-compile
         undo-tree-visualize
         ))

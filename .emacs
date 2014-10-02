@@ -325,7 +325,7 @@ Lisp code." t)
                   (filename . "\\.r\\'")))
          ("cmake" (mode . cmake-mode))
          ("text" (filename . "\\.txt\\'"))
-         ("c header" (filename . "\\.h\\'"))
+         ("cxx header" (filename . "\\.h\\'"))
          ("c" (mode . c-mode))
          ("c++" (mode . c++-mode))
          ("java" (mode . java-mode))
@@ -343,6 +343,7 @@ Lisp code." t)
          ("ruby" (mode . ruby-mode))
          ("hex" (mode . hexl-mode))
          ("qmake" (mode . qmake-mode))
+         ("org" (mode . org-mode))
          ("emacs-system" (or (name . "\*eshell\*")
                              (name . "\*scratch\*")
                              (name . "\*Messages\*")
@@ -359,6 +360,9 @@ Lisp code." t)
 
 (setq ibuffer-expert t) ;; only prompt when modified buffer is killed
 (setq ibuffer-show-empty-filter-groups nil) ;; only show full filter groups
+
+;;; add modes for specific filetypes
+(add-to-list 'auto-mode-alist '("\\.tpp\\'" . c++-mode))
 
 ;;;;; keybindings
 ;; FIND CURRENT KEYBINDINGS WITH C-h b !!!!!
