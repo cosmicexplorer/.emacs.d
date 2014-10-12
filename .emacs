@@ -1,5 +1,6 @@
-;;; note that the ~ expansion to home directory does not work when sudo/chrooted
-;;; and absolute paths are required
+;;; emacs config, aka the root node of a massively unbalanced configuration tree
+;;; by Danny McClanahan, <danieldmcclanahan@gmail.com>, 2014
+
 ;;; i've changed quite a few files besides just this one and if you wish to
 ;;; upgrade the associated external packages
 ;;; you'll have to re-add those changes for the whole frail system to work
@@ -16,7 +17,7 @@
 (transient-mark-mode 0)                 ; turn that off lol
 (setq shift-select-mode t)
 ;;; indentation silliness
-(add-hook'after-change-major-mode-hook  ; show whitespace
+(add-hook 'after-change-major-mode-hook  ; show whitespace
  '(lambda ()
     (setq show-trailing-whitespace t)))
 (setq-default indent-tabs-mode nil)	;; use spaces not tabs
