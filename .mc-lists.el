@@ -44,6 +44,7 @@
 
 (setq mc/cmds-to-run-once
       '(
+        eval-expression
         helm-swoop
         smart-compile
         undo-tree-visualize

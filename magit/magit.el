@@ -5681,7 +5681,8 @@ user because of prefix arguments are not saved with git config."
              (branch-merge (magit-get "branch" branch "merge"))
              (branch-merge-name (and branch-merge
                                      (save-match-data
-                                       (string-match "^refs/heads/\\(.+\\)" branch-merge)
+                                       (string-match "^refs/heads/\\(.+\\)"
+                                                     branch-merge)
                                        (match-string 1 branch-merge))))
              (choose-remote (>= (prefix-numeric-value current-prefix-arg) 4))
              (choose-branch (>= (prefix-numeric-value current-prefix-arg) 16))
