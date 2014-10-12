@@ -97,6 +97,7 @@ Lisp code." t)
 ;;;;; random per-language editing things
 ;; format comments like a normal person
 (add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
+(add-hook 'text-mode-hook (lambda () (setq comment-start "- " comment-end "")))
 (add-hook 'r-mode-hook (lambda () (setq comment-start "# " comment-end   "")))
 (add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; "
