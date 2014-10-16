@@ -157,7 +157,7 @@ Lisp code." t)
 (require 'multiple-cursors)
 
 ;;; for code formatting
-(load "~/.emacs.d/clang-format.el")
+(load "~/.emacs.d/lisp/clang-format.el")
 
 ;; for like real scrolling
 (xterm-mouse-mode)
