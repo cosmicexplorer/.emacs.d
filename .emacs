@@ -289,12 +289,16 @@ Lisp code." t)
 ;; qmake-mode
 (load "~/.emacs.d/lisp/qmake.el")
 
+;;; browsing kill ring, cause why not
+(require 'browse-kill-ring)
+
 ;;;;; ibuffer stuff
 ;;;; re: http://martinowen.net/blog/2010/02/03/tips-for-emacs-ibuffer.html
 ;; you can add different groups too, not just home, in case you ever want to
 ;; (lol)
 (setq ibuffer-saved-filter-groups
       '(("home"
+         ("javascript" (mode . js-mode))
          ("emacs-config" (or (filename . ".emacs.d")
                              (filename . "emacs-config")
                              (filename . ".emacs")))
@@ -340,7 +344,6 @@ Lisp code." t)
          ;; blocks this but it's whatever
          ("lisp" (mode . lisp-mode))
          ("go" (mode . go-mode))
-         ("javascript" (mode . js-mode))
          ("perl" (mode . perl-mode))
          ("haskell" (mode . haskell-mode))
          ("fortran" (mode . fortran-mode))
@@ -374,6 +377,10 @@ Lisp code." t)
 ;; use C-h k to look at the current key sequence being entered!
 ;; this is useful when creating new keybindings
 ;;; C-x C-z to suspend!
+
+;;; reset quit key combination to close
+(global-set-key (kbd "C-x C-c") nil)
+(global-set-key (kbd "C-x C-c C-q") 'save-buffers-kill-terminal)
 
 ;; C-Spc to start selection (set mark) in terminal!
 
