@@ -5,6 +5,8 @@
 # user-specific files for certain extensions
 ido.last
 saveplace
+recentf
+places
 .mc-lists.el
 undo-tree-history/
 autosaved-files/
