@@ -26,9 +26,8 @@ Because I've gone through hell and back to make this the best editor on the plan
 	* You can alias it: ```alias emacs='emacs -l ~/.emacs.d/.emacs'```
 2. Lisp setup (not required if you don't use lisp)
 	* If not using sbcl, change ```(setq inferior-lisp-program "sbcl")``` to the command calling your preferred compiler.
-	* .sbclrc loads things for slime; make the .sbclrc within your home directory (the one sbcl reads from when it starts) read ```(load "~/.emacs.d/.sbcl")``` to load everything contained within there.
-    * If sbcl does not recogni[]M#B@ze quicklisp packages, ensure that .sbclrc points to the correct location of the 'setup.lisp' file (for me it's in ```~/.emacs.d/quicklisp/setup.lisp```).
-    * Make sure that the .sbclrc in your home folder (or if it doesn't exist, make one) has the line ```(add-to-list 'exec-path "~/.cabal/bin")```.
+	* SBCL:
+    	1. make the .sbclrc within your home directory to load everything contained within this one (i.e. make it have ```(load "~/.emacs.d/.sbclrc")```).
     * If you're not using sbcl, that's cool too: look at the documentation [here](http://www.quicklisp.org/beta/) to set up your preferred lisp compiler.
 	* If things are not working (e.g. autocompletion, eldoc) in ```lisp-mode```, start slime using ```M-x slime```.
 3. Haskell setup (not required if you don't use haskell)
