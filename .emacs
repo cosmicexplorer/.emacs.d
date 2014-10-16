@@ -18,9 +18,9 @@
 (setq shift-select-mode t)
 ;;; indentation silliness
 (add-hook 'after-change-major-mode-hook  ; show whitespace
- '(lambda ()
-    (setq show-trailing-whitespace t)))
-(setq-default indent-tabs-mode nil)	;; use spaces not tabs
+          '(lambda ()
+             (setq show-trailing-whitespace t)))
+(setq-default indent-tabs-mode nil)     ;; use spaces not tabs
 (setq tab-width 4)
 (setq-default c-basic-offset 4) ;; cc-mode uses this instead of tab-width
 ;; Remove trailing whitespace from a line
@@ -62,6 +62,8 @@
 (add-hook 'prog-mode-hook #'auto-fill-mode)
 (add-hook 'prog-mode-hook #'(lambda ()
                               (set-fill-column 80)))
+(add-hook 'org-mode-hook #'highlight-80+-mode)
+(add-hook 'org-mode-hook #'auto-fill-mode)
 (require 'misc-cmds)
 
 ;;;;; setup specific modes for specific filetypes
@@ -147,6 +149,7 @@ Lisp code." t)
       w3m-output-coding-system 'utf-8
       w3m-terminal-coding-system 'utf-8)
 
+;;; TODO: why isn't this doing anything???
 (hs-minor-mode) ;; C-c @ C-c for folding up code blocks!!!
 (add-hook 'prog-mode-hook #'hs-minor-mode) ; add to all programming modes
 
@@ -234,7 +237,7 @@ Lisp code." t)
 (load "~/.emacs.d/ESS/lisp/ess-site")
 (setq inferior-julia-program-name "/usr/bin/julia-basic")
 (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/")
-(ess-toggle-underscore nil)	;; underscore means underscore
+(ess-toggle-underscore nil)     ;; underscore means underscore
 
 ;; adds haskell functionality
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
@@ -380,8 +383,8 @@ Lisp code." t)
                                         ; interactively than above
 (global-set-key (kbd "C-x f") 'helm-multi-swoop-all) ; find regexp in ALL open
                                         ; buffers
-(global-set-key (kbd "C-x j") 'helm-multi-swoop)		 ; find regexp
-                                        ; is SOME open buffers
+(global-set-key (kbd "C-x j") 'helm-multi-swoop)                 ; find regexp
+                                        ; in SOME open buffers
 (global-set-key (kbd "C-x b") 'helm-buffers-list) ; find among open buffers
 
 ;; after killing C-x o with helm,
@@ -397,6 +400,8 @@ Lisp code." t)
 (global-set-key (kbd "C-x <up>") 'split-window-vertically)
 (global-set-key (kbd "C-x C-<down>") 'split-window-below)
 (global-set-key (kbd "C-x C-<right>") 'split-window-right)
+(global-set-key (kbd "C-x C-<left>") 'split-window-horizontally)
+(global-set-key (kbd "C-x C-<up>") 'split-window-vertically)
 (global-set-key (kbd "C-x e") 'delete-other-windows) ;; "expand"
 (global-set-key (kbd "C-x p") 'delete-window) ;; "poof"
 ;; adjusting pane size
@@ -410,17 +415,17 @@ Lisp code." t)
 ;;; move among panes in a way that isn't totally fucked
 (setq windmove-wrap-around t)
 ;; original meta
-(global-set-key (kbd "C-M-<left>")	'windmove-left)
+(global-set-key (kbd "C-M-<left>") 'windmove-left)
 (global-set-key (kbd "C-M-<right>") 'windmove-right)
-(global-set-key (kbd "C-M-<up>")	'windmove-up)
-(global-set-key (kbd "C-M-<down>")	'windmove-down)
+(global-set-key (kbd "C-M-<up>") 'windmove-up)
+(global-set-key (kbd "C-M-<down>") 'windmove-down)
 ;; terminal in ubuntu doesn't allow above keybindings; probably because M-<left>
 ;; and M-<right> switch tty
 ;; which is cool i guess??? very annoying though
-(global-set-key (kbd "C-c <left>")	'windmove-left)
+(global-set-key (kbd "C-c <left>") 'windmove-left)
 (global-set-key (kbd "C-c <right>") 'windmove-right)
-(global-set-key (kbd "C-c <up>")	'windmove-up)
-(global-set-key (kbd "C-c <down>")	'windmove-down)
+(global-set-key (kbd "C-c <up>") 'windmove-up)
+(global-set-key (kbd "C-c <down>") 'windmove-down)
 
 ;; visualize undo-tree
 (global-set-key (kbd "C-x t") 'undo-tree-visualize)
@@ -522,17 +527,33 @@ Lisp code." t)
         (revert-buffer t t t) )))
   (message "Refreshed open files.") )
 
-(defcustom search-all-buffers-ignored-files (list (rx-to-string
-                                                   '(and bos (or
-                                                              ".bash_history"
-                                                              "TAGS")
-                                                         eos)))
+(defcustom search-all-buffers-ignored-files
+  (list (rx-to-string
+         '(and
+           bos
+           (or
+            ".bash_history"
+            "TAGS")
+           eos)))
   "Files to ignore when searching buffers via \\[search-all-buffers]."
   :type 'editable-list)
 
+(defun point-in-comment ()
+  "Determine if the point is inside a comment"
+  (interactive)
+  (let ((syn (syntax-ppss)))
+    (and (nth 8 syn)
+         (not (nth 3 syn)))))
+
+(defun newline-continue-comment ()
+  (interactive)
+  (if (point-in-comment)
+      (comment-indent-new-line)
+    (newline-and-indent)))
+
 (require 'grep)
 (defun search-all-buffers (regexp prefix)
-  "Searches file-visiting buffers for occurence of REGEXP.	With
+  "Searches file-visiting buffers for occurence of REGEXP.      With
 prefix > 1 (i.e., if you type C-u \\[search-all-buffers]),
 searches all buffers."
   (interactive (list (grep-read-regexp)
@@ -635,7 +656,7 @@ caps"))
                                                my-mode-line-buffer-line-count)))
                            str)))
                 "  %p"
-                (list 'column-number-mode "	 C%c")
+                (list 'column-number-mode "      C%c")
                 "  " mode-line-buffer-identification
                 "  " mode-line-modes))
 
@@ -692,13 +713,13 @@ annoying. This fixes that."
     (delete-backward-char 2)))          ; removes a and semicolon
 
 (defun string-is-capitalized-p (str)
-    (let ((case-fold-search nil))
-          (string-match-p "\\`[A-Z]*\\'" str)))
+  (let ((case-fold-search nil))
+    (string-match-p "\\`[A-Z]*\\'" str)))
 
 (defun char-is-capitalized-p (char)
-    (let ((case-fold-search nil)
-          (str-from-char (string char)))
-          (string-match-p "\\`[A-Z]*\\'" str-from-char)))
+  (let ((case-fold-search nil)
+        (str-from-char (string char)))
+    (string-match-p "\\`[A-Z]*\\'" str-from-char)))
 
 (defun camel-case-right-word ()
   (interactive "^")                     ; highlights region if shifted
@@ -736,16 +757,96 @@ annoying. This fixes that."
                        (setq cap-letter-index letter-index)))
           (goto-char (+ cur-point cap-letter-index))))))
 
+(require 'cl)
+
 (defun kill-selected-region-default (&optional lines)
   "When selection highlighted, C-k stores all characters in the kill ring,
 instead of just the final line."
-  (interactive "p")	; gets beg and end from emacs as args
+  (interactive "p")     ; gets beg and end from emacs as args
+  (message (number-to-string lines))
   (if (use-region-p)    ; if region selected
       (kill-region (region-beginning) (region-end))
     (if (= lines 1)
         (kill-line)
       (kill-line lines))))
 (global-set-key (kbd "C-k") 'kill-selected-region-default)
+
+(defun move-point-to-index (&optional index)
+  (interactive "p")
+  (if (< (point) index)
+      (loop for cur-point from (point) upto (- index 1)
+            do (forward-char))
+    (loop for cur-point from (point) downto (+ index 1)
+          do (backward-char))))
+
+(defun squeeze-region-to-80-chars (&optional lines)
+  "If region greater than 80 characters wide, insert and remove newlines as
+required to cut it down to size. Not completely functional, but useful enough to
+  stay."
+  (interactive "p")
+  (delete-trailing-whitespace)          ; cause this fails otherwise
+  (let ((orig-point (point))
+        (start-point)
+        (end-point)
+        (lines lines))
+    (if (use-region-p)
+        (progn
+          (setq start-point (region-beginning)
+                end-point (region-end))
+          (move-point-to-index start-point)
+          (move-beginning-of-line 1)
+          (setq start-point (point))
+          (move-point-to-index end-point)
+          (move-end-of-line 1)
+          (setq end-point (point)))
+      (progn
+        (if (not lines)
+            (setq lines 0))
+        (move-beginning-of-line 1)
+        (setq start-point (point))
+        (forward-line lines)
+        (move-end-of-line 1)
+        (setq end-point (point))))
+    (move-point-to-index start-point)
+    (loop with prev-point-same-line = start-point
+          and cur-point = start-point
+          while (< cur-point end-point)
+          do (progn
+               (if (> (- cur-point prev-point-same-line) 80)
+                   (progn
+                     (let ((found-left-edge nil))
+                       (loop
+                        while (not found-left-edge)
+                        do
+                        (progn    ; 32 is space character in ascii
+                          (left-word 1)
+                          (left-word 1)
+                          (setq found-left-edge
+                                (char-equal (preceding-char) 32))
+                          (if (not found-left-edge)
+                              (progn
+                                (right-word 1)
+                                (setq found-left-edge
+                                      (char-equal (following-char) 32)))))))
+                     ;; there's a bug in here, if anyone ever puts in a
+                     ;; hypen-or-whatever-delimited string longer than 80 chars,
+                     ;; with indentation; it'll basically loop infinitely
+                     (if (char-equal (following-char) 32)
+                         (progn
+                           (newline)
+                           (delete-char 1)
+                           (setq prev-point-same-line (point)))
+                       (progn
+                         (delete-char -1)
+                         (newline)
+                         (setq prev-point-same-line (point))))))
+               (if (char-equal (following-char) 10) ; 10 is newline
+                   (progn
+                     (delete-char 1)
+                     (insert " ")))
+               (right-word 1)
+               (setq cur-point (point))))
+    (move-point-to-index orig-point)))
 
 (add-hook 'slime-mode-hook 'fix-lisp-keybindings)
 ;; get useful keybindings for lisp editing
@@ -759,10 +860,10 @@ SLIME and Paredit. Not for the faint of heart."
                                         ; here (slurp-forward)
   (define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward) ; remove key
                                         ; here (slurp-backward)
-  (define-key paredit-mode-map (kbd "C-c <left>")	'windmove-left)
+  (define-key paredit-mode-map (kbd "C-c <left>")       'windmove-left)
   (define-key paredit-mode-map (kbd "C-c <right>") 'windmove-right)
-  (define-key paredit-mode-map (kbd "C-c <up>")	'windmove-up)
-  (define-key paredit-mode-map (kbd "C-c <down>")	'windmove-down)
+  (define-key paredit-mode-map (kbd "C-c <up>") 'windmove-up)
+  (define-key paredit-mode-map (kbd "C-c <down>")       'windmove-down)
   (define-key paredit-mode-map (kbd "M-a") nil) ; kill this, it's a global but
                                         ; it's annoying and i don't use it
   (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-add-parens-in-front)
@@ -803,7 +904,7 @@ SLIME and Paredit. Not for the faint of heart."
     (goto-char sel-beg)
     (paredit-open-parenthesis) ; adds closing paren too thanks to electric pair
                                         ; (or maybe it's paredit itself)
-                                        ;	(paredit-forward-slurp-sexp)
+                                        ;       (paredit-forward-slurp-sexp)
     ))
 (defun paredit-backspace-delete-highlight ()
   "Makes it so that backspace deletes all highlighted text in paredit mode.
@@ -833,18 +934,18 @@ parentheses. CURRENTLY BROKEN"
             do (progn
                  (if (char-equal (preceding-char) 41) ; 41 is closed parenthesis
                      (incf paren-counter))
-                 (if (char-equal (preceding-char) 40)	; open paren
+                 (if (char-equal (preceding-char) 40)   ; open paren
                      (decf paren-counter))
                  (paredit-backward-delete)
                  (decf sel-end))))
     (goto-char sel-end)
     (let ((paren-counter 0))
-      (loop until (and (char-equal (following-char) 41)	; closed paren
+      (loop until (and (char-equal (following-char) 41) ; closed paren
                        (= paren-counter 0))
             do (progn
-                 (if (char-equal (following-char) 40)	; open paren
+                 (if (char-equal (following-char) 40)   ; open paren
                      (incf paren-counter))
-                 (if (char-equal (following-char) 41)	; closed paren
+                 (if (char-equal (following-char) 41)   ; closed paren
                      (decf paren-counter))
                  (paredit-forward-delete))))
     (paredit-splice-sexp)))

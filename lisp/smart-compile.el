@@ -50,7 +50,7 @@
   (interactive) ;; just in case i wanna call it by command
   (byte-compile-file (file-name-nondirectory (buffer-file-name)))
   ;; names the file the same as it was before after being byte-compiled
-  (shell-command (concatenate 'string "rm " (buffer-file-name))) ;; removes current version of file (!!!) 
+  (shell-command (concatenate 'string "rm " (buffer-file-name))) ;; removes current version of file (!!!)
   (shell-command (concatenate 'string "mv " (buffer-file-name) ".elc " (buffer-file-name))) ;; but re-adds it quickly so undo doesn't notice
   (revbufs) ;; reloads buffer to reflect current contents, safely (???)
   )
@@ -107,7 +107,7 @@
   ("\\.r\\'"          . "Rscript %f") ;; redirects to stdout
   (go-mode            . (go-fmt-file-and-compile))
   (qmake-mode         . "qmake")
-	(cmake-mode					. "cmake %d")
+  (cmake-mode					. "cmake %d")
 )  "Alist of filename patterns vs corresponding format control strings.
 Each element looks like (REGEXP . STRING) or (MAJOR-MODE . STRING).
 Visiting a file whose name matches REGEXP specifies STRING as the
@@ -173,12 +173,12 @@ which is defined in `smart-compile-alist'."
   (interactive "p")
   (let ((name (buffer-file-name))
         (not-yet t))
-    
+
     (if (not name)
         (error "cannot get filename."))
 
     (save-buffer)
-    
+
     (cond
 
      ;; local command
@@ -227,7 +227,7 @@ which is defined in `smart-compile-alist'."
 		) ;; end of (cond ...)
 
     ;; compile
-    (let( (alist smart-compile-alist) 
+    (let( (alist smart-compile-alist)
           (case-fold-search nil)
           (function nil) )
       (while (and alist not-yet)
@@ -269,7 +269,7 @@ which is defined in `smart-compile-alist'."
               (set (make-local-variable 'compile-command) name)
             ))
       )
-    
+
     ;; compile
     (if not-yet (call-interactively 'compile) )
 
