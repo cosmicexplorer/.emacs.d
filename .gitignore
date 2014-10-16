@@ -17,3 +17,5 @@ quicklisp/cache/
 quicklisp/tmp/
 # tramp file
 tramp
+# compiled files
+*.elc

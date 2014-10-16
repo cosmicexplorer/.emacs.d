@@ -234,10 +234,10 @@ Lisp code." t)
             (load "dired-x")))
 
 ;; adds julia functionality
-(load "~/.emacs.d/ESS/lisp/ess-site")
-(setq inferior-julia-program-name "/usr/bin/julia-basic")
-(add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/")
-(ess-toggle-underscore nil)     ;; underscore means underscore
+;(load "~/.emacs.d/ESS/lisp/ess-site")
+;(setq inferior-julia-program-name "/usr/bin/julia-basic")
+;(add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/")
+;(ess-toggle-underscore nil)     ;; underscore means underscore
 
 ;; adds haskell functionality
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
