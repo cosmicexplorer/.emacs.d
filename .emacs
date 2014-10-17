@@ -518,8 +518,8 @@ Lisp code." t)
 ;;; some of these are mine, some are heavily adapated from emacswiki, some are
 ;;; copy/paste from emacswiki
 ;;; if you wrote something and want me to put your name by it (which would be
-;;; hilarious cause that means someone else is actually using this file email me
-;;; and i'll add accreditation immediately
+;;; hilarious cause that means someone else is actually using this file) email
+;;; me and i'll add accreditation immediately
 
 ;; allow for backtab to force '\t'
 (defun force-insert-tab ()
