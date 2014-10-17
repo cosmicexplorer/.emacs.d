@@ -26,10 +26,12 @@
 ;; Remove trailing whitespace from a line
 (setq-default nuke-trailing-whitespace-p t)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-;; fix selection issues in xterm (can't hold down shift and up arrow to
+;; fix input issues in xterm (can't hold down shift and up arrow to
 ;; highlight stuff)
 (if (equal "xterm" (tty-type))
     (define-key input-decode-map "\e[1;2A" [S-up]))
+(if (equal "xterm" (tty-type))
+    (define-key input-decode-map "[4~" [end]))
 
 ;; starts emacs in server form so i can use emacsclient to add files
 ;; but only if server isn't already started
@@ -495,8 +497,8 @@ Lisp code." t)
 (global-set-key (kbd "<backtab>") 'force-insert-tab)
 (global-set-key (kbd "C-c t") 'force-insert-tab) ; for modes like markdown-mode
                                         ; where S-tab overridden
-(define-key c-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j) ; for brackets
-(define-key c++-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j) ; for brackets
+(define-key c-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
+(define-key c++-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
 
 ;; open file with wildcards
 ;;(global-set-key (kbd "C-c o") 'open-file-with-wildcards)
@@ -508,6 +510,9 @@ Lisp code." t)
 ;;; recognize camel case
 (global-set-key (kbd "C-<right>") 'camel-case-right-word)
 (global-set-key (kbd "C-<left>") 'camel-case-left-word)
+
+;;; shortcut for magit, finally
+(global-set-key (kbd "C-x C-g") 'magit-status)
 
 ;;;;; my own functions! used throughout this file
 ;;; some of these are mine, some are heavily adapated from emacswiki, some are
@@ -739,7 +744,7 @@ annoying. This fixes that."
     ;; check if string is all caps; if so, skip
     (if (not (string-is-capitalized-p (buffer-substring cur-point fin-point)))
         (progn
-          (loop for letter-index from 1 to (- fin-point cur-point)
+          (loop for letter-index from 1 upto (- fin-point cur-point)
                 while (= cap-letter-index (- fin-point cur-point))
                 do (if (char-is-capitalized-p
                         (char-after (+ cur-point letter-index)))
@@ -764,8 +769,6 @@ annoying. This fixes that."
                        (setq cap-letter-index letter-index)))
           (goto-char (+ cur-point cap-letter-index))))))
 
-(require 'cl)
-
 (defun kill-selected-region-default (&optional lines)
   "When selection highlighted, C-k stores all characters in the kill ring,
 instead of just the final line."
@@ -778,6 +781,7 @@ instead of just the final line."
       (kill-line lines))))
 (global-set-key (kbd "C-k") 'kill-selected-region-default)
 
+;;; clone of goto-char
 (defun move-point-to-index (&optional index)
   (interactive "p")
   (if (< (point) index)
