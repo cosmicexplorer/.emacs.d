@@ -512,7 +512,7 @@ Lisp code." t)
 (global-set-key (kbd "C-<left>") 'camel-case-left-word)
 
 ;;; shortcut for magit, finally
-(global-set-key (kbd "C-x C-g") 'magit-status)
+(global-set-key (kbd "C-x g") 'magit-status)
 
 ;;;;; my own functions! used throughout this file
 ;;; some of these are mine, some are heavily adapated from emacswiki, some are
