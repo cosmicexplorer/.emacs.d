@@ -130,6 +130,12 @@ Lisp code." t)
 (setq auto-mode-alist
       (cons '("SConscript" . python-mode) auto-mode-alist))
 
+(add-to-list 'load-path "~/.emacs.d/js-beautify")
+(require 'js-beautify)
+(add-hook 'js-mode-hook 'js-beautify-init)
+(add-hook 'html-mode-hook 'js-beautify-init)
+(add-hook 'css-mode-hook 'js-beautify-init)
+
 ;;;;; FIX DUMB SEMICOLONS WITH CC-MODE AND USE CLANG-FORMAT FOR EVERYTHING
 (defun add-keybinding-to-mode-maps (keys-pressed func-to-call-quoted
                                                  &rest mode-maps-list)
@@ -190,8 +196,6 @@ Lisp code." t)
 
 ;;; for code formatting
 (load "~/.emacs.d/lisp/clang-format.el")
-(add-to-list 'load-path "~/.emacs.d/js-beautify")
-(require 'js-beautify)
 
 ;; for like real scrolling
 (xterm-mouse-mode)
