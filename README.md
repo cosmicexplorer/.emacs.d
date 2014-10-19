@@ -34,7 +34,7 @@ Because I've gone through hell and back to make this the best editor on the plan
 	* Read the instructions for [ghc-mod](http://www.mew.org/~kazu/proj/ghc-mod/en/) installation.
 
 #### Dependencies
-These aren't actually required to run it, just to use certain modes. Email me about any others you find.
+These aren't actually required to run it, just to use certain modes. [Email me](mailto:danieldmcclanahan@gmail.com) about any others you find.
 
 1. [sbcl](http://sbcl.org) (for slime usage)
 2. [R](http://www.r-project.org) and [julia](http://julialang.org) languages (for ESS)
