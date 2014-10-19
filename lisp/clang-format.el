@@ -36,11 +36,7 @@
   (let* ((orig-windows (get-buffer-window-list (current-buffer)))
          (orig-window-starts (mapcar #'window-start orig-windows))
          (orig-point (point))
-				 ;; i want to use the default method of looking for a .clang-format file
-				 ;; in the project directory, not using a single one always, so
-				 ;; (style "file") is removed
-         ;(style "file")
-				 )
+         (style "file"))
     (unwind-protect
         (call-process-region (point-min) (point-max) clang-format-binary
                              t (list t nil) nil
@@ -48,8 +44,7 @@
                              "-length" (number-to-string (- end begin))
                              "-cursor" (number-to-string (1- (point)))
                              "-assume-filename" (buffer-file-name)
-                             "-style" "file"
-														 )
+                             "-style" style)
       (goto-char (point-min))
       (let ((json-output (json-read-from-string
                            (buffer-substring-no-properties

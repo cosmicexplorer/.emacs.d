@@ -132,15 +132,39 @@ the text at point."
   (if smart-tab-debug
       (message "default"))
   (if (use-region-p)
-      (if (or (eq (with-current-buffer (current-buffer) major-mode) 'c-mode)
-              (eq (with-current-buffer (current-buffer) major-mode) 'c++-mode))
-          (clang-format-region)
-        (indent-region (region-beginning)
-                       (region-end)))
-    (if (or (eq (with-current-buffer (current-buffer) major-mode) 'c-mode)
-            (eq (with-current-buffer (current-buffer) major-mode) 'c++-mode))
-        (clang-format-line)
-      (indent-for-tab-command))))
+      (cond ((or (eq (with-current-buffer
+                         (current-buffer) major-mode) 'c-mode)
+                 (eq (with-current-buffer
+                         (current-buffer) major-mode) 'c++-mode))
+             (clang-format-region))
+            ((eq (with-current-buffer
+                     (current-buffer) major-mode) 'js-mode)
+             (js-mode-js-beautify-buffer))
+            ((eq (with-current-buffer
+                     (current-buffer) major-mode) 'html-mode)
+             (html-mode-js-beautify-buffer))
+            ((eq (with-current-buffer
+                     (current-buffer) major-mode) 'css-mode)
+             (css-mode-js-beautify-buffer))
+            (t
+             (indent-region (region-beginning)
+                            (region-end))))
+    (cond ((or (eq (with-current-buffer
+                       (current-buffer) major-mode) 'c-mode)
+               (eq (with-current-buffer
+                       (current-buffer) major-mode) 'c++-mode))
+           (clang-format-line))
+          ((eq (with-current-buffer
+                   (current-buffer) major-mode) 'js-mode)
+           (js-mode-js-beautify-buffer))
+          ((eq (with-current-buffer
+                   (current-buffer) major-mode) 'html-mode)
+           (html-mode-js-beautify-buffer))
+          ((eq (with-current-buffer
+                   (current-buffer) major-mode) 'css-mode)
+           (css-mode-js-beautify-buffer))
+          (t
+           (indent-for-tab-command)))))
 
 ;;;###autoload
 (defun smart-tab (&optional prefix)

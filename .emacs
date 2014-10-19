@@ -109,6 +109,8 @@ Lisp code." t)
                                                  comment-end "")))
 (add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (add-hook 'asm-mode-hook (lambda () (setq comment-start "# " comment-end "")))
+(add-hook 'html-mode-hook (lambda ()
+                            (setq comment-start "<!--" comment-end "-->")))
 
 (setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after
                                         ; semicolons i don't like that
@@ -135,6 +137,25 @@ Lisp code." t)
                             c++-mode-map
                             java-mode-map)))
 (c-set-offset 'innamespace 0)
+(add-hook 'js-mode-hook '(lambda ()
+                           (add-keybinding-to-mode-maps
+                            "RET" 'js-mode-newline-and-indent-js-beautify
+                            js-mode-map)))
+(setq js-indent-level 2)
+(setq css-indent-offset 2)
+(add-hook 'js-mode-hook '(lambda ()
+                           (add-keybinding-to-mode-maps
+                            "C-j" 'javascript-newline-and-indent-ctrl-j-override
+                            js-mode-map)))
+(add-hook 'html-mode-hook '(lambda ()
+                           (add-keybinding-to-mode-maps
+                            "RET" 'html-mode-newline-and-indent-js-beautify
+                            html-mode-map)))
+(add-hook 'css-mode-hook '(lambda ()
+                           (add-keybinding-to-mode-maps
+                            "RET" 'css-mode-newline-and-indent-js-beautify
+                            css-mode-map)))
+
 ;;; syntax highlighting
 (global-font-lock-mode 1)               ; turn on syntax highlighting
 (setq font-lock-maximum-decoration t)   ; turn it ALL the way on
@@ -160,6 +181,7 @@ Lisp code." t)
 
 ;;; for code formatting
 (load "~/.emacs.d/lisp/clang-format.el")
+(load "~/.emacs.d/lisp/js-beautify.el")
 
 ;; for like real scrolling
 (xterm-mouse-mode)
@@ -485,9 +507,6 @@ Lisp code." t)
 (add-hook 'go-mode-hook
           (lambda () (local-set-key (kbd "C-c f") 'go-fmt-file)))
 
-;; indent all lines in a file in case copy/pasting screws up somehow
-(global-set-key (kbd "C-c i") 'iwb)
-
 ;; remember that M-= gets word counts!
 
 ;; search all open buffers for regexp
@@ -672,15 +691,17 @@ caps"))
                 "  " mode-line-buffer-identification
                 "  " mode-line-modes))
 
-(defun count-lines-in-buffer ()
+;;; not sure why this is here, but ok
+(defun output-lines-in-buffer ()
   (setq integer-buffer-line-count (count-lines (point-min) (point-max)))
   (setq my-mode-line-buffer-line-count (int-to-string
                                         integer-buffer-line-count)))
 
-(add-hook 'find-file-hook 'count-lines-in-buffer)
-(add-hook 'after-save-hook 'count-lines-in-buffer)
-(add-hook 'after-revert-hook 'count-lines-in-buffer)
-(add-hook 'dired-after-readin-hook 'count-lines-in-buffer)
+
+(add-hook 'find-file-hook 'output-lines-in-buffer)
+(add-hook 'after-save-hook 'output-lines-in-buffer)
+(add-hook 'after-revert-hook 'output-lines-in-buffer)
+(add-hook 'dired-after-readin-hook 'output-lines-in-buffer)
 
 ;; function to indent whole buffer
 (defun indent-whole-buffer ()
@@ -695,9 +716,21 @@ caps"))
 annoying. This fixes that."
   (interactive)
   (insert-char 97)
-  (insert-char 59)                      ; insert comment
+  (insert-char 59)
   (clang-format-line)                   ; clang-formats previous line
   (delete-backward-char 2))
+
+(defun count-num-lines-in-buffer ()
+  (count-lines (point-min) (point-max)))
+
+(defun get-lines-in-buffer-str ()
+  (interactive)
+  (int-to-string integer-buffer-line-count))
+
+(defun get-current-line-as-string ()
+  (interactive)
+  (buffer-substring-no-properties
+   (line-beginning-position) (line-end-position)))
 
 (defun move-point-to-beginning-of-line ()
   (interactive)
@@ -722,7 +755,8 @@ annoying. This fixes that."
           (newline-and-indent)
           (move-point-to-beginning-of-line)
           (backward-char)))
-    (delete-backward-char 2)))          ; removes a and semicolon
+    ;; removes a and semicolon
+    (delete-backward-char 2)))
 
 (defun string-is-capitalized-p (str)
   (let ((case-fold-search nil))
@@ -780,84 +814,6 @@ instead of just the final line."
         (kill-line)
       (kill-line lines))))
 (global-set-key (kbd "C-k") 'kill-selected-region-default)
-
-;;; clone of goto-char
-(defun move-point-to-index (&optional index)
-  (interactive "p")
-  (if (< (point) index)
-      (loop for cur-point from (point) upto (- index 1)
-            do (forward-char))
-    (loop for cur-point from (point) downto (+ index 1)
-          do (backward-char))))
-
-(defun squeeze-region-to-80-chars (&optional lines)
-  "If region greater than 80 characters wide, insert and remove newlines as
-required to cut it down to size. Not completely functional, but useful enough to
-  stay."
-  (interactive "p")
-  (delete-trailing-whitespace)          ; cause this fails otherwise
-  (let ((orig-point (point))
-        (start-point)
-        (end-point)
-        (lines lines))
-    (if (use-region-p)
-        (progn
-          (setq start-point (region-beginning)
-                end-point (region-end))
-          (move-point-to-index start-point)
-          (move-beginning-of-line 1)
-          (setq start-point (point))
-          (move-point-to-index end-point)
-          (move-end-of-line 1)
-          (setq end-point (point)))
-      (progn
-        (if (not lines)
-            (setq lines 0))
-        (move-beginning-of-line 1)
-        (setq start-point (point))
-        (forward-line lines)
-        (move-end-of-line 1)
-        (setq end-point (point))))
-    (move-point-to-index start-point)
-    (loop with prev-point-same-line = start-point
-          and cur-point = start-point
-          while (< cur-point end-point)
-          do (progn
-               (if (> (- cur-point prev-point-same-line) 80)
-                   (progn
-                     (let ((found-left-edge nil))
-                       (loop
-                        while (not found-left-edge)
-                        do
-                        (progn    ; 32 is space character in ascii
-                          (left-word 1)
-                          (left-word 1)
-                          (setq found-left-edge
-                                (char-equal (preceding-char) 32))
-                          (if (not found-left-edge)
-                              (progn
-                                (right-word 1)
-                                (setq found-left-edge
-                                      (char-equal (following-char) 32)))))))
-                     ;; there's a bug in here, if anyone ever puts in a
-                     ;; hypen-or-whatever-delimited string longer than 80 chars,
-                     ;; with indentation; it'll basically loop infinitely
-                     (if (char-equal (following-char) 32)
-                         (progn
-                           (newline)
-                           (delete-char 1)
-                           (setq prev-point-same-line (point)))
-                       (progn
-                         (delete-char -1)
-                         (newline)
-                         (setq prev-point-same-line (point))))))
-               (if (char-equal (following-char) 10) ; 10 is newline
-                   (progn
-                     (delete-char 1)
-                     (insert " ")))
-               (right-word 1)
-               (setq cur-point (point))))
-    (move-point-to-index orig-point)))
 
 (add-hook 'slime-mode-hook 'fix-lisp-keybindings)
 ;; get useful keybindings for lisp editing
@@ -975,6 +931,29 @@ parentheses. CURRENTLY BROKEN"
      (define-key haskell-mode-map (kbd "C-c C-d") nil)))
 ;;; cause i can never figure out how to just get to the REPL lol
 (defalias 'haskell-repl (symbol-function 'haskell-process-do-info))
+
+(defun replace-char-in-range (from-char to-char beg end)
+  (let ((was-char-replaced nil))
+    (loop for index from beg upto end
+          do (when (< index (point-max))
+               (if
+                   (char-equal (char-after index) from-char)
+                   (save-excursion
+                     (setq was-char-replaced t)
+                     (goto-char index)
+                     (delete-char 1)
+                     (insert-char to-char)))))
+    was-char-replaced))
+
+(defun remove-newlines-from-buffer ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (loop for line-index from 1 upto (count-num-lines-in-buffer)
+          do (progn
+               (if (string-equal (get-current-line-as-string) "")
+                   (delete-forward-char 1)
+                 (forward-line 1))))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
