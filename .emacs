@@ -131,7 +131,7 @@ Lisp code." t)
 (setq auto-mode-alist
       (cons '("SConscript" . python-mode) auto-mode-alist))
 
-(add-to-list 'load-path "~/.emacs.d/js-beautify")
+(add-to-list 'load-path "~/.emacs.d/js-beautify-emacs")
 (require 'js-beautify)
 (add-hook 'js-mode-hook 'js-beautify-init)
 (add-hook 'html-mode-hook 'js-beautify-init)
