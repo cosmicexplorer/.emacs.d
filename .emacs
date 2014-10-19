@@ -181,7 +181,7 @@ Lisp code." t)
 
 ;;; for code formatting
 (load "~/.emacs.d/lisp/clang-format.el")
-(load "~/.emacs.d/lisp/js-beautify.el")
+(require 'js-beautify)
 
 ;; for like real scrolling
 (xterm-mouse-mode)

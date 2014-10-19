@@ -222,3 +222,5 @@ re-beautifying the buffer."
     (if is-found
         (goto-char index-found))
     is-found))
+
+(provide 'js-beautify)
