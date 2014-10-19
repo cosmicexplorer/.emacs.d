@@ -190,6 +190,7 @@ Lisp code." t)
 
 ;;; for code formatting
 (load "~/.emacs.d/lisp/clang-format.el")
+(add-to-list 'load-path "~/.emacs.d/js-beautify")
 (require 'js-beautify)
 
 ;; for like real scrolling
