@@ -22,6 +22,7 @@
 ;; stop the intro to emacs buffer
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
+(define-key help-map "a" 'apropos)      ; get useful help for once
 (menu-bar-mode -1) ;; remove menu bar for another line of space
 (transient-mark-mode 0)                 ; turn that off lol
 (setq shift-select-mode t)
