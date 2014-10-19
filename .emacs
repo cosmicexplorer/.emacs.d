@@ -9,6 +9,15 @@
 ;;;;; specific sections are demarcated by five semicolons, like this line
 ;;; do a global search through all such marks to go through all major sections
 
+;;; MELPA
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(when (< emacs-major-version 24)
+  ;; For important compatibility libraries like cl-lib
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+(package-initialize)
+
 ;;;;; globally useful things
 ;; stop the intro to emacs buffer
 (setq inhibit-startup-echo-area-message t)
@@ -148,13 +157,13 @@ Lisp code." t)
                             "C-j" 'javascript-newline-and-indent-ctrl-j-override
                             js-mode-map)))
 (add-hook 'html-mode-hook '(lambda ()
-                           (add-keybinding-to-mode-maps
-                            "RET" 'html-mode-newline-and-indent-js-beautify
-                            html-mode-map)))
+                             (add-keybinding-to-mode-maps
+                              "RET" 'html-mode-newline-and-indent-js-beautify
+                              html-mode-map)))
 (add-hook 'css-mode-hook '(lambda ()
-                           (add-keybinding-to-mode-maps
-                            "RET" 'css-mode-newline-and-indent-js-beautify
-                            css-mode-map)))
+                            (add-keybinding-to-mode-maps
+                             "RET" 'css-mode-newline-and-indent-js-beautify
+                             css-mode-map)))
 
 ;;; syntax highlighting
 (global-font-lock-mode 1)               ; turn on syntax highlighting

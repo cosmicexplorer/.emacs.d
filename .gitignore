@@ -14,6 +14,8 @@ auto-save-list/
 # eshell history
 eshell/history
 eshell/lastdir
+# melpa/elpa/etc
+elpa/
 # cached files for quicklisp
 quicklisp/cache/
 quicklisp/tmp/
