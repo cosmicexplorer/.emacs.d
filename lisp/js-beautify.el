@@ -21,11 +21,13 @@
 (defvar js-beautify-config-file-location nil)
 (defcustom number-of-extra-newlines-to-preserve-js-mode 1
   "Number of blank newlines in a row to preserve when running
-js-mode-js-beautify-buffer. A 'newline' here is used to mean a line which contains only
-the \n, or newline character."
+js-mode-js-beautify-buffer. A 'newline' here is used to mean a line which
+contains only the \n, or newline character."
   :type 'integer)
 
 (defun set-beautify-newlines (num)
+  "Modifies the defcustom number-of-extra-newlines-to-preserve-js-mode. Caution:
+this function's effect is session-local."
   ;; "nnumber" is not a typo! look at emacs interaction codes
   (interactive "nnumber of free newlines: ")
   (setq number-of-extra-newlines-to-preserve-js-mode num))
