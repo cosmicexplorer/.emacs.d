@@ -136,7 +136,7 @@ the text at point."
                          (current-buffer) major-mode) 'c-mode)
                  (eq (with-current-buffer
                          (current-buffer) major-mode) 'c++-mode))
-             (clang-format-region))
+             (clang-format-buffer))
             ((eq (with-current-buffer
                      (current-buffer) major-mode) 'js-mode)
              (js-mode-js-beautify-buffer))
@@ -153,7 +153,7 @@ the text at point."
                        (current-buffer) major-mode) 'c-mode)
                (eq (with-current-buffer
                        (current-buffer) major-mode) 'c++-mode))
-           (clang-format-line))
+           (clang-format-buffer))
           ((eq (with-current-buffer
                    (current-buffer) major-mode) 'js-mode)
            (js-mode-js-beautify-buffer))

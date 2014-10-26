@@ -32,7 +32,7 @@
              (setq show-trailing-whitespace t)))
 (setq-default indent-tabs-mode nil)     ;; use spaces not tabs
 (setq tab-width 4)
-(setq-default c-basic-offset 4) ;; cc-mode uses this instead of tab-width
+(setq-default c-basic-offset 2) ;; cc-mode uses this instead of tab-width
 ;; Remove trailing whitespace from a line
 (setq-default nuke-trailing-whitespace-p t)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -74,8 +74,11 @@
 (add-hook 'prog-mode-hook #'auto-fill-mode)
 (add-hook 'prog-mode-hook #'(lambda ()
                               (set-fill-column 80)))
-(add-hook 'org-mode-hook #'highlight-80+-mode)
-(add-hook 'org-mode-hook #'auto-fill-mode)
+(add-hook 'text-mode-hook #'highlight-80+-mode)
+(add-hook 'text-mode-hook #'auto-fill-mode)
+(add-hook 'text-mode-hook #'(lambda ()
+                              (set-fill-column 80)))
+
 (require 'misc-cmds)
 
 ;;;;; setup specific modes for specific filetypes
@@ -113,6 +116,8 @@ Lisp code." t)
 ;; format comments like a normal person
 (add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
 (add-hook 'text-mode-hook (lambda () (setq comment-start "- " comment-end "")))
+(add-hook 'fundamental-mode-hook (lambda ()
+                                   (setq comment-start "- " comment-end "")))
 (add-hook 'r-mode-hook (lambda () (setq comment-start "# " comment-end   "")))
 (add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; "
@@ -189,8 +194,8 @@ Lisp code." t)
       w3m-terminal-coding-system 'utf-8)
 
 ;;; TODO: why isn't this doing anything???
-(hs-minor-mode) ;; C-c @ C-c for folding up code blocks!!!
-(add-hook 'prog-mode-hook #'hs-minor-mode) ; add to all programming modes
+;; (hs-minor-mode) ;; C-c @ C-c for folding up code blocks!!!
+;; (add-hook 'prog-mode-hook #'hs-minor-mode) ; add to all programming modes
 
 (add-to-list 'load-path "~/.emacs.d/multiple-cursors.el")
 (require 'multiple-cursors)
@@ -391,6 +396,7 @@ Lisp code." t)
          ("hex" (mode . hexl-mode))
          ("qmake" (mode . qmake-mode))
          ("org" (mode . org-mode))
+         ("shell script" (mode . sh-mode))
          ("emacs-system" (or (name . "\*eshell\*")
                              (name . "\*scratch\*")
                              (name . "\*Messages\*")
