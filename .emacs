@@ -417,6 +417,14 @@ Lisp code." t)
 ;;; add modes for specific filetypes
 (add-to-list 'auto-mode-alist '("\\.tpp\\'" . c++-mode))
 
+(require 'color-theme)
+(eval-after-load "color-theme"
+  '(progn
+     (color-theme-initialize)))
+(add-to-list 'load-path "~/.emacs.d/color-themes")
+(require 'color-theme-danny)
+(color-theme-danny)
+
 ;;;;; keybindings
 ;; FIND CURRENT KEYBINDINGS WITH C-h b !!!!!
 ;; use C-h k to look at the current key sequence being entered!
@@ -426,6 +434,7 @@ Lisp code." t)
 ;;; reset quit key combination to close
 (global-set-key (kbd "C-x C-c") nil)
 (global-set-key (kbd "C-x C-c C-q") 'save-buffers-kill-terminal)
+(global-set-key (kbd "C-x C-c C-f") 'delete-frame)
 
 ;; C-Spc to start selection (set mark) in terminal!
 
@@ -659,8 +668,6 @@ also."
 
 ;; stolen from the ergo emacs guy
 ;; (http://ergoemacs.org/emacs/modernization_upcase-word.html)
-;; like normally everything he's put up is super underwhelming but this sees
-;; some use
 (defun toggle-letter-case ()
   "Toggle the letter case of current word or text selection.
 Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
@@ -983,4 +990,5 @@ parentheses. CURRENTLY BROKEN"
  ;; If there is more than one, they won't work right.
  '(fill-column 80)
  '(org-support-shift-select (quote always))
- '(asm-comment-char ?#))
+ '(asm-comment-char ?#)
+ '(color-theme-directory ("/home/cosmicexplorer/.emacs.d/color-themes/")))
