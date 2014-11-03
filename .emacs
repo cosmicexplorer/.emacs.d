@@ -115,7 +115,6 @@ Lisp code." t)
 ;;;;; random per-language editing things
 ;; format comments like a normal person
 (add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
-(add-hook 'text-mode-hook (lambda () (setq comment-start "- " comment-end "")))
 (add-hook 'fundamental-mode-hook (lambda ()
                                    (setq comment-start "- " comment-end "")))
 (add-hook 'r-mode-hook (lambda () (setq comment-start "# " comment-end   "")))
@@ -425,6 +424,9 @@ Lisp code." t)
 (require 'color-theme-danny)
 (color-theme-danny)
 
+(add-hook 'prog-mode-hook #'rainbow-mode)
+(add-hook 'text-mode-hook #'rainbow-mode)
+
 ;;;;; keybindings
 ;; FIND CURRENT KEYBINDINGS WITH C-h b !!!!!
 ;; use C-h k to look at the current key sequence being entered!
@@ -502,8 +504,9 @@ Lisp code." t)
 
 ;; translate stuff into hex (and back??)
 (global-set-key (kbd "C-x h") 'hexl-mode)
-;; add back select all functionality since that was previously bound to C-x h
-(global-set-key (kbd "C-x a") 'mark-whole-buffer)
+
+;; delete all of everything
+(global-set-key (kbd "C-x d") 'erase-buffer)
 
 ;; find file somewhere below given directory with dired
 (global-set-key (kbd "C-x C-r") 'find-name-dired) ; "recursive"
@@ -988,7 +991,9 @@ parentheses. CURRENTLY BROKEN"
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(asm-comment-char 35)
+ '(color-theme-directory ("/home/cosmicexplorer/.emacs.d/color-themes/"))
  '(fill-column 80)
  '(org-support-shift-select (quote always))
- '(asm-comment-char ?#)
- '(color-theme-directory ("/home/cosmicexplorer/.emacs.d/color-themes/")))
+ '(server-delete-tty t))
+(put 'erase-buffer 'disabled nil)
