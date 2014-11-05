@@ -816,6 +816,7 @@ annoying. This fixes that."
                        (setq cap-letter-index letter-index)))
           (goto-char (+ cur-point cap-letter-index))))))
 
+;;; TODO: fix behavior when moving among caps underscores
 (defun camel-case-left-word ()
   (interactive "^")                     ; highlights region if shifted
   (let ((cur-point (point))
@@ -994,6 +995,8 @@ parentheses. CURRENTLY BROKEN"
  '(asm-comment-char 35)
  '(color-theme-directory ("/home/cosmicexplorer/.emacs.d/color-themes/"))
  '(fill-column 80)
+ '(number-of-extra-newlines-to-preserve-js-mode 0)
+ '(org-support-shift-select (quote always))
  '(org-support-shift-select (quote always))
  '(server-delete-tty t))
 (put 'erase-buffer 'disabled nil)
