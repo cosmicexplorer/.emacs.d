@@ -435,7 +435,7 @@ Lisp code." t)
 
 ;;; reset quit key combination to close
 (global-set-key (kbd "C-x C-c") nil)
-(global-set-key (kbd "C-x C-c C-q") 'save-buffers-kill-terminal)
+(global-set-key (kbd "C-x ESC ESC") 'save-buffers-kill-terminal)
 (global-set-key (kbd "C-x C-c C-f") 'delete-frame)
 
 ;; C-Spc to start selection (set mark) in terminal!
