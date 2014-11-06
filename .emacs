@@ -416,6 +416,7 @@ Lisp code." t)
 ;;; add modes for specific filetypes
 (add-to-list 'auto-mode-alist '("\\.tpp\\'" . c++-mode))
 
+(add-to-list 'load-path "~/.emacs.d/themes")
 (require 'color-theme)
 (eval-after-load "color-theme"
   '(progn
