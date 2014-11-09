@@ -23,9 +23,17 @@
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 (define-key help-map "a" 'apropos)      ; get useful help for once
-(menu-bar-mode -1) ;; remove menu bar for another line of space
+(menu-bar-mode 0) ;; remove menu bar for another line of space
+(tool-bar-mode 0)
+(setq scroll-step 1)
+(setq scroll-conservatively 10000)
+;;; TODO: make it so point in buffer is preserved upon scrolls
+(scroll-bar-mode 0)
+(set-face-attribute 'default nil :height 100)
 (transient-mark-mode 0)                 ; turn that off lol
 (setq shift-select-mode t)
+(scroll-lock-mode nil)
+(setq scroll-preserve-screen-position t)
 ;;; indentation silliness
 (add-hook 'after-change-major-mode-hook  ; show whitespace
           '(lambda ()
@@ -49,6 +57,11 @@
 (if (and (fboundp 'server-running-p)
          (not (server-running-p)))
     (server-start))
+
+;;; FONTS
+(add-to-list 'default-frame-alist '(font . "Telegrama 10"))
+(set-face-attribute 'default t :font "Telegrama 10")
+(set-frame-font "Telegrama 10")
 
 ;;; so i can sudo edit files with C-x C-f /sudo::/path/to/file
 (require 'tramp)
@@ -141,6 +154,9 @@ Lisp code." t)
 (add-hook 'html-mode-hook 'js-beautify-init)
 (add-hook 'css-mode-hook 'js-beautify-init)
 
+;;; cause otherwise this doens't work in graphical
+(global-set-key (kbd "<C-return>") 'newline-and-indent)
+
 ;;;;; FIX DUMB SEMICOLONS WITH CC-MODE AND USE CLANG-FORMAT FOR EVERYTHING
 (defun add-keybinding-to-mode-maps (keys-pressed func-to-call-quoted
                                                  &rest mode-maps-list)
@@ -157,15 +173,16 @@ Lisp code." t)
                             c++-mode-map
                             java-mode-map)))
 (c-set-offset 'innamespace 0)
-(add-hook 'js-mode-hook '(lambda ()
-                           (add-keybinding-to-mode-maps
-                            "RET" 'js-mode-newline-and-indent-js-beautify
-                            js-mode-map)))
 (setq js-indent-level 2)
 (setq css-indent-offset 2)
 (add-hook 'js-mode-hook '(lambda ()
                            (add-keybinding-to-mode-maps
                             "C-j" 'javascript-newline-and-indent-ctrl-j-override
+                            js-mode-map)))
+(add-hook 'js-mode-hook '(lambda ()
+                           (add-keybinding-to-mode-maps
+                            "<C-return>"
+                            'javascript-newline-and-indent-ctrl-j-override
                             js-mode-map)))
 (add-hook 'html-mode-hook '(lambda ()
                              (add-keybinding-to-mode-maps
@@ -295,7 +312,20 @@ Lisp code." t)
 
 ;; show line numbers
 (global-linum-mode)
+(add-hook 'find-file-hook               ; otherwise docview is extremely slow
+          '(lambda ()
+             (when (or                  ; because regexes are parsed weirdly
+                                        ; here and this works
+                    (string-match "\.pdf$" buffer-file-name)
+                    (string-match "\.ps$" buffer-file-name)
+                    (string-match "\.dvi$" buffer-file-name)
+                    (string-match "\.doc.*$" buffer-file-name)
+                    (string-match "\.ppt.*$" buffer-file-name)
+                    (string-match "\.xls.*$" buffer-file-name)
+                    (string-match "\.od.*$" buffer-file-name))
+                 (linum-mode 0))))
 ;; make them relative
+
 (add-to-list 'load-path "~/.emacs.d/linum-relative")
 (require 'linum-relative)
 (setq linum-format 'linum-relative)
@@ -416,7 +446,6 @@ Lisp code." t)
 ;;; add modes for specific filetypes
 (add-to-list 'auto-mode-alist '("\\.tpp\\'" . c++-mode))
 
-(add-to-list 'load-path "~/.emacs.d/themes")
 (require 'color-theme)
 (eval-after-load "color-theme"
   '(progn
@@ -436,7 +465,7 @@ Lisp code." t)
 
 ;;; reset quit key combination to close
 (global-set-key (kbd "C-x C-c") nil)
-(global-set-key (kbd "C-x C-c C-x C-c") 'save-buffers-kill-terminal)
+(global-set-key (kbd "C-x C-c C-q") 'save-buffers-kill-terminal)
 (global-set-key (kbd "C-x C-c C-f") 'delete-frame)
 
 ;; C-Spc to start selection (set mark) in terminal!
@@ -551,7 +580,9 @@ Lisp code." t)
 (global-set-key (kbd "C-c t") 'force-insert-tab) ; for modes like markdown-mode
                                         ; where S-tab overridden
 (define-key c-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
+(define-key c-mode-map (kbd "<C-return>") 'newline-and-indent-ctrl-j)
 (define-key c++-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
+(define-key c++-mode-map (kbd "<C-return>") 'newline-and-indent-ctrl-j)
 
 ;; open file with wildcards
 ;;(global-set-key (kbd "C-c o") 'open-file-with-wildcards)
@@ -987,6 +1018,12 @@ parentheses. CURRENTLY BROKEN"
                (if (string-equal (get-current-line-as-string) "")
                    (delete-forward-char 1)
                  (forward-line 1))))))
+
+;;; TODO: make this functional
+;; (defun yank-push ()
+;;   (interactive)
+;;   (browse-kill-ring-forward 2)
+;;   (yank-pop))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
