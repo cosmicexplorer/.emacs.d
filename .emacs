@@ -468,6 +468,8 @@ Lisp code." t)
 (global-set-key (kbd "C-x C-c C-q") 'save-buffers-kill-terminal)
 (global-set-key (kbd "C-x C-c C-f") 'delete-frame)
 
+(define-key org-mode-map (kbd "<tab>") 'smart-tab)
+
 ;; C-Spc to start selection (set mark) in terminal!
 
 ;; the below can also be applied over multiple lines with

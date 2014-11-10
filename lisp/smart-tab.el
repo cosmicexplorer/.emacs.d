@@ -146,6 +146,9 @@ the text at point."
             ((eq (with-current-buffer
                      (current-buffer) major-mode) 'css-mode)
              (css-mode-js-beautify-buffer))
+            ((eq (with-current-buffer
+                     (current-buffer) major-mode) 'org-mode)
+             (org-cycle))
             (t
              (indent-region (region-beginning)
                             (region-end))))
@@ -163,8 +166,12 @@ the text at point."
           ((eq (with-current-buffer
                    (current-buffer) major-mode) 'css-mode)
            (css-mode-js-beautify-buffer))
+          ((eq (with-current-buffer
+                     (current-buffer) major-mode) 'org-mode)
+             (org-cycle))
           (t
            (indent-for-tab-command)))))
+
 
 ;;;###autoload
 (defun smart-tab (&optional prefix)
