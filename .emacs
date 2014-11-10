@@ -302,7 +302,6 @@ Lisp code." t)
 ;; adds haskell functionality
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-
                                         ;(add-to-list 'exec-path "~/.cabal/bin")
 (add-to-list 'load-path "~/.emacs.d/ghc-4.1.5")
 (require 'ghc)
@@ -310,20 +309,17 @@ Lisp code." t)
 (autoload 'ghc-debug "ghc" nil t)
 (add-hook 'haskell-mode-hook (lambda () (ghc-init)))
 
+;;; unfold org at startup
+(setq-default org-startup-folded "showeverything")
+
 ;; show line numbers
 (global-linum-mode)
-(add-hook 'find-file-hook               ; otherwise docview is extremely slow
+(add-hook 'change-major-mode-hook       ; otherwise docview is extremely slow
           '(lambda ()
-             (when (or                  ; because regexes are parsed weirdly
-                                        ; here and this works
-                    (string-match "\.pdf$" buffer-file-name)
-                    (string-match "\.ps$" buffer-file-name)
-                    (string-match "\.dvi$" buffer-file-name)
-                    (string-match "\.doc.*$" buffer-file-name)
-                    (string-match "\.ppt.*$" buffer-file-name)
-                    (string-match "\.xls.*$" buffer-file-name)
-                    (string-match "\.od.*$" buffer-file-name))
-                 (linum-mode 0))))
+             (when (eq (with-current-buffer
+                           (current-buffer) major-mode) 'doc-view-mode)
+               (linum-mode 0))))
+
 ;; make them relative
 
 (add-to-list 'load-path "~/.emacs.d/linum-relative")
