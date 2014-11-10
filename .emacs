@@ -32,7 +32,6 @@
 (set-face-attribute 'default nil :height 100)
 (transient-mark-mode 0)                 ; turn that off lol
 (setq shift-select-mode t)
-(scroll-lock-mode nil)
 (setq scroll-preserve-screen-position t)
 ;;; indentation silliness
 (add-hook 'after-change-major-mode-hook  ; show whitespace
@@ -314,6 +313,18 @@ Lisp code." t)
 
 ;; show line numbers
 (global-linum-mode)
+(add-hook 'find-file-hook               ; otherwise docview is extremely slow
+          '(lambda ()
+             (when (or                  ; because regexes are parsed weirdly
+                                        ; here and this works
+                    (string-match "\.pdf$" buffer-file-name)
+                    (string-match "\.ps$" buffer-file-name)
+                    (string-match "\.dvi$" buffer-file-name)
+                    (string-match "\.doc.*$" buffer-file-name)
+                    (string-match "\.ppt.*$" buffer-file-name)
+                    (string-match "\.xls.*$" buffer-file-name)
+                    (string-match "\.od.*$" buffer-file-name))
+               (linum-mode 0))))
 (add-hook 'change-major-mode-hook       ; otherwise docview is extremely slow
           '(lambda ()
              (when (eq (with-current-buffer
@@ -464,13 +475,14 @@ Lisp code." t)
 (global-set-key (kbd "C-x C-c C-q") 'save-buffers-kill-terminal)
 (global-set-key (kbd "C-x C-c C-f") 'delete-frame)
 
-(define-key org-mode-map (kbd "<tab>") 'smart-tab)
+(add-hook 'org-mode-hook
+  (local-set-key (kbd "<tab>") 'smart-tab)
 
-;; C-Spc to start selection (set mark) in terminal!
+  ;; C-Spc to start selection (set mark) in terminal!
 
-;; the below can also be applied over multiple lines with
-;; C-u [number] M-x helm-swoop RET
-(global-set-key (kbd "C-x o") 'helm-swoop) ; find regexp in file, more
+  ;; the below can also be applied over multiple lines with
+  ;; C-u [number] M-x helm-swoop RET
+  (global-set-key (kbd "C-x o") 'helm-swoop)) ; find regexp in file, more
                                         ; interactively than above
 (global-set-key (kbd "C-x f") 'helm-multi-swoop-all) ; find regexp in ALL open
                                         ; buffers
@@ -510,13 +522,6 @@ Lisp code." t)
 (global-set-key (kbd "C-M-<right>") 'windmove-right)
 (global-set-key (kbd "C-M-<up>") 'windmove-up)
 (global-set-key (kbd "C-M-<down>") 'windmove-down)
-;; terminal in ubuntu doesn't allow above keybindings; probably because M-<left>
-;; and M-<right> switch tty
-;; which is cool i guess??? very annoying though
-(global-set-key (kbd "C-c <left>") 'windmove-left)
-(global-set-key (kbd "C-c <right>") 'windmove-right)
-(global-set-key (kbd "C-c <up>") 'windmove-up)
-(global-set-key (kbd "C-c <down>") 'windmove-down)
 
 ;; visualize undo-tree
 (global-set-key (kbd "C-x t") 'undo-tree-visualize)
@@ -887,12 +892,10 @@ SLIME and Paredit. Not for the faint of heart."
   (define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
   (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key
                                         ; here (slurp-forward)
+  (define-key paredit-mode-map (kbd "C-c <right>") 'paredit-forward)
   (define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward) ; remove key
                                         ; here (slurp-backward)
-  (define-key paredit-mode-map (kbd "C-c <left>")       'windmove-left)
-  (define-key paredit-mode-map (kbd "C-c <right>") 'windmove-right)
-  (define-key paredit-mode-map (kbd "C-c <up>") 'windmove-up)
-  (define-key paredit-mode-map (kbd "C-c <down>")       'windmove-down)
+  (define-key paredit-mode-map (kbd "C-c <left>") 'paredit-backward)
   (define-key paredit-mode-map (kbd "M-a") nil) ; kill this, it's a global but
                                         ; it's annoying and i don't use it
   (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-add-parens-in-front)
@@ -901,9 +904,13 @@ SLIME and Paredit. Not for the faint of heart."
                                         ; define-key doesn't work, not sure why
   (define-key paredit-mode-map (kbd "M-a M-<right>")
     'paredit-forward-slurp-sexp)
+  (define-key paredit-mode-map (kbd "C-c <up>")
+    'paredit-forward-slurp-sexp)
   (define-key paredit-mode-map (kbd "M-a M-<left>")
     'paredit-backward-slurp-sexp)
   (define-key paredit-mode-map (kbd "C-M-a C-M-<right>")
+    'paredit-forward-barf-sexp)
+  (define-key paredit-mode-map (kbd "C-c <down>")
     'paredit-forward-barf-sexp)
   (define-key paredit-mode-map (kbd "C-M-a C-M-<left>")
     'paredit-backward-barf-sexp)
