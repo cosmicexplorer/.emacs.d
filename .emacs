@@ -9,6 +9,8 @@
 ;;;;; specific sections are demarcated by five semicolons, like this line
 ;;; do a global search through all such marks to go through all major sections
 
+;;; TODO: add kill-buffer-and-delete-file command
+
 ;;; MELPA
 (require 'package)
 (add-to-list 'package-archives
