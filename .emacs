@@ -9,10 +9,8 @@
 ;;;;; specific sections are demarcated by five semicolons, like this line
 ;;; do a global search through all such marks to go through all major sections
 
-;;; TODO: add kill-buffer-and-delete-file command
-
 ;;; MELPA
-(require 'package)
+(require 'package))
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (when (< emacs-major-version 24)
@@ -541,7 +539,7 @@ Lisp code." t)
 (global-set-key (kbd "C-x h") 'hexl-mode)
 
 ;; delete all of everything
-(global-set-key (kbd "C-x d") 'erase-buffer)
+;; (global-set-key (kbd "C-x d") 'erase-buffer)
 
 ;; find file somewhere below given directory with dired
 (global-set-key (kbd "C-x C-r") 'find-name-dired) ; "recursive"
@@ -602,6 +600,9 @@ Lisp code." t)
 
 ;;; shortcut for magit, finally
 (global-set-key (kbd "C-x g") 'magit-status)
+
+;;; just destroy unused files
+(global-set-key (kbd "C-x d") 'kill-buffer-and-move-file-to-trash)
 
 ;;;;; my own functions! used throughout this file
 ;;; some of these are mine, some are heavily adapated from emacswiki, some are
@@ -1025,6 +1026,15 @@ parentheses. CURRENTLY BROKEN"
                (if (string-equal (get-current-line-as-string) "")
                    (delete-forward-char 1)
                  (forward-line 1))))))
+
+(defun kill-buffer-and-move-file-to-trash ()
+  "Doesn't delete the file, just moves it to /tmp so that it goes away."
+  (interactive)
+  (set-buffer-modified-p nil)           ; pretends buffer not modified
+  (message
+   (shell-command-to-string
+    (concat "mv " (buffer-file-name) " /tmp/")))
+  (kill-this-buffer))
 
 ;;; TODO: make this functional
 ;; (defun yank-push ()
