@@ -29,7 +29,8 @@
 (tool-bar-mode 0)
 (setq scroll-step 1)
 (setq scroll-conservatively 10000)
-;;; TODO: make it so point in buffer is preserved upon scrolls
+;;; point in buffer not preserved between scrolls due to internal emacs logic
+;; (point must always be in frame), but save-point and goto-saved-point work
 (scroll-bar-mode 0)
 (set-face-attribute 'default nil :height 100)
 (transient-mark-mode 0)                 ; turn that off lol
@@ -489,14 +490,17 @@ Lisp code." t)
 (global-set-key (kbd "C-x C-c C-f") 'delete-frame)
 
 (add-hook 'org-mode-hook
-  (local-set-key (kbd "<tab>") 'smart-tab)
+          (local-set-key (kbd "<tab>") 'smart-tab))
 
-  ;; C-Spc to start selection (set mark) in terminal!
+(global-set-key (kbd "C-c C-s") 'save-point)
+(global-set-key (kbd "C-c C-a") 'goto-saved-point)
 
-  ;; the below can also be applied over multiple lines with
-  ;; C-u [number] M-x helm-swoop RET
-  (global-set-key (kbd "C-x o") 'helm-swoop)) ; find regexp in file, more
-                                        ; interactively than above
+;; C-Spc to start selection (set mark) in terminal!
+
+;; the below can also be applied over multiple lines with
+;; C-u [number] M-x helm-swoop RET
+                                        ; find regexp in file, more
+(global-set-key (kbd "C-x o") 'helm-swoop)         ; interactively than above
 (global-set-key (kbd "C-x f") 'helm-multi-swoop-all) ; find regexp in ALL open
                                         ; buffers
 (global-set-key (kbd "C-x j") 'helm-multi-swoop)                 ; find regexp
@@ -1053,6 +1057,22 @@ parentheses. CURRENTLY BROKEN"
 ;;   (interactive)
 ;;   (browse-kill-ring-forward 2)
 ;;   (yank-pop))
+
+(let ((saved-point 1))
+  (defun save-point ()
+    "Saves point in a single-value register. Use with goto-saved-point. Defaults
+ to position 1."
+    (interactive)
+    (setq saved-point (point))
+    (message (concat "Point saved (" (number-to-string saved-point) ")")))
+  (defun goto-saved-point ()
+    "Moves point to a point previously saved with save-point. By default, moves
+ to position 1."
+    (interactive)
+    (goto-char saved-point)
+    (recenter)
+    (message
+     (concat "Moved to saved point (" (number-to-string saved-point) ")"))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
