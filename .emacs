@@ -9,8 +9,6 @@
 ;;;;; specific sections are demarcated by five semicolons, like this line
 ;;; do a global search through all such marks to go through all major sections
 
-;; TODO: add send keystroke to window so i can pause soundcloud from without
-
 ;;; MELPA
 (require 'package)
 (add-to-list 'package-archives
@@ -211,10 +209,8 @@ Lisp code." t)
       w3m-output-coding-system 'utf-8
       w3m-terminal-coding-system 'utf-8)
 
-;;; TODO: why isn't this doing anything???
-;;; might need cedet installed/configured
-;; (hs-minor-mode) ;; C-c @ C-c for folding up code blocks!!!
-;; (add-hook 'prog-mode-hook #'hs-minor-mode) ; add to all programming modes
+;;; add code folding with hs-minor-mode
+(add-hook 'prog-mode-hook #'hs-minor-mode) ; add to all programming modes
 
 (add-to-list 'load-path "~/.emacs.d/multiple-cursors.el")
 (require 'multiple-cursors)
