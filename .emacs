@@ -9,8 +9,10 @@
 ;;;;; specific sections are demarcated by five semicolons, like this line
 ;;; do a global search through all such marks to go through all major sections
 
+;; TODO: add send keystroke to window so i can pause soundcloud from without
+
 ;;; MELPA
-(require 'package))
+(require 'package)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (when (< emacs-major-version 24)
@@ -209,6 +211,7 @@ Lisp code." t)
       w3m-terminal-coding-system 'utf-8)
 
 ;;; TODO: why isn't this doing anything???
+;;; might need cedet installed/configured
 ;; (hs-minor-mode) ;; C-c @ C-c for folding up code blocks!!!
 ;; (add-hook 'prog-mode-hook #'hs-minor-mode) ; add to all programming modes
 
@@ -854,7 +857,6 @@ annoying. This fixes that."
                        (setq cap-letter-index letter-index)))
           (goto-char (+ cur-point cap-letter-index))))))
 
-;;; TODO: fix behavior when moving among caps underscores
 (defun camel-case-left-word ()
   (interactive "^")                     ; highlights region if shifted
   (let ((cur-point (point))
