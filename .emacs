@@ -238,8 +238,7 @@ Lisp code." t)
                 [remap eshell-pcomplete]
                 'helm-esh-pcomplete)))
 
-;; autoload eshell at start so helm plays nice (this doesn't affect load time at
-;; all i've checked)
+;; autoload eshell at start so helm plays nice
 (add-hook 'emacs-startup-hook #'(lambda ()
                                   (let ((default-directory (getenv "HOME")))
                                     (command-execute 'eshell)
@@ -313,6 +312,17 @@ Lisp code." t)
 
 ;;; unfold org at startup
 (setq-default org-startup-folded "showeverything")
+
+;;; see docs for funcs n stuff
+(add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
+
+;;; clojure stuff
+(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+(setq nrepl-log-messages t)
+(global-company-mode)
+(add-hook 'cider-mode-hook 'rainbow-delimiters-mode)
+(add-hook 'cider-mode-hook 'paredit-mode)
+(add-hook 'cider-mode-hook 'subword-mode)
 
 ;; show line numbers
 (global-linum-mode)
