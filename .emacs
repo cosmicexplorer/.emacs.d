@@ -321,6 +321,9 @@ Lisp code." t)
 (add-hook 'cider-mode-hook 'paredit-mode)
 (add-hook 'cider-mode-hook 'subword-mode)
 
+;; same for scratch buffer
+(add-hook 'lisp-interaction-mode-hook 'paredit-mode)
+
 ;; show line numbers
 (global-linum-mode)
 (add-hook 'find-file-hook               ; otherwise docview is extremely slow
@@ -616,6 +619,9 @@ Lisp code." t)
 
 ;;; just destroy unused files
 (global-set-key (kbd "C-x d") 'kill-buffer-and-move-file-to-trash)
+
+;;; opposite of yank-pop
+(global-set-key (kbd "C-M-y") 'yank-push)
 
 ;;;;; my own functions! used throughout this file
 ;;; some of these are mine, some are heavily adapated from emacswiki, some are
@@ -936,6 +942,7 @@ SLIME and Paredit. Not for the faint of heart."
   (define-key paredit-mode-map (kbd "C-M-n") 'mc/unmark-next-like-this)
   (define-key paredit-mode-map (kbd "C-M-p") 'mc/unmark-previous-like-this)
   (define-key paredit-mode-map (kbd "C-x C-a") 'mc/mark-all-like-this)
+  (define-key paredit-mode-map (kbd "C-M-y") 'paredit-yank-push)
   (define-key paredit-mode-map (kbd "DEL") 'paredit-backspace-delete-highlight))
 
 ;; create parens and add adjacent two elements to sexp created by parens
@@ -1048,11 +1055,21 @@ parentheses. CURRENTLY BROKEN"
     (concat "mv " (buffer-file-name) " /tmp/")))
   (kill-this-buffer))
 
-;;; TODO: make this functional
-;; (defun yank-push ()
-;;   (interactive)
-;;   (browse-kill-ring-forward 2)
-;;   (yank-pop))
+(defun yank-push ()
+  (interactive)
+  (loop for i from 1 to 2               ; twice
+        do (if (= (length kill-ring-yank-pointer) 0)
+               nil
+             (setq kill-ring-yank-pointer (cdr kill-ring-yank-pointer))))
+  (yank-pop))
+
+(defun paredit-yank-push ()
+  (interactive)
+  (loop for i from 1 to 2               ; twice
+        do (if (= (length kill-ring-yank-pointer) 0)
+               nil
+             (setq kill-ring-yank-pointer (cdr kill-ring-yank-pointer))))
+  (paredit-yank-pop))
 
 (let ((saved-point 1))
   (defun save-point ()
@@ -1081,5 +1098,6 @@ parentheses. CURRENTLY BROKEN"
  '(number-of-extra-newlines-to-preserve-js-mode 0)
  '(org-support-shift-select (quote always))
  '(org-support-shift-select (quote always))
- '(server-delete-tty t))
+ '(server-delete-tty t)
+ '(yank-pop-change-selection t))
 (put 'erase-buffer 'disabled nil)
