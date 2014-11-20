@@ -466,6 +466,7 @@ Lisp code." t)
 ;;; add modes for specific filetypes
 (add-to-list 'auto-mode-alist '("\\.tpp\\'" . c++-mode))
 
+;;; personal color theme
 (require 'color-theme)
 (eval-after-load "color-theme"
   '(progn
@@ -474,8 +475,16 @@ Lisp code." t)
 (require 'color-theme-danny)
 (color-theme-danny)
 
+(defalias 'cider 'cider-jack-in)
+
+;;; start scratch buffer in paredit mode
+(with-current-buffer (get-buffer "*scratch*")
+  (enable-paredit-mode))
+
 (add-hook 'prog-mode-hook #'rainbow-mode)
 (add-hook 'text-mode-hook #'rainbow-mode)
+
+(setq LaTeX-command-style '(("" "%(PDF)%(latex) -file-line-error %S%(PDFout)")))
 
 ;;;;; keybindings
 ;; FIND CURRENT KEYBINDINGS WITH C-h b !!!!!
@@ -488,8 +497,9 @@ Lisp code." t)
 (global-set-key (kbd "C-x C-c C-q") 'save-buffers-kill-terminal)
 (global-set-key (kbd "C-x C-c C-f") 'delete-frame)
 
-(add-hook 'org-mode-hook
-          (local-set-key (kbd "<tab>") 'smart-tab))
+;; TODO: make this work!
+;(add-hook 'org-mode-hook
+;          (define-key org-mode-map (kbd "<tab>") 'smart-tab))
 
 (global-set-key (kbd "C-c C-s") 'save-point)
 (global-set-key (kbd "C-c C-a") 'goto-saved-point)
