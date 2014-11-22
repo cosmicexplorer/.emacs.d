@@ -102,7 +102,7 @@
   (ruby-mode          . "ruby -cw %f")
   (haskell-mode       . "ghc %f -o %n")
   (python-mode        . "python %f")
-  (js-mode            . "java -jar /usr/bin/closure.jar --js=%f") ;; google's js compiler closure
+  (js-mode            . "node %f")
   ("\\.R\\'"          . "Rscript %f") ;; redirects to stdout
   ("\\.r\\'"          . "Rscript %f") ;; redirects to stdout
   (go-mode            . (go-fmt-file-and-compile))
