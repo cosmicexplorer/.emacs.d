@@ -9,6 +9,9 @@
 ;;;;; specific sections are demarcated by five semicolons, like this line
 ;;; do a global search through all such marks to go through all major sections
 
+;;; TODO: DELETE FRAME WHEN DONE
+(byte-recompile-directory (expand-file-name "~/.emacs.d") 0)
+
 ;;; MELPA
 (require 'package)
 (add-to-list 'package-archives
@@ -16,6 +19,41 @@
 (when (< emacs-major-version 24)
   ;; For important compatibility libraries like cl-lib
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+(when (not package-archive-contents)
+  (package-refresh-contents))
+(defvar my-packages)
+(setq my-packages '(
+                    auctex
+                    better-defaults
+                    cider
+                    clojure-mode
+                    company
+                    dash
+                    epl
+                    evil
+                    espuds
+                    f
+                    go-mode
+                    helm
+                    helm-swoop
+                    linum
+                    linum-relative
+                    magit
+                    multiple-cursors
+                    noflet
+                    paredit
+                    pkg-info
+                    php-mode
+                    queue
+                    rainbow-mode
+                    s
+                    slime
+                    undo-tree
+                    w3m
+                    ))
+(dolist (p my-packages)
+  (unless (package-installed-p p)
+    (package-install p)))
 (package-initialize)
 
 ;;;;; globally useful things
@@ -46,7 +84,7 @@
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 ;; fix input issues in xterm (can't hold down shift and up arrow to
 ;; highlight stuff)
-(when (string-match "xterm" (tty-type))
+(when (string-match "xterm" (if (tty-type) (tty-type) ""))
   (define-key input-decode-map "\e[1;2A" [S-up])
   (define-key input-decode-map "\033[4~" [end]))
 
@@ -58,9 +96,9 @@
     (server-start))
 
 ;;; FONTS
-;(add-to-list 'default-frame-alist '(font . "Telegrama 10"))
-;(set-face-attribute 'default t :font "Telegrama 10")
-;(set-frame-font "Telegrama 10")
+(add-to-list 'default-frame-alist '(font . "Telegrama 10"))
+(set-face-attribute 'default t :font "Telegrama 10")
+(set-frame-font "Telegrama 10")
 
 ;;; so i can sudo edit files with C-x C-f /sudo::/path/to/file
 (require 'tramp)
@@ -117,12 +155,6 @@ Lisp code." t)
 (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-
-;; haskell mode
-(add-to-list 'load-path "~/.emacs.d/haskell-mode/")
-(require 'haskell-mode-autoloads)
-(add-to-list 'Info-default-directory-list "~/.emacs.d/haskell-mode/")
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 
 ;;;;; random per-language editing things
 ;; format comments like a normal person
@@ -202,8 +234,7 @@ Lisp code." t)
 
 ;;;;; load utilities
 ;; load w3m web browser
-(add-to-list 'load-path "~/.emacs.d/w3m")
-(require 'w3m-load)
+(require 'w3m)
 (setq w3m-use-cookies t)
 (setq w3m-coding-system 'utf-8
       w3m-file-coding-system 'utf-8
@@ -215,7 +246,6 @@ Lisp code." t)
 ;;; add code folding with hs-minor-mode
 (add-hook 'prog-mode-hook #'hs-minor-mode) ; add to all programming modes
 
-(add-to-list 'load-path "~/.emacs.d/multiple-cursors.el")
 (require 'multiple-cursors)
 
 ;;; for code formatting
@@ -271,9 +301,6 @@ Lisp code." t)
 ;; go-mode
 (add-to-list 'load-path "~/.emacs.d/go-mode")
 (require 'go-mode)
-;; dired-xattr
-(add-to-list 'load-path "~/.emacs.d/dired-xattr")
-(require 'dired-xattr)
 
 ;; adds undo-tree functionality
 (require 'undo-tree)
@@ -299,16 +326,6 @@ Lisp code." t)
 (setq inferior-julia-program-name "/usr/bin/julia-basic")
 (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/")
 (ess-toggle-underscore nil)     ;; underscore means underscore
-
-;; adds haskell functionality
-(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
-                                        ;(add-to-list 'exec-path "~/.cabal/bin")
-(add-to-list 'load-path "~/.emacs.d/ghc-4.1.5")
-(require 'ghc)
-(autoload 'ghc-init "ghc" nil t)
-(autoload 'ghc-debug "ghc" nil t)
-(add-hook 'haskell-mode-hook (lambda () (ghc-init)))
 
 ;;; unfold org at startup
 (setq-default org-startup-folded "showeverything")
@@ -976,21 +993,6 @@ parentheses. CURRENTLY BROKEN"
                      (decf paren-counter))
                  (paredit-forward-delete))))
     (paredit-splice-sexp)))
-
-(eval-after-load "haskell-mode"
-  '(define-key haskell-mode-map (kbd "C-c C-k") 'haskell-compile))
-(eval-after-load "haskell-mode"
-  '(progn
-     (define-key haskell-mode-map (kbd "C-x C-d") nil)
-     (define-key haskell-mode-map (kbd "C-c C-z") 'haskell-interactive-switch)
-     (define-key haskell-mode-map (kbd "C-c C-l") 'haskell-process-load-file)
-     (define-key haskell-mode-map (kbd "C-c C-b") 'haskell-interactive-switch)
-     (define-key haskell-mode-map (kbd "C-c C-t") 'haskell-process-do-type)
-     (define-key haskell-mode-map (kbd "C-c C-i") 'haskell-process-do-info)
-     (define-key haskell-mode-map (kbd "C-c M-.") nil)
-     (define-key haskell-mode-map (kbd "C-c C-d") nil)))
-;;; cause i can never figure out how to just get to the REPL lol
-(defalias 'haskell-repl (symbol-function 'haskell-process-do-info))
 
 (defun replace-char-in-range (from-char to-char beg end)
   (let ((was-char-replaced nil))
