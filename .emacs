@@ -46,9 +46,8 @@
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 ;; fix input issues in xterm (can't hold down shift and up arrow to
 ;; highlight stuff)
-(when (equal "xterm" (tty-type))
+(when (string-match "xterm" (tty-type))
   (define-key input-decode-map "\e[1;2A" [S-up])
-  ;; (define-key input-decode-map "[4~" [end])
   (define-key input-decode-map "\033[4~" [end]))
 
 ;; starts emacs in server form so i can use emacsclient to add files
@@ -59,9 +58,9 @@
     (server-start))
 
 ;;; FONTS
-(add-to-list 'default-frame-alist '(font . "Telegrama 10"))
-(set-face-attribute 'default t :font "Telegrama 10")
-(set-frame-font "Telegrama 10")
+;(add-to-list 'default-frame-alist '(font . "Telegrama 10"))
+;(set-face-attribute 'default t :font "Telegrama 10")
+;(set-frame-font "Telegrama 10")
 
 ;;; so i can sudo edit files with C-x C-f /sudo::/path/to/file
 (require 'tramp)
