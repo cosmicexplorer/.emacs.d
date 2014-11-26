@@ -46,10 +46,10 @@
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 ;; fix input issues in xterm (can't hold down shift and up arrow to
 ;; highlight stuff)
-(if (equal "xterm" (tty-type))
-    (define-key input-decode-map "\e[1;2A" [S-up]))
-(if (equal "xterm" (tty-type))
-    (define-key input-decode-map "[4~" [end]))
+(when (equal "xterm" (tty-type))
+  (define-key input-decode-map "\e[1;2A" [S-up])
+  ;; (define-key input-decode-map "[4~" [end])
+  (define-key input-decode-map "\033[4~" [end]))
 
 ;; starts emacs in server form so i can use emacsclient to add files
 ;; but only if server isn't already started
@@ -329,7 +329,7 @@ Lisp code." t)
 (add-hook 'lisp-interaction-mode-hook 'paredit-mode)
 
 ;; show line numbers
-(global-linum-mode)
+(global-linum-mode 1)
 (add-hook 'find-file-hook               ; otherwise docview is extremely slow
           '(lambda ()
              (when (or                  ; because regexes are parsed weirdly
@@ -341,11 +341,6 @@ Lisp code." t)
                     (string-match "\.ppt.*$" buffer-file-name)
                     (string-match "\.xls.*$" buffer-file-name)
                     (string-match "\.od.*$" buffer-file-name))
-               (linum-mode 0))))
-(add-hook 'change-major-mode-hook       ; otherwise docview is extremely slow
-          '(lambda ()
-             (when (eq (with-current-buffer
-                           (current-buffer) major-mode) 'doc-view-mode)
                (linum-mode 0))))
 
 ;; make them relative
@@ -617,10 +612,6 @@ Lisp code." t)
 (define-key c++-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
 (define-key c++-mode-map (kbd "<C-return>") 'newline-and-indent-ctrl-j)
 
-;; open file with wildcards
-;;(global-set-key (kbd "C-c o") 'open-file-with-wildcards)
-;; doesn't work lol
-
 ;; toggle letter casing from ALLCAPS to InitialCase to alllowercase
 (global-set-key (kbd "C-x M-c") 'toggle-letter-case)
 
@@ -686,24 +677,6 @@ Lisp code." t)
       (comment-indent-new-line)
     (newline-and-indent)))
 
-(require 'grep)
-(defun search-all-buffers (regexp prefix)
-  "Searches file-visiting buffers for occurence of REGEXP.      With
-prefix > 1 (i.e., if you type C-u \\[search-all-buffers]),
-searches all buffers."
-  (interactive (list (grep-read-regexp)
-                     current-prefix-arg))
-  (message "Regexp is %s; prefix is %s" regexp prefix)
-  (multi-occur
-   (if (member prefix '(4 (4)))
-       (buffer-list)
-     (remove-if
-      (lambda (b) (some (lambda (rx) (string-match rx  (file-name-nondirectory
-                                                        (buffer-file-name b))))
-                        search-all-buffers-ignored-files))
-      (remove-if-not 'buffer-file-name (buffer-list))))
-   regexp))
-
 ;; kill current buffer and close pane
 (defun close-and-kill-this-pane ()
   "If there are multiple windows, then close this pane and kill the buffer in it
@@ -712,14 +685,6 @@ also."
   (kill-this-buffer)
   (if (not (one-window-p))
       (delete-window)))
-
-;; kill all active dired buffers at once
-(defun kill-dired-buffers ()
-  (interactive)
-  (mapc (lambda (buffer)
-          (when (eq 'dired-mode (buffer-local-value 'major-mode buffer))
-            (kill-buffer buffer)))
-        (buffer-list)))
 
 ;; open new file (i wrote this!!!)
 (defun open-new-file ()
@@ -793,7 +758,6 @@ caps"))
                 "  " mode-line-buffer-identification
                 "  " mode-line-modes))
 
-;;; not sure why this is here, but ok
 (defun output-lines-in-buffer ()
   (setq integer-buffer-line-count (count-lines (point-min) (point-max)))
   (setq my-mode-line-buffer-line-count (int-to-string
@@ -804,14 +768,6 @@ caps"))
 (add-hook 'after-save-hook 'output-lines-in-buffer)
 (add-hook 'after-revert-hook 'output-lines-in-buffer)
 (add-hook 'dired-after-readin-hook 'output-lines-in-buffer)
-
-;; function to indent whole buffer
-(defun indent-whole-buffer ()
-  "indent whole buffer"
-  (interactive)
-  (delete-trailing-whitespace)
-  (indent-region (point-min) (point-max) nil)
-  (untabify (point-min) (point-max)))
 
 (defun newline-and-indent-fix-cc-mode ()
   "cc-mode's indentation procedures upon adding a new bracket or paren are
@@ -1116,7 +1072,6 @@ parentheses. CURRENTLY BROKEN"
  '(server-delete-tty t)
  '(yank-pop-change-selection t))
 (put 'erase-buffer 'disabled nil)
-
 
 ;; TODO: integrate schmidt's emacs into this one
 
