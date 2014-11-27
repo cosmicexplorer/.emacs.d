@@ -6,11 +6,9 @@
 ;;; you'll have to re-add those changes for the whole frail system to work
 ;;; alternatively you can just email me that an update occurred in some package
 ;;; and i'll merge and push the changes
-;;;;; specific sections are demarcated by five semicolons, like this line
-;;; do a global search through all such marks to go through all major sections
 
-;;; TODO: DELETE FRAME WHEN DONE
 (byte-recompile-directory (expand-file-name "~/.emacs.d") 0)
+(delete-windows-on "*Compile-Log*")
 
 ;;; MELPA
 (require 'package)
@@ -75,7 +73,8 @@
 ;;; indentation silliness
 (add-hook 'after-change-major-mode-hook  ; show whitespace
           '(lambda ()
-             (setq show-trailing-whitespace t)))
+             (unless (eq major-mode 'w3m-mode)
+               (setq show-trailing-whitespace t))))
 (setq-default indent-tabs-mode nil)     ;; use spaces not tabs
 (setq tab-width 4)
 (setq-default c-basic-offset 2) ;; cc-mode uses this instead of tab-width
@@ -242,6 +241,10 @@ Lisp code." t)
       w3m-input-coding-system 'utf-8
       w3m-output-coding-system 'utf-8
       w3m-terminal-coding-system 'utf-8)
+(add-hook 'w3m-mode-hook
+          '(lambda ()
+             (w3m-turnoff-inline-images)
+             (w3m-toggle-inline-images)))
 
 ;;; add code folding with hs-minor-mode
 (add-hook 'prog-mode-hook #'hs-minor-mode) ; add to all programming modes
@@ -578,6 +581,15 @@ Lisp code." t)
 
 ;; translate stuff into hex (and back??)
 (global-set-key (kbd "C-x h") 'hexl-mode)
+
+;;; w3m bindings
+(define-key w3m-mode-map (kbd "C-<tab>") 'w3m-tab-next-buffer)
+(define-key w3m-mode-map (kbd "C-l C-<tab>") 'w3m-tab-move-right)
+(define-key w3m-mode-map (kbd "<C-iso-lefttab>") 'w3m-tab-previous-buffer)
+(define-key w3m-mode-map (kbd "C-l <C-iso-lefttab>") 'w3m-tab-move-left)
+(define-key w3m-mode-map (kbd "C-w") 'w3m-delete-buffer)
+(define-key w3m-mode-map (kbd "C-t") 'w3m-create-empty-session)
+(define-key w3m-mode-map (kbd "C-S-t") 'w3m-goto-url-new-session)
 
 ;; delete all of everything
 ;; (global-set-key (kbd "C-x d") 'erase-buffer)
