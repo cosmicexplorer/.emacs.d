@@ -22,7 +22,7 @@
 (defvar my-packages)
 (setq my-packages '(
                     auctex
-                    better-defaults
+		    better-defaults
                     cider
                     clojure-mode
                     company
@@ -37,6 +37,7 @@
                     linum
                     linum-relative
                     magit
+                    misc-cmds
                     multiple-cursors
                     noflet
                     paredit
@@ -95,9 +96,10 @@
     (server-start))
 
 ;;; FONTS
-(add-to-list 'default-frame-alist '(font . "Telegrama 10"))
-(set-face-attribute 'default t :font "Telegrama 10")
-(set-frame-font "Telegrama 10")
+(when (member "Telegrama" (font-family-list))
+  (add-to-list 'default-frame-alist '(font . "Telegrama 10"))
+  (set-face-attribute 'default t :font "Telegrama 10")
+  (set-frame-font "Telegrama 10"))
 
 ;;; so i can sudo edit files with C-x C-f /sudo::/path/to/file
 (require 'tramp)
@@ -140,9 +142,6 @@
 (setq slime-contribs '(slime-fancy))
 (add-to-list 'slime-contribs 'slime-repl)
 (load (expand-file-name "~/.emacs.d/quicklisp/slime-helper.el")) ;; quicklisp
-(add-hook 'emacs-lisp-mode-hook 'fix-lisp-keybindings)
-(add-hook 'lisp-mode-hook 'slime-mode)
-(add-hook 'lisp-mode-hook 'fix-lisp-keybindings)
 
 ;; paredit
 (add-to-list 'load-path "~/.emacs.d/paredit")
@@ -233,18 +232,19 @@ Lisp code." t)
 
 ;;;;; load utilities
 ;; load w3m web browser
-(require 'w3m)
-(setq w3m-use-cookies t)
-(setq w3m-coding-system 'utf-8
-      w3m-file-coding-system 'utf-8
-      w3m-file-name-coding-system 'utf-8
-      w3m-input-coding-system 'utf-8
-      w3m-output-coding-system 'utf-8
-      w3m-terminal-coding-system 'utf-8)
-(add-hook 'w3m-mode-hook
-          '(lambda ()
-             (w3m-turnoff-inline-images)
-             (w3m-toggle-inline-images)))
+(when (executable-find "w3m")
+  (require 'w3m)
+  (setq w3m-use-cookies t)
+  (setq w3m-coding-system 'utf-8
+        w3m-file-coding-system 'utf-8
+        w3m-file-name-coding-system 'utf-8
+        w3m-input-coding-system 'utf-8
+        w3m-output-coding-system 'utf-8
+        w3m-terminal-coding-system 'utf-8)
+  (add-hook 'w3m-mode-hook
+            '(lambda ()
+               (w3m-turnoff-inline-images)
+               (w3m-toggle-inline-images))))
 
 ;;; add code folding with hs-minor-mode
 (add-hook 'prog-mode-hook #'hs-minor-mode) ; add to all programming modes
@@ -325,10 +325,15 @@ Lisp code." t)
             (load "dired-x")))
 
 ;; adds julia functionality
-(load "~/.emacs.d/ESS/lisp/ess-site")
-(setq inferior-julia-program-name "/usr/bin/julia-basic")
-(add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/")
-(ess-toggle-underscore nil)     ;; underscore means underscore
+(when (file-exists-p "~/.emacs.d/ESS")
+  (shell-command "make -C ~/.emacs.d/ESS")
+  (delete-windows-on "*Shell Command Output*")
+  (add-to-list 'load-path "~/.emacs.d/ESS/lisp")
+  (require 'ess-site)
+  (when (executable-find "julia-basic")
+    (setq inferior-julia-program-name (executable-find "julia-basic"))
+    (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/"))
+  (ess-toggle-underscore nil))
 
 ;;; unfold org at startup
 (setq-default org-startup-folded "showeverything")
@@ -907,6 +912,7 @@ instead of just the final line."
   "Changes about three million personalized keybindings for lisp editing with
 SLIME and Paredit. Not for the faint of heart."
   (interactive)
+  ;; TODO: add terminal keybindings for this
   (define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
   (define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
   (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key
@@ -942,6 +948,11 @@ SLIME and Paredit. Not for the faint of heart."
   (define-key paredit-mode-map (kbd "C-x C-a") 'mc/mark-all-like-this)
   (define-key paredit-mode-map (kbd "C-M-y") 'paredit-yank-push)
   (define-key paredit-mode-map (kbd "DEL") 'paredit-backspace-delete-highlight))
+
+(add-hook 'lisp-interaction-mode-hook 'fix-lisp-keybindings)
+(add-hook 'emacs-lisp-mode-hook 'fix-lisp-keybindings)
+(add-hook 'lisp-mode-hook 'slime-mode)
+(add-hook 'lisp-mode-hook 'fix-lisp-keybindings)
 
 ;; create parens and add adjacent two elements to sexp created by parens
 (defun paredit-add-parens-in-front ()
