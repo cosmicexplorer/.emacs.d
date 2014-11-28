@@ -32,7 +32,6 @@
                     epl
                     evil
                     espuds
-                    f
                     go-mode
                     helm
                     helm-swoop
