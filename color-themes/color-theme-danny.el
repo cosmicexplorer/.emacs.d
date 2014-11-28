@@ -6,7 +6,7 @@
   (interactive)
   (color-theme-install
    '(color-theme-danny
-     ((foreground-color . "brightgreen")
+     ((foreground-color . "#00ff00")
       (background-color . "black")
       (background-mode . light))
      (underline ((t (:foreground "brightyellow"))))
@@ -18,7 +18,7 @@
      (modeline-buffer-id ((t (:background "orange"
                                           :foreground "dark red"
                                           :underline nil))))
-     (modeline-mousable ((t (:background "brightgreen" :foreground "white"))))
+     (modeline-mousable ((t (:background "#00ff00" :foreground "white"))))
      (mode-line
       ((t (:background "#11aa11"
                        :foreground "black"

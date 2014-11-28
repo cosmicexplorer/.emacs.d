@@ -74,7 +74,9 @@
 ;;; indentation silliness
 (add-hook 'after-change-major-mode-hook  ; show whitespace
           '(lambda ()
-             (unless (eq major-mode 'w3m-mode)
+             (unless (or (eq major-mode 'w3m-mode)
+                         (eq major-mode 'eshell-mode)
+                         (eq major-mode 'ibuffer-mode))
                (setq show-trailing-whitespace t))))
 (setq-default indent-tabs-mode nil)     ;; use spaces not tabs
 (setq tab-width 4)
@@ -354,28 +356,30 @@ Lisp code." t)
 
 ;; show line numbers
 (global-linum-mode 1)
-(add-hook 'find-file-hook               ; otherwise docview is extremely slow
-          '(lambda ()
-             (when (or                  ; because regexes are parsed weirdly
+;;; TODO: make this work
+(add-hook 'after-change-major-mode-hook ; otherwise docview is extremely slow
+          #'(lambda ()
+             (when (and (buffer-file-name)
+                      (or               ; because regexes are parsed weirdly
                                         ; here and this works
-                    (string-match "\.pdf$" buffer-file-name)
-                    (string-match "\.ps$" buffer-file-name)
-                    (string-match "\.dvi$" buffer-file-name)
-                    (string-match "\.doc.*$" buffer-file-name)
-                    (string-match "\.ppt.*$" buffer-file-name)
-                    (string-match "\.xls.*$" buffer-file-name)
-                    (string-match "\.od.*$" buffer-file-name))
+                       (string-match "\.pdf$" (buffer-file-name))
+                       (string-match "\.ps$" (buffer-file-name))
+                       (string-match "\.dvi$" (buffer-file-name))
+                       (string-match "\.doc.*$" (buffer-file-name))
+                       (string-match "\.ppt.*$" (buffer-file-name))
+                       (string-match "\.xls.*$" (buffer-file-name))
+                       (string-match "\.od.*$" (buffer-file-name))))
                (linum-mode 0))))
+(add-hook 'buffer-list-update-hook
+          #'(lambda ()
+              (global-linum-mode 1)))
 
 ;; make them relative
 
-(add-to-list 'load-path "~/.emacs.d/linum-relative")
 (require 'linum-relative)
 (setq linum-format 'linum-relative)
 
 ;; add magit
-(add-to-list 'load-path "~/.emacs.d/git-modes")
-(add-to-list 'load-path "~/.emacs.d/magit")
 (eval-after-load 'info
   '(progn (info-initialize)
           (add-to-list 'Info-directory-list "/path/to/magit/")))
@@ -401,6 +405,7 @@ Lisp code." t)
 (require 'saveplace)
 (setq save-place-file "~/.emacs.d/saveplace")
 (setq-default save-place t)
+(setq save-place t)
 
 ;; qmake-mode
 (load "~/.emacs.d/lisp/qmake.el")
