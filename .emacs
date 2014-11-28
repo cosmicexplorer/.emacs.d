@@ -19,18 +19,19 @@
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
 (when (not package-archive-contents)
   (package-refresh-contents))
+(package-initialize)
 (defvar my-packages)
 (setq my-packages '(
                     auctex
 		    better-defaults
                     cider
                     clojure-mode
+                    color-theme
                     company
                     dash
                     epl
                     evil
                     espuds
-                    f
                     go-mode
                     helm
                     helm-swoop
@@ -53,7 +54,6 @@
 (dolist (p my-packages)
   (unless (package-installed-p p)
     (package-install p)))
-(package-initialize)
 
 ;;;;; globally useful things
 ;; stop the intro to emacs buffer
