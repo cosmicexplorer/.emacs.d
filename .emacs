@@ -327,7 +327,7 @@ Lisp code." t)
             (load "dired-x")))
 
 ;; adds julia functionality
-(when (file-exists-p "~/.emacs.d/ESS")
+(when (and (executable-find "R") (file-exists-p "~/.emacs.d/ESS"))
   (shell-command "make -C ~/.emacs.d/ESS")
   (delete-windows-on "*Shell Command Output*")
   (add-to-list 'load-path "~/.emacs.d/ESS/lisp")
@@ -592,14 +592,16 @@ Lisp code." t)
 ;; translate stuff into hex (and back??)
 (global-set-key (kbd "C-x h") 'hexl-mode)
 
+
 ;;; w3m bindings
-(define-key w3m-mode-map (kbd "C-<tab>") 'w3m-tab-next-buffer)
-(define-key w3m-mode-map (kbd "C-l C-<tab>") 'w3m-tab-move-right)
-(define-key w3m-mode-map (kbd "<C-iso-lefttab>") 'w3m-tab-previous-buffer)
-(define-key w3m-mode-map (kbd "C-l <C-iso-lefttab>") 'w3m-tab-move-left)
-(define-key w3m-mode-map (kbd "C-w") 'w3m-delete-buffer)
-(define-key w3m-mode-map (kbd "C-t") 'w3m-create-empty-session)
-(define-key w3m-mode-map (kbd "C-S-t") 'w3m-goto-url-new-session)
+(when (executable-find "w3m")
+  (define-key w3m-mode-map (kbd "C-<tab>") 'w3m-tab-next-buffer)
+  (define-key w3m-mode-map (kbd "C-l C-<tab>") 'w3m-tab-move-right)
+  (define-key w3m-mode-map (kbd "<C-iso-lefttab>") 'w3m-tab-previous-buffer)
+  (define-key w3m-mode-map (kbd "C-l <C-iso-lefttab>") 'w3m-tab-move-left)
+  (define-key w3m-mode-map (kbd "C-w") 'w3m-delete-buffer)
+  (define-key w3m-mode-map (kbd "C-t") 'w3m-create-empty-session)
+  (define-key w3m-mode-map (kbd "C-S-t") 'w3m-goto-url-new-session))
 
 ;; delete all of everything
 ;; (global-set-key (kbd "C-x d") 'erase-buffer)
