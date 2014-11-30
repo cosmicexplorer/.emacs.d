@@ -176,7 +176,7 @@ Lisp code." t)
 
 (setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after
                                         ; semicolons i don't like that
-(setq c-default-style "gnu")
+(setq c-default-style nil)
 (subword-mode)                          ; turn camel-case on
 (setq auto-mode-alist                   ; use python-mode for scons files
       (cons '("SConstruct" . python-mode) auto-mode-alist))
@@ -286,6 +286,10 @@ Lisp code." t)
 (add-to-list 'load-path "~/.emacs.d/lisp")
 ;; allow for save buffer reversion when files are being edited by external tools
 (require 'revbufs)
+
+;;; c#
+(require 'csharp-mode)
+(add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
 
 (autoload 'markdown-mode "markdown-mode"
   "Major mode for editing Markdown files" t)
@@ -434,16 +438,6 @@ Lisp code." t)
          ("git" (name . "\*git"))
          ("helm" (or (name . "helm")
                      (name . "Helm")))
-         ("documentation"
-          (or
-           (name . "help")
-           (name . "Help")
-           (name . "Apropos")
-           (name . "apropos")
-           (name . "Info")
-           (name . "info")
-           (name . "doc")
-           (name . "Doc")))
          ("makefile" (or (filename . "\\Makefile\\'")
                          (filename . "\\makefile\\'")))
          ("readme" (or (filename . "\\README\\'")
@@ -453,11 +447,13 @@ Lisp code." t)
          ;; doesn't work fsr
          ("r" (or (filename . "\\.R\\'")
                   (filename . "\\.r\\'")))
+         ("LaTeX" (filename . "\\.tex\\'"))
          ("cmake" (mode . cmake-mode))
          ("text" (filename . "\\.txt\\'"))
          ("cxx header" (filename . "\\.h\\'"))
          ("c" (mode . c-mode))
          ("c++" (mode . c++-mode))
+         ("c#" (mode . csharp-mode))
          ("java" (mode . java-mode))
          ("python" (mode . python-mode))
          ("markdown" (mode . markdown-mode))
@@ -474,13 +470,25 @@ Lisp code." t)
          ("qmake" (mode . qmake-mode))
          ("org" (mode . org-mode))
          ("shell script" (mode . sh-mode))
-         ("emacs-system" (or (name . "\*eshell\*")
-                             (name . "\*scratch\*")
-                             (name . "\*Messages\*")
-                             (name . "\*Compile-Log\*")
-                             (name . "\*ESS\*")
-                             (name . "\*compilation\*")
-                             (name . "\*Backtrace\*")))
+         ("emacs-system"
+          (or (name . "\*eshell\*")
+              (name . "\*scratch\*")
+              (name . "\*Messages\*")
+              (name . "\*Compile-Log\*")
+              (name . "\*ESS\*")
+              (name . "\*compilation\*")
+              (name . "\*Backtrace\*")
+              (name . "\*Shell Command Output\*")))
+         ("documentation"
+          (or
+           (name . "help")
+           (name . "Help")
+           (name . "Apropos")
+           (name . "apropos")
+           (name . "Info")
+           (name . "info")
+           (name . "doc")
+           (name . "Doc")))
          ("default" (name . "")))))
 
 (add-hook 'ibuffer-mode-hook
@@ -543,6 +551,7 @@ Lisp code." t)
 (global-set-key (kbd "C-x j") 'helm-multi-swoop)                 ; find regexp
                                         ; in SOME open buffers
 (global-set-key (kbd "C-x b") 'helm-buffers-list) ; find among open buffers
+(global-set-key (kbd "C-x k") 'kill-this-buffer)
 
 ;; after killing C-x o with helm,
 ;; let's make sure we do have buffer switching in the event of non-graphical
@@ -1095,7 +1104,7 @@ parentheses. CURRENTLY BROKEN"
  ;; If there is more than one, they won't work right.
  '(TeX-engine (quote luatex))
  '(asm-comment-char 35)
- '(color-theme-directory ("/home/cosmicexplorer/.emacs.d/color-themes/"))
+ '(color-theme-directory (quote ("~/.emacs.d/color-themes")))
  '(fill-column 80)
  '(number-of-extra-newlines-to-preserve-js-mode 0)
  '(org-support-shift-select (quote always))
