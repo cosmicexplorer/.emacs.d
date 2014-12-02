@@ -7,8 +7,10 @@ ido.last
 saveplace
 recentf
 places
+saved-files
 .mc-lists.el
 undo-tree-history/
+games/
 autosaved-files/
 auto-save-list/
 # eshell history

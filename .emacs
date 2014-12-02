@@ -7,6 +7,9 @@
 ;;; alternatively you can just email me that an update occurred in some package
 ;;; and i'll merge and push the changes
 
+;;; TODO: add paredit comment fix for margin comments
+;;; TODO: save buffers between sessions
+
 (byte-recompile-directory (expand-file-name "~/.emacs.d") 0)
 (delete-windows-on "*Compile-Log*")
 
@@ -29,6 +32,7 @@
                     color-theme
                     company
                     dash
+                    ein
                     epl
                     evil
                     espuds
@@ -51,9 +55,9 @@
                     undo-tree
                     w3m
                     ))
-(dolist (p my-packages)
-  (unless (package-installed-p p)
-    (package-install p)))
+(loop for p in my-packages
+  do (unless (package-installed-p p)
+       (package-install p)))
 
 ;;;;; globally useful things
 ;; stop the intro to emacs buffer
@@ -76,7 +80,8 @@
           '(lambda ()
              (unless (or (eq major-mode 'w3m-mode)
                          (eq major-mode 'eshell-mode)
-                         (eq major-mode 'ibuffer-mode))
+                         (eq major-mode 'ibuffer-mode)
+                         (eq major-mode 'undo-tree-visualizer-mode))
                (setq show-trailing-whitespace t))))
 (setq-default indent-tabs-mode nil)     ;; use spaces not tabs
 (setq tab-width 4)
@@ -117,8 +122,9 @@
       kept-old-versions 2
       version-control t)
 ;; do the same thing for undo-tree history
-(setq undo-tree-history-directory-alist `(("."
-                                           . "~/.emacs.d/undo-tree-history")))
+(setq undo-tree-history-directory-alist
+      '((".*" . "~/.emacs.d/undo-tree-history")))
+(setq undo-tree-visualizer-timestamps t)
 
 ;;; highlight cursor when over 80 chars
 (add-to-list 'load-path "~/.emacs.d/lisp")
@@ -211,7 +217,8 @@ Lisp code." t)
 (setq js-indent-level 2)
 (setq css-indent-offset 2)
 (add-hook 'js-mode-hook '(lambda ()
-                           (add-keybinding-to-mode-maps
+                           (add-keybinding
+                            -to-mode-maps
                             "C-j" 'javascript-newline-and-indent-ctrl-j-override
                             js-mode-map)))
 (add-hook 'js-mode-hook '(lambda ()
@@ -219,14 +226,6 @@ Lisp code." t)
                             "<C-return>"
                             'javascript-newline-and-indent-ctrl-j-override
                             js-mode-map)))
-(add-hook 'html-mode-hook '(lambda ()
-                             (add-keybinding-to-mode-maps
-                              "RET" 'html-mode-newline-and-indent-js-beautify
-                              html-mode-map)))
-(add-hook 'css-mode-hook '(lambda ()
-                            (add-keybinding-to-mode-maps
-                             "RET" 'css-mode-newline-and-indent-js-beautify
-                             css-mode-map)))
 
 ;;; syntax highlighting
 (global-font-lock-mode 1)               ; turn on syntax highlighting
@@ -352,7 +351,7 @@ Lisp code." t)
 (setq nrepl-log-messages t)
 (global-company-mode)
 (add-hook 'cider-mode-hook 'rainbow-delimiters-mode)
-(add-hook 'cider-mode-hook 'paredit-mode)
+(add-hook 'cider-mode-hook 'enable-paredit-mode)
 (add-hook 'cider-mode-hook 'subword-mode)
 
 ;; same for scratch buffer
@@ -513,10 +512,6 @@ Lisp code." t)
 
 (defalias 'cider 'cider-jack-in)
 
-;;; start scratch buffer in paredit mode
-(with-current-buffer (get-buffer "*scratch*")
-  (enable-paredit-mode))
-
 (add-hook 'prog-mode-hook #'rainbow-mode)
 (add-hook 'text-mode-hook #'rainbow-mode)
 
@@ -610,7 +605,8 @@ Lisp code." t)
   (define-key w3m-mode-map (kbd "C-l <C-iso-lefttab>") 'w3m-tab-move-left)
   (define-key w3m-mode-map (kbd "C-w") 'w3m-delete-buffer)
   (define-key w3m-mode-map (kbd "C-t") 'w3m-create-empty-session)
-  (define-key w3m-mode-map (kbd "C-S-t") 'w3m-goto-url-new-session))
+  (define-key w3m-mode-map (kbd "C-S-t") 'w3m-goto-url-new-session)
+  (define-key w3m-mode-map (kbd "v") 'w3m-view-source))
 
 ;; delete all of everything
 ;; (global-set-key (kbd "C-x d") 'erase-buffer)
@@ -969,6 +965,11 @@ SLIME and Paredit. Not for the faint of heart."
 (add-hook 'emacs-lisp-mode-hook 'fix-lisp-keybindings)
 (add-hook 'lisp-mode-hook 'slime-mode)
 (add-hook 'lisp-mode-hook 'fix-lisp-keybindings)
+;;; start scratch buffer in paredit mode
+(with-current-buffer (get-buffer "*scratch*")
+  (enable-paredit-mode)
+  (fix-lisp-keybindings))
+
 
 ;; create parens and add adjacent two elements to sexp created by parens
 (defun paredit-add-parens-in-front ()
@@ -1112,6 +1113,39 @@ parentheses. CURRENTLY BROKEN"
  '(server-delete-tty t)
  '(yank-pop-change-selection t))
 (put 'erase-buffer 'disabled nil)
+
+;;; save visited files
+(defvar save-visited-files t)
+(defvar saved-files "~/.emacs.d/saved-files")
+(require 'cl)
+(when save-visited-files
+  ;; TODO: restore from death
+  (with-current-buffer (find-file (expand-file-name saved-files))
+    (loop while (not (eobp))
+          with cur-line
+          do (progn
+               (setq cur-line
+                     (buffer-substring-no-properties
+                      (line-beginning-position)
+                      (line-end-position)))
+               (unless (string-equal cur-line (expand-file-name saved-files))
+                 (find-file-noselect cur-line))
+               (forward-line)))
+    (kill-buffer))
+  ;; save visiting files
+  (add-hook
+   'kill-emacs-hook
+   #'(lambda ()
+       (with-current-buffer (find-file (expand-file-name saved-files))
+         (erase-buffer)
+         (loop for buf in (buffer-list)
+               do (unless (or
+                           (not (buffer-file-name buf))
+                           (string-equal (buffer-file-name buf)
+                                         (expand-file-name saved-files)))
+                    (insert (buffer-file-name buf))
+                    (newline)))
+         (save-buffer)))))
 
 ;; TODO: integrate schmidt's emacs into this one
 
