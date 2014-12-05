@@ -42,6 +42,7 @@
                     linum
                     linum-relative
                     magit
+                    minimap
                     misc-cmds
                     multiple-cursors
                     noflet
@@ -75,6 +76,7 @@
 (transient-mark-mode 0)                 ; turn that off lol
 (setq shift-select-mode t)
 (setq scroll-preserve-screen-position t)
+(global-auto-revert-mode)
 ;;; indentation silliness
 (add-hook 'after-change-major-mode-hook  ; show whitespace
           '(lambda ()
@@ -152,7 +154,6 @@
 (load (expand-file-name "~/.emacs.d/quicklisp/slime-helper.el")) ;; quicklisp
 
 ;; paredit
-(add-to-list 'load-path "~/.emacs.d/paredit")
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of
 Lisp code." t)
 (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
@@ -359,23 +360,24 @@ Lisp code." t)
 
 ;; show line numbers
 (global-linum-mode 1)
-;;; TODO: make this work
-(add-hook 'after-change-major-mode-hook ; otherwise docview is extremely slow
-          #'(lambda ()
-             (when (and (buffer-file-name)
-                      (or               ; because regexes are parsed weirdly
-                                        ; here and this works
-                       (string-match "\.pdf$" (buffer-file-name))
-                       (string-match "\.ps$" (buffer-file-name))
-                       (string-match "\.dvi$" (buffer-file-name))
-                       (string-match "\.doc.*$" (buffer-file-name))
-                       (string-match "\.ppt.*$" (buffer-file-name))
-                       (string-match "\.xls.*$" (buffer-file-name))
-                       (string-match "\.od.*$" (buffer-file-name))))
-               (linum-mode 0))))
 (add-hook 'buffer-list-update-hook
           #'(lambda ()
-              (global-linum-mode 1)))
+              (if (and (buffer-file-name)
+                      (or               ; because regexes are parsed weirdly
+                                        ; here and this works
+                       (string-match "^.*\.pdf$" (buffer-file-name))
+                       (string-match "^.*\.ps$" (buffer-file-name))
+                       (string-match "^.*\.dvi$" (buffer-file-name))
+                       (string-match "^.*\.doc.*$" (buffer-file-name))
+                       (string-match "^.*\.ppt.*$" (buffer-file-name))
+                       (string-match "^.*\.xls.*$" (buffer-file-name))
+                       (string-match "^.*\.od.*$" (buffer-file-name)))
+                      ;; not sure why this is required, but it is
+                      (not (or (string-match "^.*\.tex$" (buffer-file-name))
+                               (string-match "^.*\.bib$" (buffer-file-name)))))
+                  (with-current-buffer (buffer-name)
+                    (linum-mode 0))
+                (global-linum-mode 1))))
 
 ;; make them relative
 
@@ -447,6 +449,7 @@ Lisp code." t)
          ("r" (or (filename . "\\.R\\'")
                   (filename . "\\.r\\'")))
          ("LaTeX" (filename . "\\.tex\\'"))
+         ("BibTeX" (filename . "\\.bib\\'"))
          ("cmake" (mode . cmake-mode))
          ("text" (filename . "\\.txt\\'"))
          ("cxx header" (filename . "\\.h\\'"))
@@ -741,6 +744,14 @@ also."
                   ;; value
                   nil nil "*newbuf*")))) ;; with default title *newbuf*
   (normal-mode))
+
+(defun big-text ()
+  (interactive)
+  (set-face-attribute 'default nil :height 400))
+
+(defun little-text ()
+  (interactive)
+  (set-face-attribute 'default nil :height 100))
 
 ;; Switching to ibuffer puts the cursor on the most recent buffer
 (defadvice ibuffer (around ibuffer-point-to-most-recent) ()
