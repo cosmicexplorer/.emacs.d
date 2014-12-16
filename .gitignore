@@ -19,6 +19,7 @@ eshell/lastdir
 # melpa/elpa/etc
 elpa/
 # cached files for quicklisp
+quicklisp/dists/
 quicklisp/cache/
 quicklisp/tmp/
 # tramp file

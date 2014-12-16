@@ -1,15 +1,6 @@
 ;;; emacs config, aka the root node of a massively unbalanced configuration tree
 ;;; by Danny McClanahan, <danieldmcclanahan@gmail.com>, 2014
 
-;;; i've changed quite a few files besides just this one and if you wish to
-;;; upgrade the associated external packages
-;;; you'll have to re-add those changes for the whole frail system to work
-;;; alternatively you can just email me that an update occurred in some package
-;;; and i'll merge and push the changes
-
-;;; TODO: add paredit comment fix for margin comments
-;;; TODO: save buffers between sessions
-
 (byte-recompile-directory (expand-file-name "~/.emacs.d") 0)
 (delete-windows-on "*Compile-Log*")
 
@@ -175,6 +166,10 @@ Lisp code." t)
 (add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (add-hook 'asm-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (add-hook 'LaTeX-mode-hook (lambda ()
+                             (setq comment-start "% " comment-end "")
+                             (auto-fill-mode -1)
+                             (highlight-80+-mode -1)))
+(add-hook 'org-mode-hook (lambda ()
                              (setq comment-start "% " comment-end "")
                              (auto-fill-mode -1)
                              (highlight-80+-mode -1)))
@@ -360,24 +355,29 @@ Lisp code." t)
 
 ;; show line numbers
 (global-linum-mode 1)
-(add-hook 'buffer-list-update-hook
-          #'(lambda ()
-              (if (and (buffer-file-name)
-                      (or               ; because regexes are parsed weirdly
-                                        ; here and this works
-                       (string-match "^.*\.pdf$" (buffer-file-name))
-                       (string-match "^.*\.ps$" (buffer-file-name))
-                       (string-match "^.*\.dvi$" (buffer-file-name))
-                       (string-match "^.*\.doc.*$" (buffer-file-name))
-                       (string-match "^.*\.ppt.*$" (buffer-file-name))
-                       (string-match "^.*\.xls.*$" (buffer-file-name))
-                       (string-match "^.*\.od.*$" (buffer-file-name)))
-                      ;; not sure why this is required, but it is
-                      (not (or (string-match "^.*\.tex$" (buffer-file-name))
-                               (string-match "^.*\.bib$" (buffer-file-name)))))
-                  (with-current-buffer (buffer-name)
-                    (linum-mode 0))
-                (global-linum-mode 1))))
+;;; TODO: make this work
+;; (add-hook 'buffer-list-update-hook
+;;           #'(lambda ()
+;;               (if (and (buffer-file-name)
+;;                       (or               ; because regexes are parsed weirdly
+;;                                         ; here and this works
+;;                        (string-match "^.*\.pdf$" (buffer-file-name))
+;;                        (string-match "^.*\.ps$" (buffer-file-name))
+;;                        (string-match "^.*\.dvi$" (buffer-file-name))
+;;                        (string-match "^.*\.doc.*$" (buffer-file-name))
+;;                        (string-match "^.*\.ppt.*$" (buffer-file-name))
+;;                        (string-match "^.*\.xls.*$" (buffer-file-name))
+;;                        (string-match "^.*\.od.*$" (buffer-file-name)))
+;;                       ;; not sure why this is required, but it is
+;;                       (not
+;;                        (or (string-match "^.*\.tex$" (buffer-file-name))
+;;                            (string-match "^.*\.bib$" (buffer-file-name))
+;;                            (string-match "^.*\.el$" (buffer-file-name))
+;;                            (string-match "^.*\.emacs$" (buffer-file-name)))))
+;;                   ;; doesn't work otherwise lol
+;;                   (with-current-buffer (buffer-name)
+;;                     (linum-mode 0))
+;;                 (global-linum-mode 1))))
 
 ;; make them relative
 
@@ -979,7 +979,8 @@ SLIME and Paredit. Not for the faint of heart."
 ;;; start scratch buffer in paredit mode
 (with-current-buffer (get-buffer "*scratch*")
   (enable-paredit-mode)
-  (fix-lisp-keybindings))
+  (fix-lisp-keybindings)
+  (eldoc-mode))
 
 
 ;; create parens and add adjacent two elements to sexp created by parens
