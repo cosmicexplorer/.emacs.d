@@ -7,7 +7,6 @@ Because I've gone through hell and back to make this the best editor on the plan
 
 * [undo-tree](http://www.emacswiki.org/emacs/UndoTree) (persistent across reboots)
 * [slime](http://common-lisp.net/project/slime/) and [paredit](http://www.emacswiki.org/emacs/ParEdit)
-* [ghc-mod](http://www.mew.org/~kazu/proj/ghc-mod/en/) for [haskell-mode](http://www.haskell.org/haskellwiki/Emacs)
 * [multiple-cursors](https://github.com/magnars/multiple-cursors.el)
 * [helm](https://github.com/emacs-helm/helm)
 * [markdown-mode](http://jblevins.org/projects/markdown-mode/)
@@ -18,6 +17,7 @@ Because I've gone through hell and back to make this the best editor on the plan
 * [magit](https://github.com/magit/magit)
 * [saveplace](http://www.emacswiki.org/emacs/SavePlace)
 * a comprehensive [ibuffer](http://www.emacswiki.org/emacs/IbufferMode) filetype/name filter system based off [this brilliant post](http://martinowen.net/blog/2010/02/03/tips-for-emacs-ibuffer.html)
+* a somewhat custom script to remember buffers previously opened and restore them upon startup
 
 #### Setup
 
@@ -25,16 +25,7 @@ Because I've gone through hell and back to make this the best editor on the plan
 	* Start emacs with the ```-l``` option to load the .emacs file within this repository.
 	* You can alias it: ```alias emacs='emacs -l ~/.emacs.d/.emacs'```
 2. Lisp setup (not required if you don't use lisp)
-	* If not using sbcl, change ```(setq inferior-lisp-program "sbcl")``` to the command calling your preferred compiler.
-	* SBCL:
-    	1. make the .sbclrc within your home directory to load everything contained within this one (i.e. make it have ```(load "~/.emacs.d/.sbclrc")```).
-    * If you're not using sbcl, that's cool too: look at the documentation [here](http://www.quicklisp.org/beta/) to set up your preferred lisp compiler.
+	* Install slime and quicklisp according to [these instructions](http://www.mohiji.org/2011/01/31/modern-common-lisp-on-linux/)
 	* If things are not working (e.g. autocompletion, eldoc) in ```lisp-mode```, start slime using ```M-x slime```.
-3. Haskell setup (not required if you don't use haskell)
-	* Read the instructions for [ghc-mod](http://www.mew.org/~kazu/proj/ghc-mod/en/) installation.
-
-#### Dependencies
-These aren't actually required to run it, just to use certain modes. [Email me](mailto:danieldmcclanahan@gmail.com) about any others you find.
-
-1. [sbcl](http://sbcl.org) (for slime usage)
-2. [R](http://www.r-project.org) and [julia](http://julialang.org) languages (for ESS)
+3. Clojure setup (not required if you don't use clojure)
+    * Install [leiningen](http://leiningen.org/) and put ```{:user {:plugins [[cider/cider-nrepl "0.8.2-SNAPSHOT"]]}}``` in `~/.lein/profiles.clj`.

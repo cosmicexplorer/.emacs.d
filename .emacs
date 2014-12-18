@@ -53,6 +53,11 @@
   do (unless (package-installed-p p)
        (package-install p)))
 
+;;; setup slime
+(setq inferior-lisp-program (executable-find "sbcl"))
+(setq slime-contribs '(slime-fancy))
+(load-file (expand-file-name "~/.emacs.d/quicklisp/slime-helper.el"))
+
 ;;;;; globally useful things
 ;; stop the intro to emacs buffer
 (setq inhibit-startup-echo-area-message t)
@@ -136,16 +141,6 @@
 (require 'misc-cmds)
 
 ;;;;; setup specific modes for specific filetypes
-;; setup slime
-;; setup load-path and autoloads
-(add-to-list 'load-path "~/.emacs.d/slime")
-(require 'slime-autoloads)
-;; Set your lisp system and, optionally, some contribs
-(setq inferior-lisp-program "sbcl")
-(setq slime-contribs '(slime-fancy))
-(add-to-list 'slime-contribs 'slime-repl)
-(load (expand-file-name "~/.emacs.d/quicklisp/slime-helper.el")) ;; quicklisp
-
 ;; paredit
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of
 Lisp code." t)
@@ -175,6 +170,9 @@ Lisp code." t)
                              (setq comment-start "% " comment-end "")
                              (auto-fill-mode -1)
                              (highlight-80+-mode -1)))
+(add-hook 'markdown-mode-hook (lambda ()
+                                (auto-fill-mode -1)
+                                (highlight-80+-mode -1)))
 (add-hook 'html-mode-hook (lambda ()
                             (setq comment-start "<!--" comment-end "-->")))
 
@@ -280,17 +278,6 @@ Lisp code." t)
 
 ;; adds smart-compile functionality
 (require 'smart-compile)
-
-;; adds evil vim layer, but doesn't turn it on
-(add-to-list 'load-path "~/.emacs.d/evil/")
-(require 'evil)
-
-;; php-mode
-(add-to-list 'load-path "~/.emacs.d/php-mode")
-(require 'php-mode)
-;; go-mode
-(add-to-list 'load-path "~/.emacs.d/go-mode")
-(require 'go-mode)
 
 ;; adds undo-tree functionality
 (require 'undo-tree)

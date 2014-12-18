@@ -1,1 +1,0 @@
-dists/quicklisp/software/zpng-1.2.1/zpng.asd
