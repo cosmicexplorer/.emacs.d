@@ -4,6 +4,7 @@
 (byte-recompile-directory (expand-file-name "~/.emacs.d") 0)
 (delete-windows-on "*Compile-Log*")
 
+(require 'cl)
 ;;; MELPA
 (require 'package)
 (add-to-list 'package-archives
@@ -45,6 +46,7 @@
                     s
                     slime
                     undo-tree
+                    web-beautify
                     w3m
                     ))
 (loop for p in my-packages
@@ -185,12 +187,6 @@ Lisp code." t)
 (setq auto-mode-alist
       (cons '("SConscript" . python-mode) auto-mode-alist))
 
-(add-to-list 'load-path "~/.emacs.d/js-beautify-emacs")
-(require 'js-beautify)
-(add-hook 'js-mode-hook 'js-beautify-init)
-(add-hook 'html-mode-hook 'js-beautify-init)
-(add-hook 'css-mode-hook 'js-beautify-init)
-
 ;;; cause otherwise this doens't work in graphical
 (global-set-key (kbd "<C-return>") 'newline-and-indent)
 
@@ -212,16 +208,6 @@ Lisp code." t)
 (c-set-offset 'innamespace 0)
 (setq js-indent-level 2)
 (setq css-indent-offset 2)
-(add-hook 'js-mode-hook '(lambda ()
-                           (add-keybinding
-                            -to-mode-maps
-                            "C-j" 'javascript-newline-and-indent-ctrl-j-override
-                            js-mode-map)))
-(add-hook 'js-mode-hook '(lambda ()
-                           (add-keybinding-to-mode-maps
-                            "<C-return>"
-                            'javascript-newline-and-indent-ctrl-j-override
-                            js-mode-map)))
 
 ;;; syntax highlighting
 (global-font-lock-mode 1)               ; turn on syntax highlighting
@@ -1119,7 +1105,6 @@ parentheses. CURRENTLY BROKEN"
  '(asm-comment-char 35)
  '(color-theme-directory (quote ("~/.emacs.d/color-themes")))
  '(fill-column 80)
- '(number-of-extra-newlines-to-preserve-js-mode 0)
  '(org-support-shift-select (quote always))
  '(org-support-shift-select (quote always))
  '(server-delete-tty t)

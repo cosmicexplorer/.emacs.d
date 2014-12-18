@@ -139,13 +139,13 @@ the text at point."
              (clang-format-buffer))
             ((eq (with-current-buffer
                      (current-buffer) major-mode) 'js-mode)
-             (js-mode-js-beautify-buffer))
+             (web-beautify-js))
             ((eq (with-current-buffer
                      (current-buffer) major-mode) 'html-mode)
-             (html-mode-js-beautify-buffer))
+             (web-beautify-html))
             ((eq (with-current-buffer
                      (current-buffer) major-mode) 'css-mode)
-             (css-mode-js-beautify-buffer))
+             (web-beautify-css))
             ((eq (with-current-buffer
                      (current-buffer) major-mode) 'org-mode)
              (org-cycle))
@@ -159,13 +159,13 @@ the text at point."
            (clang-format-buffer))
           ((eq (with-current-buffer
                    (current-buffer) major-mode) 'js-mode)
-           (js-mode-js-beautify-buffer))
+           (web-beautify-js))
           ((eq (with-current-buffer
                    (current-buffer) major-mode) 'html-mode)
-           (html-mode-js-beautify-buffer))
+           (web-beautify-html))
           ((eq (with-current-buffer
                    (current-buffer) major-mode) 'css-mode)
-           (css-mode-js-beautify-buffer))
+           (web-beautify-css))
           ((eq (with-current-buffer
                      (current-buffer) major-mode) 'org-mode)
              (org-cycle))

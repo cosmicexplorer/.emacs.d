@@ -1,0 +1,114 @@
+\initial {B}
+\entry {\code {backward-kill-word}}{24}
+\initial {C}
+\entry {\code {comint-backward-matching-input}}{25}
+\entry {\code {comint-bol}}{24}
+\entry {\code {comint-copy-old-input}}{26}
+\entry {\code {comint-dynamic-complete}}{44}
+\entry {\code {comint-forward-matching-input}}{25}
+\entry {\code {comint-history-isearch-backward-regexp}}{27}
+\entry {\code {comint-interrupt-subjob}}{31}
+\entry {\code {comint-kill-input}}{24}
+\entry {\code {comint-kill-output}}{25}
+\entry {\code {comint-next-input}}{25, 27}
+\entry {\code {comint-next-matching-input-from-input}}{27}
+\entry {\code {comint-previous-input}}{25, 27}
+\entry {\code {comint-previous-matching-input-from-input}}{27}
+\entry {\code {comint-show-output}}{25}
+\initial {D}
+\entry {dump()}{35}
+\initial {E}
+\entry {\code {ess-change-directory}}{58}
+\entry {\code {ess-cleanup}}{30, 43}
+\entry {\code {ess-describe-help-mode}}{42}
+\entry {\code {ess-developer}}{52}
+\entry {\code {ess-developer-add-package}}{52}
+\entry {\code {ess-developer-load-package}}{52}
+\entry {\code {ess-developer-remove-package}}{52}
+\entry {\code {ess-display-help-on-object}}{30, 42}
+\entry {\code {ess-dump-object-into-edit-buffer}}{35}
+\entry {\code {ess-electric-brace}}{37}
+\entry {\code {ess-eval-buffer}}{33}
+\entry {\code {ess-eval-buffer-and-go}}{33}
+\entry {\code {ess-eval-function}}{32}
+\entry {\code {ess-eval-function-and-go}}{32}
+\entry {\code {ess-eval-line}}{32}
+\entry {\code {ess-eval-line-and-go}}{32}
+\entry {\code {ess-eval-line-and-step}}{43}
+\entry {\code {ess-eval-region}}{32, 43}
+\entry {\code {ess-eval-region-and-go}}{32}
+\entry {\code {ess-eval-region-or-function-or-paragraph}}{32}
+\entry {\code {ess-eval-region-or-function-or-paragraph-and-step}}{32}
+\entry {\code {ess-eval-region-or-line-and-step}}{32}
+\entry {\code {ess-execute-objects}}{29}
+\entry {\code {ess-execute-search}}{30}
+\entry {\code {ess-goto-beginning-of-function-or-para}}{38}
+\entry {\code {ess-goto-end-of-function-or-para}}{38}
+\entry {\code {ess-handy-commands}}{54}
+\entry {\code {ess-indent-command}}{51}
+\entry {\code {ess-indent-exp}}{37}
+\entry {\code {ess-indent-or-complete}}{36}
+\entry {\code {ess-list-object-completions}}{44}
+\entry {\code {ess-load-file}}{30, 35}
+\entry {\code {ess-mark-function}}{38}
+\entry {\code {ess-parse-errors}}{30, 36}
+\entry {\code {ess-quit}}{30, 43}
+\entry {\code {ess-R-complete-object-name}}{51}
+\entry {\code {ess-remote}}{20}
+\entry {\code {ess-request-a-process}}{20}
+\entry {\code {ess-resynch}}{44}
+\entry {\code {ess-roxy-hide-all}}{51}
+\entry {\code {ess-roxy-next-entry}}{51}
+\entry {\code {ess-roxy-preview-HTML}}{51}
+\entry {\code {ess-roxy-preview-Rd}}{50}
+\entry {\code {ess-roxy-previous-entry}}{51}
+\entry {\code {ess-roxy-toggle-roxy-region}}{50}
+\entry {\code {ess-roxy-update-entry}}{50}
+\entry {\code {ess-rutils-apropos}}{58}
+\entry {\code {ess-rutils-html-docs}}{58}
+\entry {\code {ess-rutils-load-wkspc}}{58}
+\entry {\code {ess-rutils-local-pkgs}}{58}
+\entry {\code {ess-rutils-objs}}{58}
+\entry {\code {ess-rutils-repos-pkgs}}{58}
+\entry {\code {ess-rutils-rm-all}}{58}
+\entry {\code {ess-rutils-rsitesearch}}{58}
+\entry {\code {ess-rutils-save-wkspc}}{58}
+\entry {\code {ess-rutils-update-pkgs}}{58}
+\entry {\code {ess-set-style}}{37}
+\entry {\code {ess-skip-to-help-section}}{42}
+\entry {\code {ess-skip-to-next-section}}{42}
+\entry {\code {ess-skip-to-previous-section}}{42}
+\entry {\code {ess-smart-comma}}{54}
+\entry {\code {ess-submit-bug-report}}{78}
+\entry {\code {ess-switch-to-end-of-ESS}}{43}
+\entry {\code {ess-switch-to-inferior-or-script-buffer}}{31}
+\entry {\code {ess-swv-latex}}{59}
+\entry {\code {ess-swv-PDF}}{59}
+\entry {\code {ess-swv-PS}}{59}
+\entry {\code {ess-swv-weave}}{59}
+\entry {\code {ess-tracebug}}{47}
+\entry {\code {ess-transcript-clean-region}}{34}
+\entry {\code {ess-transcript-copy-command}}{34}
+\entry {\code {ess-transcript-send-command}}{34}
+\entry {\code {ess-transcript-send-command-and-move}}{34}
+\entry {\code {ess-use-ido, ess-completing-read}}{45}
+\initial {F}
+\entry {\code {fill-paragraph}}{51}
+\initial {I}
+\entry {\code {inferior-ess-send-input}}{24}
+\initial {M}
+\entry {\code {mark-paragraph}}{51}
+\entry {\code {move-beginning-of-line}}{51}
+\initial {N}
+\entry {\code {newline-and-indent}}{51}
+\initial {O}
+\entry {objects()}{29}
+\initial {P}
+\entry {printer()}{56}
+\initial {Q}
+\entry {q()}{30}
+\initial {S}
+\entry {S}{20}
+\entry {search()}{30, 44}
+\entry {source()}{32, 35}
+\entry {STERM}{30}

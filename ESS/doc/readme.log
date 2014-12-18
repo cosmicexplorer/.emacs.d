@@ -1,0 +1,374 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014/Arch Linux) (preloaded format=pdfetex 2014.12.17)  17 DEC 2014 22:47
+entering extended mode
+ restricted \write18 enabled.
+ file:line:error style messages enabled.
+ %&-line parsing enabled.
+**\catcode126=12 \def\normaltilde{~}\catcode126=13 \let~\normaltilde  \input ./
+readme.texi
+(./readme.texi (/usr/share/texmf-dist/tex/texinfo/texinfo.tex
+Loading texinfo [version 2014-05-20.16]:
+\bindingoffset=\dimen16
+\normaloffset=\dimen17
+\pagewidth=\dimen18
+\pageheight=\dimen19
+\outerhsize=\dimen20
+\outervsize=\dimen21
+\cornerlong=\dimen22
+\cornerthick=\dimen23
+\topandbottommargin=\dimen24
+\headlinebox=\box16
+\footlinebox=\box17
+\margin=\insert252
+\EMsimple=\toks13
+\groupbox=\box18
+\groupinvalidhelp=\toks14
+\mil=\dimen25
+\exdentamount=\skip18
+\inmarginspacing=\skip19
+\centerpenalty=\count27
+ pdf,
+\tempnum=\count28
+\lnkcount=\count29
+\filename=\toks15
+\filenamelength=\count30
+\pgn=\count31
+\toksA=\toks16
+\toksB=\toks17
+\toksC=\toks18
+\toksD=\toks19
+\boxA=\box19
+\countA=\count32
+\nopdfimagehelp=\toks20
+ fonts,
+\sffam=\fam8
+\textleading=\dimen26
+ markup,
+\fontdepth=\count33
+ glyphs,
+\errorbox=\box20
+
+page headings,
+\titlepagetopglue=\skip20
+\titlepagebottomglue=\skip21
+\evenheadline=\toks21
+\oddheadline=\toks22
+\evenfootline=\toks23
+\oddfootline=\toks24
+ tables,
+\tableindent=\dimen27
+\itemindent=\dimen28
+\itemmargin=\dimen29
+\itemmax=\dimen30
+\itemno=\count34
+\multitableparskip=\skip22
+\multitableparindent=\skip23
+\multitablecolspace=\dimen31
+\multitablelinespace=\skip24
+\colcount=\count35
+\everytab=\toks25
+ conditionals,
+\doignorecount=\count36
+ indexing,
+\whatsitskip=\skip25
+\whatsitpenalty=\count37
+\secondaryindent=\skip26
+\partialpage=\box21
+\doublecolumnhsize=\dimen32
+ sectioning,
+\unnumberedno=\count38
+\chapno=\count39
+\secno=\count40
+\subsecno=\count41
+\subsubsecno=\count42
+\appendixno=\count43
+\absseclevel=\count44
+\secbase=\count45
+\chapheadingskip=\skip27
+\secheadingskip=\skip28
+\subsecheadingskip=\skip29
+ toc,
+\tocfile=\write0
+\contentsrightmargin=\skip30
+\savepageno=\count46
+\lastnegativepageno=\count47
+\tocindent=\dimen33
+ environments,
+\lispnarrowing=\skip31
+\envskipamount=\skip32
+\circthick=\dimen34
+\cartouter=\dimen35
+\cartinner=\dimen36
+\normbskip=\skip33
+\normpskip=\skip34
+\normlskip=\skip35
+\lskip=\skip36
+\rskip=\skip37
+\nonfillparindent=\dimen37
+\tabw=\dimen38
+\verbbox=\box22
+
+defuns,
+\defbodyindent=\skip38
+\defargsindent=\skip39
+\deflastargmargin=\skip40
+\defunpenalty=\count48
+\parencount=\count49
+\brackcount=\count50
+ macros,
+\paramno=\count51
+\macname=\toks26
+ cross references,
+\auxfile=\write1
+\savesfregister=\count52
+\toprefbox=\box23
+\printedrefnamebox=\box24
+\infofilenamebox=\box25
+\printedmanualbox=\box26
+ insertions,
+\footnoteno=\count53
+\SAVEfootins=\box27
+\SAVEmargin=\box28
+
+(/usr/share/texmf-dist/tex/generic/epsf/epsf.tex
+This is `epsf.tex' v2.7.4 <14 February 2011>
+\epsffilein=\read1
+\epsfframemargin=\dimen39
+\epsfframethickness=\dimen40
+\epsfrsize=\dimen41
+\epsftmp=\dimen42
+\epsftsize=\dimen43
+\epsfxsize=\dimen44
+\epsfysize=\dimen45
+\pspoints=\dimen46
+)
+\noepsfhelp=\toks27
+ localization,
+\nolanghelp=\toks28
+\countUTFx=\count54
+\countUTFy=\count55
+\countUTFz=\count56
+ formatting,
+\defaultparindent=\dimen47
+ and turning on texinfo input format.) (./readme.aux)
+\openout1 = `readme.aux'.
+
+@cpindfile=@write2
+@fnindfile=@write3
+@vrindfile=@write4
+@tpindfile=@write5
+@kyindfile=@write6
+@pgindfile=@write7
+texinfo.tex: doing @include of ess-defs.texi
+
+ (./ess-defs.texi) Chapter 1
+\openout0 = `readme.toc'.
+
+texinfo.tex: doing @include of ../VERSION
+
+ (../VERSION)
+Underfull \hbox (badness 10000) in paragraph at lines 25--38
+@textrm ([][]@texttt maechler@stat.math.ethz.ch[][][]@textrm ) and Kurt Hornik 
+([][]@texttt Kurt.Hornik@R-project.org[][][]@textrm )
+
+@hbox(8.2125+2.73749)x433.62, glue set 4.81291
+.@textrm (
+.@pdfliteral{0 0 0 rg 0 0 0 RG}
+.@pdfstartlink(*+*)x* attr{/Border [0 0 0]} action user{/Subtype /Link /A << /S
+ /URI /URI (mailto:maechler@stat.math.ethz.ch)@ETC.}
+.@texttt m
+.@texttt a
+.etc.
+
+texinfo.tex: doing @include of license.texi
+
+(./license.texi)
+texinfo.tex: doing @include of stabilty.texi
+
+ (./stabilty.texi)
+texinfo.tex: doing @include of requires.texi
+
+ (./requires.texi [1
+\openout2 = `readme.cp'.
+
+\openout3 = `readme.fn'.
+
+\openout4 = `readme.vr'.
+
+\openout5 = `readme.tp'.
+
+\openout6 = `readme.ky'.
+
+\openout7 = `readme.pg'.
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}])
+texinfo.tex: doing @include of getting.texi
+
+ (./getting.texi
+texinfo.tex: doing @include of inst_svn.texi
+
+ (./inst_svn.texi))
+texinfo.tex: doing @include of installation.texi
+
+
+(./installation.texi [2])
+texinfo.tex: doing @include of currfeat.texi
+
+ (./currfeat.texi [3])
+texinfo.tex: doing @include of newfeat.texi
+
+ (./newfeat.texi [4]
+Underfull \hbox (badness 10000) in paragraph at lines 36--40
+ []@reducedrm ESS[SAS][]@textrm : Three fea-tures/fixes with spe-cial thanks to
+ Matthew Fi-dler
+
+@hbox(8.2125+2.73749)x433.62, glue set 4.74745
+.@glue(@leftskip) 21.68121
+.@hbox(4.86667+0.0)x0.0, glue set - 12.70244fil
+..@glue 0.0 plus 1.0fil minus 1.0fil
+..@mathon
+..@textsy ^^O
+..@mathoff
+..@kern 7.22743
+.@reducedrm E
+.@reducedrm S
+.@reducedrm S
+.etc.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 36--40
+ [][]@textrm https://github.com/emacs-ess/ESS/pulls/mlf176f2 (@texttt https: / 
+/ github . com /
+
+@hbox(8.2125+2.73749)x433.62, glue set 4.83934
+.@glue(@leftskip) 21.68121
+.@pdfliteral{0 0 0 rg 0 0 0 RG}
+.@pdfstartlink(*+*)x* attr{/Border [0 0 0]} action user{/Subtype /Link /A << /S
+ /URI /URI (https://github.com/emacs-ess/ESS/p@ETC.}
+.@textrm h
+.@kern-0.30418
+.etc.
+
+[5]
+Underfull \hbox (badness 6910) in paragraph at lines 69--75
+ []@textrm integration with @texttt devtools[] @textrm pack-age. New com-mand @
+texttt ess-developer-
+
+@hbox(7.60416+2.43333)x433.62, glue set 4.10715
+.@glue(@leftskip) 43.36243
+.@hbox(6.3875+0.9125)x0.0, glue set - 15.74413fil
+..@glue 0.0 plus 1.0fil minus 1.0fil
+..@mathon
+..@textsy ^^@
+..@mathoff
+..@kern 7.22743
+.@textrm i
+.@textrm n
+.@kern-0.30418
+.etc.
+
+
+Underfull \hbox (badness 7081) in paragraph at lines 69--75
+ @texttt load-package[] @textrm calls @texttt load_all[] @textrm on the pack-ag
+e con-tain-ing cur-rent file.
+
+@hbox(7.60416+2.43333)x433.62, glue set 4.13838
+.@glue(@leftskip) 43.36243
+.@texttt l
+.@texttt o
+.@texttt a
+.@texttt d
+.etc.
+
+[6]
+Underfull \hbox (badness 10000) in paragraph at lines 140--144
+ []@reducedrm ESS[tracebug][]@textrm : @texttt ess-debug-flag-for-debugging[] @
+textrm and @texttt ess-debug-unflag-for-
+
+@hbox(7.60416+2.5)x433.62, glue set 4.94865
+.@glue(@leftskip) 21.68121
+.@hbox(4.86667+0.0)x0.0, glue set - 12.70244fil
+..@glue 0.0 plus 1.0fil minus 1.0fil
+..@mathon
+..@textsy ^^O
+..@mathoff
+..@kern 7.22743
+.@reducedrm E
+.@reducedrm S
+.@reducedrm S
+.etc.
+
+[7] [8] [9] [10]
+Underfull \hbox (badness 10000) in paragraph at lines 381--383
+ [][]@textrm : Prompts in in-fe-rior buffers are now high-lighted uni-formly wi
+th
+
+@hbox(7.60416+2.12917)x433.62, glue set 4.5319
+.@glue(@leftskip) 21.68121
+.@hbox(4.86667+0.0)x0.0, glue set - 12.70244fil
+..@glue 0.0 plus 1.0fil minus 1.0fil
+..@mathon
+..@textsy ^^O
+..@mathoff
+..@kern 7.22743
+.@hbox(7.31305+0.0)x20.95839
+..@textrm i
+..@reducedrm E
+..@reducedrm S
+..@reducedrm S
+..@hbox(0.0+0.0)x0.0
+.@textrm :
+.@glue 4.86665 plus 3.65 minus 0.60832
+.etc.
+
+[11] [12]
+Overfull \hbox (81.25798pt too wide) in paragraph at lines 532--539
+ []@reducedrm ESS[R][]@textrm : Out of the box in-te-gra-tion with @texttt Auto
+ Completion[] @textrm mode [][]http://cx4a.org/software/auto-complete|
+
+@hbox(8.2125+2.73749)x433.62, glue set - 1.0
+.@glue(@leftskip) 21.68121
+.@hbox(4.86667+0.0)x0.0, glue set - 12.70244fil
+..@glue 0.0 plus 1.0fil minus 1.0fil
+..@mathon
+..@textsy ^^O
+..@mathoff
+..@kern 7.22743
+.@reducedrm E
+.@reducedrm S
+.@reducedrm S
+.etc.
+
+[13] [14] [15])
+texinfo.tex: doing @include of bugrept.texi
+
+ (./bugrept.texi)
+texinfo.tex: doing @include of mailing.texi
+
+ (./mailing.texi)
+texinfo.tex: doing @include of authors.texi
+
+ (./authors.texi [16])
+[17] ) 
+Here is how much of TeX's memory you used:
+ 2035 strings out of 494670
+ 24660 string characters out of 6155346
+ 68428 words of memory out of 5000000
+ 3490 multiletter control sequences out of 15000+600000
+ 32127 words of font info for 112 fonts, out of 8000000 for 9000
+ 1457 hyphenation exceptions out of 8191
+ 16i,5n,16p,358b,605s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmb10.pfb></usr/sha
+re/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmsl10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/c
+m/cmsltt10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
+></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texmf-dist/font
+s/type1/public/amsfonts/cm/cmtt9.pfb>
+Output written on readme.pdf (17 pages, 188607 bytes).
+PDF statistics:
+ 173 PDF objects out of 1000 (max. 8388607)
+ 140 compressed objects within 2 object streams
+ 29 named destinations out of 1000 (max. 500000)
+ 13 words of extra memory for PDF output out of 10000 (max. 10000000)
+
