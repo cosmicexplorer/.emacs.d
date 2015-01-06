@@ -276,10 +276,6 @@ Lisp code." t)
 ;; allow for save buffer reversion when files are being edited by external tools
 (require 'revbufs)
 
-;;; c#
-(require 'csharp-mode)
-(add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
-
 (autoload 'markdown-mode "markdown-mode"
   "Major mode for editing Markdown files" t)
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
