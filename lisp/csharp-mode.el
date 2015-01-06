@@ -2656,19 +2656,8 @@ This fn does these things:
 (defadvice revert-buffer (around
                           csharp-advise-revert-buffer
                           activate compile)
-  (let ((is-flymake-enabled
-         (and (fboundp 'flymake-mode)
-              flymake-mode)))
-    ;; disable
-    (if is-flymake-enabled
-        (flymake-mode-off))
-
-    ;; revert
-    ad-do-it
-
-    ;; enable
-    (if is-flymake-enabled
-        (flymake-mode-on))))
+  ;; revert
+  ad-do-it)
 
 ;; ++++++++++++++++++++++
 

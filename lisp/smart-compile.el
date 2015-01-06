@@ -79,36 +79,37 @@
   )
 
 (defcustom smart-compile-alist '(
-  (emacs-lisp-mode    . (emacs-lisp-byte-compile))
-  (lisp-mode          . (byte-compile-file-and-remove)) ;; may want to take advantage of the formatting emacs does when byte-compiling files!
-  ("\\.jl\\'"          . "julia %f") ;; for some reason detecting purely by "julia-mode" doesn't work
-  (html-mode          . (browse-url-of-buffer))
-  (nxhtml-mode        . (browse-url-of-buffer))
-  (html-helper-mode   . (browse-url-of-buffer))
-  (octave-mode        . (run-octave))
-  (c-mode             . "clang -Wall -Wextra -Werror %f -o %n -lm")
-  (c++-mode           . "clang++ -std=c++11 -Wall -Wextra -Werror %f -o %n")
-  ("\\.m\\'"          . "gcc -O2 %f -lobjc -lpthread -o %n") ;; objective-c
-  (java-mode          . "javac %f")
-  ("\\.php\\'"        . "php -l %f")
-  ;; using dragonegg for fortran and ada cause clang isn't available for them yet
-  (fortran-mode       . "gcc-4.6 -fplugin=/usr/lib/dragonegg-3.3.src/dragonegg.so -Wall -Wextra -Werror %f -o %n")
-  (ada-mode           . "gcc-4.6 -fplugin=/usr/lib/dragonegg-3.3.src/dragonegg.so -Wall -Wextra -Werror %f -o %n")
-  ("\\.cron\\(tab\\)?\\'" . "crontab %f")
-  ("\\.tex\\'"        . (tex-file))
-  ("\\.texi\\'"       . "makeinfo %f")
-  ("\\.mp\\'"         . "mptopdf %f")
-  (perl-mode          . "perl -cw %f")
-  (ruby-mode          . "ruby -cw %f")
-  (haskell-mode       . "ghc %f -o %n")
-  (python-mode        . "python %f")
-  (js-mode            . "node %f")
-  ("\\.R\\'"          . "Rscript %f") ;; redirects to stdout
-  ("\\.r\\'"          . "Rscript %f") ;; redirects to stdout
-  (go-mode            . (go-fmt-file-and-compile))
-  (qmake-mode         . "qmake")
-  (cmake-mode					. "cmake %d")
-)  "Alist of filename patterns vs corresponding format control strings.
+                                 (emacs-lisp-mode    . (emacs-lisp-byte-compile))
+                                 (lisp-mode          . (byte-compile-file-and-remove)) ;; may want to take advantage of the formatting emacs does when byte-compiling files!
+                                 ("\\.jl\\'"          . "julia %f") ;; for some reason detecting purely by "julia-mode" doesn't work
+                                 (html-mode          . (browse-url-of-buffer))
+                                 (nxhtml-mode        . (browse-url-of-buffer))
+                                 (html-helper-mode   . (browse-url-of-buffer))
+                                 (octave-mode        . (run-octave))
+                                 (c-mode             . "clang -Wall -Wextra -Werror %f -o %n -lm")
+                                 (c++-mode           . "clang++ -std=c++11 -Wall -Wextra -Werror %f -o %n")
+                                 ("\\.m\\'"          . "gcc -O2 %f -lobjc -lpthread -o %n") ;; objective-c
+                                 (java-mode          . "javac %f")
+                                 ("\\.php\\'"        . "php -l %f")
+                                 ;; using dragonegg for fortran and ada cause clang isn't available for them yet
+                                 (fortran-mode       . "gcc-4.6 -fplugin=/usr/lib/dragonegg-3.3.src/dragonegg.so -Wall -Wextra -Werror %f -o %n")
+                                 (ada-mode           . "gcc-4.6 -fplugin=/usr/lib/dragonegg-3.3.src/dragonegg.so -Wall -Wextra -Werror %f -o %n")
+                                 ("\\.cron\\(tab\\)?\\'" . "crontab %f")
+                                 ("\\.tex\\'"        . (tex-file))
+                                 ("\\.texi\\'"       . "makeinfo %f")
+                                 ("\\.mp\\'"         . "mptopdf %f")
+                                 (perl-mode          . "perl -cw %f")
+                                 (ruby-mode          . "ruby -cw %f")
+                                 (haskell-mode       . "ghc %f -o %n")
+                                 (python-mode        . "python %f")
+                                 (js-mode            . "node %f")
+                                 ("\\.R\\'"          . "Rscript %f") ;; redirects to stdout
+                                 ("\\.r\\'"          . "Rscript %f") ;; redirects to stdout
+                                 (go-mode            . (go-fmt-file-and-compile))
+                                 (coffee-mode        . "coffee -c %f")
+                                 (qmake-mode         . "qmake")
+                                 (cmake-mode	      . "cmake %d")
+                                 )  "Alist of filename patterns vs corresponding format control strings.
 Each element looks like (REGEXP . STRING) or (MAJOR-MODE . STRING).
 Visiting a file whose name matches REGEXP specifies STRING as the
 format control string.  Instead of REGEXP, MAJOR-MODE can also be used.
@@ -126,27 +127,27 @@ The following %-sequences will be replaced by:
 If the second item of the alist element is an emacs-lisp FUNCTION,
 evaluate FUNCTION instead of running a compilation command.
 "
-   :type '(repeat
-           (cons
-            (choice
-             (regexp :tag "Filename pattern")
-             (function :tag "Major-mode"))
-            (choice
-             (string :tag "Compilation command")
-             (sexp :tag "Lisp expression"))))
-   :group 'smart-compile)
+                                    :type '(repeat
+                                            (cons
+                                             (choice
+                                              (regexp :tag "Filename pattern")
+                                              (function :tag "Major-mode"))
+                                             (choice
+                                              (string :tag "Compilation command")
+                                              (sexp :tag "Lisp expression"))))
+                                    :group 'smart-compile)
 (put 'smart-compile-alist 'risky-local-variable t)
 
 (defconst smart-compile-replace-alist '(
-  ("%F" . (buffer-file-name))
-  ("%f" . (file-name-nondirectory (buffer-file-name)))
-  ("%n" . (file-name-sans-extension
-           (file-name-nondirectory (buffer-file-name))))
-  ("%e" . (or (file-name-extension (buffer-file-name)) ""))
-  ("%o" . smart-compile-option-string)
-	("%d" . (file-name-directory (buffer-file-name)))
-  ("%U" . (user-login-name))
-  ))
+                                        ("%F" . (buffer-file-name))
+                                        ("%f" . (file-name-nondirectory (buffer-file-name)))
+                                        ("%n" . (file-name-sans-extension
+                                                 (file-name-nondirectory (buffer-file-name))))
+                                        ("%e" . (or (file-name-extension (buffer-file-name)) ""))
+                                        ("%o" . smart-compile-option-string)
+                                        ("%d" . (file-name-directory (buffer-file-name)))
+                                        ("%U" . (user-login-name))
+                                        ))
 (put 'smart-compile-replace-alist 'risky-local-variable t)
 
 (defvar smart-compile-check-makefile t)
@@ -195,36 +196,50 @@ which is defined in `smart-compile-alist'."
      ((and smart-compile-check-makefile
            (or (file-readable-p "Makefile")
                (file-readable-p "makefile")
-							 (file-readable-p "../Makefile")
-							 (file-readable-p "../makefile")))
+               (file-readable-p "../Makefile")
+               (file-readable-p "../makefile")
+               (file-readable-p "../../Makefile")
+               (file-readable-p "../../makefile")))
       (if (y-or-n-p "Makefile is found.  Try 'make'? ")
           (progn
-						(if (or (file-readable-p "../Makefile")
-										(file-readable-p "../makefile"))
-								(set (make-local-variable 'compile-command) "make -C .. -k ")
-								(set (make-local-variable 'compile-command) "make -k ")
-								)
+            (cond ((or (file-readable-p "../Makefile")
+                       (file-readable-p "../makefile"))
+                   (set
+                    (make-local-variable 'compile-command) "make -C .. -k "))
+                  ((or (file-readable-p "../../Makefile")
+                       (file-readable-p "../../makefile"))
+                   (set
+                    (make-local-variable 'compile-command) "make -C ../.. -k "))
+                  (t
+                   (set (make-local-variable 'compile-command) "make -k ")))
+
             (call-interactively 'compile)
             (setq not-yet nil)
             )
         (setq smart-compile-check-makefile nil)))
 
 
-		((and smart-compile-check-scons-files
-					(or (file-readable-p "SConstruct")
-							(file-readable-p "../SConstruct"))) ;; if found in parent dir
-		 (if (y-or-n-p "scons files are found. Try 'scons'? ")
-				 (progn
-					 (if (file-readable-p "../SConstruct")
-							 (set (make-local-variable 'compile-command) "scons -C .. -k ") ;; go to above dir
-							 (set (make-local-variable 'compile-command) "scons -k ")
-							 )
-					 (call-interactively 'compile)
-					 (setq not-yet nil)
-					 )
-			 (setq smart-compile-check-scons-files nil)))
+     ((and smart-compile-check-scons-files
+           (or (file-readable-p "SConstruct")
+               (file-readable-p "../SConstruct")
+               (file-readable-p "../../SConstruct"))) ;; if found in parent dir
+      (if (y-or-n-p "scons files are found. Try 'scons'? ")
+          (progn
+            (cond ((file-readable-p "../SConstruct")
+                   (set
+                    (make-local-variable 'compile-command) "scons -C .. -k "))
+                  ((file-readable-p "../../SConstruct")
+                   (set
+                    (make-local-variable
+                     'compile-command) "scons -C ../.. -k "))
+                  (t (set (make-local-variable 'compile-command) "scons -k "))
+              )
+            (call-interactively 'compile)
+            (setq not-yet nil)
+            )
+        (setq smart-compile-check-scons-files nil)))
 
-		) ;; end of (cond ...)
+     ) ;; end of (cond ...)
 
     ;; compile
     (let( (alist smart-compile-alist)
@@ -247,7 +262,7 @@ which is defined in `smart-compile-alist'."
                     )
                 (if (listp function)
                     (eval function)
-                    ))
+                  ))
               (setq alist nil)
               (setq not-yet nil)
               )

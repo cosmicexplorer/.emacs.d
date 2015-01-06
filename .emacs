@@ -9,6 +9,7 @@
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
 (when (< emacs-major-version 24)
   ;; For important compatibility libraries like cl-lib
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
@@ -21,6 +22,7 @@
 		    better-defaults
                     cider
                     clojure-mode
+                    coffee-mode
                     color-theme
                     company
                     dash
@@ -34,6 +36,7 @@
                     linum
                     linum-relative
                     magit
+                    markdown-mode
                     minimap
                     misc-cmds
                     multiple-cursors
@@ -43,6 +46,7 @@
                     php-mode
                     queue
                     rainbow-mode
+                    rainbow-delimiters
                     s
                     slime
                     undo-tree
@@ -110,6 +114,12 @@
 
 ;;; so i can sudo edit files with C-x C-f /sudo::/path/to/file
 (require 'tramp)
+
+;;; shell-script mode indentation
+(defun setup-sh-indentation ()
+  (setq sh-basic-offset 2)
+  (setq sh-indentation 2))
+(add-hook 'sh-mode-hook 'setup-sh-indentation)
 
 ;;; have normal delete/selection (type over selected text to delete)
 (delete-selection-mode 1)
@@ -445,6 +455,7 @@ Lisp code." t)
          ("qmake" (mode . qmake-mode))
          ("org" (mode . org-mode))
          ("shell script" (mode . sh-mode))
+         ("coffeescript" (mode . coffee-mode))
          ("emacs-system"
           (or (name . "\*eshell\*")
               (name . "\*scratch\*")
@@ -632,6 +643,7 @@ Lisp code." t)
 (define-key c-mode-map (kbd "<C-return>") 'newline-and-indent-ctrl-j)
 (define-key c++-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
 (define-key c++-mode-map (kbd "<C-return>") 'newline-and-indent-ctrl-j)
+(define-key c++-mode-map (kbd "{") 'insert-brackets)
 
 ;; toggle letter casing from ALLCAPS to InitialCase to alllowercase
 (global-set-key (kbd "C-x M-c") 'toggle-letter-case)
@@ -648,6 +660,12 @@ Lisp code." t)
 
 ;;; opposite of yank-pop
 (global-set-key (kbd "C-M-y") 'yank-push)
+
+;;; fix coffee-mode
+(with-eval-after-load "coffee-mode"
+ 'after-load-functions
+ (define-key coffee-mode-map (kbd "C-c C-k") 'smart-compile)
+ (define-key coffee-mode-map (kbd "C-c C-c") 'coffee-compile-buffer))
 
 ;;;;; my own functions! used throughout this file
 ;;; some of these are mine, some are heavily adapated from emacswiki, some are
@@ -854,6 +872,11 @@ annoying. This fixes that."
         (str-from-char (string char)))
     (string-match-p "\\`[A-Z]*\\'" str-from-char)))
 
+(defun insert-brackets ()
+  (interactive)
+  (insert "{}")
+  (backward-char 1))
+
 (defun camel-case-right-word ()
   (interactive "^")                     ; highlights region if shifted
   (let ((cur-point (point))
@@ -903,12 +926,25 @@ instead of just the final line."
 (global-set-key (kbd "C-k") 'kill-selected-region-default)
 
 (add-hook 'slime-mode-hook 'fix-lisp-keybindings)
+
+(defun fix-paredit-comment-dwim (&optional arg)
+  "Fixed paredit-comment-dwim's behavior on inline comments."
+  (interactive)
+  (if arg
+      (paredit-comment-dwim arg)
+    (paredit-comment-dwim))
+  (unless (string-match "^[\s]*;"
+                        (buffer-substring-no-properties
+                         (line-beginning-position)
+                         (line-end-position)))
+    (insert " ")))
+
 ;; get useful keybindings for lisp editing
 (defun fix-lisp-keybindings ()
   "Changes about three million personalized keybindings for lisp editing with
 SLIME and Paredit. Not for the faint of heart."
   (interactive)
-  ;; TODO: add terminal keybindings for this
+  (define-key paredit-mode-map (kbd "M-;") 'fix-paredit-comment-dwim)
   (define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
   (define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
   (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key
@@ -1090,11 +1126,12 @@ parentheses. CURRENTLY BROKEN"
  ;; If there is more than one, they won't work right.
  '(TeX-engine (quote luatex))
  '(asm-comment-char 35)
- '(color-theme-directory (quote ("~/.emacs.d/color-themes")))
+ '(color-theme-directory "~/.emacs.d/color-themes")
  '(fill-column 80)
  '(org-support-shift-select (quote always))
  '(org-support-shift-select (quote always))
  '(server-delete-tty t)
+ '(coffee-tab-width 2)
  '(yank-pop-change-selection t))
 (put 'erase-buffer 'disabled nil)
 
@@ -1105,6 +1142,7 @@ parentheses. CURRENTLY BROKEN"
 (when save-visited-files
   ;; TODO: restore from death
   (with-current-buffer (find-file (expand-file-name saved-files))
+    (goto-char (point-min))
     (loop while (not (eobp))
           with cur-line
           do (progn
@@ -1119,7 +1157,7 @@ parentheses. CURRENTLY BROKEN"
   ;; save visiting files
   (add-hook
    'kill-emacs-hook
-   #'(lambda ()
+   (lambda ()
        (with-current-buffer (find-file (expand-file-name saved-files))
          (erase-buffer)
          (loop for buf in (buffer-list)
