@@ -88,7 +88,9 @@
                          (eq major-mode 'undo-tree-visualizer-mode))
                (setq show-trailing-whitespace t))))
 (setq-default indent-tabs-mode nil)     ;; use spaces not tabs
-(setq tab-width 4)
+(fset 'perl-mode 'cperl-mode)           ; TODO: is this what i want?
+(setq cperl-indent-level 2)
+(setq tab-width 2)
 (setq-default c-basic-offset 2) ;; cc-mode uses this instead of tab-width
 ;; Remove trailing whitespace from a line
 (setq-default nuke-trailing-whitespace-p t)
@@ -483,6 +485,9 @@ Lisp code." t)
 
 ;;; add modes for specific filetypes
 (add-to-list 'auto-mode-alist '("\\.tpp\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.txx\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.hxx\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.cxx\\'" . c++-mode))
 
 ;;; personal color theme
 (require 'color-theme)
@@ -604,8 +609,7 @@ Lisp code." t)
 ;; kill all active dired buffers at once
 (global-set-key (kbd "C-x M-d") 'kill-dired-buffers)
 
-;; open new file with given filename from minibuffer, or blank filename (cross
-;; your fingers)
+;; open new file with given filename from minibuffer, or blank filename
 (global-set-key (kbd "C-x C-n") 'open-new-file)
 
 ;; go to normal mode; i.e. quickly format everything pretty
@@ -635,11 +639,13 @@ Lisp code." t)
 (global-set-key (kbd "<backtab>") 'force-insert-tab)
 (global-set-key (kbd "C-c t") 'force-insert-tab) ; for modes like markdown-mode
                                         ; where S-tab overridden
-(define-key c-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
-(define-key c-mode-map (kbd "<C-return>") 'newline-and-indent-ctrl-j)
-(define-key c++-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
-(define-key c++-mode-map (kbd "<C-return>") 'newline-and-indent-ctrl-j)
-(define-key c++-mode-map (kbd "{") 'insert-brackets)
+(add-hook 'c-initialization-hook
+	  (lambda ()
+	    (define-key c-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
+	    (define-key c-mode-map (kbd "<C-return>") 'newline-and-indent-ctrl-j)
+	    (define-key c++-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
+	    (define-key c++-mode-map (kbd "<C-return>") 'newline-and-indent-ctrl-j)
+	    (define-key c++-mode-map (kbd "{") 'insert-brackets)))
 
 ;; toggle letter casing from ALLCAPS to InitialCase to alllowercase
 (global-set-key (kbd "C-x M-c") 'toggle-letter-case)
@@ -656,6 +662,8 @@ Lisp code." t)
 
 ;;; opposite of yank-pop
 (global-set-key (kbd "C-M-y") 'yank-push)
+
+(define-key dired-mode-map (kbd "F") 'dired-do-find-marked-files)
 
 ;;; fix coffee-mode
 (with-eval-after-load "coffee-mode"
