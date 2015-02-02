@@ -673,6 +673,8 @@ Lisp code." t)
  (define-key coffee-mode-map (kbd "C-c C-k") 'smart-compile)
  (define-key coffee-mode-map (kbd "C-c C-c") 'coffee-compile-buffer))
 
+(define-key js-mode-map (kbd "RET") 'newline-and-indent-fix-js-mode)
+
 ;;;;; my own functions! used throughout this file
 ;;; some of these are mine, some are heavily adapated from emacswiki, some are
 ;;; copy/paste from emacswiki
@@ -829,6 +831,18 @@ annoying. This fixes that."
   (insert-char 97)
   (insert-char 59)
   (clang-format-line)                   ; clang-formats previous line
+  (delete-backward-char 2))
+
+(defun newline-and-indent-fix-js-mode ()
+  (interactive)
+  (insert-char 97)
+  (insert-char 59)
+  (web-beautify-format-region
+   web-beautify-js-program
+   (line-beginning-position)
+   (line-end-position))
+  (forward-line 1)
+  (goto-char (line-end-position))
   (delete-backward-char 2))
 
 (defun count-num-lines-in-buffer ()
@@ -1108,6 +1122,20 @@ parentheses. CURRENTLY BROKEN"
         do (when (string/starts-with buf-name (cdr line))
              (setq is-covered-in-file t))
         finally (return (not is-covered-in-file))))
+
+(defun get-beginning-of-prev-line ()
+  (if (bolp)
+      (point)
+    (save-excursion
+      (forward-line -1)
+      (line-beginning-position))))
+
+(defun get-end-of-next-line ()
+  (if (eolp)
+      (point)
+    (save-excursion
+      (forward-line 1)
+      (line-end-position))))
 
 (defun yank-push ()
   (interactive)

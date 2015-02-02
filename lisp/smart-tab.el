@@ -157,21 +157,22 @@ the text at point."
           ((eq major-mode 'js-mode)
            (if (is-buffer-beautifiable (buffer-file-name))
                (web-beautify-js)
+             (js-indent-line)
              (web-beautify-format-region
               web-beautify-js-program
-              (line-beginning-position) (line-end-position))))
+              (get-beginning-of-prev-line) (get-end-of-next-line))))
           ((eq major-mode 'html-mode)
            (if (is-buffer-beautifiable (buffer-file-name))
                (web-beautify-html)
              (web-beautify-format-region
               web-beautify-html-program
-              (line-beginning-position) (line-end-position))))
+              (get-beginning-of-prev-line) (get-end-of-next-line))))
           ((eq major-mode 'css-mode)
            (if (is-buffer-beautifiable (buffer-file-name))
                (web-beautify-css)
              (web-beautify-format-region
               web-beautify-css-program
-              (line-beginning-position) (line-end-position))))
+              (get-beginning-of-prev-line) (get-end-of-next-line))))
           ((eq major-mode 'org-mode)
            (org-cycle))
           (t
