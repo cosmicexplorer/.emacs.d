@@ -675,6 +675,9 @@ Lisp code." t)
 
 (define-key js-mode-map (kbd "RET") 'newline-and-indent-fix-js-mode)
 
+(add-hook 'js-mode-hook (lambda ()
+                          (setq-local electric-indent-chars nil)))
+
 ;;;;; my own functions! used throughout this file
 ;;; some of these are mine, some are heavily adapated from emacswiki, some are
 ;;; copy/paste from emacswiki
