@@ -57,6 +57,9 @@
   do (unless (package-installed-p p)
        (package-install p)))
 
+;;; fix js-beautify
+(setq web-beautify-js-program "~/.emacs.d/node_modules/js-beautify/js-beautify")
+
 ;;; setup slime
 (setq inferior-lisp-program (executable-find "sbcl"))
 (setq slime-contribs '(slime-fancy))
@@ -283,6 +286,7 @@ Lisp code." t)
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
 
 ;; adds smart-compile functionality
 (require 'smart-compile)
@@ -583,7 +587,6 @@ Lisp code." t)
 
 ;; translate stuff into hex (and back??)
 (global-set-key (kbd "C-x h") 'hexl-mode)
-
 
 ;;; w3m bindings
 (when (executable-find "w3m")
@@ -1088,7 +1091,7 @@ parentheses. CURRENTLY BROKEN"
   (set-buffer-modified-p nil)           ; pretends buffer not modified
   (message
    (shell-command-to-string
-    (concat "mv " (buffer-file-name) " /tmp/")))
+    (concat "mv " "\"" (buffer-file-name) "\"" " /tmp/")))
   (kill-this-buffer))
 
 (defun yank-push ()
