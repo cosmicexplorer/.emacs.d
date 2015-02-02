@@ -57,8 +57,7 @@
   do (unless (package-installed-p p)
        (package-install p)))
 
-;;; fix js-beautify
-(setq web-beautify-js-program "~/.emacs.d/node_modules/js-beautify/js-beautify")
+;;; TODO: document no-beautify and saved-files!
 
 ;;; setup slime
 (setq inferior-lisp-program (executable-find "sbcl"))
@@ -1093,6 +1092,22 @@ parentheses. CURRENTLY BROKEN"
    (shell-command-to-string
     (concat "mv " "\"" (buffer-file-name) "\"" " /tmp/")))
   (kill-this-buffer))
+
+(defun string/starts-with (s begins)
+      "Return non-nil if string S starts with BEGINS."
+      (cond ((>= (length s) (length begins))
+             (string-equal (substring s 0 (length begins)) begins))
+            (t nil)))
+
+(defun is-buffer-beautifiable (buf-name)
+  "Determines whether file is in directory specified in ~/.emacs.d/no-beautify,
+  and if so, only beautifies the current line instead of the entire
+  file."
+  (loop with is-covered-in-file = nil
+        for line in (json-read-file "~/.emacs.d/no-beautify")
+        do (when (string/starts-with buf-name (cdr line))
+             (setq is-covered-in-file t))
+        finally (return (not is-covered-in-file))))
 
 (defun yank-push ()
   (interactive)

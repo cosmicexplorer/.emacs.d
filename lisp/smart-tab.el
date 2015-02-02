@@ -133,43 +133,47 @@ the text at point."
   (if smart-tab-debug
       (message "default"))
   (if (use-region-p)
-      (cond ((or (eq (with-current-buffer
-                         (current-buffer) major-mode) 'c-mode)
-                 (eq (with-current-buffer
-                         (current-buffer) major-mode) 'c++-mode))
-             (clang-format-buffer))
-            ((eq (with-current-buffer
-                     (current-buffer) major-mode) 'js-mode)
+      (cond ((or (eq major-mode 'c-mode)
+                 (eq major-mode 'c++-mode))
+             (if (is-buffer-beautifiable (buffer-file-name))
+                 (clang-format-buffer)
+               (clang-format-region)))
+            ((eq major-mode 'js-mode)
              (web-beautify-js))
-            ((eq (with-current-buffer
-                     (current-buffer) major-mode) 'html-mode)
+            ((eq major-mode 'html-mode)
              (web-beautify-html))
-            ((eq (with-current-buffer
-                     (current-buffer) major-mode) 'css-mode)
+            ((eq major-mode 'css-mode)
              (web-beautify-css))
-            ((eq (with-current-buffer
-                     (current-buffer) major-mode) 'org-mode)
+            ((eq major-mode 'org-mode)
              (org-cycle))
             (t
              (indent-region (region-beginning)
                             (region-end))))
-    (cond ((or (eq (with-current-buffer
-                       (current-buffer) major-mode) 'c-mode)
-               (eq (with-current-buffer
-                       (current-buffer) major-mode) 'c++-mode))
-           (clang-format-buffer))
-          ((eq (with-current-buffer
-                   (current-buffer) major-mode) 'js-mode)
-           (web-beautify-js))
-          ((eq (with-current-buffer
-                   (current-buffer) major-mode) 'html-mode)
-           (web-beautify-html))
-          ((eq (with-current-buffer
-                   (current-buffer) major-mode) 'css-mode)
-           (web-beautify-css))
-          ((eq (with-current-buffer
-                     (current-buffer) major-mode) 'org-mode)
-             (org-cycle))
+    (cond ((or (eq major-mode 'c-mode)
+               (eq major-mode 'c++-mode))
+           (if (is-buffer-beautifiable (buffer-file-name))
+               (clang-format-buffer)
+             (clang-format-line)))
+          ((eq major-mode 'js-mode)
+           (if (is-buffer-beautifiable (buffer-file-name))
+               (web-beautify-js)
+             (web-beautify-format-region
+              web-beautify-js-program
+              (line-beginning-position) (line-end-position))))
+          ((eq major-mode 'html-mode)
+           (if (is-buffer-beautifiable (buffer-file-name))
+               (web-beautify-html)
+             (web-beautify-format-region
+              web-beautify-html-program
+              (line-beginning-position) (line-end-position))))
+          ((eq major-mode 'css-mode)
+           (if (is-buffer-beautifiable (buffer-file-name))
+               (web-beautify-css)
+             (web-beautify-format-region
+              web-beautify-css-program
+              (line-beginning-position) (line-end-position))))
+          ((eq major-mode 'org-mode)
+           (org-cycle))
           (t
            (indent-for-tab-command)))))
 
