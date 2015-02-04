@@ -675,6 +675,7 @@ Lisp code." t)
  (define-key coffee-mode-map (kbd "C-c C-k") 'smart-compile)
  (define-key coffee-mode-map (kbd "C-c C-c") 'coffee-compile-buffer))
 
+(require 'web-beautify)
 (with-eval-after-load "js.el"
   (define-key js-mode-map (kbd "RET") 'newline-and-indent-fix-js-mode))
 
