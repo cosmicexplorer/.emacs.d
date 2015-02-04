@@ -1,6 +1,13 @@
 ;;; emacs config, aka the root node of a massively unbalanced configuration tree
 ;;; by Danny McClanahan, <danieldmcclanahan@gmail.com>, 2014
 
+;; starts emacs in server form so i can use emacsclient to add files
+;; but only if server isn't already started
+(require 'server)
+(if (and (fboundp 'server-running-p)
+         (not (server-running-p)))
+    (server-start))
+
 (byte-recompile-directory (expand-file-name "~/.emacs.d") 0)
 (delete-windows-on "*Compile-Log*")
 
@@ -102,13 +109,6 @@
 (when (string-match "xterm" (if (tty-type) (tty-type) ""))
   (define-key input-decode-map "\e[1;2A" [S-up])
   (define-key input-decode-map "\033[4~" [end]))
-
-;; starts emacs in server form so i can use emacsclient to add files
-;; but only if server isn't already started
-(require 'server)
-(if (and (fboundp 'server-running-p)
-         (not (server-running-p)))
-    (server-start))
 
 ;;; FONTS
 (when (member "Telegrama" (font-family-list))
@@ -397,7 +397,7 @@ Lisp code." t)
 (setq save-place t)
 
 ;; qmake-mode
-(load "~/.emacs.d/lisp/qmake.el")
+(load-file "~/.emacs.d/lisp/qmake.el")
 
 ;;; browsing kill ring, cause why not
 (require 'browse-kill-ring)
@@ -520,8 +520,10 @@ Lisp code." t)
 (global-set-key (kbd "C-x C-c C-f") 'delete-frame)
 
 ;; TODO: make this work!
-;(add-hook 'org-mode-hook
-;          (define-key org-mode-map (kbd "<tab>") 'smart-tab))
+;;(add-hook 'org-mode-hook
+;l          (define-key org-mode-map (kbd "<tab>") 'smart-tab))
+
+(global-set-key (kbd "<XF86Search>") 'helm-multi-swoop-all)
 
 (global-set-key (kbd "C-c C-s") 'save-point)
 (global-set-key (kbd "C-c C-a") 'goto-saved-point)
@@ -673,7 +675,8 @@ Lisp code." t)
  (define-key coffee-mode-map (kbd "C-c C-k") 'smart-compile)
  (define-key coffee-mode-map (kbd "C-c C-c") 'coffee-compile-buffer))
 
-(define-key js-mode-map (kbd "RET") 'newline-and-indent-fix-js-mode)
+(with-eval-after-load "js.el"
+  (define-key js-mode-map (kbd "RET") 'newline-and-indent-fix-js-mode))
 
 (add-hook 'js-mode-hook (lambda ()
                           (setq-local electric-indent-chars nil)))
@@ -838,12 +841,13 @@ annoying. This fixes that."
 
 (defun newline-and-indent-fix-js-mode ()
   (interactive)
+  (newline)
   (insert-char 97)
   (insert-char 59)
   (web-beautify-format-region
    web-beautify-js-program
-   (line-beginning-position)
-   (line-end-position))
+   (get-beginning-of-prev-line)
+   (get-end-of-next-line))
   (forward-line 1)
   (goto-char (line-end-position))
   (delete-backward-char 2))
