@@ -501,6 +501,8 @@ Lisp code." t)
 (add-to-list 'auto-mode-alist '("\\.hxx\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.cxx\\'" . c++-mode))
 
+(define-key dired-mode-map "c" 'find-file)
+
 ;;; personal color theme
 (require 'color-theme)
 (eval-after-load "color-theme"
