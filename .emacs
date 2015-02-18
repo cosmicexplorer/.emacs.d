@@ -40,6 +40,7 @@
                     go-mode
                     helm
                     helm-swoop
+                    less-css-mode
                     linum
                     linum-relative
                     magit
@@ -56,6 +57,7 @@
                     rainbow-delimiters
                     s
                     slime
+                    smartrep
                     undo-tree
                     web-beautify
                     w3m
@@ -65,6 +67,12 @@
        (package-install p)))
 
 ;;; TODO: document no-beautify and saved-files!
+
+;;; ein setup
+(require 'ein)
+(setq ein:use-auto-complete-superpack t)
+(require 'smartrep)
+(setq ein:use-smartrep t)
 
 ;;; setup slime
 (setq inferior-lisp-program (executable-find "sbcl"))
@@ -457,6 +465,7 @@ Lisp code." t)
          ("org" (mode . org-mode))
          ("shell script" (mode . sh-mode))
          ("coffeescript" (mode . coffee-mode))
+         ("less" (mode . less-css-mode))
          ("emacs-system"
           (or (name . "\*eshell\*")
               (name . "\*scratch\*")
