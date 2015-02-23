@@ -1151,6 +1151,8 @@ parentheses. CURRENTLY BROKEN"
                  ((eq major-mode 'coffee-mode)
                   (concat (file-name-sans-extension (buffer-file-name)) ".js"))
                  (t nil))))
+      (unless (file-exists-p compiled-file)
+        (setq compiled-file nil))
       (if compiled-file
           (message
            (concat msg
