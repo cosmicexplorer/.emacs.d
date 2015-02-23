@@ -1,6 +1,8 @@
 ;;; emacs config, aka the root node of a massively unbalanced configuration tree
 ;;; by Danny McClanahan, <danieldmcclanahan@gmail.com>, 2014
 
+(require 'cl)
+
 ;; starts emacs in server form so i can use emacsclient to add files
 ;; but only if server isn't already started
 (require 'server)
@@ -10,8 +12,6 @@
 
 (byte-recompile-directory (expand-file-name "~/.emacs.d") 0)
 (delete-windows-on "*Compile-Log*")
-
-(require 'cl)
 
 ;;; MELPA
 (require 'package)
@@ -1138,9 +1138,25 @@ parentheses. CURRENTLY BROKEN"
   "Doesn't delete the file, just moves it to /tmp so that it goes away."
   (interactive)
   (set-buffer-modified-p nil)           ; pretends buffer not modified
-  (message
-   (shell-command-to-string
-    (concat "mv " "\"" (buffer-file-name) "\"" " /tmp/")))
+  (let ((msg
+         (shell-command-to-string
+          (concat "mv " "\"" (buffer-file-name) "\"" " /tmp/"))))
+    (let ((compiled-file                  ;  save generated filename
+           (cond ((or (eq major-mode 'c-mode)
+                      (eq major-mode 'c++-mode))
+                  (file-name-sans-extension (buffer-file-name)))
+                 ((eq major-mode 'java-mode)
+                  (concat
+                   (file-name-sans-extension (buffer-file-name)) ".class"))
+                 ((eq major-mode 'coffee-mode)
+                  (concat (file-name-sans-extension (buffer-file-name)) ".js"))
+                 (t nil))))
+      (if compiled-file
+          (message
+           (concat msg
+                   (shell-command-to-string
+                    (concat "mv " "\"" compiled-file "\"" " /tmp/"))))
+        (message msg))))
   (kill-this-buffer))
 
 (defun string/starts-with (s begins)
