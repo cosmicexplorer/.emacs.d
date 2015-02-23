@@ -12,6 +12,7 @@
 (delete-windows-on "*Compile-Log*")
 
 (require 'cl)
+
 ;;; MELPA
 (require 'package)
 (add-to-list 'package-archives
@@ -416,6 +417,9 @@ Lisp code." t)
 ;; (lol)
 (setq ibuffer-saved-filter-groups
       '(("home"
+         ("readme" (filename . "README"))
+         ("todo" (filename . "TODO"))
+         ("json" (filename . "\\.json\\'"))
          ("javascript" (mode . js-mode))
          ("emacs-config" (or (filename . ".emacs.d")
                              (filename . "emacs-config")
@@ -433,8 +437,6 @@ Lisp code." t)
                      (name . "Helm")))
          ("makefile" (or (filename . "\\Makefile\\'")
                          (filename . "\\makefile\\'")))
-         ("readme" (or (filename . "\\README\\'")
-                       (filename . "\\readme\\'")))
          ("dired" (mode . dired-mode))
          ("julia" (filename . "\\.jl\\'")) ;; because just detecting julia-mode
          ;; doesn't work fsr
@@ -466,6 +468,9 @@ Lisp code." t)
          ("shell script" (mode . sh-mode))
          ("coffeescript" (mode . coffee-mode))
          ("less" (mode . less-css-mode))
+         ("genbank" (filename . "\\.gb\\'"))
+         ("fasta" (or (filename . "\\.fna\\'")
+                      (filename . "\\.fasta\\'")))
          ("emacs-system"
           (or (name . "\*eshell\*")
               (name . "\*scratch\*")
@@ -491,6 +496,16 @@ Lisp code." t)
           '(lambda ()
              (ibuffer-auto-mode t) ;; automatically updates buffer list
              (ibuffer-switch-to-saved-filter-groups "home")))
+
+(defun coffeescript-comment-do-what-i-really-mean (arg)
+  (interactive "*P")
+  (coffee-comment-dwim arg)
+  (when (char-equal (char-before) 35)   ; 35 == '#'
+    (insert " ")))
+
+(eval-after-load "coffee-mode"
+  '(define-key coffee-mode-map (kbd "M-;")
+     'coffeescript-comment-do-what-i-really-mean))
 
 (setq ibuffer-expert t) ;; only prompt when modified buffer is killed
 (setq ibuffer-show-empty-filter-groups nil) ;; only show full filter groups
@@ -657,9 +672,11 @@ Lisp code." t)
 (add-hook 'c-initialization-hook
 	  (lambda ()
 	    (define-key c-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
-	    (define-key c-mode-map (kbd "<C-return>") 'newline-and-indent-ctrl-j)
+	    (define-key c-mode-map (kbd "<C-return>")
+              'newline-and-indent-ctrl-j)
 	    (define-key c++-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
-	    (define-key c++-mode-map (kbd "<C-return>") 'newline-and-indent-ctrl-j)
+	    (define-key c++-mode-map (kbd "<C-return>")
+              'newline-and-indent-ctrl-j)
 	    (define-key c++-mode-map (kbd "{") 'insert-brackets)))
 
 ;; toggle letter casing from ALLCAPS to InitialCase to alllowercase
@@ -679,7 +696,7 @@ Lisp code." t)
 (global-set-key (kbd "C-M-y") 'yank-push)
 
 (define-key dired-mode-map (kbd "F") 'dired-do-find-marked-files)
-
+-
 ;;; fix coffee-mode
 (with-eval-after-load "coffee-mode"
  'after-load-functions
