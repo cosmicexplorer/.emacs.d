@@ -202,16 +202,17 @@ which is defined in `smart-compile-alist'."
                (file-readable-p "../../makefile")))
       (if (y-or-n-p "Makefile is found.  Try 'make'? ")
           (progn
-            (cond ((or (file-readable-p "../Makefile")
-                       (file-readable-p "../makefile"))
-                   (set
-                    (make-local-variable 'compile-command) "make -C .. -k "))
-                  ((or (file-readable-p "../../Makefile")
-                       (file-readable-p "../../makefile"))
-                   (set
-                    (make-local-variable 'compile-command) "make -C ../.. -k "))
-                  (t
-                   (set (make-local-variable 'compile-command) "make -k ")))
+            (cond
+             ((or (file-readable-p "../../Makefile")
+                  (file-readable-p "../../makefile"))
+              (set
+               (make-local-variable 'compile-command) "make -C ../.. -k "))
+             ((or (file-readable-p "../Makefile")
+                  (file-readable-p "../makefile"))
+              (set
+               (make-local-variable 'compile-command) "make -C .. -k "))
+             (t
+              (set (make-local-variable 'compile-command) "make -k ")))
 
             (call-interactively 'compile)
             (setq not-yet nil)
@@ -225,15 +226,16 @@ which is defined in `smart-compile-alist'."
                (file-readable-p "../../SConstruct"))) ;; if found in parent dir
       (if (y-or-n-p "scons files are found. Try 'scons'? ")
           (progn
-            (cond ((file-readable-p "../SConstruct")
-                   (set
-                    (make-local-variable 'compile-command) "scons -C .. -k "))
-                  ((file-readable-p "../../SConstruct")
-                   (set
-                    (make-local-variable
-                     'compile-command) "scons -C ../.. -k "))
-                  (t (set (make-local-variable 'compile-command) "scons -k "))
-              )
+            (cond
+             ((file-readable-p "../../SConstruct")
+              (set
+               (make-local-variable
+                'compile-command) "scons -C ../.. -k "))
+             ((file-readable-p "../SConstruct")
+              (set
+               (make-local-variable 'compile-command) "scons -C .. -k "))
+             (t (set (make-local-variable 'compile-command) "scons -k "))
+             )
             (call-interactively 'compile)
             (setq not-yet nil)
             )

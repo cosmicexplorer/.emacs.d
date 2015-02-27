@@ -179,7 +179,9 @@ Lisp code." t)
 (add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
 (add-hook 'fundamental-mode-hook (lambda ()
                                    (setq comment-start "- " comment-end "")))
+;;; TODO: this doesn't work! figure out why
 (add-hook 'r-mode-hook (lambda () (setq comment-start "# " comment-end   "")))
+(add-hook 'ess-mode-hook (lambda () (setq comment-start "# " comment-end   "")))
 (add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; "
                                                  comment-end "")))
@@ -696,7 +698,7 @@ Lisp code." t)
 (global-set-key (kbd "C-M-y") 'yank-push)
 
 (define-key dired-mode-map (kbd "F") 'dired-do-find-marked-files)
--
+
 ;;; fix coffee-mode
 (with-eval-after-load "coffee-mode"
  'after-load-functions
