@@ -1157,7 +1157,8 @@ parentheses. CURRENTLY BROKEN"
                  ((eq major-mode 'coffee-mode)
                   (concat (file-name-sans-extension (buffer-file-name)) ".js"))
                  (t nil))))
-      (unless (file-exists-p compiled-file)
+      (unless (and compiled-file
+                   (file-exists-p compiled-file))
         (setq compiled-file nil))
       (if compiled-file
           (message
@@ -1236,12 +1237,12 @@ parentheses. CURRENTLY BROKEN"
  ;; If there is more than one, they won't work right.
  '(TeX-engine (quote luatex))
  '(asm-comment-char 35)
+ '(coffee-tab-width 2)
  '(color-theme-directory "~/.emacs.d/color-themes")
  '(fill-column 80)
- '(org-support-shift-select (quote always))
+ '(gud-key-prefix "")
  '(org-support-shift-select (quote always))
  '(server-delete-tty t)
- '(coffee-tab-width 2)
  '(yank-pop-change-selection t))
 (put 'erase-buffer 'disabled nil)
 
