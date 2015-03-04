@@ -1230,6 +1230,14 @@ parentheses. CURRENTLY BROKEN"
     (message
      (concat "Moved to saved point (" (number-to-string saved-point) ")"))))
 
+;;; macros
+
+;;; http://stackoverflow.com/a/26137517/2518889
+(defmacro with-system (type &rest body)
+  "Evaluate body if `system-type' equals type."
+  `(when (eq system-type ,type)
+     ,@body))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
