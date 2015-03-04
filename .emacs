@@ -1240,7 +1240,7 @@ parentheses. CURRENTLY BROKEN"
  '(coffee-tab-width 2)
  '(color-theme-directory "~/.emacs.d/color-themes")
  '(fill-column 80)
- '(gud-key-prefix "")
+ '(gud-key-prefix "")
  '(org-support-shift-select (quote always))
  '(server-delete-tty t)
  '(yank-pop-change-selection t))
