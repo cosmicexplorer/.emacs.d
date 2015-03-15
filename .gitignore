@@ -28,3 +28,5 @@ tramp
 # compiled files
 *.elc
 backups/
+# request folder, not sure why this exists at all lol but whatever
+request/

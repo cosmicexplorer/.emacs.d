@@ -26,6 +26,7 @@
 (package-initialize)
 (defvar my-packages)
 (setq my-packages '(
+                    2048-game
                     auctex
 		    better-defaults
                     cider
@@ -118,6 +119,10 @@
 (when (string-match "xterm" (if (tty-type) (tty-type) ""))
   (define-key input-decode-map "\e[1;2A" [S-up])
   (define-key input-decode-map "\033[4~" [end]))
+
+;;; perl stuff
+;; (eval-after-load "cperl-mode"
+;;   '(define-key cperl-mode-map (kbd "C-c C-k") 'smart-compile))
 
 ;;; FONTS
 (when (member "Telegrama" (font-family-list))
@@ -435,6 +440,7 @@ Lisp code." t)
          ("subversion" (name . "\*svn"))
          ("magit" (name . "\*magit\*"))
          ("git" (name . "\*git"))
+         ("perl" (mode . cperl-mode))
          ("helm" (or (name . "helm")
                      (name . "Helm")))
          ("makefile" (or (filename . "\\Makefile\\'")
