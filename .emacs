@@ -424,6 +424,7 @@ Lisp code." t)
 ;; (lol)
 (setq ibuffer-saved-filter-groups
       '(("home"
+         ("dired" (mode . dired-mode))
          ("readme" (filename . "README"))
          ("todo" (filename . "TODO"))
          ("json" (filename . "\\.json\\'"))
@@ -502,6 +503,8 @@ Lisp code." t)
            (name . "info")
            (name . "doc")
            (name . "Doc")))
+         ("yaml" (filename . "\\.yaml\\'"))
+         ("man pages" (mode . Man-mode))
          ("default" (name . "")))))
 
 (add-hook 'ibuffer-mode-hook
