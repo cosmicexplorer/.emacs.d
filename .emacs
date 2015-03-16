@@ -1247,22 +1247,6 @@ parentheses. CURRENTLY BROKEN"
   `(when (eq system-type ,type)
      ,@body))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(TeX-engine (quote luatex))
- '(asm-comment-char 35)
- '(coffee-tab-width 2)
- '(color-theme-directory "~/.emacs.d/color-themes")
- '(fill-column 80)
- '(gud-key-prefix "")
- '(org-support-shift-select (quote always))
- '(server-delete-tty t)
- '(yank-pop-change-selection t))
-(put 'erase-buffer 'disabled nil)
-
 ;;; save visited files
 (defvar save-visited-files t)
 (defvar saved-files "~/.emacs.d/saved-files")
@@ -1283,10 +1267,9 @@ parentheses. CURRENTLY BROKEN"
                (forward-line)))
     (kill-buffer))
   ;; save visiting files
-  (add-hook
-   'kill-emacs-hook
-   (lambda ()
-       (with-current-buffer (find-file (expand-file-name saved-files))
+  (defun save-visiting-files-to-buffer ()
+    (interactive)
+    (with-current-buffer (find-file (expand-file-name saved-files))
          (erase-buffer)
          (loop for buf in (buffer-list)
                do (unless (or
@@ -1295,7 +1278,11 @@ parentheses. CURRENTLY BROKEN"
                                          (expand-file-name saved-files)))
                     (insert (buffer-file-name buf))
                     (newline)))
-         (save-buffer)))))
+         (save-buffer)
+         (kill-buffer)))
+  (add-hook
+   'kill-emacs-hook
+   'save-visiting-files-to-buffer))
 
 ;; TODO: integrate schmidt's emacs into this one
 
@@ -1359,35 +1346,28 @@ parentheses. CURRENTLY BROKEN"
 ;; (setq line-number-mode t)
 ;; (setq enable-local-variables t)
 ;; (setq auto-fill-default t) ;; make new buffers be in auto fill mode by default
-;; (setq auto-save-interval 600)     ; half as often as default
-;; (setq-default indent-tabs-mode nil)
-;; (setq gc-cons-threshold 2000000)
-;; (setq lpr-switches '("-Pps"))
-;; (setq text-mode-hook 'turn-on-auto-fill)
-;; (setq default-truncate-lines nil)
-;; (setq visible-bell t)
-;; (setq require-final-newline t)
-;; (setq version-control t)
-;; (setq abbrev-all-caps t)
-;; (put 'eval-expression 'disabled t)
-;; (setq trim-versions-without-asking t)
-;; (setq mode-line-inverse-video t)
-;; (setq-default nuke-trailing-whitespace-p t)
-;; (setq default-tab-width 8)
-;; (setq explicit-shell-file-name "/pkg/local/bin/tcsh");
-;;
-;; (autoload 'html-helper-mode "html-helper-mode" "HTML rules!" t)
-;; (autoload 'ispell-word "ispell" "Check spelling of word at or before point" t)
-;; (autoload 'ispell-complete-word "ispell" "Complete word at or before point" t)
-;; (autoload 'ispell-region "ispell" "Check spelling of region" t)
-;; (autoload 'ispell-buffer "ispell" "Check spelling of buffer" t)
-;; (autoload 'webster "webster" "look up a word in Webster's 7th edition" t)
-;;
-;; (fmakunbound 'c-mode)
-;; (makunbound 'c-mode-map)
-;; (fmakunbound 'c++-mode)
-;; (makunbound 'c++-mode-map)
-;;
+(setq auto-save-interval 600)     ; half as often as default
+(setq gc-cons-threshold 2000000)
+(setq lpr-switches '("-Pps"))
+(setq text-mode-hook 'turn-on-auto-fill)
+(setq default-truncate-lines nil)
+(setq visible-bell t)
+(setq require-final-newline t)
+(setq version-control t)
+(setq abbrev-all-caps t)
+(put 'eval-expression 'disabled nil)
+
+;;; i'm not sure what these do
+(setq trim-versions-without-asking t)
+(setq mode-line-inverse-video t)
+(setq-default nuke-trailing-whitespace-p t)
+
+(autoload 'html-helper-mode "html-helper-mode" "HTML rules!" t)
+(autoload 'ispell-word "ispell" "Check spelling of word at or before point" t)
+(autoload 'ispell-complete-word "ispell" "Complete word at or before point" t)
+(autoload 'ispell-region "ispell" "Check spelling of region" t)
+(autoload 'ispell-buffer "ispell" "Check spelling of buffer" t)
+
 ;; (setq load-path (cons (expand-file-name "~/lib/lisp") load-path))
 ;; (autoload 'c++-mode "cc-mode" "C++ Editing Mode" t)
 ;; (autoload 'c-mode   "cc-mode" "C Editing Mode" t)
@@ -1511,9 +1491,9 @@ parentheses. CURRENTLY BROKEN"
 ;; (kill-line)
 ;; (just-one-space))
 ;;
-;; (defun load-display-time () "load the display time upon invocation!"
-;; (setq display-time-day-and-date t)
-;; (display-time))
+(defun load-display-time () "load the display time upon invocation!"
+(setq display-time-day-and-date t)
+(display-time))
 ;;
 ;; (defun save-modified-buffers () "saves all modified file buffers w/o query"
 ;; (interactive)
@@ -1803,9 +1783,9 @@ parentheses. CURRENTLY BROKEN"
 ;; ; Things to do everytime we start up!
 ;; ;---------------------------------------------------------------------------
 ;;
-;; (load-display-time)
-;;
-;; (put 'downcase-region 'disabled nil)
+(load-display-time)
+
+(put 'downcase-region 'disabled nil)
 ;; (custom-set-variables
 ;; ;; custom-set-variables was added by Custom.
 ;; ;; If you edit it by hand, you could mess it up, so be careful.
@@ -1817,3 +1797,31 @@ parentheses. CURRENTLY BROKEN"
 ;; ;; If you edit it by hand, you could mess it up, so be careful.
 ;; ;; Your init file should contain only one such instance.
 ;; ;; If there is more than one, they won't work right.
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(TeX-engine (quote luatex))
+ '(safe-local-variable-values
+   (quote ((TeX-master . "proposal")
+           (add-log-time-format
+            lambda nil
+            (progn
+              (setq tz
+                    (getenv "TZ"))
+              (set-time-zone-rule "UTC")
+              (setq time
+                    (format-time-string "%a %b %e %H:%M:%S %Z %Y"
+                                        (current-time)))
+              (set-time-zone-rule tz) time)))))
+ '(asm-comment-char 35)
+ '(coffee-tab-width 2)
+ '(color-theme-directory "~/.emacs.d/color-themes")
+ '(fill-column 80)
+ '(gud-key-prefix "")
+ '(org-support-shift-select (quote always))
+ '(server-delete-tty t)
+ '(yank-pop-change-selection t))
+(put 'erase-buffer 'disabled nil)
