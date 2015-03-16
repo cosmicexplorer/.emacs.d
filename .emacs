@@ -483,7 +483,7 @@ Lisp code." t)
          ("latex package" (filename . "\\.sty\\'"))
          ("gitignore" (filename . "\\.gitignore\\'"))
          ("clang-format" (filename . "\\.clang-format\\'"))
-         ("table" (filename . "\\.tbl\\'"))
+         ("syscall table" (filename . "\\.tbl\\'"))
          ("emacs-system"
           (or (name . "\*eshell\*")
               (name . "\*scratch\*")
