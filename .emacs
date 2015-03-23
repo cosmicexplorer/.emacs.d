@@ -1,6 +1,11 @@
 ;;; emacs config, aka the root node of a massively unbalanced configuration tree
-;;; by Danny McClanahan, <danieldmcclanahan@gmail.com>, 2014
+;;; by Danny McClanahan, <danieldmcclanahan@gmail.com>, 2014-2015
 
+;;; let's not hardcode everyhing like back in 9th grade
+(defvar init-home-folder-dir "~/.emacs.d/")
+
+;;; added up here cause a lot of packages depend on it being defined without
+;;; defining it themselves
 (require 'cl)
 
 ;; starts emacs in server form so i can use emacsclient to add files
@@ -10,210 +15,30 @@
          (not (server-running-p)))
     (server-start))
 
-(byte-recompile-directory (expand-file-name "~/.emacs.d") 0)
-(delete-windows-on "*Compile-Log*")
+;;; automate everythingggggggggg
+(defun load-my-init-script (file-name)
+  "Loads script located in init-scripts directory."
+  (load-file (concat init-home-folder-dir) "init-scripts/" file-name))
 
-;;; MELPA
-(require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-(when (< emacs-major-version 24)
-  ;; For important compatibility libraries like cl-lib
-  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
-(when (not package-archive-contents)
-  (package-refresh-contents))
-(package-initialize)
-(defvar my-packages)
-(setq my-packages '(
-                    2048-game
-                    auctex
-		    better-defaults
-                    cider
-                    clojure-mode
-                    coffee-mode
-                    color-theme
-                    company
-                    dash
-                    ein
-                    epl
-                    evil
-                    espuds
-                    go-mode
-                    helm
-                    helm-swoop
-                    less-css-mode
-                    linum
-                    linum-relative
-                    magit
-                    markdown-mode
-                    minimap
-                    misc-cmds
-                    multiple-cursors
-                    noflet
-                    paredit
-                    pkg-info
-                    php-mode
-                    queue
-                    rainbow-mode
-                    rainbow-delimiters
-                    s
-                    slime
-                    smartrep
-                    undo-tree
-                    web-beautify
-                    w3m
-                    ))
-(loop for p in my-packages
-  do (unless (package-installed-p p)
-       (package-install p)))
+;;; load the packages i like
+(load-my-init-script "packages.el")
+
+;;; byte-compile everything: slow on first startup, but /significantly/ faster
+;;; during normal usage
+(byte-recompile-directory
+ ;; needs expand-file-name for some reason i don't understand
+ (expand-file-name init-home-folder-dir) 0)
+(delete-windows-on "*Compile-Log*")     ; nobody wants to see that
+
+;;; enforce my strong opinions on the default emacs ui
+(load-my-init-script "interface.el")
 
 ;;; TODO: document no-beautify and saved-files!
 
-;;; ein setup
-(require 'ein)
-(setq ein:use-auto-complete-superpack t)
-(require 'smartrep)
-(setq ein:use-smartrep t)
-
-;;; setup slime
-(setq inferior-lisp-program (executable-find "sbcl"))
-(setq slime-contribs '(slime-fancy))
-(load-file (expand-file-name "~/.emacs.d/quicklisp/slime-helper.el"))
-
-;;;;; globally useful things
-;; stop the intro to emacs buffer
-(setq inhibit-startup-echo-area-message t)
-(setq inhibit-startup-message t)
-(define-key help-map "a" 'apropos)      ; get useful help for once
-(menu-bar-mode 0) ;; remove menu bar for another line of space
-(tool-bar-mode 0)
-(setq scroll-step 1)
-(setq scroll-conservatively 10000)
-;;; point in buffer not preserved between scrolls due to internal emacs logic
-;; (point must always be in frame), but save-point and goto-saved-point work
-(scroll-bar-mode 0)
-(set-face-attribute 'default nil :height 100)
-(transient-mark-mode 0)                 ; turn that off lol
-(setq shift-select-mode t)
-(setq scroll-preserve-screen-position t)
-(global-auto-revert-mode)
-;;; indentation silliness
-(add-hook 'after-change-major-mode-hook  ; show whitespace
-          '(lambda ()
-             (unless (or (eq major-mode 'w3m-mode)
-                         (eq major-mode 'eshell-mode)
-                         (eq major-mode 'ibuffer-mode)
-                         (eq major-mode 'undo-tree-visualizer-mode))
-               (setq show-trailing-whitespace t))))
-(setq-default indent-tabs-mode nil)     ;; use spaces not tabs
-(fset 'perl-mode 'cperl-mode)           ; TODO: is this what i want?
-(setq cperl-indent-level 2)
-(setq tab-width 2)
-(setq-default c-basic-offset 2) ;; cc-mode uses this instead of tab-width
-;; Remove trailing whitespace from a line
-(setq-default nuke-trailing-whitespace-p t)
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-;; fix input issues in xterm (can't hold down shift and up arrow to
-;; highlight stuff)
-(when (string-match "xterm" (if (tty-type) (tty-type) ""))
-  (define-key input-decode-map "\e[1;2A" [S-up])
-  (define-key input-decode-map "\033[4~" [end]))
-
+;;; TODO: fix this
 ;;; perl stuff
 ;; (eval-after-load "cperl-mode"
 ;;   '(define-key cperl-mode-map (kbd "C-c C-k") 'smart-compile))
-
-;;; FONTS
-(when (member "Telegrama" (font-family-list))
-  (add-to-list 'default-frame-alist '(font . "Telegrama 10"))
-  (set-face-attribute 'default t :font "Telegrama 10")
-  (set-frame-font "Telegrama 10"))
-
-;;; so i can sudo edit files with C-x C-f /sudo::/path/to/file
-(require 'tramp)
-
-;;; shell-script mode indentation
-(defun setup-sh-indentation ()
-  (setq sh-basic-offset 2)
-  (setq sh-indentation 2))
-(add-hook 'sh-mode-hook 'setup-sh-indentation)
-
-;;; have normal delete/selection (type over selected text to delete)
-(delete-selection-mode 1)
-
-;; do backups well and put them into a separate folder
-(setq backup-directory-alist `(("." . "~/.emacs.d/autosaved-files")))
-(setq backup-by-copying t)
-(setq delete-old-versions t
-      kept-new-versions 6
-      kept-old-versions 2
-      version-control t)
-;; do the same thing for undo-tree history
-(setq undo-tree-history-directory-alist
-      '((".*" . "~/.emacs.d/undo-tree-history")))
-(setq undo-tree-visualizer-timestamps t)
-
-;;; highlight cursor when over 80 chars
-(add-to-list 'load-path "~/.emacs.d/lisp")
-(require 'highlight-80+)
-(add-hook 'prog-mode-hook #'highlight-80+-mode)
-(add-hook 'prog-mode-hook #'auto-fill-mode)
-(add-hook 'prog-mode-hook #'(lambda ()
-                              (set-fill-column 80)))
-(add-hook 'text-mode-hook #'highlight-80+-mode)
-(add-hook 'text-mode-hook #'auto-fill-mode)
-(add-hook 'text-mode-hook #'(lambda ()
-                              (set-fill-column 80)))
-
-(require 'misc-cmds)
-
-;;;;; setup specific modes for specific filetypes
-;; paredit
-(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of
-Lisp code." t)
-(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-
-;;;;; random per-language editing things
-;; format comments like a normal person
-(add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
-(add-hook 'fundamental-mode-hook (lambda ()
-                                   (setq comment-start "- " comment-end "")))
-;;; TODO: this doesn't work! figure out why
-(add-hook 'r-mode-hook (lambda () (setq comment-start "# " comment-end   "")))
-(add-hook 'ess-mode-hook (lambda () (setq comment-start "# " comment-end   "")))
-(add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
-(add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; "
-                                                 comment-end "")))
-(add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
-(add-hook 'asm-mode-hook (lambda () (setq comment-start "# " comment-end "")))
-(add-hook 'LaTeX-mode-hook (lambda ()
-                             (setq comment-start "% " comment-end "")
-                             (auto-fill-mode -1)
-                             (highlight-80+-mode -1)))
-(add-hook 'org-mode-hook (lambda ()
-                             (setq comment-start "% " comment-end "")
-                             (auto-fill-mode -1)
-                             (highlight-80+-mode -1)))
-(add-hook 'markdown-mode-hook (lambda ()
-                                (auto-fill-mode -1)
-                                (highlight-80+-mode -1)))
-(add-hook 'html-mode-hook (lambda ()
-                            (setq comment-start "<!--" comment-end "-->")))
-
-(setq c-hanging-semi&comma-criteria nil) ; stop inserting newlines after
-                                        ; semicolons i don't like that
-(setq c-default-style nil)
-(subword-mode)                          ; turn camel-case on
-(setq auto-mode-alist                   ; use python-mode for scons files
-      (cons '("SConstruct" . python-mode) auto-mode-alist))
-(setq auto-mode-alist
-      (cons '("SConscript" . python-mode) auto-mode-alist))
 
 ;;; cause otherwise this doens't work in graphical
 (global-set-key (kbd "<C-return>") 'newline-and-indent)
