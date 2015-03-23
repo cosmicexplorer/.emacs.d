@@ -58,9 +58,9 @@
 ;;-------------------------------------------------------
 (provide 'qmake-mode)
 
-;; User define variable, set to which qmake to use also add 
+;; User define variable, set to which qmake to use also add
 ;; possible arguments for qmake.
-;; To set it use M-x set-variable <ret> qmake-command-str 
+;; To set it use M-x set-variable <ret> qmake-command-str
 ;; <ret> "/usr/local/bin/qmake"
 (defvar qmake-command-str "qmake -Wall"
   "*This variable will set the  qmake whereabout and options for compiling"
@@ -488,7 +488,7 @@
         (line-number-list ())
         (first-error nil)
         )
-    (progn 
+    (progn
       (shell-command (concat qmake-command-str " " file-name))
       (switch-to-buffer-other-window "*Shell Command Output*")
       (qmake-highlight-error)
@@ -505,7 +505,7 @@
           (delete-windows-on "*Shell Command Output*")
           (message "Compiled successfully")
           )
-        
+
 				)
 			)
 		)
@@ -525,7 +525,7 @@
         (qmake-compile-error-points ())
         )
     (while (integerp my-point)
-      (progn 
+      (progn
         (push my-point qmake-compile-error-points)
         (goto-char my-point)
         (setq my-point (search-forward-regexp ":[0-9]*:" (point-max) t))
@@ -542,7 +542,7 @@
   "Highlight error in the compile buffer"
   (save-excursion)
   (highlight-regexp ":[0-9]*:")
-  
+
   )
 
 
@@ -570,14 +570,14 @@
 
 
 (defun qmake-compile-list-error()
-  "Search through the buffer after compile errors, 
+  "Search through the buffer after compile errors,
    it then returns a list of these points"
   (let (
         (my-point (search-forward-regexp ":[0-9]*:" (point-max) t))
         (error-points ())
         )
     (while (integerp my-point)
-      (progn 
+      (progn
         (push my-point error-points)
         (goto-char my-point)
         (setq my-point (search-forward-regexp ":[0-9]*:" (point-max) t))
@@ -590,7 +590,7 @@
 
 (defun qmake-compile-error-line-nr(current-pos)
   "Returns the number for which the error occured while compiling
-   For example asdha/asdas:19: 
+   For example asdha/asdas:19:
                               ^- Current-pos (after search-forward-regexp)
    Will return number 19"
   (let (
@@ -604,10 +604,12 @@
         (st-error-point nil)
         (end-error-point nil)
         )
-    (progn 
+    (progn
       (setq error-line-text (buffer-substring-no-properties start-of-line current-pos))
       (setq st-error-point (+ (+ (string-match ":[0-9]+" error-line-text) 1) start-of-line))
       (string-to-number (buffer-substring-no-properties st-error-point  current-pos))
       )
     )
   )
+
+(provide 'qmake)

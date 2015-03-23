@@ -9,8 +9,6 @@
 ;; Depending on your configuration and coding style, you might need to modify
 ;; 'style' in clang-format, below.
 
-(require 'json)
-
 ;; *Location of the clang-format binary. If it is on your PATH, a full path name
 ;; need not be specified.
 (defvar clang-format-binary "clang-format")
@@ -60,3 +58,5 @@
 	"Use clang-format to format the current line."
 	(interactive)
 	(clang-format (line-beginning-position) (line-end-position)))
+
+(provide 'clang-format)
