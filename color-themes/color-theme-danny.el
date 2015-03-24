@@ -15,6 +15,8 @@
      (bold-italic ((t (:foreground "dark magenta" :bold t :italic t))))
      (font-lock-comment-face
       ((t (:foreground "white" :background "dark magenta"))))
+     (font-lock-warning-face
+      ((t (:foreground "red" :background "white"))))
      (modeline-buffer-id ((t (:background "orange"
                                           :foreground "dark red"
                                           :underline nil))))

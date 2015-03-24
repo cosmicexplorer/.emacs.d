@@ -114,6 +114,8 @@ Lisp code." t)
 ;;; js/css/html
 (setq js-indent-level 2)
 (setq css-indent-offset 2)
+(fset 'js-mode 'js2-mode)
+(add-to-list 'auto-mode-alist '("\\.gyp\\'" . js2-mode))
 
 ;;; syntax highlighting
 (global-font-lock-mode 1)               ; turn on syntax highlighting

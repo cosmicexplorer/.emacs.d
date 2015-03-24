@@ -86,7 +86,8 @@
          ("readme" (filename . "README"))
          ("todo" (filename . "TODO"))
          ("json" (filename . "\\.json\\'"))
-         ("javascript" (mode . js-mode))
+         ("gyp" (filename . "\\.gyp\\'"))
+         ("javascript" (mode . js2-mode))
          ("emacs-config" (or (filename . ".emacs.d")
                              (filename . "emacs-config")
                              (filename . ".emacs")))
@@ -164,6 +165,7 @@
          ("yaml" (filename . "\\.yaml\\'"))
          ("man pages" (mode . Man-mode))
          ("default" (name . "")))))
+
 ;;; more ibuffer stuff
 (add-hook 'ibuffer-mode-hook
           '(lambda ()

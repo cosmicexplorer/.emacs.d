@@ -209,14 +209,14 @@ annoying. This fixes that."
     (setq fin-point (point)
           cap-letter-index (- fin-point cur-point))
     ;; check if string is all caps; if so, skip
-    (if (not (string-is-capitalized-p (buffer-substring cur-point fin-point)))
-        (progn
-          (loop for letter-index from 1 upto (- fin-point cur-point)
-                while (= cap-letter-index (- fin-point cur-point))
-                do (if (char-is-capitalized-p
-                        (char-after (+ cur-point letter-index)))
-                       (setq cap-letter-index letter-index)))
-          (goto-char (+ cur-point cap-letter-index))))))
+    (when (not (string-is-capitalized-p (buffer-substring cur-point fin-point)))
+      (progn
+        (loop for letter-index from 1 upto (- fin-point cur-point)
+              while (= cap-letter-index (- fin-point cur-point))
+              do (if (char-is-capitalized-p
+                      (char-after (+ cur-point letter-index)))
+                     (setq cap-letter-index letter-index)))
+        (goto-char (+ cur-point cap-letter-index))))))
 
 (defun camel-case-left-word ()
   (interactive "^")                     ; highlights region if shifted
@@ -227,14 +227,14 @@ annoying. This fixes that."
     (setq fin-point (point)
           cap-letter-index (- fin-point cur-point))
     ;; check if string is all caps; if so, skip
-    (if (not (string-is-capitalized-p (buffer-substring cur-point fin-point)))
-        (progn
-          (loop for letter-index from -1 downto (- fin-point cur-point)
-                while (= cap-letter-index (- fin-point cur-point))
-                do (if (char-is-capitalized-p
-                        (char-after (+ cur-point letter-index)))
-                       (setq cap-letter-index letter-index)))
-          (goto-char (+ cur-point cap-letter-index))))))
+    (when (not (string-is-capitalized-p (buffer-substring cur-point fin-point)))
+      (progn
+        (loop for letter-index from -1 downto (- fin-point cur-point)
+              while (= cap-letter-index (- fin-point cur-point))
+              do (if (char-is-capitalized-p
+                      (char-after (+ cur-point letter-index)))
+                     (setq cap-letter-index letter-index)))
+        (goto-char (+ cur-point cap-letter-index))))))
 
 (defun kill-selected-region-default (&optional lines)
   "When selection highlighted, C-k stores all characters in the kill ring,

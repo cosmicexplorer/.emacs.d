@@ -23,7 +23,18 @@
 
 ;;; load the packages i like
 (load-my-init-script "packages")
+
+;;; byte-compile everything: slow on first startup, but /significantly/ faster
+;;; during normal usage
+(byte-recompile-directory
+ ;; needs expand-file-name for some reason i don't understand
+ (expand-file-name init-home-folder-dir) 0)
+(when (get-buffer "*Compile-Log*")
+  ;; nobody wants to see that
+  (delete-windows-on "*Compile-Log*"))
+
 ;;; load elisp
+;;; should be /after/ byte-recompilation
 (load-my-init-script "requires")
 ;;; functions used throughout
 (load-my-init-script "functions")
@@ -37,15 +48,6 @@
 (load-my-init-script "languages")
 ;;; cause what else is emacs for
 (load-my-init-script "keybindings")
-
-;;; byte-compile everything: slow on first startup, but /significantly/ faster
-;;; during normal usage
-(byte-recompile-directory
- ;; needs expand-file-name for some reason i don't understand
- (expand-file-name init-home-folder-dir) 0)
-(when (get-buffer "*Compile-Log*")
-  ;; nobody wants to see that
-  (delete-windows-on "*Compile-Log*"))
 
 ;;; TODO: document no-beautify and saved-files!
 

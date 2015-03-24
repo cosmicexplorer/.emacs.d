@@ -15,9 +15,8 @@
   (package-refresh-contents))
 (package-initialize)
 
-(defvar my-packages)
-(setq my-packages '(                    ; setq over defvar for easier testing
-                    2048-game           ; (can't update value with defvar)
+(defvar my-packages '(
+                    2048-game
                     auctex
 		    better-defaults
                     cider
@@ -33,6 +32,7 @@
                     go-mode
                     helm
                     helm-swoop
+                    js2-mode
                     less-css-mode
                     linum
                     linum-relative

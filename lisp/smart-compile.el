@@ -154,6 +154,8 @@ evaluate FUNCTION instead of running a compilation command.
 (make-variable-buffer-local 'smart-compile-check-makefile)
 (defvar smart-compile-check-scons-files t)
 (make-variable-buffer-local 'smart-compile-check-scons-files)
+(defvar smart-compile-check-gyp t)
+(make-variable-buffer-local 'smart-compile-check-gyp)
 
 (defcustom smart-compile-make-program "make "
   "The command by which to invoke the make program."
@@ -215,10 +217,27 @@ which is defined in `smart-compile-alist'."
               (set (make-local-variable 'compile-command) "make -k ")))
 
             (call-interactively 'compile)
-            (setq not-yet nil)
-            )
+            (setq not-yet nil))
         (setq smart-compile-check-makefile nil)))
 
+     ((and smart-compile-check-gyp
+           (or (file-readable-p "binding.gyp")
+               (file-readable-p "../binding.gyp")
+               (file-readable-p "../../binding.gyp")))
+      (if (y-or-n-p "binding.gyp found. Try 'npm build'?")
+          (progn
+            (cond
+             ((file-readable-p "../../binding.gyp")
+              (set
+               (make-local-variable 'compile-command) "npm build ../.."))
+             ((file-readable-p "../binding.gyp")
+              (set
+               (make-local-variable 'compile-command) "npm build .."))
+             (t
+              (set (make-local-variable 'compile-command) "npm build .")))
+            (call-interactively 'compile)
+            (setq not-yet nil))
+        (setq smart-compile-check-gyp nil)))
 
      ((and smart-compile-check-scons-files
            (or (file-readable-p "SConstruct")
@@ -237,8 +256,7 @@ which is defined in `smart-compile-alist'."
              (t (set (make-local-variable 'compile-command) "scons -k "))
              )
             (call-interactively 'compile)
-            (setq not-yet nil)
-            )
+            (setq not-yet nil))
         (setq smart-compile-check-scons-files nil)))
 
      ) ;; end of (cond ...)

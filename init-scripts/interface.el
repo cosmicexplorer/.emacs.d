@@ -171,3 +171,10 @@
 ;;; i'm not sure what these do
 (setq trim-versions-without-asking t)
 (setq mode-line-inverse-video t)
+
+;;; setup syntax highlighting for keywords i care about
+;;; TODO: set up this highlighting. font-lock doesn't seem to be working since
+;;; any code that is already in a comment is already fontified by
+;;; comment-lock-face, so you can't refontify it. ughhhhhhhhh
+;;; a regex to use for this situation
+;;; "TODO\\|FIXME\\|FIX\\|DEPRECATED\\|XXX\\|HACK\\|IFFY\\|CHANGED"
