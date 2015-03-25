@@ -109,9 +109,6 @@ also."
   (let ((case-fold-search nil))
     (string-match-p "\\`[A-Z]*\\'" str)))
 
-;;; stolen from the ergo emacs guy
-;;; TODO: figure out how to make the region remain the same when shift selecting
-;;; from right side!
 (defun toggle-letter-case ()
   "Toggle the letter case of current word or text selection.
 Toggles between: lowercase->ALL CAPS->Initial Caps->(cycle)."
