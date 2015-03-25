@@ -109,7 +109,7 @@ also."
   (let ((case-fold-search nil))
     (string-match-p "\\`[A-Z]*\\'" str)))
 
-;; stolen from the ergo emacs guy
+;;; stolen from the ergo emacs guy
 ;;; TODO: figure out how to make the region remain the same when shift selecting
 ;;; from right side!
 (defun toggle-letter-case ()
@@ -174,8 +174,13 @@ Toggles between: lowercase->ALL CAPS->Initial Caps->(cycle)."
               (when (uppercasep next-char)
                 (goto-char (+ beg pt))
                 (delete-char 1)
-                (insert-char (downcase next-char) 1 t)))))))
-    (goto-char orig-pt)))
+                (insert-char (downcase next-char) 1 t))))))
+      (goto-char orig-pt)
+      (set-mark end))))
+
+(defadvice toggle-letter-case (after deactivate-mark-nil activate)
+  (when (called-interactively-p)
+    (setq deactivate-mark nil)))
 
 (defun newline-and-indent-fix-cc-mode ()
   "cc-mode's indentation procedures upon adding a new bracket or paren are
