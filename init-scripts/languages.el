@@ -144,9 +144,10 @@ Lisp code." t)
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-(add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
-(add-to-list 'auto-mode-alist '("readme\\.md\\'" . gfm-mode))
-(add-to-list 'auto-mode-alist '("Readme\\.md\\'" . gfm-mode))
+;;; TODO: figure out why markdown-mode.el chooses to cripple gfm-mode
+;; (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+;; (add-to-list 'auto-mode-alist '("readme\\.md\\'" . gfm-mode))
+;; (add-to-list 'auto-mode-alist '("Readme\\.md\\'" . gfm-mode))
 
 ;;; coffeescript
 (eval-after-load "coffee-mode"
