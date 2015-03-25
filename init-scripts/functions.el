@@ -95,36 +95,87 @@ also."
     (ibuffer-jump-to-buffer recent-buffer-name)))
 (ad-activate 'ibuffer)
 
+;;; helper functions for toggle-letter-case
+;;; https://stackoverflow.com/questions/27798296/check-if-a-character-not-string-is-lowercase-uppercase-alphanumeric
+(defun wordp (c)
+  (= ?w (char-syntax c)))
+(defun lowercasep (c)
+  (and (wordp c) (= c (downcase c))))
+(defun uppercasep (c)
+  (and (wordp c) (= c (upcase c))))
+(defun whitespacep (c)
+  (= 32 (char-syntax c)))
+(defun string-capitalized-p (str)
+  (let ((case-fold-search nil))
+    (string-match-p "\\`[A-Z]*\\'" str)))
+
 ;; stolen from the ergo emacs guy
+;;; TODO: figure out how to make the region remain the same when shift selecting
+;;; from right side!
 (defun toggle-letter-case ()
   "Toggle the letter case of current word or text selection.
-Toggles between: “all lower”, “Init Caps”, “ALL CAPS”."
+Toggles between: lowercase->ALL CAPS->Initial Caps->(cycle)."
   (interactive)
-  (let (p1 p2 (deactivate-mark nil) (case-fold-search nil))
-    (if (region-active-p)
-        (setq p1 (region-beginning) p2 (region-end))
-      (let ((bds (bounds-of-thing-at-point 'word)))
-        (setq p1 (car bds) p2 (cdr bds))))
-    (when (not (eq last-command this-command))
-      (save-excursion
-        (goto-char p1)
-        (cond
-         ((looking-at "[[:lower:]][[:lower:]]") (put this-command 'state "all
-lower"))
-         ((looking-at "[[:upper:]][[:upper:]]") (put this-command 'state "all
-caps"))
-         ((looking-at "[[:upper:]][[:lower:]]") (put this-command 'state "init
-caps"))
-         ((looking-at "[[:lower:]]") (put this-command 'state "all lower"))
-         ((looking-at "[[:upper:]]") (put this-command 'state "all caps"))
-         (t (put this-command 'state "all lower")))))
-    (cond
-     ((string= "all lower" (get this-command 'state))
-      (upcase-initials-region p1 p2) (put this-command 'state "init caps"))
-     ((string= "init caps" (get this-command 'state))
-      (upcase-region p1 p2) (put this-command 'state "all caps"))
-     ((string= "all caps" (get this-command 'state))
-      (downcase-region p1 p2) (put this-command 'state "all lower")))))
+  (let ((orig-pt (point)))
+    (let* ((beg (region-beginning))
+           (end (region-end))
+           (reg (buffer-substring-no-properties beg end))
+           (case-fold-search nil))
+      (cond
+       ((not (string-match "[A-Z]" reg))
+        ;; if no uppercase (all lowercase)
+        ;; -> ALL CAPS
+        (loop
+         ;; not sure why the 1- is required
+         ;; i think it's some silly intricacy of emacs region selection
+         for pt from 0 upto (1- (- end beg))
+         with next-char = 0
+         do (progn
+              (setq next-char (aref reg pt))
+              (when (lowercasep next-char)
+                (goto-char (+ beg pt))
+                ;; delete, then insert; net zero change
+                (delete-char 1)
+                (insert-char (upcase next-char) 1 t)))))
+       ((not (string-match "[a-z]" reg))
+        ;; if no lowercase (all uppercase)
+        ;; -> Initial Caps
+        (let ((before-first-char (char-before beg))
+              (first-char (char-after beg)))
+          (when (and (not (wordp before-first-char))
+                   (lowercasep first-char))
+            (goto-char beg)
+            (delete-char 1)
+            (insert-char (upcase first-char) 1 t)))
+        (loop
+         for pt from 1 upto (1- (- end beg))
+         with next-char = 0 and prev-char = 0
+         do (progn
+              (setq next-char (aref reg pt)
+                    prev-char (aref reg (1- pt)))
+              (cond ((and (not (wordp prev-char))
+                          (lowercasep next-char))
+                     (goto-char (+ beg pt))
+                     (delete-char 1)
+                     (insert-char (downcase next-char)))
+                    ((and (wordp prev-char)
+                          (uppercasep next-char))
+                     (goto-char (+ beg pt))
+                     (delete-char 1)
+                     (insert-char (downcase next-char) 1 t))))))
+       (t
+        ;; if mixture of upper/lowercase, "assume" Init Caps
+        ;; -> lowercase
+        (loop
+         for pt from 0 upto (1- (- end beg))
+         with next-char = 0
+         do (progn
+              (setq next-char (aref reg pt))
+              (when (uppercasep next-char)
+                (goto-char (+ beg pt))
+                (delete-char 1)
+                (insert-char (downcase next-char) 1 t)))))))
+    (goto-char orig-pt)))
 
 (defun newline-and-indent-fix-cc-mode ()
   "cc-mode's indentation procedures upon adding a new bracket or paren are

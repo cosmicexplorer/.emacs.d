@@ -114,10 +114,6 @@
 (global-set-key (kbd "C-z") 'undo-tree-undo)
 (global-set-key (kbd "C-M-z") 'undo-tree-redo)
 
-;; kill all active dired buffers at once
-;;; TODO: make this kill all buffers that tend to accumulate (helm/dired/tramp)
-(global-set-key (kbd "C-x M-d") 'kill-dired-buffers)
-
 ;; open new file with given filename from minibuffer, or blank filename
 (global-set-key (kbd "C-x C-n") 'open-new-file)
 

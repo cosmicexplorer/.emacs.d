@@ -177,4 +177,4 @@
 ;;; any code that is already in a comment is already fontified by
 ;;; comment-lock-face, so you can't refontify it. ughhhhhhhhh
 ;;; a regex to use for this situation
-;;; "TODO\\|FIXME\\|FIX\\|DEPRECATED\\|XXX\\|HACK\\|IFFY\\|CHANGED"
+;;; "TODO\\|FIXME\\|FIX\\|DEPRECATED\\|XXX\\|HACK\\|IFFY\\|CHANGED\\|OPTIMIZATION"
