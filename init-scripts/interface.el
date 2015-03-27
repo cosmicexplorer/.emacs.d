@@ -184,7 +184,8 @@
                     "IFFY" "iffy" "Iffy"
                     "CHANGED" "changed" "Changed"
                     "OPTIMIZATION" "optimization" "Optimization"
-                    "BROKEN" "broken" "Broken"))
+                    "BROKEN" "broken" "Broken")
+                  'words)
      0 font-lock-warning-face t))
   "Keywords to apply extra highlights to.")
 (defun warning-highlights-turn-on ()
