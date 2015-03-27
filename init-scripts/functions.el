@@ -517,10 +517,15 @@ parentheses. CURRENTLY BROKEN"
              (setq kill-ring-yank-pointer (cdr kill-ring-yank-pointer))))
   (paredit-yank-pop))
 
+;;; functions to save point in a file; for example, when you have a place you
+;;; are modifying but often need to move somewhere else and return back, and you
+;;; don't have enough screen space to split screen constantly
+;;; TODO: make some functionality to keep point in the same spot when scrolling
+;;; so this little hack isn't needed anymore
 (let ((saved-point 1))
   (defun save-point ()
-    "Saves point in a single-value register. Use with goto-saved-point. Defaults
- to position 1."
+    "Saves point in a single-value register. Use goto-saved-point to return to
+that point."
     (interactive)
     (setq saved-point (point))
     (message (concat "Point saved (" (number-to-string saved-point) ")")))
@@ -533,14 +538,14 @@ parentheses. CURRENTLY BROKEN"
     (message
      (concat "Moved to saved point (" (number-to-string saved-point) ")"))))
 
+(defun load-display-time ()
+  "load the display time upon invocation!"
+  (setq display-time-day-and-date t)
+  (display-time))
+
 ;;; macros
 ;;; http://stackoverflow.com/a/26137517/2518889
 (defmacro with-system (type &rest body)
   "Evaluate body if `system-type' equals type."
   `(when (eq system-type ,type)
      ,@body))
-
-(defun load-display-time ()
-  "load the display time upon invocation!"
-  (setq display-time-day-and-date t)
-  (display-time))
