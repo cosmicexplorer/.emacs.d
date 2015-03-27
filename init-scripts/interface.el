@@ -173,8 +173,36 @@
 (setq mode-line-inverse-video t)
 
 ;;; setup syntax highlighting for keywords i care about
-;;; TODO: set up this highlighting. font-lock doesn't seem to be working since
-;;; any code that is already in a comment is already fontified by
-;;; comment-lock-face, so you can't refontify it. ughhhhhhhhh
-;;; a regex to use for this situation
-;;; "TODO\\|FIXME\\|FIX\\|DEPRECATED\\|XXX\\|HACK\\|IFFY\\|CHANGED\\|OPTIMIZATION"
+;;; this overrides comment highlighting now, thank god
+(defvar warning-highlights-keywords
+  `((,(regexp-opt '("TODO" "todo" "Todo"
+                    "FIXME" "fixme" "Fixme"
+                    "FIX" "fix" "Fix"
+                    "DEPRECATED" "deprecated" "Deprecated"
+                    "XXX" "xxx" "Xxx"
+                    "HACK" "hack" "Hack"
+                    "IFFY" "iffy" "Iffy"
+                    "CHANGED" "changed" "Changed"
+                    "OPTIMIZATION" "optimization" "Optimization"
+                    "BROKEN" "broken" "Broken"))
+     0 font-lock-warning-face t))
+  "Keywords to apply extra highlights to.")
+(defun warning-highlights-turn-on ()
+  "Turn on warning-highlights-mode."
+  (font-lock-add-keywords
+   nil
+   warning-highlights-keywords))
+(defun warning-highlights-turn-off ()
+  "Turn off warning-highlights-mode."
+  (font-lock-remove-keywords
+   nil
+   `(,@warning-highlights-keywords)))
+(define-minor-mode warning-highlights-mode
+  "radical"
+  :lighter " !!"
+  (progn
+    (if warning-highlights-mode
+        (warning-highlights-turn-on)
+      (warning-highlights-turn-off))
+    (font-lock-mode 1)))
+(add-hook 'prog-mode-hook #'warning-highlights-mode)
