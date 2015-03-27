@@ -178,6 +178,7 @@
   `((,(regexp-opt '("TODO" "todo" "Todo"
                     "FIXME" "fixme" "Fixme"
                     "FIX" "fix" "Fix"
+                    "NB" "nb" "Nb"
                     "DEPRECATED" "deprecated" "Deprecated"
                     "XXX" "xxx" "Xxx"
                     "HACK" "hack" "Hack"

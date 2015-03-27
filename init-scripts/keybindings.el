@@ -24,13 +24,14 @@
 (global-set-key (kbd "C-<right>") 'camel-case-right-word)
 (global-set-key (kbd "C-<left>") 'camel-case-left-word)
 ;;; toggle letter casing from ALLCAPS to InitialCase to all lowercase
-;;; TODO: doesn't work (used to though)
 (global-set-key (kbd "C-x M-c") 'toggle-letter-case)
 ;;; kill buffer without prompting
 (global-set-key (kbd "C-x k") 'kill-this-buffer)
 ;;; functions to save point in a file; for example, when you have a place you
 ;;; are modifying but often need to move somewhere else and return back, and you
 ;;; don't have enough screen space to split screen constantly
+;;; TODO: make some functionality to keep point in the same spot when scrolling
+;;; so this little hack isn't needed anymore
 (global-set-key (kbd "C-c C-s") 'save-point)
 (global-set-key (kbd "C-c C-a") 'goto-saved-point)
 
