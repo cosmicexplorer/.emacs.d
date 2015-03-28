@@ -45,16 +45,6 @@
   :group 'processes
   :prefix "smart-compile")
 
-;; unused, left in for reference on how it would work if lisp compilation in specific wasn't fucked
-(defun byte-compile-file-and-optimize () ;; uses compiled and optimized file instead of actual file
-  (interactive) ;; just in case i wanna call it by command
-  (byte-compile-file (file-name-nondirectory (buffer-file-name)))
-  ;; names the file the same as it was before after being byte-compiled
-  (shell-command (concatenate 'string "rm " (buffer-file-name))) ;; removes current version of file (!!!)
-  (shell-command (concatenate 'string "mv " (buffer-file-name) ".elc " (buffer-file-name))) ;; but re-adds it quickly so undo doesn't notice
-  (revbufs) ;; reloads buffer to reflect current contents, safely (???)
-  )
-
 (defun byte-compile-file-and-remove ()
   (interactive)
   (byte-compile-file (file-name-nondirectory (buffer-file-name)))
@@ -108,7 +98,8 @@
                                  (go-mode            . (go-fmt-file-and-compile))
                                  (coffee-mode        . "coffee -c %f")
                                  (qmake-mode         . "qmake")
-                                 (cmake-mode	      . "cmake %d")
+                                 (cmake-mode	     . "cmake %d")
+                                 (qmake-mode         . "qmake")
                                  )  "Alist of filename patterns vs corresponding format control strings.
 Each element looks like (REGEXP . STRING) or (MAJOR-MODE . STRING).
 Visiting a file whose name matches REGEXP specifies STRING as the
