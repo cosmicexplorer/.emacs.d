@@ -48,7 +48,7 @@
 ;;
 ;; Features that might be required by this library:
 ;;
-;;   `easy-mmmode'
+;;   `easy-mmode'
 
 ;;; Change Log:
 
@@ -77,10 +77,8 @@ when we don't have to indent."
   :group 'smart-tab)
 
 (defcustom smart-tab-completion-functions-alist
-  '(; (emacs-lisp-mode . lisp-complete-symbol)
-    ;; TODO: make this work
-    (lisp-mode . slime-complete-symbol)
-    (text-mode       . dabbrev-completion))
+  '((lisp-mode . slime-complete-symbol)
+    (text-mode . dabbrev-completion))
   "A-list of major modes in which to use a mode specific completion function.
 If current major mode is not found in this alist, fall back to
 `hippie-expand' or `dabbrev-expand', depending on the value of
@@ -151,27 +149,30 @@ the text at point."
                (eq major-mode 'c++-mode))
            (clang-format-buffer))
           ((eq major-mode 'js2-mode)
-           ;; (if (is-buffer-beautifiable (buffer-file-name))
-           ;;     (web-beautify-js)
-           ;;   (js-indent-line)
-           ;;   (web-beautify-format-region
-           ;;    web-beautify-js-program
-           ;;    (get-beginning-of-prev-line) (get-end-of-next-line)))
-           (web-beautify-js))
+           (if (is-buffer-beautifiable (buffer-file-name))
+               (web-beautify-js)
+             (js-indent-line)
+             (web-beautify-format-region
+              web-beautify-js-program
+              (get-beginning-of-prev-line) (get-end-of-next-line)))
+           ;; (web-beautify-js)
+           )
           ((eq major-mode 'html-mode)
-           ;; (if (is-buffer-beautifiable (buffer-file-name))
-           ;;     (web-beautify-html)
-           ;;   (web-beautify-format-region
-           ;;    web-beautify-html-program
-           ;;    (get-beginning-of-prev-line) (get-end-of-next-line)))
-           (web-beautify-html))
+           (if (is-buffer-beautifiable (buffer-file-name))
+               (web-beautify-html)
+             (web-beautify-format-region
+              web-beautify-html-program
+              (get-beginning-of-prev-line) (get-end-of-next-line)))
+           ;; (web-beautify-html)
+           )
           ((eq major-mode 'css-mode)
-           ;; (if (is-buffer-beautifiable (buffer-file-name))
-           ;;     (web-beautify-css)
-           ;;   (web-beautify-format-region
-           ;;    web-beautify-css-program
-           ;;    (get-beginning-of-prev-line) (get-end-of-next-line)))
-           (web-beautify-css))
+           (if (is-buffer-beautifiable (buffer-file-name))
+               (web-beautify-css)
+             (web-beautify-format-region
+              web-beautify-css-program
+              (get-beginning-of-prev-line) (get-end-of-next-line)))
+           ;; (web-beautify-css)
+           )
           ((eq major-mode 'org-mode)
            (org-cycle))
           (t

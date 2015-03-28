@@ -127,7 +127,7 @@
 
 ;;; TODO: make this work
 ;; (add-hook 'buffer-list-update-hook
-;;           #'(lambda ()
+;;           (lambda ()
 ;;               (if (and (buffer-file-name)
 ;;                       (or               ; because regexes are parsed weirdly
 ;;                                         ; here and this works

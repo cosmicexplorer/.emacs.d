@@ -15,13 +15,13 @@
 (helm-mode t)
 (add-hook 'eshell-mode-hook
           ;; add pcomplete with helm support to eshell
-          #'(lambda ()
+          (lambda ()
               (define-key eshell-mode-map
                 [remap eshell-pcomplete]
                 'helm-esh-pcomplete)))
 (add-hook 'emacs-startup-hook
           ;; autoload eshell at start so helm plays nice
-          #'(lambda ()
+          (lambda ()
               (let ((default-directory (getenv "HOME")))
                 (command-execute 'eshell)
                 (bury-buffer))))

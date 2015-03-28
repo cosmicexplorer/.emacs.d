@@ -33,11 +33,11 @@
 ;;; highlight cursor and auto-fill when over 80 chars in certain modes
 (add-hook 'prog-mode-hook #'highlight-80+-mode)
 (add-hook 'prog-mode-hook #'auto-fill-mode)
-(add-hook 'prog-mode-hook #'(lambda ()
+(add-hook 'prog-mode-hook (lambda ()
                               (set-fill-column 80)))
 (add-hook 'text-mode-hook #'highlight-80+-mode)
 (add-hook 'text-mode-hook #'auto-fill-mode)
-(add-hook 'text-mode-hook #'(lambda ()
+(add-hook 'text-mode-hook (lambda ()
                               (set-fill-column 80)))
 
 
