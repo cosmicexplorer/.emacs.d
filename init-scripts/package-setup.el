@@ -84,7 +84,8 @@
       '(("home"
          ("dired" (mode . dired-mode))
          ("readme" (filename . "README"))
-         ("todo" (filename . "TODO"))
+         ("TODO" (filename . "TODO"))
+         ("TODO" (filename . "todo"))
          ("json" (filename . "\\.json\\'"))
          ("gyp" (filename . "\\.gyp\\'"))
          ("javascript" (mode . js2-mode))

@@ -149,30 +149,33 @@ the text at point."
                (eq major-mode 'c++-mode))
            (clang-format-buffer))
           ((eq major-mode 'js2-mode)
-           (if (is-buffer-beautifiable (buffer-file-name))
-               (web-beautify-js)
-             (js-indent-line)
-             (web-beautify-format-region
-              web-beautify-js-program
-              (get-beginning-of-prev-line) (get-end-of-next-line)))
-           ;; (web-beautify-js)
-           )
+           ;; (if (is-buffer-beautifiable (buffer-file-name))
+           ;;     (web-beautify-js)
+           ;;   (js-indent-line)
+           ;;   (web-beautify-format-region
+           ;;    web-beautify-js-program
+           ;;    (get-beginning-of-prev-line) (get-end-of-next-line)))
+           ;; ;; (web-beautify-js)
+           web-beautify-j
+            )
           ((eq major-mode 'html-mode)
-           (if (is-buffer-beautifiable (buffer-file-name))
-               (web-beautify-html)
-             (web-beautify-format-region
-              web-beautify-html-program
-              (get-beginning-of-prev-line) (get-end-of-next-line)))
-           ;; (web-beautify-html)
-           )
+           ;; (if (is-buffer-beautifiable (buffer-file-name))
+           ;;     (web-beautify-html)
+           ;;   (web-beautify-format-region
+           ;;    web-beautify-html-program
+           ;;    (get-beginning-of-prev-line) (get-end-of-next-line)))
+           ;; ;; (web-beautify-html)
+           (web-beautify-html)
+            )
           ((eq major-mode 'css-mode)
-           (if (is-buffer-beautifiable (buffer-file-name))
-               (web-beautify-css)
-             (web-beautify-format-region
-              web-beautify-css-program
-              (get-beginning-of-prev-line) (get-end-of-next-line)))
-           ;; (web-beautify-css)
-           )
+           ;; (if (is-buffer-beautifiable (buffer-file-name))
+           ;;     (web-beautify-css)
+           ;;   (web-beautify-format-region
+           ;;    web-beautify-css-program
+           ;;    (get-beginning-of-prev-line) (get-end-of-next-line)))
+           ;; ;; (web-beautify-css)
+           (web-beautify-css)
+            )
           ((eq major-mode 'org-mode)
            (org-cycle))
           (t

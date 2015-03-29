@@ -265,3 +265,6 @@ lowercase, and Initial Caps versions."
     (font-lock-mode 1)))
 ;;; add it to programming modes!
 (add-hook 'prog-mode-hook #'warning-highlights-mode)
+
+;;; wrap lines in org-mode
+(visual-line-mode)
