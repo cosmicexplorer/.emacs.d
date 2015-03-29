@@ -174,37 +174,94 @@
 
 ;;; setup syntax highlighting for keywords i care about
 ;;; this overrides comment highlighting now, thank god
+(defvar warning-words
+  '("TODO" "todo" "Todo"
+    "FIXME" "fixme" "Fixme"
+    "FIX" "fix" "Fix"
+    "NB" "nb" "Nb"
+    "DEPRECATED" "deprecated" "Deprecated"
+    "XXX" "xxx" "Xxx"
+    "HACK" "hack" "Hack"
+    "IFFY" "iffy" "Iffy"
+    "CHANGED" "changed" "Changed"
+    "OPTIMIZATION" "optimization" "Optimization"
+    "BROKEN" "broken" "Broken")
+  "Used if no warning_words file exists.")
+
+(defvar warning-words-file "~/.zsh/warning_words"
+  "Path to file defining words to highlight specially. An example file would
+contain:
+
+todo
+fixme
+hack
+broken
+deprecated
+
+The value given works with my other repository,
+https://github.com/cosmicexplorer/.zsh. This should just work if you give it
+your own file path.")
+
+(defun make-string-init-caps (str)
+  "Takes string with arbitrary capitalization and forces it to Initial Caps
+case."
+  (let ((downstr (downcase str)))
+    (loop for i from 0 upto (1- (length downstr))
+          do (if (/= i 0)
+                 (when (and (not (wordp (aref downstr (1- i))))
+                            (wordp (aref downstr i)))
+                   (setf (aref downstr i)
+                         (upcase (aref downstr i))))
+               (setf (aref downstr i)
+                     (upcase (aref downstr i)))))
+    downstr))
+
+(defun read-words-from-file-as-list (filename)
+  "Reads words from file, delimited by newlines, as a list. Reads in ALLCAPS,
+lowercase, and Initial Caps versions."
+  (if (not (file-exists-p filename))
+      (throw 'no-warning-words-file t)
+    (let ((final-word-list nil))
+      (loop for word in
+            (split-string
+             (with-temp-buffer
+               (insert-file-contents filename)
+               (buffer-string))
+             "\n")                       ; split by newlines
+            do (unless (string= "" word) ; files with final newline have this
+                 (add-to-list 'final-word-list (downcase word))
+                 (add-to-list 'final-word-list (upcase word))
+                 (add-to-list 'final-word-list (make-string-init-caps word))))
+      final-word-list)))
+
 (defvar warning-highlights-keywords
-  `((,(regexp-opt '("TODO" "todo" "Todo"
-                    "FIXME" "fixme" "Fixme"
-                    "FIX" "fix" "Fix"
-                    "NB" "nb" "Nb"
-                    "DEPRECATED" "deprecated" "Deprecated"
-                    "XXX" "xxx" "Xxx"
-                    "HACK" "hack" "Hack"
-                    "IFFY" "iffy" "Iffy"
-                    "CHANGED" "changed" "Changed"
-                    "OPTIMIZATION" "optimization" "Optimization"
-                    "BROKEN" "broken" "Broken")
-                  'words)
+  `((,(regexp-opt
+       (if (file-exists-p warning-words-file)
+           (read-words-from-file-as-list warning-words-file)
+         warning-words)
+       'words)
      0 font-lock-warning-face t))
   "Keywords to apply extra highlights to.")
+
 (defun warning-highlights-turn-on ()
   "Turn on warning-highlights-mode."
   (font-lock-add-keywords
    nil
    warning-highlights-keywords))
+
 (defun warning-highlights-turn-off ()
   "Turn off warning-highlights-mode."
   (font-lock-remove-keywords
    nil
    `(,@warning-highlights-keywords)))
+
 (define-minor-mode warning-highlights-mode
-  "radical"
+  "Highlight words of warning."
   :lighter " !!"
   (progn
     (if warning-highlights-mode
         (warning-highlights-turn-on)
       (warning-highlights-turn-off))
     (font-lock-mode 1)))
+;;; add it to programming modes!
 (add-hook 'prog-mode-hook #'warning-highlights-mode)
