@@ -27,6 +27,8 @@
 (global-set-key (kbd "C-x M-c") 'toggle-letter-case)
 ;;; kill buffer without prompting
 (global-set-key (kbd "C-x k") 'kill-this-buffer)
+;;; quit-window is more useful than i previously thought
+(global-set-key (kbd "C-c q") 'quit-window)
 
 ;;; helm
 ;;; the below can also be applied over multiple lines with:
