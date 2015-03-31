@@ -44,9 +44,6 @@
 ;;; perl
 (fset 'perl-mode 'cperl-mode)
 (setq cperl-indent-level 2)
-;;; TODO: fix this
-;; (eval-after-load "cperl-mode"
-;;   '(define-key cperl-mode-map (kbd "C-c C-k") 'smart-compile))
 
 ;;; c/c++/java
 (setq-default c-basic-offset 2) ;; cc-mode uses this instead of tab-width
