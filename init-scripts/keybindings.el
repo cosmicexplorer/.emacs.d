@@ -162,3 +162,8 @@
 ;;; js
 (with-eval-after-load "js.el"
   (define-key js-mode-map (kbd "RET") 'newline-and-indent-fix-js-mode))
+
+;;; CPerl-mode
+(add-hook 'cperl-mode-hook
+          (lambda ()
+            (define-key cperl-mode-map (kbd "C-c C-k") nil)))
