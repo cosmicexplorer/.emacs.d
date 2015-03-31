@@ -1,6 +1,9 @@
 ;;; emacs config, aka the root node of a massively unbalanced configuration tree
 ;;; by Danny McClanahan, <danieldmcclanahan@gmail.com>, 2014-2015
 
+;;; IF YOU ARE HAVING CRASHES UPON OPENING A PARTICULAR FILE, TRY DELETING THAT
+;;; FILE'S UNDO-TREE-HISTORY in ~/.emacs.d/undo-tree-history !!!!!!!!!!!
+
 ;;; let's not hardcode everyhing like back in 9th grade
 (defvar init-home-folder-dir "~/.emacs.d/")
 
