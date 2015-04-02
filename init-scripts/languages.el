@@ -5,7 +5,6 @@
 (setq tab-width 2)                      ; 4-spacers get at me
 
 ;;; format comments like a normal person
-(add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
 (add-hook 'fundamental-mode-hook (lambda ()
                                    (setq comment-start "- " comment-end "")))
 ;;; TODO: this doesn't work! figure out why

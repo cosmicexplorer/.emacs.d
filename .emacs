@@ -58,7 +58,6 @@
 (defvar save-visited-files t)
 (defvar saved-files (concat init-home-folder-dir "saved-files"))
 (when save-visited-files
-  ;; TODO: restore from death
   (with-current-buffer (find-file (expand-file-name saved-files))
     (goto-char (point-min))
     (loop while (not (eobp))
