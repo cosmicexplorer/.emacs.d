@@ -50,11 +50,11 @@
   (ess-toggle-underscore nil))
 
 ;;; magit
-;;; TODO: is this required?
-(eval-after-load 'info
-  '(progn (info-initialize)
-          (add-to-list 'Info-directory-list "/path/to/magit/")))
 (require 'magit)
+(setq magit-last-seen-setup-instructions "1.4.0")
+;; automatically revert unmodified (saved) buffers that magit changes through
+;; e.g. pull, merge
+(setq magit-auto-revert-mode t)
 
 ;;; parenthesis matching and more
 ;;; turn pair parens on
