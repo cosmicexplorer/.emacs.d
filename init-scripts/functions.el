@@ -482,7 +482,7 @@ parentheses. CURRENTLY BROKEN"
   and if so, only beautifies the current line instead of the entire
   file."
   (loop with is-covered-in-file = nil
-        for line in (json-read-file "~/.emacs.d/no-beautify")
+        for line in (json-read-file (concat init-home-folder-dir "no-beautify"))
         do (when (string/starts-with buf-name (cdr line))
              (setq is-covered-in-file t))
         finally (return (not is-covered-in-file))))
@@ -559,20 +559,3 @@ that point."
   "Evaluate body if `system-type' equals type."
   `(when (eq system-type ,type)
      ,@body))
-
-;;; mark eshell buffers with their current directory
-(defun eshell-set-pwd-name (orig-eshell-fun &rest args)
-  (with-current-buffer (apply orig-eshell-fun args)
-    (rename-buffer
-     (generate-new-buffer-name (concat "eshell: " default-directory)))))
-(advice-add 'eshell :around #'eshell-set-pwd-name)
-;;; possibly inefficient, as it resets name on every input send to every
-;;; command, not just cd. oh well. it's better than manipulating eshell's
-;;; internal parser and relying on its internal structure remaining the same in
-;;; the future
-(defun eshell-set-pwd-name-on-cd (&rest args)
-  (rename-buffer
-   (generate-new-buffer-name
-    (concat "eshell: " default-directory)
-    (buffer-name))))
-(advice-add 'eshell-send-input :after #'eshell-set-pwd-name-on-cd)

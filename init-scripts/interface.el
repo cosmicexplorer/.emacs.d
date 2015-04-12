@@ -268,3 +268,57 @@ lowercase, and Initial Caps versions."
 
 ;;; wrap lines in org-mode
 (visual-line-mode)
+
+;;; mark eshell buffers with their current directory
+(defun eshell-set-pwd-name (orig-eshell-fun &rest args)
+  (with-current-buffer (apply orig-eshell-fun args)
+    (rename-buffer
+     (generate-new-buffer-name (concat "eshell: " default-directory)))))
+(advice-add 'eshell :around #'eshell-set-pwd-name)
+;;; resets name on every input send to every command, not just cd. the overhead
+;;; is negligible. the bigger issue is that if "exit" is used to quit eshell
+;;; instead of kill-buffer, the buffer switched to after eshell exits is renamed
+;;; as described below. this is not an issue i care about fixing, though
+(defun eshell-set-pwd-name-on-cd (&rest args)
+  (rename-buffer
+   (generate-new-buffer-name
+    (concat "eshell: " default-directory)
+    (buffer-name))))
+(advice-add 'eshell-send-input :after #'eshell-set-pwd-name-on-cd)
+
+;;; output eshell buffers to file
+(defvar eshell-user-output-file (concat init-home-folder-dir "eshell-output")
+  "File containing all eshell I/O from all eshell buffers.")
+
+;;; the below two functions rely on eshell using eshell-last-input-start,
+;;; eshell-last-input-end, and eshell-last-output-start internally! hopefully
+;;; these won't change.........................................
+;;; currently working on emacs 24.5
+(defun eshell-send-input-to-history ()
+  (append-to-file
+   (concat "--in--: "
+           (buffer-substring-no-properties
+            (marker-position eshell-last-input-start)
+            (point)))
+   nil eshell-user-output-file)
+  ;; because append-to-file cheerfully tells us that it has written to the file,
+  ;; and that's annoying
+  (message ""))
+(add-hook 'eshell-pre-command-hook #'eshell-send-input-to-history)
+
+(defun eshell-send-output-to-history ()
+  (append-to-file
+   (let* ((str
+           (concat "--out--: "
+                   (buffer-substring-no-properties
+                    (marker-position eshell-last-input-end)
+                    (marker-position eshell-last-output-start))))
+          (res (string-match "\n" str)))
+     (if res
+         str
+       (concat str "\n")))
+   nil eshell-user-output-file)
+  (message ""))
+(add-hook 'eshell-post-command-hook #'eshell-send-output-to-history)
+
+;;; add input redirection to eshell

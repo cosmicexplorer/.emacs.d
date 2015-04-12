@@ -1,6 +1,6 @@
-alias emacs emacsclient -n $*
 alias ec emacsclient -n $*
-alias s ls -a $*
-alias l ls -a $*
-alias sl ls -a $*
-alias ls ls -a $*
+alias s ls -arlt $*
+alias l ls -arlt $*
+alias sl ls -arlt $*
+alias ls ls -arlt $*
+alias g grep -rnPH --color $*

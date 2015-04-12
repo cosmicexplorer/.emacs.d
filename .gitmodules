@@ -1,3 +1,0 @@
-[submodule "js-beautify-emacs"]
-	path = js-beautify-emacs
-	url = git@github.com:cosmicexplorer/js-beautify-emacs.git

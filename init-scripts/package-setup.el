@@ -9,7 +9,8 @@
 ;;; slime
 (setq inferior-lisp-program (executable-find "sbcl"))
 (setq slime-contribs '(slime-fancy))
-(load-file (expand-file-name "~/.emacs.d/quicklisp/slime-helper.el"))
+(load-file (expand-file-name
+            (concat init-home-folder-dir "quicklisp/slime-helper.el")))
 
 ;;; helm
 (helm-mode t)
@@ -33,10 +34,11 @@
 (global-smart-tab-mode 1)               ; put it EVERYWHERE
 
 ;; julia/R from ESS
-(when (and (executable-find "R") (file-exists-p "~/.emacs.d/ESS"))
-  (shell-command "make -C ~/.emacs.d/ESS")
+(when (and (executable-find "R")
+           (file-exists-p (concat init-home-folder-dir "ESS")))
+  (shell-command (concat "make -C " init-home-folder-dir "ESS"))
   (delete-windows-on "*Shell Command Output*")
-  (add-to-list 'load-path "~/.emacs.d/ESS/lisp")
+  (add-to-list 'load-path (concat init-home-folder-dir "ESS/lisp"))
   (require 'ess-site)
   (when (executable-find "julia-basic")
     (setq inferior-julia-program-name (executable-find "julia-basic"))

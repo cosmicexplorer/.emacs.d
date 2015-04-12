@@ -4,7 +4,7 @@
 ;;; IF YOU ARE HAVING CRASHES UPON OPENING A PARTICULAR FILE, TRY DELETING THAT
 ;;; FILE'S UNDO-TREE-HISTORY in ~/.emacs.d/undo-tree-history !!!!!!!!!!!
 
-;;; let's not hardcode everyhing like back in 9th grade
+;;; let's not hardcode everything like back in 9th grade
 (defvar init-home-folder-dir "~/.emacs.d/")
 
 ;;; added up here cause a lot of packages depend on it being defined without
@@ -74,6 +74,8 @@
   ;; save visiting files
   (defun save-visiting-files-to-buffer ()
     (interactive)
+    ;; TODO: make this more error-resistant, somehow. having to send emacs a
+    ;; sigterm because this function fails on quit is annoying.
     (with-current-buffer (find-file (expand-file-name saved-files))
          (erase-buffer)
          (loop for buf in (buffer-list)
@@ -87,7 +89,7 @@
          (kill-buffer)))
   (add-hook
    'kill-emacs-hook
-   'save-visiting-files-to-buffer))
+   #'save-visiting-files-to-buffer))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -112,5 +114,4 @@
  '(fill-column 80)
  '(gud-key-prefix "")
  '(org-support-shift-select 'always)
- '(server-delete-tty t)
  '(yank-pop-change-selection t))
