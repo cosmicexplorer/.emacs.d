@@ -324,3 +324,51 @@ lowercase, and Initial Caps versions."
 (add-hook 'eshell-post-command-hook #'eshell-send-output-to-history)
 
 ;;; TODO: add input redirection to eshell
+;;; these functions work, i'm just not too familiar with the order in which
+;;; eshell-parse-arguments is called. ideally we'd insert an advice in front of
+;;; eshell-parse-command-input, but eshell-parse-arguments seems to be called
+;;; before that for some reason, and also called by helm when completing
+;;; commands/directories and such. frustrating. i'll work on this later.
+(defun rewrite-command-without-redirection (str)
+  ;; TODO: use backreferences to put the first three of these regexes into one
+  (let ((final-str str))
+    (cond ((string-match "<\(.+\)" str)
+           (setq final-str
+                 (concat
+                  ;; remove the < and parens
+                  (let ((res (match-string-no-properties 0 str)))
+                    (substring res 2 (1- (length res))))
+                  " | "
+                  (replace-match "" t t str))))
+          ((string-match "<\s*\'.+\'" str)
+           (setq final-str
+                 (concat
+                  "cat "
+                  (substring (match-string-no-properties 0 str) 1)
+                  " | "
+                  (replace-match "" t t str))))
+          ((string-match "<\s*\".+\"" str)
+           (setq final-str
+                 (concat
+                  "cat "
+                  (substring (match-string-no-properties 0 str) 1)
+                  " | "
+                  (replace-match "" t t str))))
+          ((string-match "<\s*([^\\s]|[\\\s])+" str)
+           (setq final-str
+                 (concat
+                  "cat "
+                  (substring (match-string-no-properties 0 str) 1)
+                  " | "
+                  (replace-match "" t t str)))))
+    final-str))
+
+(defun check-for-annoying-characters-in-command (str)
+  "Checks for ;, &&, and backslash-without-newline, since those make this input
+redirection hack fail."
+  (or (string-match ";" str)
+      (string-match "&&" str)
+      (string-match "\\\\\\'" str)))
+
+;; (defun replace-command-arg
+;;     (eshell-parse-command-input-orig-fn beg end &optional args))
