@@ -559,3 +559,19 @@ that point."
   "Evaluate body if `system-type' equals type."
   `(when (eq system-type ,type)
      ,@body))
+
+;;; mark eshell buffers with their current directory
+(defun eshell-set-pwd-name (orig-eshell-fun &rest args)
+  (with-current-buffer (apply orig-eshell-fun args)
+    (rename-buffer
+     (generate-new-buffer-name (concat "eshell: " default-directory)))))
+(advice-add 'eshell :around #'eshell-set-pwd-name)
+;;; possibly inefficient, as it resets name on every invocation of every
+;;; command, not just cd. oh well. it's better than parsing the "cmd" argument
+;;; and relying on its internal structure remaining the same in the future
+(defun eshell-set-pwd-name-on-cd (&rest args)
+  (rename-buffer
+   (generate-new-buffer-name
+    (concat "eshell: " default-directory)
+    (buffer-name))))
+(advice-add 'eshell-send-input :after #'eshell-set-pwd-name-on-cd)

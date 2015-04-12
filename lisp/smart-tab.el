@@ -156,7 +156,7 @@ the text at point."
            ;;    web-beautify-js-program
            ;;    (get-beginning-of-prev-line) (get-end-of-next-line)))
            ;; ;; (web-beautify-js)
-           web-beautify-j
+           (web-beautify-js)
             )
           ((eq major-mode 'html-mode)
            ;; (if (is-buffer-beautifiable (buffer-file-name))

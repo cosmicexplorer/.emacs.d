@@ -19,12 +19,6 @@
               (define-key eshell-mode-map
                 [remap eshell-pcomplete]
                 'helm-esh-pcomplete)))
-(add-hook 'emacs-startup-hook
-          ;; autoload eshell at start so helm plays nice
-          (lambda ()
-              (let ((default-directory (getenv "HOME")))
-                (command-execute 'eshell)
-                (bury-buffer))))
 
 ;;; undo-tree
 (global-undo-tree-mode)                 ; put it EVERYWHERE
