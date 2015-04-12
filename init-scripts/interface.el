@@ -269,6 +269,8 @@ lowercase, and Initial Caps versions."
 ;;; wrap lines in org-mode
 (visual-line-mode)
 
+;;; advice-add used below because for some reason when using add-hook
+;;; generate-new-buffer-name doesn't respect its "ignore" argument
 ;;; mark eshell buffers with their current directory
 (defun eshell-set-pwd-name (orig-eshell-fun &rest args)
   (with-current-buffer (apply orig-eshell-fun args)
@@ -321,4 +323,4 @@ lowercase, and Initial Caps versions."
   (message ""))
 (add-hook 'eshell-post-command-hook #'eshell-send-output-to-history)
 
-;;; add input redirection to eshell
+;;; TODO: add input redirection to eshell
