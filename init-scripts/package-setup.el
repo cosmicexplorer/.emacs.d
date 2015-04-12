@@ -60,13 +60,11 @@
 ;;; rainbow delimiters!
 (global-rainbow-delimiters-mode)
 
-;;; allow for ido usage for better C-x b buffer search n stuff
 (ido-mode t)
 ;;; makes searching fuzzier
 (setq ido-enable-flex-matching t)
 
 ;; when opening a file the cursor will be at the last saved position
-;;; TODO: cleanup files
 (setq save-place-file (concat init-home-folder-dir "saveplace"))
 (setq-default save-place t)
 (setq save-place t)
@@ -130,6 +128,8 @@
          ("org" (mode . org-mode))
          ("shell script" (mode . sh-mode))
          ("coffeescript" (mode . coffee-mode))
+         ("literate coffeescript" (or (filename . "\\.litcoffee\\'")
+                                      (filename . "\\.coffee\\.\\'")))
          ("less" (mode . less-css-mode))
          ("genbank" (filename . "\\.gb\\'"))
          ("fasta" (or (filename . "\\.fna\\'")

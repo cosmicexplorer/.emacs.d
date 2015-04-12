@@ -36,6 +36,7 @@
                     less-css-mode
                     linum
                     linum-relative
+                    literate-coffee-mode
                     magit
                     markdown-mode
                     minimap
