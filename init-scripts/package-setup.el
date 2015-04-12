@@ -76,6 +76,7 @@
 ;; you can add different groups too, not just home, in case you ever want to
 (setq ibuffer-saved-filter-groups
       '(("home"
+         ("eshell" (mode . eshell-mode))
          ("dired" (mode . dired-mode))
          ("readme" (filename . "README"))
          ("TODO" (filename . "TODO"))
