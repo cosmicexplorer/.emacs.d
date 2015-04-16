@@ -27,3 +27,4 @@
 (require 'color-theme)
 (require 'color-theme-danny)            ; mine
 (require 'web-beautify)
+(require 'aggressive-fill-paragraph)
