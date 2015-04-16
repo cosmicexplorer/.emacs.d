@@ -656,3 +656,7 @@ redirection hack fail."
       (setq cur-window-config window-configuration-ring)
       (message "Looped through window configuration ring!"))
     (set-window-configuration (car cur-window-config))))
+(defun clear-window-configurations ()
+  (interactive)
+  (setq window-configuration-ring nil
+        cur-window-config nil))
