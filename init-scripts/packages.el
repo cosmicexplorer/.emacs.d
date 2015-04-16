@@ -17,7 +17,6 @@
 
 (defvar my-packages '(
                       2048-game
-                      aggressive-fill-paragraph
                       auctex
                       better-defaults
                       cider

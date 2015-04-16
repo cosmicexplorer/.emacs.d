@@ -177,7 +177,3 @@
   '(progn
      (color-theme-initialize)
      (color-theme-danny)))
-
-;;; aggressive-fill-paragraphs
-(eval-after-load "aggressive-fill-paragraph"
-  '(afp-setup-recommended-hooks))

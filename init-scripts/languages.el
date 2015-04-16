@@ -150,6 +150,7 @@ Lisp code." t)
 (eval-after-load "coffee-mode"
   '(define-key coffee-mode-map (kbd "M-;")
      'coffeescript-comment-do-what-i-really-mean))
+(add-hook 'coffee-mode-hook (lambda () (setq coffee-tab-width 2)))
 
 ;;; latex
 (setq LaTeX-command-style '(("" "%(PDF)%(latex) -file-line-error %S%(PDFout)")))
