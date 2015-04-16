@@ -141,12 +141,15 @@ evaluate FUNCTION instead of running a compilation command.
                                         ))
 (put 'smart-compile-replace-alist 'risky-local-variable t)
 
+;;; these are the things i added for automated build systems
 (defvar smart-compile-check-makefile t)
 (make-variable-buffer-local 'smart-compile-check-makefile)
 (defvar smart-compile-check-scons-files t)
 (make-variable-buffer-local 'smart-compile-check-scons-files)
 (defvar smart-compile-check-gyp t)
 (make-variable-buffer-local 'smart-compile-check-gyp)
+(defvar smart-compile-check-cakefile t)
+(make-variable-buffer-local 'smart-compile-check-cakefile)
 
 (defcustom smart-compile-make-program "make "
   "The command by which to invoke the make program."
@@ -249,6 +252,19 @@ which is defined in `smart-compile-alist'."
             (call-interactively 'compile)
             (setq not-yet nil))
         (setq smart-compile-check-scons-files nil)))
+
+     ((and smart-compile-check-cakefile
+           (or (file-readable-p "Cakefile")
+               (file-readable-p "../Cakefile")
+               (file-readable-p "../../Cakefile")))
+      (if (y-or-n-p "Cakefile found. Try 'cake'?")
+          (progn
+            (set
+             (make-local-variable
+              'compile-command) "cake build ")
+            (call-interactively 'compile)
+            (setq not-yet nil))
+        (setq smart-compile-check-cakefile nil)))
 
      ) ;; end of (cond ...)
 

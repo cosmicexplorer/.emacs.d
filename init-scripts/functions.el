@@ -559,3 +559,100 @@ that point."
   "Evaluate body if `system-type' equals type."
   `(when (eq system-type ,type)
      ,@body))
+
+;;; the below two functions rely on eshell using eshell-last-input-start,
+;;; eshell-last-input-end, and eshell-last-output-start internally! hopefully
+;;; these won't change.........................................
+;;; currently working on emacs 24.5
+(defun eshell-send-input-to-history ()
+  (append-to-file
+   (concat "--in--: "
+           (buffer-substring-no-properties
+            (marker-position eshell-last-input-start)
+            (point)))
+   nil eshell-user-output-file)
+  ;; because append-to-file cheerfully tells us that it has written to the file,
+  ;; and that's annoying
+  (message ""))
+
+(defun eshell-send-output-to-history ()
+  (append-to-file
+   (let* ((str
+           (concat "--out--: "
+                   (buffer-substring-no-properties
+                    (marker-position eshell-last-input-end)
+                    (marker-position eshell-last-output-start))))
+          (res (string-match "\n" str)))
+     (if res
+         str
+       (concat str "\n")))
+   nil eshell-user-output-file)
+  (message ""))
+
+;;; TODO: add input redirection and command substitution (!!!) to eshell
+;;; these functions work, i'm just not too familiar with the order in which
+;;; eshell-parse-arguments is called. ideally we'd insert an advice in front of
+;;; eshell-parse-command-input, but eshell-parse-arguments seems to be called
+;;; before that for some reason, and also called by helm when completing
+;;; commands/directories and such. frustrating. i'll work on this later.
+(defun rewrite-command-without-redirection (str)
+  ;; TODO: use backreferences to put the first three of these regexes into one
+  (let ((final-str str))
+    (cond ((string-match "<\(.+\)" str)
+           (setq final-str
+                 (concat
+                  ;; remove the < and parens
+                  (let ((res (match-string-no-properties 0 str)))
+                    (substring res 2 (1- (length res))))
+                  " | "
+                  (replace-match "" t t str))))
+          ((string-match "<\s*\'.+\'" str)
+           (setq final-str
+                 (concat
+                  "cat "
+                  (substring (match-string-no-properties 0 str) 1)
+                  " | "
+                  (replace-match "" t t str))))
+          ((string-match "<\s*\".+\"" str)
+           (setq final-str
+                 (concat
+                  "cat "
+                  (substring (match-string-no-properties 0 str) 1)
+                  " | "
+                  (replace-match "" t t str))))
+          ((string-match "<\s*([^\\s]|[\\\s])+" str)
+           (setq final-str
+                 (concat
+                  "cat "
+                  (substring (match-string-no-properties 0 str) 1)
+                  " | "
+                  (replace-match "" t t str)))))
+    final-str))
+
+(defun check-for-annoying-characters-in-command (str)
+  "Checks for ;, &&, and backslash-without-newline, since those make this input
+redirection hack fail."
+  (or (string-match ";" str)
+      (string-match "&&" str)
+      (string-match "\\\\\\'" str)))
+
+;; (defun replace-command-arg
+;;     (eshell-parse-command-input-orig-fn beg end &optional args))
+
+;;; functions to save and reset window configuration to a list
+;;; since i only use a single frame mostly the intricacies of multiple frames
+;;; and window configurations likely won't be an issue
+(defun save-current-window-configuration ()
+  (interactive)
+  (setq window-configuration-ring (cons (current-window-configuration)
+                                        window-configuration-ring)))
+(defvar cur-window-config nil)
+(defun cycle-window-configuration ()
+  (interactive)
+  (if (not window-configuration-ring)
+      (message "No window configurations saved!")
+    (setq cur-window-config (cdr cur-window-config))
+    (unless cur-window-config
+      (setq cur-window-config window-configuration-ring)
+      (message "Looped through window configuration ring!"))
+    (set-window-configuration (car cur-window-config))))
