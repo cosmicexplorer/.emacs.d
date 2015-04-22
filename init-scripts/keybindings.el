@@ -78,9 +78,6 @@
 (global-set-key (kbd "C-M-<right>") 'windmove-right)
 (global-set-key (kbd "C-M-<up>") 'windmove-up)
 (global-set-key (kbd "C-M-<down>") 'windmove-down)
-;;; save and cycle through window configurations
-(global-set-key (kbd "C-c s") 'save-current-window-configuration)
-(global-set-key (kbd "C-c c") 'cycle-window-configuration)
 
 ;; visualize undo-tree
 (global-set-key (kbd "C-x t") 'undo-tree-visualize)

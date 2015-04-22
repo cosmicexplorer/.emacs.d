@@ -297,3 +297,7 @@ lowercase, and Initial Caps versions."
 ;;; save and reset window configuration to ring
 (defvar window-configuration-ring nil
   "List of saved window configurations; only stays present within a session.")
+
+;; for some reason these don't always fire
+(add-hook 'prog-mode-hook 'highlight-80+-mode)
+(add-hook 'prog-mode-hook 'auto-fill-mode)
