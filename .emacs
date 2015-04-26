@@ -99,21 +99,31 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(TeX-engine (quote luatex))
- '(safe-local-variable-values
-   (quote ((TeX-master . "proposal")
-           (add-log-time-format
-            lambda nil
-            (progn
-              (setq tz
-                    (getenv "TZ"))
-              (set-time-zone-rule "UTC")
-              (setq time
-                    (format-time-string "%a %b %e %H:%M:%S %Z %Y"
-                                        (current-time)))
-              (set-time-zone-rule tz) time)))))
  '(asm-comment-char 35)
  '(coffee-tab-width 2)
  '(fill-column 80)
  '(gud-key-prefix "")
- '(org-support-shift-select 'always)
+ '(org-support-shift-select (quote always))
+ '(package-selected-packages
+   (quote
+    (web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode evil espuds ein company color-theme cider better-defaults auto-complete auctex 2048-game)))
+ '(safe-local-variable-values
+   (quote
+    ((TeX-master . "proposal")
+     (add-log-time-format lambda nil
+                          (progn
+                            (setq tz
+                                  (getenv "TZ"))
+                            (set-time-zone-rule "UTC")
+                            (setq time
+                                  (format-time-string "%a %b %e %H:%M:%S %Z %Y"
+                                                      (current-time)))
+                            (set-time-zone-rule tz)
+                            time)))))
  '(yank-pop-change-selection t))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

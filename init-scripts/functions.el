@@ -79,9 +79,13 @@ also."
                   nil nil "*newbuf*")))) ;; with default title *newbuf*
   (normal-mode))
 
-(defun big-text ()
+(defun massive-text ()
   (interactive)
   (set-face-attribute 'default nil :height 400))
+
+(defun big-text ()
+  (interactive)
+  (set-face-attribute 'default nil :height 200))
 
 (defun little-text ()
   (interactive)
@@ -660,3 +664,11 @@ redirection hack fail."
   (interactive)
   (setq window-configuration-ring nil
         cur-window-config nil))
+
+;;; clear out all files which no longer exist or have moved
+(defun clear-all-buffers-to-deleted-files ()
+  (interactive)
+  (loop for buf in (buffer-list)
+        do (with-current-buffer buf
+             (unless (and (buffer-file-name) (file-exists-p (buffer-file-name)))
+               (kill-buffer buf)))))
