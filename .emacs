@@ -106,7 +106,7 @@
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode evil espuds ein company color-theme cider better-defaults auto-complete auctex 2048-game)))
+    (cloc package-build flycheck-package web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode evil espuds ein company color-theme cider better-defaults auto-complete auctex 2048-game)))
  '(safe-local-variable-values
    (quote
     ((TeX-master . "proposal")

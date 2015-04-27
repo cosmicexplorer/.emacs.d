@@ -20,6 +20,7 @@
                       auctex
                       better-defaults
                       cider
+                      cloc              ; YEAH!!!
                       clojure-mode
                       coffee-mode
                       color-theme
@@ -29,6 +30,8 @@
                       epl
                       espuds
                       evil
+                      flycheck
+                      flycheck-package
                       go-mode
                       helm
                       helm-swoop
@@ -43,6 +46,7 @@
                       misc-cmds
                       multiple-cursors
                       noflet
+                      package-build
                       paredit
                       php-mode
                       pkg-info

@@ -4,7 +4,7 @@
 ;;; are from more dubious sources
 (add-to-list 'load-path (concat init-home-folder-dir "lisp"))
 
-;;;
+;;; get my colors themes up!
 (add-to-list 'load-path (concat init-home-folder-dir "color-themes"))
 
 (require 'tramp)
@@ -27,3 +27,4 @@
 (require 'color-theme)
 (require 'color-theme-danny)            ; mine
 (require 'web-beautify)
+(require 'cloc)
