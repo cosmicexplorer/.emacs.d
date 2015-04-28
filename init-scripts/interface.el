@@ -12,7 +12,7 @@
 
 ;;; remove toolbars
 (menu-bar-mode 0)                       ;  remove menu bar for a line of space
-(tool-bar-mode 0)                       ;  and tool bar for graphical
+(tool-bar-mode 0)                       ; and tool bar for graphical
 
 ;;; configure scrolling
 (setq scroll-step 1)
@@ -266,12 +266,13 @@ lowercase, and Initial Caps versions."
 ;;; resets name on every input send to every command, not just cd. the overhead
 ;;; is negligible. the bigger issue is that if "exit" is used to quit eshell
 ;;; instead of kill-buffer, the buffer switched to after eshell exits is renamed
-;;; as described below. this is not an issue i care about fixing, though
+;;; as described below. this is fixed by the "when" statement.
 (defun eshell-set-pwd-name-on-cd (&rest args)
-  (rename-buffer
-   (generate-new-buffer-name
-    (concat "eshell: " default-directory)
-    (buffer-name))))
+  (when (eq major-mode 'eshell-mode)
+    (rename-buffer
+     (generate-new-buffer-name
+      (concat "eshell: " default-directory)
+      (buffer-name)))))
 (advice-add 'eshell-send-input :after #'eshell-set-pwd-name-on-cd)
 
 ;;; output eshell buffers to file
