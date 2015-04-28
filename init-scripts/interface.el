@@ -124,30 +124,12 @@
 (add-hook 'after-save-hook 'output-lines-in-buffer)
 (add-hook 'after-revert-hook 'output-lines-in-buffer)
 (add-hook 'dired-after-readin-hook 'output-lines-in-buffer)
-
-;;; TODO: make this work
-;; (add-hook 'buffer-list-update-hook
-;;           (lambda ()
-;;               (if (and (buffer-file-name)
-;;                       (or               ; because regexes are parsed weirdly
-;;                                         ; here and this works
-;;                        (string-match "^.*\.pdf$" (buffer-file-name))
-;;                        (string-match "^.*\.ps$" (buffer-file-name))
-;;                        (string-match "^.*\.dvi$" (buffer-file-name))
-;;                        (string-match "^.*\.doc.*$" (buffer-file-name))
-;;                        (string-match "^.*\.ppt.*$" (buffer-file-name))
-;;                        (string-match "^.*\.xls.*$" (buffer-file-name))
-;;                        (string-match "^.*\.od.*$" (buffer-file-name)))
-;;                       ;; not sure why this is required, but it is
-;;                       (not
-;;                        (or (string-match "^.*\.tex$" (buffer-file-name))
-;;                            (string-match "^.*\.bib$" (buffer-file-name))
-;;                            (string-match "^.*\.el$" (buffer-file-name))
-;;                            (string-match "^.*\.emacs$" (buffer-file-name)))))
-;;                   ;; doesn't work otherwise lol
-;;                   (with-current-buffer (buffer-name)
-;;                     (linum-mode 0))
-;;                 (global-linum-mode 1))))
+;;; turn off linum mode for pdf/ps whatever files because it takes like a
+;;; million years to scroll through it otherwise
+(add-hook 'after-change-major-mode-hook
+          (lambda ()
+            (when (eq major-mode 'doc-view-mode)
+              (linum-mode 0))))
 
 ;;; misc
 (load-display-time)
@@ -219,19 +201,22 @@ lowercase, and Initial Caps versions."
                  (add-to-list 'final-word-list (make-string-init-caps word))))
       final-word-list)))
 
+(defvar warning-highlights-regex
+  (concat
+   "\\(^\\|[^[:word:]]\\)"
+   "\\("
+   (regexp-opt
+    (if (file-exists-p warning-words-file)
+        (read-words-from-file-as-list-with-caps warning-words-file)
+      warning-words))
+   "\\)"
+   "\\($\\|[^[:word:]]\\)"))
+
 (defvar warning-highlights-keywords
   ;; the 'words option to regexp-opt surrounds the output with \<...\>, which
   ;; doesn't work with "warning" words that have non-word characters in them
   ;; (for example, n.b., or words with spaces). this is a workaround.
-  `((,(concat
-       "\\(^\\|[^[:word:]]\\)"
-       "\\("
-       (regexp-opt
-        (if (file-exists-p warning-words-file)
-            (read-words-from-file-as-list-with-caps warning-words-file)
-          warning-words))
-       "\\)"
-       "\\($\\|[^[:word:]]\\)")
+  `((,warning-highlights-regex
      ;; highlights the second subexpression: the warning-word expression
      2 font-lock-warning-face t))
   "Keywords to apply extra highlights to.")
@@ -254,6 +239,11 @@ lowercase, and Initial Caps versions."
     (font-lock-mode 1)))
 ;;; add it to programming modes!
 (add-hook 'prog-mode-hook #'warning-highlights-mode)
+
+(defun find-warning-words ()
+  (interactive)
+  (helm-multi-swoop-all
+   warning-highlights-regex))
 
 ;;; wrap lines in org-mode
 (visual-line-mode)

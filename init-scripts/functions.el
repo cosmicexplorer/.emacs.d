@@ -521,16 +521,6 @@ parentheses. CURRENTLY BROKEN"
              (setq kill-ring-yank-pointer (cdr kill-ring-yank-pointer))))
   (paredit-yank-pop))
 
-(defun find-warning-words ()
-  (interactive)
-  (helm-multi-swoop-all
-   (concat "\\<"
-    (regexp-opt
-     (if (file-exists-p warning-words-file)
-         (read-words-from-file-as-list warning-words-file)
-       (warning-words)))
-    "\\>")))
-
 ;;; functions to save point in a file; for example, when you have a place you
 ;;; are modifying but often need to move somewhere else and return back, and you
 ;;; don't have enough screen space to split screen constantly
