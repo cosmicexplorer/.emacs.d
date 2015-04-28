@@ -225,12 +225,14 @@ lowercase, and Initial Caps versions."
   ;; (for example, n.b., or words with spaces). this is a workaround.
   `((,(concat
        "\\(^\\|[^[:word:]]\\)"
+       "\\("
        (regexp-opt
         (if (file-exists-p warning-words-file)
             (read-words-from-file-as-list-with-caps warning-words-file)
           warning-words))
+       "\\)"
        "\\($\\|[^[:word:]]\\)")
-     0 font-lock-warning-face t))
+     2 font-lock-warning-face t))
   "Keywords to apply extra highlights to.")
 
 (defun warning-highlights-turn-on ()
