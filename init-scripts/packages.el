@@ -59,6 +59,7 @@
                       undo-tree
                       w3m
                       web-beautify
+                      xterm-color
                       ))
 
 ;;; do the install (slow upon startup, but only for the first time)

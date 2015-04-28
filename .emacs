@@ -7,7 +7,30 @@
 ;;; FILE'S UNDO-TREE-HISTORY in ~/.emacs.d/undo-tree-history !!!!!!!!!!!
 
 ;;; let's not hardcode everything like back in 9th grade
-(defvar init-home-folder-dir "~/.emacs.d/")
+;;; hopefully this is a sane default
+(defvar init-home-folder-dir (concat (getenv "HOME") "/.emacs.d/"))
+;;; used in init-scripts/interface.el
+(defvar warning-words-file nil
+  "Path to file defining words to highlight specially. An example file would
+contain:
+
+todo
+fixme
+hack
+broken
+deprecated
+")
+
+;;; load custom values for these variables (this file is .gitignored)
+(let ((custom-var-file
+       (concat
+        (file-name-directory (file-truename load-file-name))
+        "custom-vars.el")))
+  (when (file-exists-p custom-var-file)
+    (load-file custom-var-file)))
+
+(unless (file-exists-p init-home-folder-dir)
+  (throw 'no-home-holder "no emacs home directory given!"))
 
 ;;; added up here cause a lot of packages depend on it being defined without
 ;;; defining it themselves
@@ -106,7 +129,7 @@
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (cloc package-build flycheck-package web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode evil espuds ein company color-theme cider better-defaults auto-complete auctex 2048-game)))
+    (xterm-color cloc package-build flycheck-package web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode evil espuds ein company color-theme cider better-defaults auto-complete auctex 2048-game)))
  '(safe-local-variable-values
    (quote
     ((TeX-master . "proposal")

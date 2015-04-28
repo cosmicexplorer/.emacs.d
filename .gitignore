@@ -24,3 +24,5 @@ tramp
 backups/
 # request folder, not sure why this exists at all lol but whatever
 request/
+# user-customizable variables
+custom-vars.el

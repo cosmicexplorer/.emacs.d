@@ -173,34 +173,19 @@
 (setq mode-line-inverse-video t)
 
 ;;; setup syntax highlighting for keywords i care about
-;;; this overrides comment highlighting now, thank god
 (defvar warning-words
-  '("TODO" "todo" "Todo"
-    "FIXME" "fixme" "Fixme"
-    "FIX" "fix" "Fix"
-    "NB" "nb" "Nb"
-    "DEPRECATED" "deprecated" "Deprecated"
-    "XXX" "xxx" "Xxx"
-    "HACK" "hack" "Hack"
-    "IFFY" "iffy" "Iffy"
-    "CHANGED" "changed" "Changed"
-    "OPTIMIZATION" "optimization" "Optimization"
-    "BROKEN" "broken" "Broken")
+  '("todo"
+    "fixme"
+    "fix"
+    "nb"
+    "deprecated"
+    "xxx"
+    "hack"
+    "iffy"
+    "changed"
+    "optimization"
+    "broken")
   "Used if no warning_words file exists.")
-
-(defvar warning-words-file "~/.zsh/warning_words"
-  "Path to file defining words to highlight specially. An example file would
-contain:
-
-todo
-fixme
-hack
-broken
-deprecated
-
-The value given works with my other repository,
-https://github.com/cosmicexplorer/.zsh. This should just work if you give it
-your own file path.")
 
 (defun make-string-init-caps (str)
   "Takes string with arbitrary capitalization and forces it to Initial Caps
@@ -216,7 +201,7 @@ case."
                      (upcase (aref downstr i)))))
     downstr))
 
-(defun read-words-from-file-as-list (filename)
+(defun read-words-from-file-as-list-with-caps (filename)
   "Reads words from file, delimited by newlines, as a list. Reads in ALLCAPS,
 lowercase, and Initial Caps versions."
   (if (not (file-exists-p filename))
@@ -235,25 +220,26 @@ lowercase, and Initial Caps versions."
       final-word-list)))
 
 (defvar warning-highlights-keywords
-  `((,(regexp-opt
-       (if (file-exists-p warning-words-file)
-           (read-words-from-file-as-list warning-words-file)
-         warning-words)
-       'words)
+  ;; the 'words option to regexp-opt surrounds the output with \<...\>, which
+  ;; doesn't work with "warning" words that have non-word characters in them
+  ;; (for example, n.b., or words with spaces). this is a workaround.
+  `((,(concat
+       "\\(^\\|[^[:word:]]\\)"
+       (regexp-opt
+        (if (file-exists-p warning-words-file)
+            (read-words-from-file-as-list-with-caps warning-words-file)
+          warning-words))
+       "\\($\\|[^[:word:]]\\)")
      0 font-lock-warning-face t))
   "Keywords to apply extra highlights to.")
 
 (defun warning-highlights-turn-on ()
   "Turn on warning-highlights-mode."
-  (font-lock-add-keywords
-   nil
-   warning-highlights-keywords))
+  (font-lock-add-keywords nil warning-highlights-keywords t))
 
 (defun warning-highlights-turn-off ()
   "Turn off warning-highlights-mode."
-  (font-lock-remove-keywords
-   nil
-   `(,@warning-highlights-keywords)))
+  (font-lock-remove-keywords nil `(,@warning-highlights-keywords)))
 
 (define-minor-mode warning-highlights-mode
   "Highlight words of warning."
@@ -297,7 +283,3 @@ lowercase, and Initial Caps versions."
 ;;; save and reset window configuration to ring
 (defvar window-configuration-ring nil
   "List of saved window configurations; only stays present within a session.")
-
-;; for some reason these don't always fire
-(add-hook 'prog-mode-hook 'highlight-80+-mode)
-(add-hook 'prog-mode-hook 'auto-fill-mode)
