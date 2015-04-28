@@ -232,7 +232,7 @@ lowercase, and Initial Caps versions."
           warning-words))
        "\\)"
        "\\($\\|[^[:word:]]\\)")
-     ;; highlights the second expression: the warning-word expression
+     ;; highlights the second subexpression: the warning-word expression
      2 font-lock-warning-face t))
   "Keywords to apply extra highlights to.")
 
