@@ -26,3 +26,5 @@ backups/
 request/
 # user-customizable variables
 custom-vars.el
+# quicklisp is a per-user setup
+quicklisp/

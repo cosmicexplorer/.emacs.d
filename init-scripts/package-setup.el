@@ -6,12 +6,6 @@
 (require 'smartrep)
 (setq ein:use-smartrep t)
 
-;;; slime
-(setq inferior-lisp-program (executable-find "sbcl"))
-(setq slime-contribs '(slime-fancy))
-(load-file (expand-file-name
-            (concat init-home-folder-dir "quicklisp/slime-helper.el")))
-
 ;;; helm
 (helm-mode t)
 (add-hook 'eshell-mode-hook

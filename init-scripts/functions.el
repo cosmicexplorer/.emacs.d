@@ -349,10 +349,11 @@ SLIME and Paredit. Not for the faint of heart."
     'paredit-forward-barf-sexp)
   (define-key paredit-mode-map (kbd "C-M-a C-M-<left>")
     'paredit-backward-barf-sexp)
-  (define-key paredit-mode-map (kbd "C-x C-l") 'mc/edit-lines) ; so that
-                                        ; multiple-cursors can use these
-  (define-key paredit-mode-map (kbd "M-n") 'mc/mark-next-like-this)
-  (define-key paredit-mode-map (kbd "M-p") 'mc/mark-previous-like-this)
+  ;; so that multiple-cursors can use these
+  (define-key paredit-mode-map (kbd "C-x C-l") 'mc/edit-lines)
+  (unless (eq major-mode 'slime-repl-mode)
+    (define-key paredit-mode-map (kbd "M-n") 'mc/mark-next-like-this)
+    (define-key paredit-mode-map (kbd "M-p") 'mc/mark-previous-like-this))
   (define-key paredit-mode-map (kbd "C-M-n") 'mc/unmark-next-like-this)
   (define-key paredit-mode-map (kbd "C-M-p") 'mc/unmark-previous-like-this)
   (define-key paredit-mode-map (kbd "C-x C-a") 'mc/mark-all-like-this)

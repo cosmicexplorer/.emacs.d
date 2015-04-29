@@ -8,7 +8,8 @@
 
 ;;; let's not hardcode everything like back in 9th grade
 ;;; hopefully this is a sane default
-(defvar init-home-folder-dir (concat (getenv "HOME") "/.emacs.d/"))
+(defvar init-home-folder-dir (concat (getenv "HOME") "/.emacs.d/")
+  "Location of this home directory. Set in custom-vars.el")
 ;;; used in init-scripts/interface.el
 (defvar warning-words-file nil
   "Path to file defining words to highlight specially. An example file would
@@ -19,15 +20,22 @@ fixme
 hack
 broken
 deprecated
-")
+
+Set in custom-vars.el")
+(defvar sbcl-special-command nil
+  "Sometimes required because some versions of sbcl are difficult to wire up
+correctly. Set in custom-vars.el")
 
 ;;; load custom values for these variables (this file is .gitignored)
 (let ((custom-var-file
        (concat
         (file-name-directory (file-truename load-file-name))
         "custom-vars.el")))
-  (when (file-exists-p custom-var-file)
-    (load-file custom-var-file)))
+  (if (file-exists-p custom-var-file)
+      (load-file custom-var-file)
+    (with-current-buffer "*scratch*"
+      (insert "Make a custom-vars.el! Only if you want, though. Check out your
+.emacs."))))
 
 (unless (file-exists-p init-home-folder-dir)
   (throw 'no-home-holder "no emacs home directory given!"))
@@ -72,6 +80,8 @@ deprecated
 (load-my-init-script "interface")
 ;;; do some additional work to setup packages
 (load-my-init-script "package-setup")
+;;; slime is annoying but great
+(load-my-init-script "slime-setup")
 ;;; load (programming) language-specific settings
 (load-my-init-script "languages")
 ;;; cause what else is emacs for
