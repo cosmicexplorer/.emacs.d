@@ -80,8 +80,6 @@ correctly. Set in custom-vars.el")
 (load-my-init-script "interface")
 ;;; do some additional work to setup packages
 (load-my-init-script "package-setup")
-;;; slime is annoying but great
-(load-my-init-script "slime-setup")
 ;;; load (programming) language-specific settings
 (load-my-init-script "languages")
 ;;; cause what else is emacs for

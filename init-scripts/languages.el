@@ -84,14 +84,17 @@ Lisp code." t)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 ;;; just turn on paredit for scratch buffer
 (add-hook 'lisp-interaction-mode-hook 'paredit-mode)
+(defun setup-paredit-with-repl (mode-map)
+  (let ((prev-m-n (lookup-key mode-map (kbd "M-n")))
+        (prev-m-p (lookup-key mode-map (kbd "M-p"))))
+    (paredit-mode)
+    (fix-lisp-keybindings)
+    (define-key paredit-mode-map (kbd "M-n") prev-m-n)
+    (define-key paredit-mode-map (kbd "M-p") prev-m-p)))
 (add-hook 'slime-repl-mode-hook
-          (lambda ()
-            (let ((prev-m-n (lookup-key slime-repl-mode-map (kbd "M-n")))
-                  (prev-m-p (lookup-key slime-repl-mode-map (kbd "M-p"))))
-              (paredit-mode)
-              (fix-lisp-keybindings)
-              (define-key slime-repl-mode-map (kbd "M-n") prev-m-n)
-              (define-key slime-repl-mode-map (kbd "M-p") prev-m-p))))
+          (lambda () (setup-paredit-with-repl slime-repl-mode-map)))
+(add-hook 'cider-repl-mode-hook
+          (lambda () (setup-paredit-with-repl cider-repl-mode-map)))
 (add-hook 'lisp-interaction-mode-hook 'fix-lisp-keybindings)
 (add-hook 'emacs-lisp-mode-hook 'fix-lisp-keybindings)
 (add-hook 'lisp-mode-hook 'slime-mode)
@@ -133,14 +136,11 @@ Lisp code." t)
           (lambda ()
             (load "dired-x")))
 
+;;; slime
+(load-my-init-script "slime-setup")
+
 ;;; clojure
-(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
-(setq nrepl-log-messages t)
-(global-company-mode)
-(add-hook 'cider-mode-hook 'rainbow-delimiters-mode)
-(add-hook 'cider-mode-hook 'enable-paredit-mode)
-(add-hook 'cider-mode-hook 'subword-mode)
-(defalias 'cider 'cider-jack-in)
+(load-my-init-script "cider-setup")
 
 ;;; markdown
 (autoload 'markdown-mode "markdown-mode"
