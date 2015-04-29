@@ -19,6 +19,7 @@
                                     "-qO" quicklisp-file))
                 (throw 'setup-failure "quicklisp setup failed!")
               (if (/= 0 (shell-command
+                         ;; the echo is because it waits for a newline
                          (concat "echo | " sbcl-binary " --script "
                                  this-directory "/slime-setup.lisp > "
                                  this-directory "/error-log")))

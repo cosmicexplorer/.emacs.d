@@ -22,7 +22,7 @@ This is all licensed under GPLv3, which means do whatever you want with it excep
 1. Initial:
 	* Start emacs with the ```-l``` option to load the .emacs file within this repository instead of one in ~/.emacs. You can also use a symlink, or you can alias it: ```alias emacs='emacs -l ~/.emacs.d/.emacs'```.
 2. Lisp setup (not required if you don't use lisp):
-	* Install slime and quicklisp according to [these instructions](http://www.mohiji.org/2011/01/31/modern-common-lisp-on-linux/)
+	* There is a not-too-robust function in the setup files that automatically sets up quicklisp and emacs integration according to [these instructions](http://www.mohiji.org/2011/01/31/modern-common-lisp-on-linux/) if you have installed `sbcl` and are on a gnu/linux system.
 	* If things are not working (e.g. autocompletion, eldoc) in ```lisp-mode```, start slime using ```M-x slime```.
 3. Clojure setup (not required if you don't use clojure):
     * Install [leiningen](http://leiningen.org/) and put ```{:user {:plugins [[cider/cider-nrepl "0.8.2-SNAPSHOT"]]}}``` in `~/.lein/profiles.clj`.
