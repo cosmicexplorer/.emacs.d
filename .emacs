@@ -31,11 +31,13 @@ correctly. Set in custom-vars.el")
        (concat
         (file-name-directory (file-truename load-file-name))
         "custom-vars.el"))
-      (msg-string 
+      (msg-string
 "Make a custom-vars.el! Only if you want, though. Check out your .emacs"))
   (unless (file-exists-p custom-var-file)
     (with-temp-buffer
-      (insert "(with-current-buffer \"*scratch*\" (insert \"Make a custom-vars.el! Only if you want, though. Check out your .emacs.\"))")
+      (insert "(with-current-buffer \"*scratch*\"
+  (insert \"Make a custom-vars.el! Only if you want, though.
+Check out your .emacs.\"))")
       (write-region nil nil custom-var-file)))
   (load-file custom-var-file))
 
