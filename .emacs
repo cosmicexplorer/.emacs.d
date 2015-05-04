@@ -7,7 +7,6 @@
 ;;; FILE'S UNDO-TREE-HISTORY in ~/.emacs.d/undo-tree-history !!!!!!!!!!!
 
 ;;; let's not hardcode everything like back in 9th grade
-;;; hopefully this is a sane default
 (defvar init-home-folder-dir (concat (getenv "HOME") "/.emacs.d/")
   "Location of this home directory. Set in custom-vars.el")
 ;;; used in init-scripts/interface.el
