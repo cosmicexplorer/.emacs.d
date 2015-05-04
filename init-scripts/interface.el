@@ -3,6 +3,9 @@
 ;;; prompts for (yes/no) -> (y/n)
 (fset 'yes-or-no-p 'y-or-n-p)
 
+;;; use my shell aliases in shell commands run from emacs
+(setq shell-command-switch "-ic")
+
 ;; stop the intro to emacs buffer
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
@@ -248,7 +251,11 @@ lowercase, and Initial Caps versions."
 ;;; wrap lines in org-mode
 (visual-line-mode)
 
-;;; advice-add used below because for some reason when using add-hook
+;;; defadvice used here because even recent emacs (the default version for
+;;; ubuntu, for example) don't support advice-add yet (which is /so/ much
+;;; better). oh well.
+
+;;; advice used below because for some reason when using add-hook
 ;;; generate-new-buffer-name doesn't respect its "ignore" argument
 ;;; mark eshell buffers with their current directory
 (defadvice eshell-set-pwd-name (around eshell (&rest args))
@@ -277,3 +284,44 @@ lowercase, and Initial Caps versions."
 ;;; save and reset window configuration to ring
 (defvar window-configuration-ring nil
   "List of saved window configurations; only stays present within a session.")
+
+;;; do ssh-agent stuff
+(when do-ssh-agent-command-on-start
+  (if id-rsa-path
+      (when (and (executable-find "ssh-agent")
+                 (executable-find "ssh-add"))
+        (let ((command-results (shell-command-to-string "ssh-agent -s"))
+              (ssh-auth-sock-regex "SSH_AUTH_SOCK=\\([^;]+\\);")
+              (ssh-agent-pid-regex "SSH_AGENT_PID=\\([^;]+\\);"))
+          ;; setup required environment vars
+          (if (string-match ssh-auth-sock-regex command-results)
+              (setenv "SSH_AUTH_SOCK" (match-string 1 command-results))
+            (throw 'ssh-agent-err "ssh-agent's output can't be parsed!"))
+          (if (string-match ssh-agent-pid-regex command-results)
+              (setenv "SSH_AGENT_PID" (match-string 1 command-results))
+            (throw 'ssh-agent-err "ssh-agent's output can't be parsed!")))
+        ;; make it ask for a password using our script
+        (let ((prev-display (getenv "DISPLAY"))
+              (prev-ssh-askpass (getenv "SSH_ASKPASS")))
+          (setenv "DISPLAY" ":0")
+          (setenv "SSH_ASKPASS" (local-file-path "read-ssh-pass.sh"))
+          (with-temp-buffer
+            (loop with ssh-add-success = nil
+                  with ssh-did-fail = nil
+                  while (not ssh-add-success)
+                  do (progn
+                       (insert (read-passwd
+                                (if ssh-did-fail
+                                    "incorrect password. ssh password: "
+                                  "ssh password: ")))
+                       (if (zerop (call-process-region
+                                   (point-min) (point-max)
+                                   "ssh-add" t nil nil id-rsa-path))
+                           (setq ssh-add-success t)
+                         (erase-buffer)
+                         (setq ssh-did-fail t)))))
+          (setenv "DISPLAY" prev-display)
+          (setenv "SSH_ASKPASS" prev-ssh-askpass)))
+    (with-current-buffer "*scratch*"
+      (insert "Set up an id-rsa-path! Only if you want to, though.
+Check out your .emacs.\n"))))

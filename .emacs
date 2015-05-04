@@ -18,7 +18,8 @@
 ;;; setting up sbcl, the location of the home folder, and other nonsense not
 ;;; related to actually using emacs). therefore i have placed them in a separate
 ;;; file which below is created for the user if it doesn't exist. This
-;;; "custom-vars.el" file is gitignored so that it may vary easily.
+;;; "custom-vars.el" file is gitignored so that it may vary easily. meaningful
+;;; defaults are provided below with each variable.
 (defvar warning-words-file nil
   "Path to file defining words to highlight specially. An example file would
 contain:
@@ -35,6 +36,10 @@ Set in custom-vars.el, and used in init-scripts/interface.el.")
 correctly. Set in custom-vars.el")
 (defvar do-ssh-agent-command-on-start t
   "Whether or not to run an ssh-agent command on starting up emacs.")
+(defvar id-rsa-path (let ((id-rsa-path (concat (getenv "HOME") "/.ssh/id_rsa")))
+                      (if (file-exists-p id-rsa-path) id-rsa-path nil))
+  "Path to desired id_rsa file for ssh. Used in init-scripts/interface.el to
+stop ssh from prompting you every time you run git.")
 
 ;;; load custom values for these variables (this file is .gitignored)
 (let ((custom-var-file
@@ -47,7 +52,7 @@ Check out your .emacs."))
   (unless (file-exists-p custom-var-file)
     (with-temp-buffer
       (insert (concat "(with-current-buffer \"*scratch*\"
-  (insert \"" msg-string "\"))"))
+  (insert \"" msg-string "\\n\"))"))
       (write-region nil nil custom-var-file)))
   (load-file custom-var-file))
 

@@ -2,6 +2,14 @@
 ;;; copy/paste from emacswiki
 ;;; macros at bottom
 
+;;; helper function used for loading custom scripts littered throughout here
+(defun local-file-path (filename)
+  (concat (expand-file-name
+           (if load-file-name
+               (file-name-directory (file-truename load-file-name))
+             default-directory))
+   "/" filename))
+
 ;;; helper function often used in keybinding mappings
 (defun add-keybinding-to-mode-maps (keys-pressed func-to-call-quoted
                                                  &rest mode-maps-list)
