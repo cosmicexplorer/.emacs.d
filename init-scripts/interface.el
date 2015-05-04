@@ -322,7 +322,11 @@ lowercase, and Initial Caps versions."
                          (erase-buffer)
                          (setq ssh-did-fail t)))))
           (setenv "DISPLAY" prev-display)
-          (setenv "SSH_ASKPASS" prev-ssh-askpass)))
+          (setenv "SSH_ASKPASS" prev-ssh-askpass))
+        (add-hook 'kill-emacs-hook
+                  (lambda ()
+                    (call-process "kill" nil nil nil
+                                  (getenv "SSH_AGENT_PID")))))
     (with-current-buffer "*scratch*"
       (switch-to-buffer (current-buffer))
       (insert "Set up an id-rsa-path! Only if you want to, though.

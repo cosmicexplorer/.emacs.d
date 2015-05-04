@@ -1,3 +1,6 @@
+;;; .....let's begin
+(package-initialize)
+
 ;;; emacs config, aka the root node of a massively unbalanced configuration tree
 ;;; by Danny McClanahan, <danieldmcclanahan@gmail.com>, 2014-2015
 
@@ -45,7 +48,7 @@ stop ssh from prompting you every time you run git.")
 (defvar save-visited-files t
   "Whether or not to restore all files that were visited during the previous
 session. Used later in this file.")
-(defvar saved-files (concat init-home-folder-dir "saved-files")
+(defvar saved-files (file-truename (concat init-home-folder-dir "saved-files"))
   "File path to save visited-files. Used later in this file.")
 
 ;;; load custom values for these variables (this file is .gitignored)
@@ -59,7 +62,8 @@ Check out your .emacs."))
   (unless (file-exists-p custom-var-file)
     (with-temp-buffer
       (insert (concat "(with-current-buffer \"*scratch*\"
-  (insert \"" msg-string "\\n\"))"))
+  (insert \"" msg-string "\")
+  (newline))"))
       (write-region nil nil custom-var-file)))
   (load-file custom-var-file))
 
@@ -115,17 +119,27 @@ Check out your .emacs."))
 
 ;;; save visited files
 (when save-visited-files
-  (with-current-buffer (find-file (expand-file-name saved-files))
+  (with-current-buffer (find-file saved-files)
     (goto-char (point-min))
     (loop while (not (eobp))
-          with cur-line
-          do (progn
-               (setq cur-line
-                     (buffer-substring-no-properties
-                      (line-beginning-position)
-                      (line-end-position)))
-               (unless (string-equal cur-line (expand-file-name saved-files))
-                 (find-file-noselect cur-line))
+          do (let ((cur-line (buffer-substring-no-properties
+                               (line-beginning-position)
+                               (line-end-position))))
+               (if (string-match "^\\(.+\\):\\([[:digit:]]+\\)$" cur-line)
+                   (let ((active-filename
+                          (match-string 1 cur-line))
+                         (active-point
+                          (match-string 2 cur-line)))
+                     (unless (or (string= cur-line saved-files)
+                                 (string= cur-line ""))
+                       (with-current-buffer (find-file-noselect active-filename)
+                         (goto-char (string-to-number active-point)))
+                       ;; (async-load-file cur-line)
+                       (message "")))
+                 (with-current-buffer "*scratch*"
+                   (insert (concat "couldn't parse this line of "
+                                   saved-files ": \"" cur-line "\""))
+                   (newline)))
                (forward-line)))
     (kill-buffer))
   ;; save visiting files
@@ -133,15 +147,16 @@ Check out your .emacs."))
     (interactive)
     ;; TODO: make this more error-resistant, somehow. having to send emacs a
     ;; sigterm because this function fails on quit is annoying.
-    (with-current-buffer (find-file (expand-file-name saved-files))
+    (with-current-buffer (find-file saved-files)
          (erase-buffer)
          (loop for buf in (buffer-list)
-               do (unless (or
-                           (not (buffer-file-name buf))
-                           (string-equal (buffer-file-name buf)
-                                         (expand-file-name saved-files)))
-                    (insert (buffer-file-name buf))
-                    (newline)))
+               do (let ((bufname (buffer-file-name buf))
+                        (buf-pt (with-current-buffer buf (point))))
+                    (unless (or (not bufname)
+                                (string-equal bufname saved-files)
+                                (string-match-p "^/ssh:" bufname))
+                      (insert (concat bufname ":" (number-to-string buf-pt)))
+                      (newline))))
          (save-buffer)
          (kill-buffer)))
   (add-hook

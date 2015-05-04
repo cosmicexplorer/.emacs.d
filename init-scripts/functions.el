@@ -593,56 +593,6 @@ that point."
    nil eshell-user-output-file)
   (message ""))
 
-;;; TODO: add input redirection and command substitution (!!!) to eshell
-;;; these functions work, i'm just not too familiar with the order in which
-;;; eshell-parse-arguments is called. ideally we'd insert an advice in front of
-;;; eshell-parse-command-input, but eshell-parse-arguments seems to be called
-;;; before that for some reason, and also called by helm when completing
-;;; commands/directories and such. frustrating. i'll work on this later.
-(defun rewrite-command-without-redirection (str)
-  ;; TODO: use backreferences to put the first three of these regexes into one
-  (let ((final-str str))
-    (cond ((string-match "<\(.+\)" str)
-           (setq final-str
-                 (concat
-                  ;; remove the < and parens
-                  (let ((res (match-string-no-properties 0 str)))
-                    (substring res 2 (1- (length res))))
-                  " | "
-                  (replace-match "" t t str))))
-          ((string-match "<\s*\'.+\'" str)
-           (setq final-str
-                 (concat
-                  "cat "
-                  (substring (match-string-no-properties 0 str) 1)
-                  " | "
-                  (replace-match "" t t str))))
-          ((string-match "<\s*\".+\"" str)
-           (setq final-str
-                 (concat
-                  "cat "
-                  (substring (match-string-no-properties 0 str) 1)
-                  " | "
-                  (replace-match "" t t str))))
-          ((string-match "<\s*([^\\s]|[\\\s])+" str)
-           (setq final-str
-                 (concat
-                  "cat "
-                  (substring (match-string-no-properties 0 str) 1)
-                  " | "
-                  (replace-match "" t t str)))))
-    final-str))
-
-(defun check-for-annoying-characters-in-command (str)
-  "Checks for ;, &&, and backslash-without-newline, since those make this input
-redirection hack fail."
-  (or (string-match ";" str)
-      (string-match "&&" str)
-      (string-match "\\\\\\'" str)))
-
-;; (defun replace-command-arg
-;;     (eshell-parse-command-input-orig-fn beg end &optional args))
-
 ;;; functions to save and reset window configuration to a list
 ;;; since i only use a single frame mostly the intricacies of multiple frames
 ;;; and window configurations likely won't be an issue
@@ -672,3 +622,87 @@ redirection hack fail."
         do (with-current-buffer buf
              (unless (and (buffer-file-name) (file-exists-p (buffer-file-name)))
                (kill-buffer buf)))))
+
+;;; load file into buffer asynchronously
+;;; this is unfortunately somewhat useless because emacs has to stop the world
+;;; to receive sentinel input from a process, so if anything it's just more
+;;; annoying than waiting for find-file to complete synchronously. i've forked
+;;; emacs at https://github.com/cosmicexplorer/emacs-async to provide true
+;;; asynchronous support variables used for communication between process and
+;;; emacs
+(defvar async-load-is-buffer-modified-outside nil)
+(setq-default async-load-is-buffer-modified-outside nil)
+(make-variable-buffer-local 'async-load-is-buffer-modified-outside)
+(defvar async-load-is-modifying-buffer nil)
+(setq-default async-load-is-modifying-buffer nil)
+(make-variable-buffer-local 'async-load-is-modifying-buffer)
+(defvar async-load-line-count 0)
+(setq-default async-load-line-count 0)
+(make-variable-buffer-local 'async-load-line-count)
+
+(defun async-load-after-change-function (beg end len)
+  (unless async-load-is-modifying-buffer
+    (setq async-load-is-buffer-modified-outside t)))
+
+(defmacro with-async-load-modification (buffer &rest body)
+  `(with-current-buffer ,buffer
+     (setq async-load-is-modifying-buffer t)
+     (save-excursion
+       (goto-char (point-max))
+       ,@body)
+     (setq async-load-is-modifying-buffer nil)))
+;;; makes it more aesthetically pleasing to use this
+(put 'with-async-load-modification 'lisp-indent-function 1)
+
+(defun async-load-file (filepath)
+  (unless (and (file-exists-p filepath)
+               (not (file-directory-p filepath))
+               (file-readable-p filepath))
+    (throw 'file-not-found (concat "specified filepath " filepath
+                                   " could not be read.")))
+  (let* ((process-connection-type nil)   ; use pipe
+         ;; reimplementing part of the standard find-file function :(
+         (arg-buffer (get-buffer-create (generate-new-buffer-name
+                                         (file-name-nondirectory filepath))))
+         (arg-proc (start-process
+                    (concat "async-load-file: " filepath) arg-buffer
+                    "cat" filepath))
+         (arg-modify))
+    ;; see if we can setup appropriate mode hooks before loading contents
+    (with-current-buffer arg-buffer
+      (set-visited-file-name filepath t)
+      (normal-mode)
+      (add-hook 'after-change-functions #'async-load-after-change-function))
+    (set-process-filter
+     arg-proc
+     (lambda (proc str)
+       (with-async-load-modification (process-buffer proc)
+         (let ((prev-async-load-line-count async-load-line-count)
+               ;; newline is ascii code 10
+               (added-line-count (cl-count 10 str)))
+           (insert str)
+           (setq async-load-line-count (+ prev-async-load-line-count
+                                          added-line-count))
+           ;; update modes here because first two lines of file can often
+           ;; contain fun things like file-local variables caught by normal-mode
+           (when (and (< prev-async-load-line-count 2)
+                      (>= async-load-line-count 2))
+             (normal-mode))))))
+    (set-process-sentinel
+     arg-proc
+     (lambda (proc ev)
+       (if (string= ev "finished\n")
+           ;; update modes again here after the whole file has loaded
+           ;; in case file-local variables/etc have been defined again
+           (with-current-buffer (process-buffer proc)
+             (normal-mode)
+             (set-buffer-modified-p async-load-is-buffer-modified-outside))
+         ;; alert the user that SOMETHING BAD HAS HAPPENED!!!!
+         (switch-to-buffer (process-buffer proc))
+         (goto-char (point-max))
+         (message ev))
+       (remove-hook #'after-change-functions
+                    #'async-load-after-change-function)))
+    ;; return the process used to fill the buffer
+    ;; (the actual buffer can be found from the process)
+    arg-proc))
