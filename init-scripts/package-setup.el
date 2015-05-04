@@ -28,6 +28,20 @@
 (global-smart-tab-mode 1)               ; put it EVERYWHERE
 
 ;; julia/R from ESS
+(let ((ess-git-folder (concat init-home-folder-dir "ESS/.git")))
+  (unless (file-directory-p ess-git-folder)
+    (let ((ess-update-buf-name "*ESS-create-errors*")
+          (prev-wd default-directory))
+      (cd init-home-folder-dir)
+      (unwind-protect
+          (let ((ess-submodule-out-buf (get-buffer-create ess-update-buf-name)))
+            (unless (zerop (call-process "git" nil ess-submodule-out-buf nil
+                                         "submodule" "init"))
+              (throw 'ess-failure "init failed"))
+            (unless (zerop (call-process "git" nil ess-submodule-out-buf nil
+                                         "submodule" "update"))
+              (throw 'ess-failure "update failed")))
+        (cd prev-wd)))))
 (let ((ess-make-output-buf (get-buffer-create "*ESS-make-errors*")))
   (set-process-sentinel
    (start-process "make-ess" (buffer-name ess-make-output-buf)
