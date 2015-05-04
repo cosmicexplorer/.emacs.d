@@ -255,7 +255,6 @@ lowercase, and Initial Caps versions."
   (with-current-buffer ad-do-it
     (rename-buffer
      (generate-new-buffer-name (concat "eshell: " default-directory)))))
-;; (advice-add 'eshell :around #'eshell-set-pwd-name)
 (ad-activate 'eshell-set-pwd-name)
 ;;; resets name on every input send to every command, not just cd. the overhead
 ;;; is negligible. the bigger issue is that if "exit" is used to quit eshell
@@ -267,7 +266,6 @@ lowercase, and Initial Caps versions."
      (generate-new-buffer-name
       (concat "eshell: " default-directory)
       (buffer-name)))))
-;; (advice-add 'eshell-send-input :after #'eshell-set-pwd-name-on-cd)
 (ad-activate 'eshell-set-pwd-name-on-cd)
 
 ;;; output eshell buffers to file

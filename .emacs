@@ -7,9 +7,18 @@
 ;;; FILE'S UNDO-TREE-HISTORY in ~/.emacs.d/undo-tree-history !!!!!!!!!!!
 
 ;;; let's not hardcode everything like back in 9th grade
-(defvar init-home-folder-dir (concat (getenv "HOME") "/.emacs.d/")
-  "Location of this home directory. Set in custom-vars.el")
-;;; used in init-scripts/interface.el
+(defvar init-home-folder-dir (if load-file-name
+                                 (file-name-directory
+                                  (file-truename load-file-name))
+                               (file-truename default-directory))
+  "Location of this home directory.")
+
+;;; the below are custom variables that are "more custom" than defcustom; i.e.,
+;;; they may differ for the same person on different systems (things like
+;;; setting up sbcl, the location of the home folder, and other nonsense not
+;;; related to actually using emacs). therefore i have placed them in a separate
+;;; file which below is created for the user if it doesn't exist. This
+;;; "custom-vars.el" file is gitignored so that it may vary easily.
 (defvar warning-words-file nil
   "Path to file defining words to highlight specially. An example file would
 contain:
@@ -20,10 +29,12 @@ hack
 broken
 deprecated
 
-Set in custom-vars.el")
+Set in custom-vars.el, and used in init-scripts/interface.el.")
 (defvar sbcl-special-command nil
   "Sometimes required because some versions of sbcl are difficult to wire up
 correctly. Set in custom-vars.el")
+(defvar do-ssh-agent-command-on-start t
+  "Whether or not to run an ssh-agent command on starting up emacs.")
 
 ;;; load custom values for these variables (this file is .gitignored)
 (let ((custom-var-file
@@ -31,17 +42,17 @@ correctly. Set in custom-vars.el")
         (file-name-directory (file-truename load-file-name))
         "custom-vars.el"))
       (msg-string
-"Make a custom-vars.el! Only if you want, though. Check out your .emacs"))
+       "Make a custom-vars.el! Only if you want, though.
+Check out your .emacs."))
   (unless (file-exists-p custom-var-file)
     (with-temp-buffer
-      (insert "(with-current-buffer \"*scratch*\"
-  (insert \"Make a custom-vars.el! Only if you want, though.
-Check out your .emacs.\"))")
+      (insert (concat "(with-current-buffer \"*scratch*\"
+  (insert \"" msg-string "\"))"))
       (write-region nil nil custom-var-file)))
   (load-file custom-var-file))
 
 (unless (file-exists-p init-home-folder-dir)
-  (throw 'no-home-holder "no emacs home directory given!"))
+  (throw 'no-home-holder "no emacs home directory found (check your .emacs)!"))
 
 ;;; added up here cause a lot of packages depend on it being defined without
 ;;; defining it themselves
