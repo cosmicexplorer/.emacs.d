@@ -286,7 +286,8 @@ lowercase, and Initial Caps versions."
   "List of saved window configurations; only stays present within a session.")
 
 ;;; do ssh-agent stuff
-(when do-ssh-agent-command-on-start
+(defun setup-ssh-agent ()
+  (interactive)
   (if id-rsa-path
       (when (and (executable-find "ssh-agent")
                  (executable-find "ssh-add"))
@@ -323,5 +324,9 @@ lowercase, and Initial Caps versions."
           (setenv "DISPLAY" prev-display)
           (setenv "SSH_ASKPASS" prev-ssh-askpass)))
     (with-current-buffer "*scratch*"
+      (switch-to-buffer (current-buffer))
       (insert "Set up an id-rsa-path! Only if you want to, though.
 Check out your .emacs.\n"))))
+
+(when do-ssh-agent-command-on-start
+  (setup-ssh-agent))

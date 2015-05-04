@@ -13,6 +13,7 @@
                                (file-truename default-directory))
   "Location of this home directory.")
 
+;;; CUSTOM VARS
 ;;; the below are custom variables that are "more custom" than defcustom; i.e.,
 ;;; they may differ for the same person on different systems (things like
 ;;; setting up sbcl, the location of the home folder, and other nonsense not
@@ -40,6 +41,11 @@ correctly. Set in custom-vars.el")
                       (if (file-exists-p id-rsa-path) id-rsa-path nil))
   "Path to desired id_rsa file for ssh. Used in init-scripts/interface.el to
 stop ssh from prompting you every time you run git.")
+(defvar save-visited-files t
+  "Whether or not to restore all files that were visited during the previous
+session. Used later in this file.")
+(defvar saved-files (concat init-home-folder-dir "saved-files")
+  "File path to save visited-files. Used later in this file.")
 
 ;;; load custom values for these variables (this file is .gitignored)
 (let ((custom-var-file
@@ -107,8 +113,6 @@ Check out your .emacs."))
 ;;; TODO: document no-beautify and saved-files!
 
 ;;; save visited files
-(defvar save-visited-files t)
-(defvar saved-files (concat init-home-folder-dir "saved-files"))
 (when save-visited-files
   (with-current-buffer (find-file (expand-file-name saved-files))
     (goto-char (point-min))

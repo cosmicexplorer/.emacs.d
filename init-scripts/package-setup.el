@@ -28,16 +28,21 @@
 (global-smart-tab-mode 1)               ; put it EVERYWHERE
 
 ;; julia/R from ESS
-(when (and (executable-find "R")
-           (file-exists-p (concat init-home-folder-dir "ESS")))
-  (shell-command (concat "make -C " init-home-folder-dir "ESS"))
-  (delete-windows-on "*Shell Command Output*")
-  (add-to-list 'load-path (concat init-home-folder-dir "ESS/lisp"))
-  (require 'ess-site)
-  (when (executable-find "julia-basic")
-    (setq inferior-julia-program-name (executable-find "julia-basic"))
-    (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/"))
-  (ess-toggle-underscore nil))
+(let ((ess-make-output-buf (get-buffer-create "*ESS-make-errors*")))
+  (set-process-sentinel
+   (start-process "make-ess" (buffer-name ess-make-output-buf)
+                  "make" "-C"
+                  (expand-file-name (concat init-home-folder-dir "ESS")))
+
+   (lambda (proc ev)
+     (unless (string= ev "finished\n")
+       (when (process-live-p proc) (kill-process proc))
+       (switch-to-buffer (process-buffer proc))
+       (message ev)))))
+(when (executable-find "julia-basic")
+  (setq inferior-julia-program-name (executable-find "julia-basic"))
+  (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/"))
+(ess-toggle-underscore nil)
 
 ;;; magit
 (setq magit-last-seen-setup-instructions "1.4.0")
