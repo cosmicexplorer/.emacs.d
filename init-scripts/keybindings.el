@@ -171,3 +171,4 @@
 ;;; so it's all emacsy
 (define-key lisp-mode-map (kbd "C-h f") 'slime-documentation)
 (define-key lisp-mode-map (kbd "C-h v") 'slime-documentation)
+(define-key lisp-mode-map (kbd "C-h h") 'slime-hyperspec-lookup)

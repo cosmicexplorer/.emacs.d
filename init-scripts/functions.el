@@ -360,7 +360,9 @@ SLIME and Paredit. Not for the faint of heart."
   (when (eq major-mode 'lisp-mode)
     (define-key slime-mode-indirect-map (kbd "C-M-a") nil)
     (define-key slime-mode-indirect-map (kbd "M-p") nil)
-    (define-key slime-mode-indirect-map (kbd "M-n") nil))
+    (define-key paredit-mode-map (kbd "M-p") nil)
+    (define-key slime-mode-indirect-map (kbd "M-n") nil)
+    (define-key paredit-mode-map (kbd "M-n") nil))
   (when (eq major-mode 'slime-repl-mode)
     (define-key slime-repl-mode-map (kbd "M-s") nil))
   ;; so that multiple-cursors can use these
@@ -568,13 +570,22 @@ that point."
   `(when (eq system-type ,type)
      ,@body))
 
+(defvar current-date-time-format "%a %b %d %H:%M:%S %Z %Y"
+  "Format of date to insert with `insert-current-date-time' func
+See help of `format-time-string' for possible replacements")
+(defvar current-time-format "%a %H:%M:%S"
+  "Format of date to insert with `insert-current-time' func.
+Note the weekly scope of the command's precision.")
+
 ;;; the below two functions rely on eshell using eshell-last-input-start,
 ;;; eshell-last-input-end, and eshell-last-output-start internally! hopefully
 ;;; these won't change.........................................
 ;;; currently working on emacs 24.5
 (defun eshell-send-input-to-history ()
   (append-to-file
-   (concat "--in--: "
+   (concat "--in--: " default-directory ": "
+           (format-time-string current-date-time-format (current-time))
+           "\n"
            (buffer-substring-no-properties
             (marker-position eshell-last-input-start)
             (point)))
@@ -586,7 +597,9 @@ that point."
 (defun eshell-send-output-to-history ()
   (append-to-file
    (let* ((str
-           (concat "--out--: "
+           (concat "--out--: " default-directory ": "
+                   (format-time-string current-date-time-format (current-time))
+                   "\n"
                    (buffer-substring-no-properties
                     (marker-position eshell-last-input-end)
                     (marker-position eshell-last-output-start))))

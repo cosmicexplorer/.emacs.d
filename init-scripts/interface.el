@@ -258,22 +258,22 @@ lowercase, and Initial Caps versions."
 ;;; advice used below because for some reason when using add-hook
 ;;; generate-new-buffer-name doesn't respect its "ignore" argument
 ;;; mark eshell buffers with their current directory
-(defadvice eshell-set-pwd-name (around eshell (&rest args))
-  (with-current-buffer ad-do-it
-    (rename-buffer
-     (generate-new-buffer-name (concat "eshell: " default-directory)))))
-(ad-activate 'eshell-set-pwd-name)
+(defadvice eshell (after eshell-set-pwd-name)
+  (rename-buffer
+   (generate-new-buffer-name (concat "eshell: " default-directory))))
+(ad-activate 'eshell)
+
 ;;; resets name on every input send to every command, not just cd. the overhead
 ;;; is negligible. the bigger issue is that if "exit" is used to quit eshell
 ;;; instead of kill-buffer, the buffer switched to after eshell exits is renamed
 ;;; as described below. this is fixed by the "when" statement.
-(defadvice eshell-set-pwd-name-on-cd (after eshell-send-input)
+(defadvice eshell-send-input (after eshell-set-pwd-name-on-cd)
   (when (eq major-mode 'eshell-mode)
     (rename-buffer
      (generate-new-buffer-name
       (concat "eshell: " default-directory)
       (buffer-name)))))
-(ad-activate 'eshell-set-pwd-name-on-cd)
+(ad-activate 'eshell-send-input)
 
 ;;; output eshell buffers to file
 (defvar eshell-user-output-file (concat init-home-folder-dir "eshell-output")
