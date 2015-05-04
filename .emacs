@@ -29,12 +29,16 @@ correctly. Set in custom-vars.el")
 (let ((custom-var-file
        (concat
         (file-name-directory (file-truename load-file-name))
-        "custom-vars.el")))
-  (if (file-exists-p custom-var-file)
-      (load-file custom-var-file)
-    (with-current-buffer "*scratch*"
-      (insert "Make a custom-vars.el! Only if you want, though. Check out your
-.emacs."))))
+        "custom-vars.el"))
+      (msg-string
+"Make a custom-vars.el! Only if you want, though. Check out your .emacs"))
+  (unless (file-exists-p custom-var-file)
+    (with-temp-buffer
+      (insert "(with-current-buffer \"*scratch*\"
+  (insert \"Make a custom-vars.el! Only if you want, though.
+Check out your .emacs.\"))")
+      (write-region nil nil custom-var-file)))
+  (load-file custom-var-file))
 
 (unless (file-exists-p init-home-folder-dir)
   (throw 'no-home-holder "no emacs home directory given!"))

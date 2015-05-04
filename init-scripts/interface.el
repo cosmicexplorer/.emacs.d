@@ -186,7 +186,7 @@ case."
 (defun read-words-from-file-as-list-with-caps (filename)
   "Reads words from file, delimited by newlines, as a list. Reads in ALLCAPS,
 lowercase, and Initial Caps versions."
-  (if (not (file-exists-p filename))
+  (if (or (not filename) (not (file-exists-p filename)))
       (throw 'no-warning-words-file t)
     (let ((final-word-list nil))
       (loop for word in
@@ -206,7 +206,7 @@ lowercase, and Initial Caps versions."
    "\\(^\\|[^[:word:]]\\)"
    "\\("
    (regexp-opt
-    (if (file-exists-p warning-words-file)
+    (if (and warning-words-file (file-exists-p warning-words-file))
         (read-words-from-file-as-list-with-caps warning-words-file)
       warning-words))
    "\\)"
@@ -251,22 +251,24 @@ lowercase, and Initial Caps versions."
 ;;; advice-add used below because for some reason when using add-hook
 ;;; generate-new-buffer-name doesn't respect its "ignore" argument
 ;;; mark eshell buffers with their current directory
-(defun eshell-set-pwd-name (orig-eshell-fun &rest args)
-  (with-current-buffer (apply orig-eshell-fun args)
+(defadvice eshell-set-pwd-name (around eshell (&rest args))
+  (with-current-buffer ad-do-it
     (rename-buffer
      (generate-new-buffer-name (concat "eshell: " default-directory)))))
-(advice-add 'eshell :around #'eshell-set-pwd-name)
+;; (advice-add 'eshell :around #'eshell-set-pwd-name)
+(ad-activate 'eshell-set-pwd-name)
 ;;; resets name on every input send to every command, not just cd. the overhead
 ;;; is negligible. the bigger issue is that if "exit" is used to quit eshell
 ;;; instead of kill-buffer, the buffer switched to after eshell exits is renamed
 ;;; as described below. this is fixed by the "when" statement.
-(defun eshell-set-pwd-name-on-cd (&rest args)
+(defadvice eshell-set-pwd-name-on-cd (after eshell-send-input)
   (when (eq major-mode 'eshell-mode)
     (rename-buffer
      (generate-new-buffer-name
       (concat "eshell: " default-directory)
       (buffer-name)))))
-(advice-add 'eshell-send-input :after #'eshell-set-pwd-name-on-cd)
+;; (advice-add 'eshell-send-input :after #'eshell-set-pwd-name-on-cd)
+(ad-activate 'eshell-set-pwd-name-on-cd)
 
 ;;; output eshell buffers to file
 (defvar eshell-user-output-file (concat init-home-folder-dir "eshell-output")

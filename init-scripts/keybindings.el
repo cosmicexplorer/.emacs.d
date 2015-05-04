@@ -153,14 +153,14 @@
 ;;           (define-key org-mode-map (kbd "<tab>") 'smart-tab))
 
 ;;; coffeescript
-(with-eval-after-load "coffee-mode"
- 'after-load-functions
- (define-key coffee-mode-map (kbd "C-c C-k") 'smart-compile)
- (define-key coffee-mode-map (kbd "C-c C-c") 'coffee-compile-buffer))
+(eval-after-load "coffee-mode"
+  '(progn
+     (define-key coffee-mode-map (kbd "C-c C-k") 'smart-compile)
+     (define-key coffee-mode-map (kbd "C-c C-c") 'coffee-compile-buffer)))
 
 ;;; js
-(with-eval-after-load "js.el"
-  (define-key js-mode-map (kbd "RET") 'newline-and-indent-fix-js-mode))
+(eval-after-load "js.el"
+  '(define-key js-mode-map (kbd "RET") 'newline-and-indent-fix-js-mode))
 
 ;;; CPerl-mode
 (add-hook 'cperl-mode-hook
