@@ -168,6 +168,6 @@
             (define-key cperl-mode-map (kbd "C-c C-k") nil)))
 
 ;;; lisp
-;;; TODO: make these work!
-;; (define-key lisp-mode-map (kbd "C-h f") 'slime-documentation-lookup)
-;; (define-key lisp-mode-map (kbd "C-h v") 'slime-documentation-lookup)
+;;; so it's all emacsy
+(define-key lisp-mode-map (kbd "C-h f") 'slime-documentation)
+(define-key lisp-mode-map (kbd "C-h v") 'slime-documentation)

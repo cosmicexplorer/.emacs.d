@@ -7,21 +7,22 @@
   (add-hook 'cider-mode-hook 'enable-paredit-mode)
   (add-hook 'cider-mode-hook 'subword-mode))
 
-(let ((lein-binary (executable-find "lein"))
-      (clojure-binary (executable-find "clojure"))
-      (lein-profiles-file (concat (getenv "HOME") "/.lein/profiles.clj")))
-  (if (and lein-binary clojure-binary (file-exists-p lein-profiles-file))
-      (progn
-        (with-temp-buffer
-          (insert-file-contents lein-profiles-file)
-          (goto-char (point-min))
-          (re-search-forward "\\[\\[cider/cider-nrepl\s+\"\\(.*\\)\"\\]\\]")
-          (replace-match cider-version nil t nil 1)
-          (write-region nil nil lein-profiles-file))
-        (setup-cider-stuff))
-    (when (and lein-binary clojure-binary)
-      (with-temp-buffer
-        (insert (concat "{:user {:plugins [[cider/cider-nrepl"
-                        cider-version "]]}}"))
-        (write-region nil nil lein-profiles-file))
-      (setup-cider-stuff))))
+(eval-after-load "cider"
+  '(let ((lein-binary (executable-find "lein"))
+         (clojure-binary (executable-find "clojure"))
+         (lein-profiles-file (concat (getenv "HOME") "/.lein/profiles.clj")))
+     (if (and lein-binary clojure-binary (file-exists-p lein-profiles-file))
+         (progn
+           (with-temp-buffer
+             (insert-file-contents lein-profiles-file)
+             (goto-char (point-min))
+             (re-search-forward "cider/cider-nrepl\s+\"\\(.*\\)\"" nil t)
+             (replace-match cider-version nil t nil 1)
+             (write-region nil nil lein-profiles-file))
+           (setup-cider-stuff))
+       (when (and lein-binary clojure-binary)
+         (with-temp-buffer
+           (insert (concat "{:user {:plugins [[cider/cider-nrepl"
+                           cider-version "]]}}"))
+           (write-region nil nil lein-profiles-file))
+         (setup-cider-stuff)))))
