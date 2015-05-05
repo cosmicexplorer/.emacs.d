@@ -172,3 +172,7 @@
 (define-key lisp-mode-map (kbd "C-h f") 'slime-documentation)
 (define-key lisp-mode-map (kbd "C-h v") 'slime-documentation)
 (define-key lisp-mode-map (kbd "C-h h") 'slime-hyperspec-lookup)
+
+;;; makefile
+(define-key makefile-gmake-mode-map (kbd "M-n") nil)
+(define-key makefile-gmake-mode-map (kbd "M-p") nil)

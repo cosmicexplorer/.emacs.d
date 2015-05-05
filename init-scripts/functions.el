@@ -637,7 +637,11 @@ Note the weekly scope of the command's precision.")
   (interactive)
   (loop for buf in (buffer-list)
         do (with-current-buffer buf
-             (unless (and (buffer-file-name) (file-exists-p (buffer-file-name)))
+             (unless
+                 (or (not (buffer-file-name))
+                     (file-exists-p (buffer-file-name))
+                     (get-buffer-process (current-buffer))
+                     (string= "*slime-repl sbcl*" (buffer-name)))
                (kill-buffer buf)))))
 
 ;;; load file into buffer asynchronously
