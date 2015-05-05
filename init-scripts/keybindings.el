@@ -174,5 +174,7 @@
 (define-key lisp-mode-map (kbd "C-h h") 'slime-hyperspec-lookup)
 
 ;;; makefile
-(define-key makefile-gmake-mode-map (kbd "M-n") nil)
-(define-key makefile-gmake-mode-map (kbd "M-p") nil)
+(eval-after-load "makefile-mode"
+  '(progn
+     (define-key makefile-gmake-mode-map (kbd "M-n") nil)
+     (define-key makefile-gmake-mode-map (kbd "M-p") nil)))
