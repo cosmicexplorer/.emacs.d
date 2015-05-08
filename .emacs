@@ -171,8 +171,12 @@ Check out your .emacs."))
  '(TeX-engine (quote luatex))
  '(asm-comment-char 35)
  '(coffee-tab-width 2)
+ '(dabbrev-case-replace nil)
  '(fill-column 80)
  '(gud-key-prefix "")
+ '(hippie-expand-try-functions-list
+   (quote
+    (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-list try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)))
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
@@ -190,6 +194,8 @@ Check out your .emacs."))
                                                       (current-time)))
                             (set-time-zone-rule tz)
                             time)))))
+ '(smart-tab-using-hippie-expand t)
+ '(warning-suppress-types (quote ((undo discard-info))))
  '(yank-pop-change-selection t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

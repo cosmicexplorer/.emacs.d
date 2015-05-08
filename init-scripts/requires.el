@@ -32,3 +32,4 @@
 (require 'color-theme-danny)            ; mine
 (require 'web-beautify)
 (require 'cloc)
+(require 'pp-c-l)

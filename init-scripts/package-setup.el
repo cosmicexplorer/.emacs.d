@@ -41,6 +41,7 @@
             (unless (zerop (call-process "git" nil ess-submodule-out-buf nil
                                          "submodule" "update"))
               (throw 'ess-failure "update failed")))
+        (kill-buffer ess-update-buf-name)
         (cd prev-wd)))))
 (let ((ess-make-output-buf (get-buffer-create "*ESS-make-errors*")))
   (set-process-sentinel
@@ -52,7 +53,8 @@
      (unless (string= ev "finished\n")
        (when (process-live-p proc) (kill-process proc))
        (switch-to-buffer (process-buffer proc))
-       (message ev)))))
+       (message ev))
+     (kill-buffer (process-buffer proc)))))
 (when (executable-find "julia-basic")
   (setq inferior-julia-program-name (executable-find "julia-basic"))
   (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/"))

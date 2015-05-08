@@ -334,3 +334,6 @@ Check out your .emacs.\n"))))
 
 (when do-ssh-agent-command-on-start
   (setup-ssh-agent))
+
+;;; control l setup
+(pretty-control-l-mode 1)
