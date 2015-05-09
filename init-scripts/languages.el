@@ -98,7 +98,7 @@ Lisp code." t)
 (add-hook 'lisp-interaction-mode-hook 'fix-lisp-keybindings)
 (add-hook 'emacs-lisp-mode-hook 'fix-lisp-keybindings)
 (add-hook 'lisp-mode-hook 'slime-mode)
-(add-hook 'lisp-mode-hook 'fix-lisp-keybindings)
+(add-hook 'slime-mode-hook 'fix-lisp-keybindings)
 
 ;;; start scratch buffer in paredit mode
 (with-current-buffer (get-buffer "*scratch*")
