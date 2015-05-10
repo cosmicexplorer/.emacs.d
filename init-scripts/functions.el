@@ -375,6 +375,13 @@ SLIME and Paredit. Not for the faint of heart."
   (define-key paredit-mode-map (kbd "C-M-y") 'paredit-yank-push)
   (define-key paredit-mode-map (kbd "DEL") 'paredit-backspace-delete-highlight))
 
+;; so that paredit-kill works the way it should on regions
+(defadvice paredit-kill (around paredit-kill-region-dwim)
+  (interactive)
+  (if (use-region-p)
+      (kill-region (region-beginning) (region-end))
+    ad-do-it))
+
 ;; create parens and add adjacent two elements to sexp created by parens
 (defun paredit-add-parens-in-front ()
   ;; TODO: add to this later; slurp all sexps until closing paren would be very
