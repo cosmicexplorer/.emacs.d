@@ -581,34 +581,36 @@ Note the weekly scope of the command's precision.")
 ;;; eshell-last-input-end, and eshell-last-output-start internally! hopefully
 ;;; these won't change.........................................
 ;;; currently working on emacs 24.5
-(defun eshell-send-input-to-history ()
-  (append-to-file
-   (concat "--in--: " default-directory ": "
-           (format-time-string current-date-time-format (current-time))
-           "\n"
-           (buffer-substring-no-properties
-            (marker-position eshell-last-input-start)
-            (point)))
-   nil eshell-user-output-file)
-  ;; because append-to-file cheerfully tells us that it has written to the file,
-  ;; and that's annoying
-  (message ""))
+(when save-eshell-history
+  (defun eshell-send-input-to-history ()
+    (append-to-file
+     (concat "--in--: " default-directory ": "
+             (format-time-string current-date-time-format (current-time))
+             "\n"
+             (buffer-substring-no-properties
+              (marker-position eshell-last-input-start)
+              (point)))
+     nil eshell-user-output-file)
+    ;; because append-to-file cheerfully tells us that it has written to the
+    ;; file, and that's annoying
+    (message ""))
 
-(defun eshell-send-output-to-history ()
-  (append-to-file
-   (let* ((str
-           (concat "--out--: " default-directory ": "
-                   (format-time-string current-date-time-format (current-time))
-                   "\n"
-                   (buffer-substring-no-properties
-                    (marker-position eshell-last-input-end)
-                    (marker-position eshell-last-output-start))))
-          (res (string-match "\n" str)))
-     (if res
-         str
-       (concat str "\n")))
-   nil eshell-user-output-file)
-  (message ""))
+  (defun eshell-send-output-to-history ()
+    (append-to-file
+     (let* ((str
+             (concat "--out--: " default-directory ": "
+                     (format-time-string current-date-time-format
+                                         (current-time))
+                     "\n"
+                     (buffer-substring-no-properties
+                      (marker-position eshell-last-input-end)
+                      (marker-position eshell-last-output-start))))
+            (res (string-match "\n" str)))
+       (if res
+           str
+         (concat str "\n")))
+     nil eshell-user-output-file)
+    (message "")))
 
 ;;; functions to save and reset window configuration to a list
 ;;; since i only use a single frame mostly the intricacies of multiple frames
@@ -727,3 +729,58 @@ Note the weekly scope of the command's precision.")
     ;; return the process used to fill the buffer
     ;; (the actual buffer can be found from the process)
     arg-proc))
+
+
+;;; save buffers to disk and get them back
+(defun reread-visited-files-from-disk ()
+  (with-current-buffer (find-file saved-files)
+    (goto-char (point-min))
+    (loop while (not (eobp))
+          do (let ((cur-line (buffer-substring-no-properties
+                               (line-beginning-position)
+                               (line-end-position))))
+               (if (string-match "^\\([^:]+\\):\\([^:]+\\):\\([[:digit:]]+\\)$"
+                                 cur-line)
+                   (let ((active-filetype
+                          (match-string 1 cur-line))
+                         (active-filename
+                          (match-string 2 cur-line))
+                         (active-point
+                          (match-string 3 cur-line)))
+                     (unless (or (string= cur-line saved-files)
+                                 (string= cur-line ""))
+                       (cond ((string= active-filetype "visit")
+                              (with-current-buffer
+                                  (find-file-noselect active-filename)
+                                (goto-char (string-to-number active-point))))
+                             (t (throw 'no-such-active-filetype
+                                       (concat "i don't recognize "
+                                               active-filetype "!"))))
+                       ;; figure this out later!!!
+                       ;; (async-load-file cur-line)
+                       (message "")))
+                 (with-current-buffer "*scratch*"
+                   (insert (concat "couldn't parse this line of "
+                                   saved-files ": \"" cur-line "\""))
+                   (newline)))
+               (forward-line)))
+    (kill-buffer)))
+
+(defun save-visiting-files-to-buffer ()
+    (interactive)
+    ;; TODO: make this more error-resistant, somehow. having to send emacs a
+    ;; sigterm because this function fails on quit is annoying.
+    (with-current-buffer (find-file saved-files)
+         (erase-buffer)
+         (loop for buf in (buffer-list)
+               do (let ((bufname (buffer-file-name buf))
+                        (buf-pt (with-current-buffer buf (point))))
+                    (unless (or (not bufname)
+                                (string-equal bufname saved-files)
+                                (string-match-p "^/ssh:" bufname))
+                      (insert (concat "visit" ":"
+                                      bufname ":"
+                                      (number-to-string buf-pt)))
+                      (newline))))
+         (save-buffer)
+         (kill-buffer)))

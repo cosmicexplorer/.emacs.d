@@ -134,6 +134,7 @@
             (when (eq major-mode 'doc-view-mode)
               (linum-mode 0))))
 
+
 ;;; misc
 (load-display-time)
 (put 'downcase-region 'disabled nil)
@@ -157,6 +158,7 @@
 (setq trim-versions-without-asking t)
 (setq mode-line-inverse-video t)
 
+
 ;;; setup syntax highlighting for keywords i care about
 (defvar warning-words
   '("todo"
@@ -248,13 +250,14 @@ lowercase, and Initial Caps versions."
   (helm-multi-swoop-all
    warning-highlights-regex))
 
+
 ;;; wrap lines in org-mode
 (visual-line-mode)
 
+
 ;;; defadvice used here because even recent emacs (the default version for
 ;;; ubuntu, for example) don't support advice-add yet (which is /so/ much
 ;;; better). oh well.
-
 ;;; advice used below because for some reason when using add-hook
 ;;; generate-new-buffer-name doesn't respect its "ignore" argument
 ;;; mark eshell buffers with their current directory
@@ -276,15 +279,18 @@ lowercase, and Initial Caps versions."
 (ad-activate 'eshell-send-input)
 
 ;;; output eshell buffers to file
-(defvar eshell-user-output-file (concat init-home-folder-dir "eshell-output")
-  "File containing all eshell I/O from all eshell buffers.")
-(add-hook 'eshell-pre-command-hook #'eshell-send-input-to-history)
-(add-hook 'eshell-post-command-hook #'eshell-send-output-to-history)
+(when save-eshell-history
+  (defvar eshell-user-output-file (concat init-home-folder-dir "eshell-output")
+    "File containing all eshell I/O from all eshell buffers.")
+  (add-hook 'eshell-pre-command-hook #'eshell-send-input-to-history)
+  (add-hook 'eshell-post-command-hook #'eshell-send-output-to-history))
 
+
 ;;; save and reset window configuration to ring
 (defvar window-configuration-ring nil
   "List of saved window configurations; only stays present within a session.")
 
+
 ;;; do ssh-agent stuff
 (defun setup-ssh-agent ()
   (interactive)
@@ -328,12 +334,20 @@ lowercase, and Initial Caps versions."
                     (call-process "kill" nil nil nil
                                   (getenv "SSH_AGENT_PID")))))
     (with-current-buffer "*scratch*"
-      (switch-to-buffer (current-buffer))
       (insert "Set up an id-rsa-path! Only if you want to, though.
 Check out your .emacs.\n"))))
 
 (when do-ssh-agent-command-on-start
   (setup-ssh-agent))
 
+
 ;;; control l setup
 (pretty-control-l-mode 1)
+
+
+;;; persist buffers not visiting files to disk as well because apparently
+;;; sublime does this by default and we can't let sublime beat us; let's also do
+;;; the same for tramp buffers (this requires logging in; "luckily" emacs is
+;;; synchronous so that should still work. may get annoying for people who tramp
+;;; around a lot. let's make that an option)
+()

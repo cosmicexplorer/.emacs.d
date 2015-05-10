@@ -18,11 +18,13 @@
   "Location of this home directory.")
 
 ;;; CUSTOM VARS
-;;; the below are custom variables that are "more custom" than defcustom; i.e.,
-;;; they may differ for the same person on different systems (things like
-;;; setting up sbcl, the location of the home folder, and other nonsense not
-;;; related to actually using emacs). therefore i have placed them in a separate
-;;; file which below is created for the user if it doesn't exist. This
+;;; the below variables should be defcustoms, but i don't enjoy that setup
+;;; because when you click "apply and save" on a "customize" prompt, it saves
+;;; the choice directly to your .emacs file. after every such operation, i would
+;;; have to then move the choice of defcustom from this .emacs file to a
+;;; separate file if i wanted it to be gitignored. as a result, I am creating
+;;; essentially my own more low-level version of defcustoms so that a single
+;;; file can be modified without affecting version control. this
 ;;; "custom-vars.el" file is gitignored so that it may vary easily. meaningful
 ;;; defaults are provided below with each variable.
 (defvar warning-words-file nil
@@ -50,6 +52,15 @@ stop ssh from prompting you every time you run git.")
 session. Used later in this file.")
 (defvar saved-files (file-truename (concat init-home-folder-dir "saved-files"))
   "File path to save visited-files. Used later in this file.")
+(defvar save-eshell-history t
+  "Whether or not to save eshell history to disk. Used in
+init-scripts/interface.el.")
+(defvar save-nonvisiting-files t
+  "Whether or not to persist all buffers not visiting files to disk. Used in
+init-scripts/interface.el.")
+(defvar save-tramp-bufs t
+  "Whether or not to revisit tramp buffers opened in a previous session. Used in
+init-scripts/interface.el.")
 
 ;;; load custom values for these variables (this file is .gitignored)
 (let ((custom-var-file
@@ -119,46 +130,7 @@ Check out your .emacs."))
 
 ;;; save visited files
 (when save-visited-files
-  (with-current-buffer (find-file saved-files)
-    (goto-char (point-min))
-    (loop while (not (eobp))
-          do (let ((cur-line (buffer-substring-no-properties
-                               (line-beginning-position)
-                               (line-end-position))))
-               (if (string-match "^\\(.+\\):\\([[:digit:]]+\\)$" cur-line)
-                   (let ((active-filename
-                          (match-string 1 cur-line))
-                         (active-point
-                          (match-string 2 cur-line)))
-                     (unless (or (string= cur-line saved-files)
-                                 (string= cur-line ""))
-                       (with-current-buffer (find-file-noselect active-filename)
-                         (goto-char (string-to-number active-point)))
-                       ;; (async-load-file cur-line)
-                       (message "")))
-                 (with-current-buffer "*scratch*"
-                   (insert (concat "couldn't parse this line of "
-                                   saved-files ": \"" cur-line "\""))
-                   (newline)))
-               (forward-line)))
-    (kill-buffer))
-  ;; save visiting files
-  (defun save-visiting-files-to-buffer ()
-    (interactive)
-    ;; TODO: make this more error-resistant, somehow. having to send emacs a
-    ;; sigterm because this function fails on quit is annoying.
-    (with-current-buffer (find-file saved-files)
-         (erase-buffer)
-         (loop for buf in (buffer-list)
-               do (let ((bufname (buffer-file-name buf))
-                        (buf-pt (with-current-buffer buf (point))))
-                    (unless (or (not bufname)
-                                (string-equal bufname saved-files)
-                                (string-match-p "^/ssh:" bufname))
-                      (insert (concat bufname ":" (number-to-string buf-pt)))
-                      (newline))))
-         (save-buffer)
-         (kill-buffer)))
+  (reread-visited-files-from-disk)
   (add-hook
    'kill-emacs-hook
    #'save-visiting-files-to-buffer))
