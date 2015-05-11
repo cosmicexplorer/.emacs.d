@@ -178,3 +178,6 @@
   '(progn
      (define-key makefile-gmake-mode-map (kbd "M-n") nil)
      (define-key makefile-gmake-mode-map (kbd "M-p") nil)))
+
+;;; erc
+(global-set-key (kbd "C-c C-e") 'message-erc-modded-chans)
