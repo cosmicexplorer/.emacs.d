@@ -33,3 +33,6 @@
 (require 'web-beautify)
 (require 'cloc)
 (require 'pp-c-l)
+(require 'erc)
+(require 'erc-nicklist)                 ; this file is in /lisp/
+(require 'erc-highlight-nicknames)      ; this file is in /lisp/

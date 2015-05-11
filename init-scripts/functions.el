@@ -381,6 +381,7 @@ SLIME and Paredit. Not for the faint of heart."
   (if (use-region-p)
       (kill-region (region-beginning) (region-end))
     ad-do-it))
+(ad-activate 'paredit-kill)
 
 ;; create parens and add adjacent two elements to sexp created by parens
 (defun paredit-add-parens-in-front ()

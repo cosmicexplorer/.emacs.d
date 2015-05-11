@@ -350,4 +350,32 @@ Check out your .emacs.\n"))))
 ;;; the same for tramp buffers (this requires logging in; "luckily" emacs is
 ;;; synchronous so that should still work. may get annoying for people who tramp
 ;;; around a lot. let's make that an option)
-()
+
+
+;;; erc setup
+;; (add-hook 'erc-mode-hook 'erc-nicklist)
+(add-to-list 'erc-modules 'highlight-nicknames)
+(erc-update-modules)
+(defun destroy-all-erc-stuff ()
+  (interactive)
+  (loop for buf in (buffer-list)
+        do (with-current-buffer buf
+             (when (eq major-mode 'erc-mode)
+               (kill-this-buffer)))))
+(defun message-erc-modded-chans ()
+  (interactive)
+  (message "%s" erc-modified-channels-object))
+(defun message-erc-modded-chans-when-erc-mode ()
+  (when (eq major-mode 'erc-mode)
+    (message-erc-modded-chans)))
+;;; update me with irc activity, but only if i'm in an erc buffer
+(defadvice erc-server-filter-function (after update-erc-status-on-erc-bufs)
+  (message-erc-modded-chans-when-erc-mode))
+(ad-activate 'erc-server-filter-function)
+;;; update me with activity when i switch to an erc buffer
+(defadvice switch-to-buffer (after update-erc-status-on-switch-to-erc-buf)
+  (message-erc-modded-chans-when-erc-mode))
+(ad-activate 'switch-to-buffer)
+(defadvice windmove-do-window-select (after update-erc-status-on-windmove)
+  (message-erc-modded-chans-when-erc-mode))
+(ad-activate 'windmove-do-window-select)

@@ -7,9 +7,6 @@
 ;;; IF YOU ARE HAVING CRASHES UPON OPENING A PARTICULAR FILE, TRY DELETING THAT
 ;;; FILE'S UNDO-TREE-HISTORY in ~/.emacs.d/undo-tree-history/!!!!!!!!!!!
 
-;;; .....let's begin
-(package-initialize)
-
 ;;; let's not hardcode everything like back in 9th grade
 (defvar init-home-folder-dir (if load-file-name
                                  (file-name-directory
@@ -24,9 +21,11 @@
 ;;; have to then move the choice of defcustom from this .emacs file to a
 ;;; separate file if i wanted it to be gitignored. as a result, I am creating
 ;;; essentially my own more low-level version of defcustoms so that a single
-;;; file can be modified without affecting version control. this
-;;; "custom-vars.el" file is gitignored so that it may vary easily. meaningful
-;;; defaults are provided below with each variable.
+;;; file can be modified without affecting version control. this also allows for
+;;; storing personal information such as directory structure, or irc nicks,
+;;; which is not really great for sharing on github. this "custom-vars.el" file
+;;; is gitignored so that it may vary easily. meaningful defaults are provided
+;;; below with each variable.
 (defvar warning-words-file nil
   "Path to file defining words to highlight specially. An example file would
 contain:
@@ -144,6 +143,25 @@ Check out your .emacs."))
  '(asm-comment-char 35)
  '(coffee-tab-width 2)
  '(dabbrev-case-replace nil)
+ '(erc-autojoin-mode t)
+ '(erc-button-mode t)
+ '(erc-fill-mode t)
+ '(erc-highlight-nicknames-mode t)
+ '(erc-irccontrols-mode t)
+ '(erc-list-mode t)
+ '(erc-match-mode t)
+ '(erc-menu-mode nil)
+ '(erc-move-to-prompt-mode t)
+ '(erc-netsplit-mode t)
+ '(erc-networks-mode t)
+ '(erc-noncommands-mode t)
+ '(erc-pcomplete-mode t)
+ '(erc-readonly-mode t)
+ '(erc-ring-mode t)
+ '(erc-stamp-mode t)
+ '(erc-track-minor-mode t)
+ '(erc-track-mode t)
+ '(erc-track-position-in-mode-line nil)
  '(fill-column 80)
  '(gud-key-prefix "")
  '(hippie-expand-try-functions-list
