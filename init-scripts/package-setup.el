@@ -41,8 +41,8 @@
             (unless (zerop (call-process "git" nil ess-submodule-out-buf nil
                                          "submodule" "update"))
               (throw 'ess-failure "update failed")))
-        (kill-buffer ess-update-buf-name)
-        (cd prev-wd)))))
+        (cd prev-wd))
+      (kill-buffer ess-update-buf-name))))
 (let ((ess-make-output-buf (get-buffer-create "*ESS-make-errors*")))
   (set-process-sentinel
    (start-process "make-ess" (buffer-name ess-make-output-buf)
