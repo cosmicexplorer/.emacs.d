@@ -748,8 +748,10 @@ Note the weekly scope of the command's precision.")
           do (let ((cur-line (buffer-substring-no-properties
                                (line-beginning-position)
                                (line-end-position))))
-               (if (string-match "^\\([^:]+\\):\\([^:]+\\):\\([[:digit:]]+\\)$"
-                                 cur-line)
+               ;; the \" is so that windows paths with C: are parsed correctly
+               (if (string-match
+                    "^\\([^:]+\\):\"\\([^\"]+\\)\":\\([[:digit:]]+\\)$"
+                    cur-line)
                    (let ((active-filetype
                           (match-string 1 cur-line))
                          (active-filename
@@ -787,8 +789,8 @@ Note the weekly scope of the command's precision.")
                     (unless (or (not bufname)
                                 (string-equal bufname saved-files)
                                 (string-match-p "^/ssh:" bufname))
-                      (insert (concat "visit" ":"
-                                      bufname ":"
+                      (insert (concat "visit" ":\""
+                                      bufname "\":"
                                       (number-to-string buf-pt)))
                       (newline))))
          (save-buffer)
