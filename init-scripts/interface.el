@@ -299,16 +299,13 @@ lowercase, and Initial Caps versions."
                  (executable-find "ssh-add"))
         (let ((command-results (shell-command-to-string "ssh-agent -s"))
               (ssh-auth-sock-regex "SSH_AUTH_SOCK=\\([^;]+\\);")
-              (ssh-agent-pid-regex "SSH_AGENT_PID=\\([^;]+\\);")
-              (ssh-agent-pid 0))
+              (ssh-agent-pid-regex "SSH_AGENT_PID=\\([^;]+\\);"))
           ;; setup required environment vars
           (if (string-match ssh-auth-sock-regex command-results)
               (setenv "SSH_AUTH_SOCK" (match-string 1 command-results))
             (throw 'ssh-agent-err "ssh-agent's output can't be parsed!"))
           (if (string-match ssh-agent-pid-regex command-results)
-              (let ((pid-str (match-string 1 command-results)))
-                (setenv "SSH_AGENT_PID" pid-str)
-                (setq ssh-agent-pid (string-to-number pid-str 10)))
+              (setenv "SSH_AGENT_PID" (match-string 1 command-results))
             (throw 'ssh-agent-err "ssh-agent's output can't be parsed!"))
           ;; make it ask for a password using our script
           (let ((prev-display (getenv "DISPLAY"))
@@ -334,7 +331,8 @@ lowercase, and Initial Caps versions."
             (setenv "SSH_ASKPASS" prev-ssh-askpass))
           (add-hook 'kill-emacs-hook
                     (lambda ()
-                      (call-process "kill" nil nil nil ssh-agent-pid)))))
+                      (call-process "kill" nil nil nil
+                                    (getenv "SSH_AGENT_PID"))))))
     (with-current-buffer "*scratch*"
       (insert "Set up an id-rsa-path! Only if you want to, though.
 Check out your .emacs.\n"))))
@@ -387,6 +385,3 @@ Check out your .emacs.\n"))))
     ad-do-it
     (set-window-configuration prev-win-conf)))
 (ad-activate 'erc-cmd-JOIN)
-
-;;; hl-line mode!!!
-(global-hl-line-mode)
