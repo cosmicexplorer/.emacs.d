@@ -204,3 +204,23 @@
 ;;; flycheck lol
 (eval-after-load 'flycheck
   '(flycheck-package-setup))
+
+;;; npm executables
+(defvar npm-bin-dir nil
+  "Location of npm binary files.")
+(when (executable-find "npm")
+  (cd init-home-folder-dir)
+  (call-process "npm" nil nil nil "install")
+  (setq npm-bin-dir
+        ;; destroy trailing newline
+        (let ((str (shell-command-to-string "npm bin")))
+          (substring str 0 (1- (length str)))))
+  (eval-after-load "web-beautify"
+    `(progn
+       (setq web-beautify-html-program (concat ,npm-bin-dir "/html-beautify"))
+       (setq web-beautify-css-program (concat ,npm-bin-dir "/css-beautify"))
+       (setq web-beautify-js-program (concat ,npm-bin-dir "/js-beautify"))))
+  (eval-after-load "coffee-mode"
+    `(progn
+       (setq coffee-command (concat ,npm-bin-dir "/coffee"))
+       (setq js2coffee-command (concat ,npm-bin-dir "/js2coffee")))))

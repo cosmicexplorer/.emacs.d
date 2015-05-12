@@ -28,3 +28,4 @@ request/
 custom-vars.el
 # quicklisp is a per-user setup
 quicklisp/
+node_modules/

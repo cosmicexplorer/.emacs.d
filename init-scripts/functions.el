@@ -795,3 +795,8 @@ Note the weekly scope of the command's precision.")
                       (newline))))
          (save-buffer)
          (kill-buffer)))
+
+;;; checking for features
+(defmacro with-feature (feature-sym &rest body)
+  ,(when (featurep ,feature-sym) ,@body))
+(put 'with-feature 'lisp-indent-function 1)

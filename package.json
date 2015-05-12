@@ -1,0 +1,8 @@
+{
+  "repository": "https://github.com/cosmicexplorer/.emacs.d",
+  "devDependencies": {
+    "coffee-script": "^1.9.2",
+    "js-beautify": "^1.5.5",
+    "js2coffee": "^2.0.4"
+  }
+}
