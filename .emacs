@@ -1,6 +1,19 @@
 ;;; .....let's begin
 (package-initialize)
 
+;;; add wherever emacs was invoked from to path
+;;; done at top so we know we're not changing any directories
+(defvar emacs-start-command (car command-line-args)
+  "Command used to start emacs.")
+(let ((emacs-bin-path (file-name-directory emacs-start-command)))
+  (when emacs-bin-path
+    (setenv
+     "PATH"
+     (concat
+      (getenv "PATH")
+      (if (eq system-type 'windows-nt) ";" ":")
+      (expand-file-name (convert-standard-filename emacs-bin-path))))))
+
 ;;; emacs config, aka the root node of a massively unbalanced configuration tree
 ;;; by Danny McClanahan, <danieldmcclanahan@gmail.com>, 2014-2015
 
