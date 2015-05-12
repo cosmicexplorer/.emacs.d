@@ -106,7 +106,14 @@ Lisp code." t)
   (fix-lisp-keybindings)
   (eldoc-mode))
 
-
+(eval-after-load "slime"
+  '(define-key slime-autodoc-mode-map (kbd "SPC")
+     (lambda (arg) (interactive "p")
+       (if (use-region-p)
+           (progn
+             (delete-region (region-beginning) (region-end))
+             (insert " "))
+         (slime-autodoc-space arg)))))
 
 ;;; scons
 ;;; use python-mode for scons files
