@@ -55,6 +55,9 @@
        (switch-to-buffer (process-buffer proc))
        (message ev))
      (kill-buffer (process-buffer proc)))))
+;;; now let's load it
+(add-to-list 'load-path (concat init-home-folder-dir "/ESS/lisp"))
+(require 'ess-site)
 (when (executable-find "julia-basic")
   (setq inferior-julia-program-name (executable-find "julia-basic"))
   (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/"))

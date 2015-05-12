@@ -7,8 +7,7 @@
 ;;; get my colors themes up!
 (add-to-list 'load-path (concat init-home-folder-dir "/color-themes"))
 
-;;; ESS
-(add-to-list 'load-path (concat init-home-folder-dir "/ESS/lisp"))
+;;; ESS is done in `./package-setup.el'
 
 (require 'tramp)
 (require 'highlight-80+)
@@ -16,7 +15,6 @@
 (require 'multiple-cursors)
 (require 'clang-format)
 (require 'helm-config)
-(require 'ess-site)
 (require 'helm-swoop)
 (require 'revbufs)
 (require 'smart-compile)
