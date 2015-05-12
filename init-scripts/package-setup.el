@@ -28,6 +28,7 @@
 (global-smart-tab-mode 1)               ; put it EVERYWHERE
 
 ;; julia/R from ESS
+;;; because it's not detecting this variable correctly on windows fsr
 (setq ess-lisp-directory (concat init-home-folder-dir "ESS/lisp"))
 (when (executable-find "git")
   (let ((ess-git-folder (concat init-home-folder-dir "ESS/.git")))
