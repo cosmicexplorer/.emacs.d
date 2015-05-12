@@ -28,23 +28,26 @@
 (global-smart-tab-mode 1)               ; put it EVERYWHERE
 
 ;; julia/R from ESS
-(let ((ess-git-folder (concat init-home-folder-dir "ESS/.git")))
-  (unless (file-directory-p ess-git-folder)
-    (let ((ess-update-buf-name "*ESS-create-errors*")
-          (prev-wd default-directory))
-      (cd init-home-folder-dir)
-      (unwind-protect
-          (let ((ess-submodule-out-buf (get-buffer-create ess-update-buf-name)))
-            (unless (zerop (call-process "git" nil ess-submodule-out-buf nil
-                                         "submodule" "init"))
-              (throw 'ess-failure "init failed"))
-            (unless (zerop (call-process "git" nil ess-submodule-out-buf nil
-                                         "submodule" "update"))
-              (throw 'ess-failure "update failed")))
-        (cd prev-wd))
-      (kill-buffer ess-update-buf-name))))
-(let ((ess-make-output-buf (get-buffer-create "*ESS-make-errors*")))
-  (when (executable-find "make")
+(setq ess-lisp-directory (concat init-home-folder-dir "ESS/lisp"))
+(when (executable-find "git")
+  (let ((ess-git-folder (concat init-home-folder-dir "ESS/.git")))
+    (unless (file-directory-p ess-git-folder)
+      (let ((ess-update-buf-name "*ESS-create-errors*")
+            (prev-wd default-directory))
+        (cd init-home-folder-dir)
+        (unwind-protect
+            (let ((ess-submodule-out-buf
+                   (get-buffer-create ess-update-buf-name)))
+              (unless (zerop (call-process "git" nil ess-submodule-out-buf nil
+                                           "submodule" "init"))
+                (throw 'ess-failure "init failed"))
+              (unless (zerop (call-process "git" nil ess-submodule-out-buf nil
+                                           "submodule" "update"))
+                (throw 'ess-failure "update failed")))
+          (cd prev-wd))
+        (kill-buffer ess-update-buf-name)))))
+(when (executable-find "make")
+  (let ((ess-make-output-buf (get-buffer-create "*ESS-make-errors*")))
     (set-process-sentinel
      (start-process "make-ess" (buffer-name ess-make-output-buf)
                     "make" "-C"
@@ -57,8 +60,9 @@
          (message ev))
        (kill-buffer (process-buffer proc))))))
 ;;; now let's load it
-(add-to-list 'load-path (concat init-home-folder-dir "/ESS/lisp"))
-(require 'ess-site)
+(when (file-directory-p (concat init-home-folder-dir "/ESS/lisp"))
+  (add-to-list 'load-path (concat init-home-folder-dir "/ESS/lisp"))
+  (require 'ess-site))
 (when (executable-find "julia-basic")
   (setq inferior-julia-program-name (executable-find "julia-basic"))
   (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/"))
