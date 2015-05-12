@@ -44,18 +44,18 @@
         (cd prev-wd))
       (kill-buffer ess-update-buf-name))))
 (let ((ess-make-output-buf (get-buffer-create "*ESS-make-errors*")))
-  (set-process-sentinel
-   (start-process "make-ess" (buffer-name ess-make-output-buf)
-                  "make" "-C"
-                  (expand-file-name (concat init-home-folder-dir "ESS")))
+  (when (executable-find "make")
+    (set-process-sentinel
+     (start-process "make-ess" (buffer-name ess-make-output-buf)
+                    "make" "-C"
+                    (expand-file-name (concat init-home-folder-dir "ESS")))
 
-   (lambda (proc ev)
-     (unless (string= ev "finished\n")
-       (when (process-live-p proc) (kill-process proc))
-       (switch-to-buffer (process-buffer proc))
-       (insert ev)
-       (message ev))
-     (kill-buffer (process-buffer proc)))))
+     (lambda (proc ev)
+       (unless (string= ev "finished\n")
+         (when (process-live-p proc) (kill-process proc))
+         (switch-to-buffer (process-buffer proc))
+         (message ev))
+       (kill-buffer (process-buffer proc))))))
 ;;; now let's load it
 (add-to-list 'load-path (concat init-home-folder-dir "/ESS/lisp"))
 (require 'ess-site)
