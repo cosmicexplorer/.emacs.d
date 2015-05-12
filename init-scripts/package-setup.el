@@ -71,9 +71,9 @@
 
 ;;; magit
 (setq magit-last-seen-setup-instructions "1.4.0")
-(setq magit-auto-revert-mode nil)
 ;; automatically revert unmodified (saved) buffers that magit changes through
 ;; e.g. pull, merge
+(setq magit-auto-revert-mode t)
 
 ;;; parenthesis matching and more
 ;;; turn pair parens on
