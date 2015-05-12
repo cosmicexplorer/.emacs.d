@@ -63,11 +63,11 @@
 ;;; now let's load it
 (when (file-directory-p (concat init-home-folder-dir "/ESS/lisp"))
   (add-to-list 'load-path (concat init-home-folder-dir "/ESS/lisp"))
-  (require 'ess-site))
-(when (executable-find "julia-basic")
-  (setq inferior-julia-program-name (executable-find "julia-basic"))
-  (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/"))
-(ess-toggle-underscore nil)
+  (require 'ess-site)
+  (when (executable-find "julia-basic")
+    (setq inferior-julia-program-name (executable-find "julia-basic"))
+    (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/"))
+  (ess-toggle-underscore nil))
 
 ;;; magit
 (setq magit-last-seen-setup-instructions "1.4.0")
