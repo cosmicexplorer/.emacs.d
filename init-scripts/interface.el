@@ -4,7 +4,8 @@
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;;; use my shell aliases in shell commands run from emacs
-(setq shell-command-switch "-ic")
+(unless (eq system-type 'windows-nt)
+  (setq shell-command-switch "-ic"))
 
 ;; stop the intro to emacs buffer
 (setq inhibit-startup-echo-area-message t)
