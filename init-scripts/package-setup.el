@@ -53,6 +53,7 @@
      (unless (string= ev "finished\n")
        (when (process-live-p proc) (kill-process proc))
        (switch-to-buffer (process-buffer proc))
+       (insert ev)
        (message ev))
      (kill-buffer (process-buffer proc)))))
 ;;; now let's load it
