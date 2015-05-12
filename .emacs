@@ -61,6 +61,25 @@ init-scripts/interface.el.")
   "Whether or not to revisit tramp buffers opened in a previous session. Used in
 init-scripts/interface.el.")
 
+;;; used in user customizations
+(defmacro with-internet-connection (&rest body)
+  "Perform BODY only if we can grab a url in a short period of time."
+  `(progn
+     (unless (featurep 'url-queue)
+       (require 'url-queue))
+     ;; url-queue-retrieve used because of built-in timeout
+     (url-queue-retrieve
+      ;; arbitrary url, chosen because github's uptime is ridiculous (remember
+      ;; when all of china ddos'd them? incredible)
+      "http://github.com"
+      (lambda (status)
+        (let ((err (plist-get status :error)))
+          (unless err ,@body)))
+      nil t t)))
+
+(defvar after-load-init-hook nil
+  "Hook to run whatever after loading packages n functions n whatever.")
+
 ;;; load custom values for these variables (this file is .gitignored)
 (let ((custom-var-file
        (concat
@@ -77,6 +96,10 @@ Check out your .emacs."))
       (write-region nil nil custom-var-file)))
   (load-file custom-var-file))
 
+;;; get rid of annoying erc stuff everywhere
+(switch-to-buffer "*scratch*")
+(delete-other-windows)
+
 (unless (file-exists-p init-home-folder-dir)
   (throw 'no-home-holder "no emacs home directory found (check your .emacs)!"))
 
@@ -92,7 +115,6 @@ Check out your .emacs."))
          (not (server-running-p)))
     (server-start))
 
-;;; automate everythingggggggggg
 (defun load-my-init-script (file-name)
   "Loads script located in init-scripts directory."
   (load-file (concat init-home-folder-dir "init-scripts/" file-name ".el")))
@@ -112,6 +134,8 @@ Check out your .emacs."))
 ;;; load elisp
 ;;; should be /after/ byte-recompilation
 (load-my-init-script "requires")
+;;; should be /before/ everything in case they rely on it
+(load-my-init-script "utilities")
 ;;; functions used throughout
 (load-my-init-script "functions")
 ;;; for compatibility between different operating environments
@@ -124,6 +148,9 @@ Check out your .emacs."))
 (load-my-init-script "languages")
 ;;; cause what else is emacs for
 (load-my-init-script "keybindings")
+
+;;; let's do it
+(run-hooks 'after-load-init-hook)
 
 ;;; TODO: document no-beautify and saved-files!
 
@@ -148,6 +175,7 @@ Check out your .emacs."))
  '(erc-fill-mode t)
  '(erc-highlight-nicknames-mode t)
  '(erc-irccontrols-mode t)
+ '(erc-join-buffer (quote bury))
  '(erc-list-mode t)
  '(erc-match-mode t)
  '(erc-menu-mode nil)
@@ -170,7 +198,7 @@ Check out your .emacs."))
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (xterm-color cloc package-build flycheck-package web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode evil espuds ein company color-theme cider better-defaults auto-complete auctex 2048-game)))
+    (csharp-mode xterm-color cloc package-build flycheck-package web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode evil espuds ein company color-theme cider better-defaults auto-complete auctex 2048-game)))
  '(safe-local-variable-values
    (quote
     ((TeX-master . "proposal")

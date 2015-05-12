@@ -22,6 +22,7 @@
                       cider
                       cloc              ; YEAH!!!
                       clojure-mode
+                      csharp-mode
                       coffee-mode
                       color-theme
                       company

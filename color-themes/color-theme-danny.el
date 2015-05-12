@@ -1,6 +1,3 @@
-(eval-when-compile
-  (require 'color-theme))
-
 ;;;###autoload
 (defun color-theme-danny ()
   "Yet another color theme. I like it a bit."
