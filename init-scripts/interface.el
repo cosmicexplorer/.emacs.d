@@ -386,3 +386,13 @@ Check out your .emacs.\n")))))
     ad-do-it
     (set-window-configuration prev-win-conf)))
 (ad-activate 'erc-cmd-JOIN)
+
+;;; add wherever emacs was invoked from to path
+(defvar emacs-start-command (car command-line-args)
+  "Command used to start emacs.")
+(let ((emacs-bin-path (file-name-directory emacs-start-command)))
+  (when emacs-bin-path
+      (setenv "PATH"
+              (concat (getenv "PATH")
+                      (if (eq system-type 'windows-nt) ";" ":")
+                      (convert-standard-filename emacs-bin-path)))))
