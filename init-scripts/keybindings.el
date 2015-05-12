@@ -30,6 +30,12 @@
 ;;; quit-window is more useful than i previously thought
 (global-set-key (kbd "C-c q") 'quit-window)
 
+;;; compatibility fixes for windows
+(global-set-key (kbd "<C-kp-home>")
+                (lookup-key (current-global-map) (kbd "<C-home>") t))
+(global-set-key (kbd "<C-kp-end>")
+                (lookup-key (current-global-map) (kbd "<C-end>") t))
+
 ;;; helm
 ;;; the below can also be applied over multiple lines with:
 ;;; C-u [number] M-x helm-swoop RET
