@@ -55,19 +55,23 @@
   (interactive)
   (save-buffer)
   ;; makes temporary file with contents of gofmt
-  (shell-command (concatenate 'string "gofmt " (buffer-file-name) " > "
-                              (buffer-file-name) ".fmt"))
+  (shell-command
+   (concatenate
+    'string "gofmt "
+    (convert-standard-filename (buffer-file-name)) " > "
+    (convert-standard-filename (concat (buffer-file-name) ".fmt"))))
   (shell-command (concatenate 'string
                               (if (eq system-type 'windows-nt)
                                   "del "
                                 "rm ")
-                              (buffer-file-name))) ;; deletes file (!!!)
-  ;; resuscitates file from the ashes with gofmt
+                              (convert-standard-filename (buffer-file-name))))
   (shell-command (concatenate 'string
                               (if (eq system-type 'windows-nt)
                                   "move "
                                 "mv ")
-                              (buffer-file-name) ".fmt " (buffer-file-name)))
+                              (convert-standard-filename
+                               (concat (buffer-file-name) ".fmt "))
+                              (convert-standard-filename (buffer-file-name))))
   (revbufs))
 
 (defun go-fmt-file-and-compile ()
