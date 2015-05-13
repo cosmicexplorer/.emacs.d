@@ -180,7 +180,7 @@
 (define-key lisp-mode-map (kbd "C-h h") 'slime-hyperspec-lookup)
 
 ;;; makefile
-(eval-after-load "makefile-mode"
+(eval-after-load "make-mode"
   '(progn
      (define-key makefile-gmake-mode-map (kbd "M-n") nil)
      (define-key makefile-gmake-mode-map (kbd "M-p") nil)))
