@@ -804,3 +804,12 @@ Note the weekly scope of the command's precision.")
 ;;; erc prompt
 (defun get-erc-prompt ()
   (concat (erc-current-nick) ">"))
+
+(defun rejoin-erc ()
+  (interactive)
+  (destroy-all-erc-stuff)
+  (loop for serv-tuple in erc-server-pass-alist
+        do (erc :server (first serv-tuple)
+                :port (or (second serv-tuple) erc-port)
+                :nick (or (third serv-tuple) erc-nick)
+                :password (fourth serv-tuple))))

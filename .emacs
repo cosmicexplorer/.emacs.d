@@ -73,6 +73,12 @@ init-scripts/interface.el.")
 (defvar save-tramp-bufs t
   "Whether or not to revisit tramp buffers opened in a previous session. Used in
 init-scripts/interface.el.")
+(defvar erc-nick nil
+  "Nick to use for erc.")
+(defvar erc-port 6667
+  "Default port to use for erc.")
+(defvar erc-server-pass-alist nil
+  "Alist of passwords and ports for servers to connect with erc.")
 
 ;;; used in user customizations
 (defmacro with-internet-connection (&rest body)
