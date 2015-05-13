@@ -800,3 +800,7 @@ Note the weekly scope of the command's precision.")
 (defmacro with-feature (feature-sym &rest body)
   ,(when (featurep ,feature-sym) ,@body))
 (put 'with-feature 'lisp-indent-function 1)
+
+;;; erc prompt
+(defun get-erc-prompt ()
+  (concat (erc-current-nick) ">"))
