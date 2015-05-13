@@ -478,7 +478,7 @@ parentheses. CURRENTLY BROKEN"
   (let ((msg
          (shell-command-to-string
           (if (eq system-type 'windows-nt)
-              (concat "move " "\"" (buffer-file-name) "\"" " %temp%")
+              (concat "move " "\"" (buffer-file-name) "\" " (getenv "temp"))
             (concat "mv " "\"" (buffer-file-name) "\"" " /tmp/")))))
     (let ((compiled-file                  ;  save generated filename
            (cond ((or (eq major-mode 'c-mode)
@@ -498,7 +498,8 @@ parentheses. CURRENTLY BROKEN"
            (concat msg
                    (shell-command-to-string
                     (if (eq system-type 'windows-nt)
-                        (concat "move " "\"" compiled-file "\"" " %temp%")
+                        (concat "move " "\"" compiled-file "\" "
+                                (getenv "temp"))
                       (concat "mv " "\"" compiled-file "\"" " /tmp/")))))
         (message msg))))
   (kill-this-buffer))

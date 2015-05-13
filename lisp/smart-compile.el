@@ -55,19 +55,25 @@
   (interactive)
   (save-buffer)
   ;; makes temporary file with contents of gofmt
-  (shell-command (concatenate 'string "gofmt " (buffer-file-name) " > " (buffer-file-name) ".fmt"))
-  (shell-command (concatenate 'string "rm " (buffer-file-name))) ;; deletes file (!!!)
+  (shell-command (concatenate 'string "gofmt " (buffer-file-name) " > "
+                              (buffer-file-name) ".fmt"))
+  (shell-command (concatenate 'string
+                              (if (eq system-type 'windows-nt)
+                                  "del "
+                                "rm ")
+                              (buffer-file-name))) ;; deletes file (!!!)
   ;; resuscitates file from the ashes with gofmt
-  (shell-command (concatenate 'string "mv " (buffer-file-name) ".fmt " (buffer-file-name)))
-  (revbufs)
-  )
+  (shell-command (concatenate 'string
+                              (if (eq system-type 'windows-nt)
+                                  "move "
+                                "mv ")
+                              (buffer-file-name) ".fmt " (buffer-file-name)))
+  (revbufs))
 
 (defun go-fmt-file-and-compile ()
   (interactive)
-  (unless (eq system-type 'windows-nt)
-    (go-fmt-file))
-  (compile (concatenate 'string "go build " (buffer-file-name)))
-  )
+  (go-fmt-file)
+  (compile (concatenate 'string "go build " (buffer-file-name))))
 
 (defcustom smart-compile-alist '(
                                  (emacs-lisp-mode    . (emacs-lisp-byte-compile))
