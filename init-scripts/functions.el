@@ -500,10 +500,10 @@ parentheses. CURRENTLY BROKEN"
            (concat msg
                    (shell-command-to-string
                     (if (eq system-type 'windows-nt)
-                        (concat "move " "\"" compiled-file "\" "
+                        (concat "move " "\"" (convert-standard-filename
+                                              compiled-file) "\" "
                                 (getenv "temp"))
-                      (concat "mv " "\"" (convert-standard-filename
-                                          compiled-file) "\"" " /tmp/")))))
+                      (concat "mv " "\"" compiled-file "\"" " /tmp/")))))
         (message msg))))
   (kill-this-buffer))
 
