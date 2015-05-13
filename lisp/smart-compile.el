@@ -64,7 +64,8 @@
 
 (defun go-fmt-file-and-compile ()
   (interactive)
-  (go-fmt-file)
+  (unless (eq system-type 'windows-nt)
+    (go-fmt-file))
   (compile (concatenate 'string "go build " (buffer-file-name)))
   )
 

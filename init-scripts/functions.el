@@ -477,7 +477,9 @@ parentheses. CURRENTLY BROKEN"
   (set-buffer-modified-p nil)           ; pretends buffer not modified
   (let ((msg
          (shell-command-to-string
-          (concat "mv " "\"" (buffer-file-name) "\"" " /tmp/"))))
+          (if (eq system-type 'windows-nt)
+              (concat "move " "\"" (buffer-file-name) "\"" " %temp%")
+            (concat "mv " "\"" (buffer-file-name) "\"" " /tmp/")))))
     (let ((compiled-file                  ;  save generated filename
            (cond ((or (eq major-mode 'c-mode)
                       (eq major-mode 'c++-mode))
@@ -495,7 +497,9 @@ parentheses. CURRENTLY BROKEN"
           (message
            (concat msg
                    (shell-command-to-string
-                    (concat "mv " "\"" compiled-file "\"" " /tmp/"))))
+                    (if (eq system-type 'windows-nt)
+                        (concat "move " "\"" compiled-file "\"" " %temp%")
+                      (concat "mv " "\"" compiled-file "\"" " /tmp/")))))
         (message msg))))
   (kill-this-buffer))
 
