@@ -189,23 +189,27 @@ case."
                      (upcase (aref downstr i)))))
     downstr))
 
+(defun read-words-from-list-with-caps (list)
+  "Read words from list, transformed into ALLCAPS, lowercase, and Init Caps."
+  (let ((final-word-list nil))
+    (loop for line in list
+          do (unless (string= "" line)
+               (add-to-list 'final-word-list (downcase line))
+               (add-to-list 'final-word-list (upcase line))
+               (add-to-list 'final-word-list (make-string-init-caps line))))
+    final-word-list))
+
 (defun read-words-from-file-as-list-with-caps (filename)
   "Reads words from file, delimited by newlines, as a list. Reads in ALLCAPS,
 lowercase, and Initial Caps versions."
   (if (or (not filename) (not (file-exists-p filename)))
       (throw 'no-warning-words-file t)
-    (let ((final-word-list nil))
-      (loop for word in
-            (split-string
-             (with-temp-buffer
-               (insert-file-contents filename)
-               (buffer-string))
-             "\n")                       ; split by newlines
-            do (unless (string= "" word) ; files with final newline have this
-                 (add-to-list 'final-word-list (downcase word))
-                 (add-to-list 'final-word-list (upcase word))
-                 (add-to-list 'final-word-list (make-string-init-caps word))))
-      final-word-list)))
+    (read-words-from-list-with-caps
+     (split-string
+      (with-temp-buffer
+        (insert-file-contents filename)
+        (buffer-string))
+      "\n"))))
 
 (defvar warning-highlights-regex
   (concat
@@ -214,7 +218,7 @@ lowercase, and Initial Caps versions."
    (regexp-opt
     (if (and warning-words-file (file-exists-p warning-words-file))
         (read-words-from-file-as-list-with-caps warning-words-file)
-      warning-words))
+      (read-words-from-list-with-caps warning-words)))
    "\\)"
    "\\($\\|[^[:word:]]\\)"))
 
