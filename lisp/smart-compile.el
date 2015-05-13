@@ -77,7 +77,7 @@
                                  (html-helper-mode   . (browse-url-of-buffer))
                                  (octave-mode        . (run-octave))
                                  (c-mode             . "clang -Wall -Wextra -Werror %f -o %n -lm")
-                                 (c++-mode           . "clang++ -std=c++11 -Wall -Wextra -Werror %f -o %n")
+                                 (c++-mode           . "clang++ -std=c++14 -Wall -Wextra -Werror %f -o %n")
                                  ("\\.m\\'"          . "gcc -O2 %f -lobjc -lpthread -o %n") ;; objective-c
                                  (java-mode          . "javac %f")
                                  ("\\.php\\'"        . "php -l %f")
