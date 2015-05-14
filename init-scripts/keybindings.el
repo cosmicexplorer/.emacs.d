@@ -70,6 +70,7 @@
 (global-set-key (kbd "C-x C-<up>") 'split-window-vertically)
 (global-set-key (kbd "C-x e") 'delete-other-windows) ;; "expand"
 (global-set-key (kbd "C-x p") 'delete-window) ;; "poof"
+(global-set-key (kbd "C-x RET") 'call-last-kbd-macro) ; because expand destroyed
 ;; adjusting pane size
 (global-set-key (kbd "C-x <home>") 'enlarge-window) ;; increase window height
 (global-set-key (kbd "C-x <end>") 'shrink-window) ;; decrease window height
