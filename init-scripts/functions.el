@@ -821,3 +821,10 @@ Note the weekly scope of the command's precision.")
                 :port (or (second serv-tuple) erc-port)
                 :nick (or (third serv-tuple) erc-nick)
                 :password (fourth serv-tuple))))
+
+;;; windows stuff
+(defun dewindowsify-path (path)
+  "Turn a windows path PATH into a format find-file (and the rest of emacs)
+likes."
+  ;; 92 is backslash, 47 is slash
+  (map 'string (lambda (char) (if (char-equal char 92) 47 char)) path))
