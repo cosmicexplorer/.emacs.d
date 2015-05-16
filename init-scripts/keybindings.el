@@ -188,3 +188,7 @@
 
 ;;; erc
 (global-set-key (kbd "C-c C-e") 'message-erc-modded-chans)
+
+;;; replacing text
+(global-set-key (kbd "M-$") 'replace-string)
+(global-set-key (kbd "M-#") 'replace-regexp)

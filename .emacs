@@ -168,17 +168,15 @@ Check out your .emacs."))
 ;;; cause what else is emacs for
 (load-my-init-script "keybindings")
 
-;;; let's do it
-(run-hooks 'after-load-init-hook)
-
-;;; TODO: document no-beautify and saved-files!
-
 ;;; save visited files
 (when save-visited-files
   (reread-visited-files-from-disk)
   (add-hook
    'kill-emacs-hook
    #'save-visiting-files-to-buffer))
+
+;;; let's do it
+(run-hooks 'after-load-init-hook)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

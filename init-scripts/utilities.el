@@ -36,3 +36,29 @@ of BUFFER-OR-STRING; else, use contents of buffer named BUFFER-OR-STRING."
                       "\n")
         do (unless (string= line "")
              (funcall fun line))))
+
+(defmacro check-types (exception types-vars-list)
+  "Throws EXCEPTION if variables don't match types specified in
+TYPES-VARS-LIST. TYPES-VARS-LIST is an alist of type-checking functions and
+variable names, in the format:
+
+'(((fun1 fun2 ...) var1 var2 ..) ((fun1 fun2 ...) var1 var2 ...) ...)
+
+A representative example might be:
+
+'(check-types
+ (((`numberp' `markerp') a b) ((`stringp' `charp') b c))
+ 'invalid-argument)."
+  `(progn
+     ,@(mapcar
+        (lambda (type-var-pair)
+          `(progn
+             ,@(mapcar (lambda (var)
+                         `(unless (or
+                                   ,@(mapcar (lambda (checker-fun)
+                                               `(,checker-fun ,var))
+                                             (first type-var-pair)))
+                            (throw ,exception ,var)))
+                     (rest type-var-pair))))
+        types-vars-list)))
+(put 'check-types 'lisp-indent-function 1)

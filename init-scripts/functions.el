@@ -795,8 +795,7 @@ Note the weekly scope of the command's precision.")
                do (let ((bufname (buffer-file-name buf))
                         (buf-pt (with-current-buffer buf (point))))
                     (unless (or (not bufname)
-                                (string-equal bufname saved-files)
-                                (string-match-p "^/ssh:" bufname))
+                                (string-equal bufname saved-files))
                       (insert (concat "visit" ":\""
                                       bufname "\":"
                                       (number-to-string buf-pt)))
