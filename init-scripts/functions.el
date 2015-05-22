@@ -484,7 +484,8 @@ parentheses. CURRENTLY BROKEN"
             (concat "mv " "\"" (buffer-file-name) "\"" " /tmp/")))))
     (let ((compiled-file                  ;  save generated filename
            (cond ((or (eq major-mode 'c-mode)
-                      (eq major-mode 'c++-mode))
+                      (eq major-mode 'c++-mode)
+                      (eq major-mode 'csharp-mode))
                   (file-name-sans-extension (buffer-file-name)))
                  ((eq major-mode 'java-mode)
                   (concat
