@@ -30,3 +30,4 @@ custom-vars.el
 quicklisp/
 node_modules/
 server/
+url/

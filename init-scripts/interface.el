@@ -391,3 +391,8 @@ Check out your .emacs.\n")))))
     ad-do-it
     (set-window-configuration prev-win-conf)))
 (ad-activate 'erc-cmd-JOIN)
+
+;;; save visited files to buffer
+(when save-visited-files
+  (add-hook 'after-load-init-hook #'reread-visited-files-from-disk)
+  (add-hook 'kill-emacs-hook #'save-visiting-files-to-buffer))

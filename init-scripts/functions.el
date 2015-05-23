@@ -751,7 +751,7 @@ Note the weekly scope of the command's precision.")
 
 ;;; save buffers to disk and get them back
 (defun reread-visited-files-from-disk ()
-  (with-current-buffer (find-file saved-files)
+  (with-current-buffer (find-file-noselect saved-files)
     (goto-char (point-min))
     (loop while (not (eobp))
           do (let ((cur-line (buffer-substring-no-properties

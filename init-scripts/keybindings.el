@@ -76,7 +76,6 @@
 (global-set-key (kbd "C-x <end>") 'shrink-window) ;; decrease window height
 (global-set-key (kbd "C-x <prior>") 'enlarge-window-horizontally)
 (global-set-key (kbd "C-x <next>") 'shrink-window-horizontally)
-(global-set-key (kbd "C-x RET") 'shrink-window-if-larger-than-buffer) ;; shrink
 ;; window to fit content
 (global-set-key (kbd "C-x !") 'balance-windows) ;; make all windows same height
 ;;; move among panes in a way that isn't totally fucked

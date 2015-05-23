@@ -168,13 +168,6 @@ Check out your .emacs."))
 ;;; cause what else is emacs for
 (load-my-init-script "keybindings")
 
-;;; save visited files
-(when save-visited-files
-  (reread-visited-files-from-disk)
-  (add-hook
-   'kill-emacs-hook
-   #'save-visiting-files-to-buffer))
-
 ;;; let's do it
 (run-hooks 'after-load-init-hook)
 
