@@ -860,3 +860,14 @@ prompt the user for a coding system."
           (setq here (1+ here))) ))
     (and found (goto-char (car found)))
     found))
+
+;;; get name of buffer and other info as required
+(defun get-buffer-id (&optional buf)
+  (with-current-buffer (if buf buf (current-buffer))
+    (concat (buffer-name)
+            (if (buffer-file-name)
+                (concat ":" (buffer-file-name))
+              ""))))
+
+(defun kill-message-buffer-id (&optional buf)
+  (message "%s" (concat "killed " (get-buffer-id buf))))

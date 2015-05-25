@@ -396,3 +396,6 @@ Check out your .emacs.\n")))))
 (when save-visited-files
   (add-hook 'after-load-init-hook #'reread-visited-files-from-disk)
   (add-hook 'kill-emacs-hook #'save-visiting-files-to-buffer))
+
+;;; see what i just killed
+(add-hook 'kill-buffer-hook #'kill-message-buffer-id)
