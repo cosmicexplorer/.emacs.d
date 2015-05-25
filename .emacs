@@ -178,6 +178,7 @@ Check out your .emacs."))
  ;; If there is more than one, they won't work right.
  '(TeX-engine (quote luatex))
  '(asm-comment-char 35)
+ '(cloc-use-3rd-gen t)
  '(coffee-tab-width 2)
  '(dabbrev-case-replace nil)
  '(erc-autojoin-mode t)
