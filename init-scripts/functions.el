@@ -866,7 +866,7 @@ prompt the user for a coding system."
   (with-current-buffer (if buf buf (current-buffer))
     (concat (buffer-name)
             (if (buffer-file-name)
-                (concat ":" (buffer-file-name))
+                (concat ", at " (buffer-file-name))
               ""))))
 
 (defun kill-message-buffer-id (&optional buf)
