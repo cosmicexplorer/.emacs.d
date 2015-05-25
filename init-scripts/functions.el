@@ -870,4 +870,6 @@ prompt the user for a coding system."
               ""))))
 
 (defun kill-message-buffer-id (&optional buf)
-  (message "%s" (concat "killed " (get-buffer-id buf))))
+  ;; unless is emacs-internal buffer
+  (unless (char-equal (aref (buffer-name) 0) 32)
+    (message "%s" (concat "killed " (get-buffer-id buf)))))
