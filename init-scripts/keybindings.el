@@ -191,3 +191,6 @@
 ;;; replacing text
 (global-set-key (kbd "M-$") 'replace-string)
 (global-set-key (kbd "M-#") 'replace-regexp)
+
+;;; org-mode
+(define-key org-mode-map (kbd "<tab>") #'smart-tab)
