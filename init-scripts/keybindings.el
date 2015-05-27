@@ -191,3 +191,14 @@
 ;;; replacing text
 (global-set-key (kbd "M-$") 'replace-string)
 (global-set-key (kbd "M-#") 'replace-regexp)
+
+;;; org-mode
+(define-key org-mode-map (kbd "<tab>") #'smart-tab)
+(define-key org-mode-map (kbd "C-c a") #'org-agenda)
+(define-key org-mode-map (kbd "C-c c") #'org-capture)
+
+;;; convenience bindings from working with windows
+(global-set-key (kbd "C-a") #'mark-whole-buffer)
+(global-set-key (kbd "C-c C-a") #'beginning-of-line)
+(global-set-key (kbd "C-c C-e") #'end-of-line)
+(global-set-key (kbd "M-`") #'indent-regardless-of-mode)
