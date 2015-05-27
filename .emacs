@@ -38,7 +38,8 @@
 ;;; storing personal information such as directory structure, or irc nicks,
 ;;; which is not really great for sharing on github. this "custom-vars.el" file
 ;;; is gitignored so that it may vary easily. meaningful defaults are provided
-;;; below with each variable.
+;;; below with each variable. it should be noted that this file is especially
+;;; useful to store variables such as org-agenda-files.
 (defvar warning-words-file nil
   "Path to file defining words to highlight specially. An example file would
 contain:
@@ -209,6 +210,10 @@ Check out your .emacs."))
    (quote
     (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)))
  '(initial-buffer-choice t)
+ '(org-agenda-files
+   (quote
+    ("~/projects/active/semantic-code-browser/TODO.org")))
+ '(org-log-done (quote note))
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote

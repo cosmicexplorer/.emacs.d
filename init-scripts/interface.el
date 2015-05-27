@@ -399,3 +399,10 @@ Check out your .emacs.\n")))))
 
 ;;; see what i just killed
 (add-hook 'kill-buffer-hook #'kill-message-buffer-id)
+
+;;; don't like seeing wraparound
+(add-hook 'text-mode-hook #'visual-line-mode)
+
+;;; i like being able to search for w3m buffers
+;;; TODO: doesn't work, let's fix
+;; (add-hook 'w3m-select-buffer-hook #'w3m-rename-buf)

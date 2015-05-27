@@ -492,6 +492,9 @@ parentheses. CURRENTLY BROKEN"
                    (file-name-sans-extension (buffer-file-name)) ".class"))
                  ((eq major-mode 'coffee-mode)
                   (concat (file-name-sans-extension (buffer-file-name)) ".js"))
+                 ((eq major-mode 'markdown-mode)
+                  (concat
+                   (file-name-sans-extension (buffer-file-name)) ".html"))
                  (t nil))))
       (unless (and compiled-file
                    (file-exists-p compiled-file))
@@ -873,3 +876,16 @@ prompt the user for a coding system."
   ;; unless is emacs-internal buffer
   (unless (char-equal (aref (buffer-name) 0) 32)
     (message "%s" (concat "killed " (get-buffer-id buf)))))
+
+;;; allow for searchable names of w3m buffers
+(defun w3m-rename-buf ()
+  (when (and (eq major-mode 'w3m-mode)
+             w3m-current-title w3m-current-url
+             (not (string= w3m-current-url ""))
+             (not (string= w3m-current-title "")))
+    (rename-buffer
+     (concat w3m-current-title ":" w3m-current-url " "
+             (let ((str (buffer-name)))
+               (when (string-match "\\*w3m\\*.*" str)
+                 (match-string 0 str))))
+     t)))
