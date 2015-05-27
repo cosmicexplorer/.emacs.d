@@ -131,7 +131,7 @@ Check out your .emacs."))
 ;; but only if server isn't already started
 (require 'server)
 (if (and (fboundp 'server-running-p)
-         (not (server-running-p)))
+         (not (eq (server-running-p) t)))
     (server-start))
 
 (defun load-my-init-script (file-name)
@@ -209,6 +209,9 @@ Check out your .emacs."))
    (quote
     (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)))
  '(initial-buffer-choice t)
+ '(org-catch-invisible-edits (quote smart))
+ '(org-enforce-todo-checkbox-dependencies t)
+ '(org-enforce-todo-dependencies t)
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
@@ -220,7 +223,6 @@ Check out your .emacs."))
                           (progn
                             (setq tz
                                   (getenv "TZ"))
-                            (set-time-zone-rule "UTC")
                             (setq time
                                   (format-time-string "%a %b %e %H:%M:%S %Z %Y"
                                                       (current-time)))

@@ -309,10 +309,10 @@ lowercase, and Initial Caps versions."
             ;; setup required environment vars
             (if (string-match ssh-auth-sock-regex command-results)
                 (setenv "SSH_AUTH_SOCK" (match-string 1 command-results))
-              (throw 'ssh-agent-err "ssh-agent's output can't be parsed!"))
+              (throw 'ssh-agent-err "SOCK output can't be parsed!"))
             (if (string-match ssh-agent-pid-regex command-results)
                 (setenv "SSH_AGENT_PID" (match-string 1 command-results))
-              (throw 'ssh-agent-err "ssh-agent's output can't be parsed!"))
+              (throw 'ssh-agent-err "PID output can't be parsed!"))
             ;; make it ask for a password using our script
             (let ((prev-display (getenv "DISPLAY"))
                   (prev-ssh-askpass (getenv "SSH_ASKPASS")))

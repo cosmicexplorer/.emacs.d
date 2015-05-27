@@ -377,10 +377,13 @@ SLIME and Paredit. Not for the faint of heart."
 
 ;; so that paredit-kill works the way it should on regions
 (defadvice paredit-kill (around paredit-kill-region-dwim)
-  (interactive)
-  (if (use-region-p)
-      (kill-region (region-beginning) (region-end))
-    ad-do-it))
+  (interactive "P")
+  (cond ((use-region-p)
+         (kill-region (region-beginning) (region-end)))
+        ((numberp (ad-get-arg 0))
+         (kill-line (ad-get-arg 0)))
+        (t
+         ad-do-it)))
 (ad-activate 'paredit-kill)
 
 ;; create parens and add adjacent two elements to sexp created by parens
@@ -873,3 +876,14 @@ prompt the user for a coding system."
   ;; unless is emacs-internal buffer
   (unless (char-equal (aref (buffer-name) 0) 32)
     (message "%s" (concat "killed " (get-buffer-id buf)))))
+
+;;; string manipulation
+(defun get-last-n-of-str (n str)
+  (substring str (- (length str) n)))
+
+;;; indent everything
+(defun indent-regardless-of-mode ()
+  (interactive)
+  (if (use-region-p)
+      (indent-region (region-beginning) (region-end))
+    (funcall indent-line-function)))
