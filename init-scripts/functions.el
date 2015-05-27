@@ -878,6 +878,7 @@ prompt the user for a coding system."
     (message "%s" (concat "killed " (get-buffer-id buf)))))
 
 ;;; allow for searchable names of w3m buffers
+;;; TODO: make this work
 (defun w3m-rename-buf ()
   (when (and (eq major-mode 'w3m-mode)
              w3m-current-title w3m-current-url
@@ -889,3 +890,29 @@ prompt the user for a coding system."
                (when (string-match "\\*w3m\\*.*" str)
                  (match-string 0 str))))
      t)))
+
+;;; org-mode stuff
+(defadvice org-kill-line (around org-kill-region-advice)
+  (if (use-region-p)
+      (kill-region (region-beginning) (region-end))
+    ad-do-it))
+(ad-activate 'org-kill-line)
+
+;;; TODO: make these work
+;; (defadvice org-open-at-point (around org-recenter-open)
+;;   (let* ((prev-pt (point))
+;;          (res ad-do-it))
+;;     (when (/= prev-pt (point))
+;;       (message "hey")
+;;       (recenter))
+;;     res))
+;; (ad-activate 'org-open-at-point)
+
+;; (defadvice org-mark-ring-goto (around org-recenter-mark-goto)
+;;   (let ((prev-pt (point))
+;;         (res ad-do-it))
+;;     (when (/= prev-pt (point))
+;;       (message "lol")
+;;       (recenter))
+;;     res))
+;; (ad-activate 'org-mark-ring-goto)
