@@ -62,3 +62,5 @@ A representative example might be:
                      (rest type-var-pair))))
         types-vars-list)))
 (put 'check-types 'lisp-indent-function 1)
+
+;;; TODO: add change-modified for org and other files!

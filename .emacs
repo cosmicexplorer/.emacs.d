@@ -210,10 +210,12 @@ Check out your .emacs."))
    (quote
     (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)))
  '(initial-buffer-choice t)
- '(org-log-done (quote note))
+ '(org-agenda-files nil)
  '(org-catch-invisible-edits (quote smart))
  '(org-enforce-todo-checkbox-dependencies t)
  '(org-enforce-todo-dependencies t)
+ '(org-from-is-user-regexp nil)
+ '(org-startup-folded "showeverything")
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
