@@ -154,10 +154,6 @@
 ;;; cool but never used cause lol search key
 (global-set-key (kbd "<XF86Search>") 'helm-multi-swoop-all)
 
-;; TODO: make this work!
-;; (add-hook 'org-mode-hook
-;;           (define-key org-mode-map (kbd "<tab>") 'smart-tab))
-
 ;;; coffeescript
 (eval-after-load "coffee-mode"
   '(progn

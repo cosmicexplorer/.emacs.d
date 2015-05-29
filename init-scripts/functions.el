@@ -415,8 +415,7 @@ Breaks the rules a little bit, but makes me a lot less insane."
     (paredit-backward-delete)))
 
 (defun paredit-remove-function-wrapper ()
-  ;; TODO: this one is very imperative, not so lispy
-  ;; it's really useful though so hopefully history will forgive me
+  ;; TODO: make this work
   "Removes all arguments to the left of point within sexp, and removes enclosing
 parentheses. CURRENTLY BROKEN"
   (interactive)
