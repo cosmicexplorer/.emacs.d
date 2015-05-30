@@ -1,3 +1,4 @@
 [submodule "ESS"]
 	path = ESS
 	url = http://github.com/emacs-ess/ESS.git
+	ignore = dirty

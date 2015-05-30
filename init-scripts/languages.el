@@ -6,13 +6,15 @@
 
 ;;; format comments like a normal person
 (add-hook 'fundamental-mode-hook (lambda ()
-                                   (setq comment-start "- " comment-end "")))
-;;; TODO: this doesn't work! figure out why
-(add-hook 'r-mode-hook (lambda () (setq comment-start "# " comment-end   "")))
-(add-hook 'ess-mode-hook (lambda () (setq comment-start "# " comment-end   "")))
+                                   (setq comment-start "-" comment-end ""
+                                         comment-padding 1)))
+(add-hook 'c++-mode-hook (lambda ()
+                           (setq comment-start "/* " comment-end " */")))
+(add-hook 'r-mode-hook (lambda () (setq comment-start "# " comment-end "")))
+(add-hook 'ess-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
-(add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-start ";; "
-                                                 comment-end "")))
+(add-hook 'emacs-lisp-mode-hook
+          (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (add-hook 'asm-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (add-hook 'LaTeX-mode-hook (lambda ()
@@ -20,14 +22,14 @@
                              (auto-fill-mode -1)
                              (highlight-80+-mode -1)))
 (add-hook 'org-mode-hook (lambda ()
-                             (setq comment-start "% " comment-end "")
+                           (setq comment-start "% " comment-end "")
                              (auto-fill-mode -1)
                              (highlight-80+-mode -1)))
 (add-hook 'markdown-mode-hook (lambda ()
                                 (auto-fill-mode -1)
                                 (highlight-80+-mode -1)))
 (add-hook 'html-mode-hook (lambda ()
-                            (setq comment-start "<!--" comment-end "-->")))
+                            (setq comment-start "<!-- " comment-end " -->")))
 
 ;;; highlight cursor and auto-fill when over 80 chars in certain modes
 (add-hook 'prog-mode-hook #'highlight-80+-mode)
