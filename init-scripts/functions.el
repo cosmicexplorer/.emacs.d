@@ -330,6 +330,7 @@ instead of just the final line."
   "Changes about three million personalized keybindings for lisp editing with
 SLIME and Paredit. Not for the faint of heart."
   (interactive)
+  (define-key paredit-mode-map (kbd "M-t") 'transpose-sexps)
   (define-key paredit-mode-map (kbd "M-;") 'fix-paredit-comment-dwim)
   (define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
   (define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
@@ -929,3 +930,119 @@ prompt the user for a coding system."
   (if (use-region-p)
       (indent-region (region-beginning) (region-end))
     (funcall indent-line-function)))
+
+;;; linum-relative does the same thing as this, except the first line of the
+;;; let* has (diff1 (abs (- line-number linum-relative-last-pos))) and for the
+;;; life of me i will never understand why the abs is there
+(defun fix-linum-relative (line-number)
+  "Makes useful offsets for `linum-relative', equal to the appropriate prefix
+\"C-u NUM\" argument for `kill-line'. Used because `linum-relative-plusp-offset'
+also affects negative line numbers, even though it says it doesn't."
+  (let* ((diff1 (- line-number linum-relative-last-pos))
+         (diff (if (minusp diff1) diff1 (+ diff1 linum-relative-plusp-offset)))
+	 (current-p (= diff linum-relative-plusp-offset))
+	 (current-symbol (if (and linum-relative-current-symbol current-p)
+			     (if (string= "" linum-relative-current-symbol)
+				 (number-to-string line-number)
+			       linum-relative-current-symbol)
+			   (number-to-string diff)))
+	 (face (if current-p 'linum-relative-current-face 'linum)))
+    (propertize (format linum-relative-format current-symbol) 'face face)))
+(defvar linum-relative-symbols
+  ["X"
+   "☭"
+   "⚘"
+   ">"]
+  "A vector of strings to represent the marker on the current line. Used in
+`get-linum-relative-symbol'.")
+(defun get-linum-relative-symbol ()
+  "Makes the string `linum-relative' uses to point to the current line any one
+of `linum-relative-symbols' from calling `sxhash' on the result of
+`buffer-name'."
+  (interactive)
+  (setq linum-relative-current-symbol
+        (aref linum-relative-symbols
+              (mod (sxhash (buffer-name)) (length linum-relative-symbols)))))
+
+;;; commenting is dumb
+(defun insert-string-before-each-line-in-range (str beg end)
+  "Inserts STR at beginning of each line in range denoted by BEG and END. If
+range doesn't begin at the beginning of the line, then the first line in the
+range is not marked."
+  (let ((orig-pos (point)))
+    (goto-char beg)
+    (loop with num-insertions-before-point = 0
+          and cur-end = end
+          and str-length = (length str)
+          while (< (point) cur-end)
+          do (progn
+               (when (bolp)
+                 (when (<= (point) orig-pos)
+                   (incf num-insertions-before-point str-length))
+                 (incf cur-end str-length)
+                 (insert str))
+               (forward-char))
+          finally (goto-char (+ orig-pos num-insertions-before-point)))))
+
+(defun c-comment-region-stars (reg-beg reg-end num-stars-arg)
+  "Comments all text within a given region, or the current line if no region is
+active. NUM-STARS-ARG is given by prefix argument, and determines the number of
+asterisks ('*') to insert before the initial delimiter and after the closing
+comment delimiter. If a blank argument is given, it formats the region using
+'javadoc' syntax, with two stars on the initial line and a single star for each
+line in between. This \"pushes\" the region affected to the beginning of the
+line containing the `region-beginning', and the end of the line containing
+`region-end'."
+  (interactive "P")
+  ;; num-stars is nil if the single-prefix argument is given, which signals
+  ;; using javadoc
+  (let ((num-stars (cond ((numberp num-stars-arg) num-stars-arg)
+                         ((consp num-stars-arg) nil)
+                         ((null num-stars-arg) 1)
+                         (t (throw 'unrecognized-prefix-arg num-stars-arg))))
+        ;; the definitions of beg and end could have been done in one line, but
+        ;; i thought it was fun to make them super "generic"
+        (beg
+         (apply
+          (if (use-region-p)
+              (lambda (fun &rest args)
+                (save-excursion
+                  (goto-char reg-beg)
+                  (apply fun args)))
+            #'funcall)
+          (list #'line-beginning-position)))
+        (end (apply
+              (if (use-region-p)
+                  (lambda (fun &rest args)
+                    (goto-char
+                     (if (save-excursion (goto-char (region-end)) (bolp))
+                         (1- reg-end)
+                       reg-end))
+                    (apply fun args))
+                #'funcall)
+              (list #'line-end-position)))
+        (begin-insertions 0)
+        (end-insertions 0)
+        (init-point (point)))
+    (goto-char beg)
+    (let ((insert-begin-str
+           (concat "/" (make-string (or num-stars 2) (str2char "*")) "\n")))
+      (insert insert-begin-str)
+      (setq begin-insertions (length insert-begin-str)))
+    (goto-char (+ end begin-insertions))
+    (let ((insert-end-str
+           (concat "\n"
+                   ;; push the closing delimiter out a space when javadocking
+                   (if num-stars "" " ")
+                   (make-string (or num-stars 1) (str2char "*")) "/")))
+      (insert insert-end-str)
+      (setq end-insertions (+ begin-insertions (length insert-end-str))))
+    (unless num-stars
+      (insert-string-before-each-line-in-range
+       "* "
+       (if (save-excursion (goto-char beg) (bolp))
+           (1+ beg) beg)
+       (+ end begin-insertions)))
+    (c-indent-region beg (+ end begin-insertions end-insertions) t)
+    ;; c-indent-region is loud and annoying
+    (message (prin1-to-string (type-of num-stars-arg)))))

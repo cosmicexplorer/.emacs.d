@@ -216,6 +216,7 @@ Check out your .emacs."))
  '(org-enforce-todo-dependencies t)
  '(org-from-is-user-regexp nil)
  '(org-startup-folded "showeverything")
+ '(linum-relative-plusp-offset 1)
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote

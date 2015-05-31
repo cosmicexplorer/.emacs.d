@@ -4,43 +4,38 @@
 (setq-default indent-tabs-mode nil)     ;; use spaces not tabs
 (setq tab-width 2)                      ; 4-spacers get at me
 
-;;; format comments like a normal person
+;;; commenting
+(add-hook 'c++-mode-hook
+          ;; i hate the young whippersnappers and their strange and weird ways
+          (lambda () (setq comment-start "/* " comment-end " */")))
+(add-hook 'java-mode-hook
+          (lambda () (setq comment-start "/* " comment-end " */")))
 (add-hook 'fundamental-mode-hook (lambda ()
-                                   (setq comment-start "-" comment-end ""
-                                         comment-padding 1)))
-(add-hook 'c++-mode-hook (lambda ()
-                           (setq comment-start "/* " comment-end " */")))
+                                   (setq comment-start "-" comment-end "")))
+;;; format comments like a normal person
 (add-hook 'r-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (add-hook 'ess-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
-(add-hook 'emacs-lisp-mode-hook
-          (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (add-hook 'asm-mode-hook (lambda () (setq comment-start "# " comment-end "")))
+
+;;; highlight cursor and auto-fill when over 80 chars in certain modes
+(add-hook 'prog-mode-hook #'highlight-80+-mode)
+(add-hook 'prog-mode-hook #'auto-fill-mode)
+(add-hook 'prog-mode-hook
+          (lambda () (set-fill-column 80)))
+(add-hook 'text-mode-hook #'highlight-80+-mode)
+(add-hook 'text-mode-hook #'auto-fill-mode)
+(add-hook 'text-mode-hook
+          (lambda () (set-fill-column 80)))
+
+;;; ...but not others
 (add-hook 'LaTeX-mode-hook (lambda ()
-                             (setq comment-start "% " comment-end "")
-                             (auto-fill-mode -1)
-                             (highlight-80+-mode -1)))
-(add-hook 'org-mode-hook (lambda ()
-                           (setq comment-start "% " comment-end "")
                              (auto-fill-mode -1)
                              (highlight-80+-mode -1)))
 (add-hook 'markdown-mode-hook (lambda ()
                                 (auto-fill-mode -1)
                                 (highlight-80+-mode -1)))
-(add-hook 'html-mode-hook (lambda ()
-                            (setq comment-start "<!-- " comment-end " -->")))
-
-;;; highlight cursor and auto-fill when over 80 chars in certain modes
-(add-hook 'prog-mode-hook #'highlight-80+-mode)
-(add-hook 'prog-mode-hook #'auto-fill-mode)
-(add-hook 'prog-mode-hook (lambda ()
-                              (set-fill-column 80)))
-(add-hook 'text-mode-hook #'highlight-80+-mode)
-(add-hook 'text-mode-hook #'auto-fill-mode)
-(add-hook 'text-mode-hook (lambda ()
-                              (set-fill-column 80)))
-
 
 ;;; perl
 (fset 'perl-mode 'cperl-mode)
@@ -62,6 +57,13 @@
      c-mode-map
      c++-mode-map
      java-mode-map)))
+
+(defun add-star-comment-region ()
+  (setq comment-region-function 'c-comment-region-stars))
+(add-hook 'c-mode-hook #'add-star-comment-region)
+(add-hook 'c++-mode-hook #'add-star-comment-region)
+(add-hook 'java-mode-hook #'add-star-comment-region)
+
 (c-set-offset 'innamespace 0)
 ;;; add modes for specific filetypes
 (add-to-list 'auto-mode-alist '("\\.tpp\\'" . c++-mode))

@@ -93,7 +93,9 @@
 ;; show line numbers
 (global-linum-mode 1)
 ;; make them relative
-(setq linum-format 'linum-relative)
+(setq linum-format 'fix-linum-relative)
+(make-variable-buffer-local 'linum-relative-current-symbol)
+(add-hook 'after-change-major-mode-hook 'get-linum-relative-symbol)
 
 ;;; RAINBOW
 (add-hook 'prog-mode-hook #'rainbow-mode)
@@ -406,3 +408,6 @@ Check out your .emacs.\n")))))
 ;;; i like being able to search for w3m buffers
 ;;; TODO: doesn't work, let's fix
 ;; (add-hook 'w3m-select-buffer-hook #'w3m-rename-buf)
+
+;;; company
+(global-company-mode)

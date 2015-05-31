@@ -63,4 +63,6 @@ A representative example might be:
         types-vars-list)))
 (put 'check-types 'lisp-indent-function 1)
 
-;;; TODO: add change-modified for org and other files!
+;;; this already exists in emacs, but may be removed, according to the
+;;; documentation
+(defun str2char (str) (aref str 0))
