@@ -988,35 +988,39 @@ range is not marked."
 which contains POS, depending upon the value of LEFT-OR-RIGHT. If neither 'left
 nor 'right is given as an argument, assumes right."
   (save-excursion
-    (when pos
-      (goto-char pos))
-    (if (eq left-or-right 'left)
-        (end-of-line)
-      (beginning-of-line))
-    (loop with final-text-char = (point)
-          with was-final-char = nil
-          until was-final-char
-          do (progn
-               (unless (whitespacep (char-after (point)))
-                 (setq final-text-char (point)))
-               (when (or (and (eq left-or-right 'left)
-                              (bolp))
-                         (and (not (eq left-or-right 'left))
-                              (eolp)))
-                 (setq was-final-char t))
-               (if (eq left-or-right 'left) (backward-char)
-                      (forward-char)))
-          finally (return final-text-char))))
+    (let ((orig-pt (if pos pos (point))))
+      (goto-char orig-pt)
+      (if (eq left-or-right 'left)
+          (end-of-line)
+        (beginning-of-line))
+      (loop with final-text-char = -1
+            with first-text-char = -1
+            with was-final-char = nil
+            until was-final-char
+            do (progn
+                 (unless (whitespacep (char-after (point)))
+                   (when (= -1 first-text-char)
+                     (setq first-text-char (point)))
+                   (setq final-text-char (point)))
+                 (when (or (and (eq left-or-right 'left)
+                                (bolp))
+                           (and (not (eq left-or-right 'left))
+                                (eolp)))
+                   (setq was-final-char t))
+                 (if (eq left-or-right 'left) (backward-char)
+                   (forward-char)))
+            finally
+            (return final-text-char)))))
 
 (defun c-comment-region-stars (reg-beg reg-end num-stars-arg)
-  "Comments all text within a given region, or the current line if no region is
-active. NUM-STARS-ARG is given by prefix argument, and determines the number of
-asterisks ('*') to insert before the initial delimiter and after the closing
-comment delimiter. If a blank argument is given, it formats the region using
-'javadoc' syntax, with two stars on the initial line and a single star for each
-line in between. This \"pushes\" the region affected to the beginning of the
-line containing the `region-beginning', and the end of the line containing
-`region-end'."
+  "Comments all text within a given region between REG-BEG and REG-END, or the
+current line if no region is active. NUM-STARS-ARG is given by prefix argument,
+and determines the number of asterisks ('*') to insert before the initial
+delimiter and after the closing comment delimiter. If a blank argument is given,
+it formats the region using 'javadoc' syntax, with two stars on the initial line
+and a single star for each line in between. This \"pushes\" the region affected
+to the beginning of the line containing the `region-beginning', and the end of
+the line containing `region-end'."
   (interactive "P")
   ;; num-stars is nil if the single-prefix argument is given, which signals
   ;; using javadoc
@@ -1083,6 +1087,12 @@ line containing the `region-beginning', and the end of the line containing
 way I prefer, and regards `comment-padding', unlike the standard version."
   (interactive)
   (goto-char (frontier-of-text-for-line 'right))
-  (insert (if (bolp) "" comment-padding) comment-start comment-padding)
+  (insert (if (or
+               (bolp)
+               (string-match-p "^\s*$" (buffer-substring-no-properties
+                                        (line-beginning-position)
+                                        (line-end-position))))
+              "" comment-padding)
+          comment-start comment-padding)
   (save-excursion
     (insert comment-padding comment-end)))
