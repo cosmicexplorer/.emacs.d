@@ -95,6 +95,10 @@ also."
   (interactive)
   (set-face-attribute 'default nil :height 200))
 
+(defun medium-text ()
+  (interactive)
+  (set-face-attribute 'default nil :height 150))
+
 (defun little-text ()
   (interactive)
   (set-face-attribute 'default nil :height 100))
@@ -108,7 +112,8 @@ also."
 (ad-activate 'ibuffer)
 
 ;;; helper functions for toggle-letter-case
-;;; https://stackoverflow.com/questions/27798296/check-if-a-character-not-string-is-lowercase-uppercase-alphanumeric
+;;; https://stackoverflow.com/questions/27798296/check-if-a (continued)
+;;; -character-not-string-is-lowercase-uppercase-alphanumeric
 (defun wordp (c)
   (= ?w (char-syntax c)))
 (defun lowercasep (c)
@@ -948,21 +953,15 @@ also affects negative line numbers, even though it says it doesn't."
 			   (number-to-string diff)))
 	 (face (if current-p 'linum-relative-current-face 'linum)))
     (propertize (format linum-relative-format current-symbol) 'face face)))
-(defvar linum-relative-symbols
-  ["X"
-   "☭"
-   "⚘"
-   ">"]
-  "A vector of strings to represent the marker on the current line. Used in
-`get-linum-relative-symbol'.")
 (defun get-linum-relative-symbol ()
   "Makes the string `linum-relative' uses to point to the current line any one
 of `linum-relative-symbols' from calling `sxhash' on the result of
 `buffer-name'."
   (interactive)
   (setq linum-relative-current-symbol
-        (aref linum-relative-symbols
-              (mod (sxhash (buffer-name)) (length linum-relative-symbols)))))
+        (let ((index
+               (mod (sxhash (buffer-name)) (length linum-relative-symbols))))
+          (substring linum-relative-symbols index (1+ index)))))
 
 ;;; commenting is dumb
 (defun insert-string-before-each-line-in-range (str beg end)
@@ -984,6 +983,31 @@ range is not marked."
                (forward-char))
           finally (goto-char (+ orig-pos num-insertions-before-point)))))
 
+(defun frontier-of-text-for-line (left-or-right &optional pos)
+  "Returns the position either the leftmost or rightmost character in the line
+which contains POS, depending upon the value of LEFT-OR-RIGHT. If neither 'left
+nor 'right is given as an argument, assumes right."
+  (save-excursion
+    (when pos
+      (goto-char pos))
+    (if (eq left-or-right 'left)
+        (end-of-line)
+      (beginning-of-line))
+    (loop with final-text-char = (point)
+          with was-final-char = nil
+          until was-final-char
+          do (progn
+               (unless (whitespacep (char-after (point)))
+                 (setq final-text-char (point)))
+               (when (or (and (eq left-or-right 'left)
+                              (bolp))
+                         (and (not (eq left-or-right 'left))
+                              (eolp)))
+                 (setq was-final-char t))
+               (if (eq left-or-right 'left) (backward-char)
+                      (forward-char)))
+          finally (return final-text-char))))
+
 (defun c-comment-region-stars (reg-beg reg-end num-stars-arg)
   "Comments all text within a given region, or the current line if no region is
 active. NUM-STARS-ARG is given by prefix argument, and determines the number of
@@ -996,7 +1020,8 @@ line containing the `region-beginning', and the end of the line containing
   (interactive "P")
   ;; num-stars is nil if the single-prefix argument is given, which signals
   ;; using javadoc
-  (let ((num-stars (cond ((numberp num-stars-arg) num-stars-arg)
+  (let ((num-stars (cond ((numberp num-stars-arg)
+                          (if (zerop num-stars-arg) 1 num-stars-arg))
                          ((consp num-stars-arg) nil)
                          ((null num-stars-arg) 1)
                          (t (throw 'unrecognized-prefix-arg num-stars-arg))))
@@ -1010,7 +1035,7 @@ line containing the `region-beginning', and the end of the line containing
                   (goto-char reg-beg)
                   (apply fun args)))
             #'funcall)
-          (list #'line-beginning-position)))
+          (list #'frontier-of-text-for-line 'left)))
         (end (apply
               (if (use-region-p)
                   (lambda (fun &rest args)
@@ -1020,29 +1045,44 @@ line containing the `region-beginning', and the end of the line containing
                        reg-end))
                     (apply fun args))
                 #'funcall)
-              (list #'line-end-position)))
+              (list #'frontier-of-text-for-line 'right)))
         (begin-insertions 0)
         (end-insertions 0)
-        (init-point (point)))
+        (one-line nil))
+    (setq one-line (loop for char across (buffer-substring reg-beg reg-end)
+                         do (when (char-equal char (str2char "\n"))
+                              (return nil))
+                         finally (return t)))
     (goto-char beg)
     (let ((insert-begin-str
-           (concat "/" (make-string (or num-stars 2) (str2char "*")) "\n")))
+           (concat comment-start
+                   (make-string (1- (or num-stars 2)) (str2char "*"))
+                   (if (and one-line num-stars) comment-padding "\n"))))
       (insert insert-begin-str)
       (setq begin-insertions (length insert-begin-str)))
     (goto-char (+ end begin-insertions))
     (let ((insert-end-str
-           (concat "\n"
+           (concat (if (and one-line num-stars) comment-padding "\n")
                    ;; push the closing delimiter out a space when javadocking
                    (if num-stars "" " ")
-                   (make-string (or num-stars 1) (str2char "*")) "/")))
+                   (make-string (1- (or num-stars 1)) (str2char "*"))
+                   comment-end)))
       (insert insert-end-str)
       (setq end-insertions (+ begin-insertions (length insert-end-str))))
     (unless num-stars
       (insert-string-before-each-line-in-range
-       "* "
-       (if (save-excursion (goto-char beg) (bolp))
-           (1+ beg) beg)
+       (concat "*" comment-padding)
+       (if (save-excursion (goto-char beg) (bolp)) (1+ beg) beg)
        (+ end begin-insertions)))
     (c-indent-region beg (+ end begin-insertions end-insertions) t)
     ;; c-indent-region is loud and annoying
-    (message (prin1-to-string (type-of num-stars-arg)))))
+    (message "")))
+
+(defun c-comment-end-of-line ()
+  "Meant to be set as `comment-insert-comment-function'. Performs commenting the
+way I prefer, and regards `comment-padding', unlike the standard version."
+  (interactive)
+  (goto-char (frontier-of-text-for-line 'right))
+  (insert (if (bolp) "" comment-padding) comment-start comment-padding)
+  (save-excursion
+    (insert comment-padding comment-end)))

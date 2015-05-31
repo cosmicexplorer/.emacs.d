@@ -84,8 +84,12 @@
                (w3m-toggle-inline-images))))
 
 
-;;; unfold org at startup
+;;; org-mode
 (setq-default org-startup-folded "showeverything")
+(add-hook 'org-mode-hook
+          (lambda ()
+            (highlight-80+-mode -1)
+            (auto-fill-mode -1)))
 
 ;;; see docs for funcs n stuff
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
@@ -94,6 +98,11 @@
 (global-linum-mode 1)
 ;; make them relative
 (setq linum-format 'fix-linum-relative)
+;;; make it weird
+(defvar linum-relative-symbols
+  "->X☢☣☠⚠☤⚕⚚†☯⚖☮⚘⚔☭⚒⚓⚛⚜⚡⚶☥✠✙✞✟✧⋆★☆✪✫✬✭✮✯✰⚝✡☫☬☸✵❂☘♡♥❤⚘❀❃❁✼☀✌♫♪☃❄❅❆☕☂❦✈♕♛♖♜☁☾"
+  "A vector of strings to represent the marker on the current line. Used in
+`get-linum-relative-symbol'.")
 (make-variable-buffer-local 'linum-relative-current-symbol)
 (add-hook 'after-change-major-mode-hook 'get-linum-relative-symbol)
 

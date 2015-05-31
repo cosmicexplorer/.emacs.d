@@ -5,11 +5,12 @@
 (setq tab-width 2)                      ; 4-spacers get at me
 
 ;;; commenting
-(add-hook 'c++-mode-hook
-          ;; i hate the young whippersnappers and their strange and weird ways
-          (lambda () (setq comment-start "/* " comment-end " */")))
-(add-hook 'java-mode-hook
-          (lambda () (setq comment-start "/* " comment-end " */")))
+(defun make-comments-like-c ()
+  (setq comment-start "/*" comment-end "*/" comment-padding " "))
+;; i hate the young whippersnappers and their strange and weird ways
+(add-hook 'c++-mode-hook #'make-comments-like-c)
+(add-hook 'c-mode-hook #'make-comments-like-c)
+(add-hook 'java-mode-hook #'make-comments-like-c)
 (add-hook 'fundamental-mode-hook (lambda ()
                                    (setq comment-start "-" comment-end "")))
 ;;; format comments like a normal person
@@ -58,8 +59,11 @@
      c++-mode-map
      java-mode-map)))
 
+(make-variable-buffer-local 'comment-region-function)
+(make-variable-buffer-local 'c-comment-end-of-line)
 (defun add-star-comment-region ()
-  (setq comment-region-function 'c-comment-region-stars))
+  (setq comment-region-function 'c-comment-region-stars)
+  (setq comment-insert-comment-function 'c-comment-end-of-line))
 (add-hook 'c-mode-hook #'add-star-comment-region)
 (add-hook 'c++-mode-hook #'add-star-comment-region)
 (add-hook 'java-mode-hook #'add-star-comment-region)
