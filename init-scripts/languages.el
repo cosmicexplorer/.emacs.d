@@ -86,10 +86,11 @@
   :group 'csharp)
 (defconst csharp-cc-style
   `("cc-mode"
-    (c-offsets-alist . ((innamespace [,(if csharp-indent-namespaces
-                                           csharp-indent-level
-                                         0)])))
-    (c-basic-offset . csharp-indent-level)))
+    (c-offsets-alist . ((innamespace
+                         ,(make-vector
+                           1 (if csharp-indent-namespaces
+                                 csharp-indent-level 0)))))
+    (c-basic-offset . ,csharp-indent-level)))
 (c-add-style "csharp-mode-style" csharp-cc-style)
 (add-hook 'csharp-mode-hook (lambda () (c-set-style "csharp-mode-style")))
 
