@@ -358,11 +358,7 @@ Check out your .emacs.\n")))))
   (setup-ssh-agent))
 
 
-;;; control l setup
-(pretty-control-l-mode 1)
-
-
-;;; persist buffers not visiting files to disk as well because apparently
+;;; TODO: persist buffers not visiting files to disk as well because apparently
 ;;; sublime does this by default and we can't let sublime beat us; let's also do
 ;;; the same for tramp buffers (this requires logging in; "luckily" emacs is
 ;;; synchronous so that should still work. may get annoying for people who tramp

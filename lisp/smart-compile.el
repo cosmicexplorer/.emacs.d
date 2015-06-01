@@ -105,10 +105,10 @@
                                  (python-mode        . "python %f")
                                  (js-mode            . "node %f")
                                  (csharp-mode        . "mcs %f -out:%n")
-                                 ("\\.R\\'"          . "Rscript %f") ;; redirects to stdout
-                                 ("\\.r\\'"          . "Rscript %f") ;; redirects to stdout
-                                 (go-mode            . (go-fmt-file-and-compile))
-                                 (coffee-mode        . "coffee -c %f")
+                                 ("\\.R\\'"          . "Rscript %f")
+                                 ("\\.r\\'"          . "Rscript %f")
+                                 (go-mode           . (go-fmt-file-and-compile))
+                                 (coffee-mode     . "coffee -bc --no-header %f")
                                  (qmake-mode         . "qmake")
                                  (cmake-mode	     . "cmake %d")
                                  (qmake-mode         . "qmake")

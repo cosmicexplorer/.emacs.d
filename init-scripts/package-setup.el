@@ -98,7 +98,7 @@
 ;;;; re: http://martinowen.net/blog/2010/02/03/tips-for-emacs-ibuffer.html
 ;; you can add different groups too, not just home, in case you ever want to
 (setq ibuffer-saved-filter-groups
-      '(("home"
+      `(("home"
          ("eshell" (mode . eshell-mode))
          ("dired" (mode . dired-mode))
          ("readme" (filename . "README"))
@@ -110,7 +110,7 @@
          ("emacs-config" (or (filename . ".emacs.d")
                              (filename . "emacs-config")
                              (filename . ".emacs")
-                             (filename . user-init-file)))
+                             (filename . ,user-init-file)))
          ("doc-view" (mode . doc-view-mode))
          ("web" (or (mode . html-mode)
                     (mode . css-mode)
