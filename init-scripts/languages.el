@@ -44,8 +44,8 @@
 
 ;;; c/c++/java
 (setq-default c-basic-offset 2) ;; cc-mode uses this instead of tab-width
-(setq c-hanging-semi&comma-criteria nil) ; stop auto-inserting newlines after ;
-                                        ; semicolons i don't like that
+;;; stop auto-inserting newlines after semicolons i don't like that
+(setq c-hanging-semi&comma-criteria nil)
 (setq c-default-style nil)
 ;;; doesn't work, hence camel-case-{left,right}-word in functions.el
 (subword-mode)
@@ -67,13 +67,32 @@
 (add-hook 'c-mode-hook #'add-star-comment-region)
 (add-hook 'c++-mode-hook #'add-star-comment-region)
 (add-hook 'java-mode-hook #'add-star-comment-region)
-
+;;; don't indent namespaces wtf
 (c-set-offset 'innamespace 0)
-;;; add modes for specific filetypes
+;;; add modes for random c++ filetypes
 (add-to-list 'auto-mode-alist '("\\.tpp\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.txx\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.hxx\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.cxx\\'" . c++-mode))
+
+;;; lol c#
+(defcustom csharp-indent-level 4
+  "Level of indentation used for C# buffers. NOT part of csharp-mode!"
+  :type 'integer
+  :group 'csharp)
+(defcustom csharp-indent-namespaces t
+  "Whether to indent namespaces in C# buffers. NOT part of csharp-mode!"
+  :type 'boolean
+  :group 'csharp)
+(defconst csharp-cc-style
+  `("cc-mode"
+    (c-offsets-alist . ((innamespace [,(if csharp-indent-namespaces
+                                           csharp-indent-level
+                                         0)])))
+    (c-basic-offset . csharp-indent-level)))
+(c-add-style "csharp-mode-style" csharp-cc-style)
+(add-hook 'csharp-mode-hook (lambda () (c-set-style "csharp-mode-style")))
+
 
 ;;; shell
 (defun setup-sh-indentation ()
