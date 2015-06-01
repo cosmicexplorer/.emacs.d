@@ -1,6 +1,8 @@
 ;;; fun stuff that i might release on melpa if anyone cares
 
+;;; setf stuff that *should* work already lol
 (gv-define-simple-setter plist-get plist-put t)
+(gv-define-simple-setter getenv setenv t)
 
 (defmacro nconcat (&rest sequences)
   "Destructively modify all of SEQUENCES except for the last. Analogous to

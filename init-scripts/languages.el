@@ -60,7 +60,7 @@
      java-mode-map)))
 
 (make-variable-buffer-local 'comment-region-function)
-(make-variable-buffer-local 'c-comment-end-of-line)
+(make-variable-buffer-local 'comment-insert-comment-function)
 (defun add-star-comment-region ()
   (setq comment-region-function #'c-comment-region-stars)
   (setq comment-insert-comment-function #'c-comment-end-of-line))
