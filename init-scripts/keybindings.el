@@ -198,3 +198,9 @@
 (global-set-key (kbd "C-c C-a") #'beginning-of-line)
 (global-set-key (kbd "C-c C-e") #'end-of-line)
 (global-set-key (kbd "M-`") #'indent-regardless-of-mode)
+
+;;; c#
+(eval-after-load "csharp-mode"
+  '(progn
+     (define-key csharp-mode-map (kbd "RET") #'csharp-hack-newline)
+     (define-key csharp-mode-map (kbd "{") #'csharp-hack-braces)))

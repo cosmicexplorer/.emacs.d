@@ -93,7 +93,13 @@
     (c-basic-offset . ,csharp-indent-level)))
 (c-add-style "csharp-mode-style" csharp-cc-style)
 (add-hook 'csharp-mode-hook (lambda () (c-set-style "csharp-mode-style")))
-
+(eval-after-load "csharp-mode"
+  '(progn
+     (c-lang-defconst c-type-list-kwds csharp
+                      (cons "else" (c-lang-const c-type-list-kwds csharp)))
+     (font-lock-add-keywords
+      'csharp-mode
+      '(("else" . font-lock-keyword-face)))))
 
 ;;; shell
 (defun setup-sh-indentation ()

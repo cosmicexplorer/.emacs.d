@@ -245,3 +245,4 @@ Check out your .emacs."))
 
 ;;; if everything loaded correctly, clear that last message
 (message "")
+(put 'upcase-region 'disabled nil)
