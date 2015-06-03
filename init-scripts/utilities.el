@@ -68,3 +68,21 @@ A representative example might be:
 ;;; this already exists in emacs, but may be removed, according to the
 ;;; documentation
 (defun str2char (str) (aref str 0))
+
+(defun line-before-you ()
+  (buffer-substring-no-properties (line-beginning-position) (point)))
+
+(defun rest-of-line ()
+  (buffer-substring-no-properties (point) (line-end-position)))
+
+(defun trim-whitespace-in-region (beg end)
+  (goto-char beg)
+  (loop while (< (point) end)
+        with num-cut = 0
+        do (if (and (whitespacep (char-after))
+                    (string-match-p "^\s*$" (line-before-you)))
+               (progn
+                 (delete-char 1)
+                 (incf num-cut))
+             (forward-char))
+        finally (return num-cut)))
