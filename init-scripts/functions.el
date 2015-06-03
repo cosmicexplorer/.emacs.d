@@ -797,23 +797,29 @@ Note the weekly scope of the command's precision.")
                (forward-line)))
     (kill-buffer)))
 
-(defun save-visiting-files-to-buffer ()
-    (interactive)
+(defvar init-loaded-fully nil
+  "Set to t after init loads fully.")
+(defun save-visiting-files-to-buffer (&optional is-called-interactively)
+  (interactive "p")
+  (when (or is-called-interactively
+            ;; used so that init failures (which do not load any files from the
+            ;; saved-files file) do not delete all history
+            init-loaded-fully)
     ;; TODO: make this more error-resistant, somehow. having to send emacs a
     ;; sigterm because this function fails on quit is annoying.
     (with-current-buffer (find-file saved-files)
-         (erase-buffer)
-         (loop for buf in (buffer-list)
-               do (let ((bufname (buffer-file-name buf))
-                        (buf-pt (with-current-buffer buf (point))))
-                    (unless (or (not bufname)
-                                (string-equal bufname saved-files))
-                      (insert (concat "visit" ":\""
-                                      bufname "\":"
-                                      (number-to-string buf-pt)))
-                      (newline))))
-         (save-buffer)
-         (kill-buffer)))
+      (erase-buffer)
+      (loop for buf in (buffer-list)
+            do (let ((bufname (buffer-file-name buf))
+                     (buf-pt (with-current-buffer buf (point))))
+                 (unless (or (not bufname)
+                             (string-equal bufname saved-files))
+                   (insert (concat "visit" ":\""
+                                   bufname "\":"
+                                   (number-to-string buf-pt)))
+                   (newline))))
+      (save-buffer)
+      (kill-buffer))))
 
 ;;; checking for features
 (defmacro with-feature (feature-sym &rest body)
@@ -1167,3 +1173,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (goto-char pt)
     (delete-char 1)
     (goto-char (1- next-pt))))
+
+;;; todo: try creating a namespace, then a class, in an empty file, see what
+;;; happens. fix that.

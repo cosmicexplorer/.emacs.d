@@ -225,3 +225,6 @@
     `(progn
        (setq coffee-command (concat ,npm-bin-dir "/coffee"))
        (setq js2coffee-command (concat ,npm-bin-dir "/js2coffee")))))
+
+;;; company
+(add-hook 'after-load-init-hook #'global-company-mode)

@@ -210,17 +210,17 @@ Check out your .emacs."))
    (quote
     (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)))
  '(initial-buffer-choice t)
+ '(linum-relative-plusp-offset 1)
  '(org-agenda-files nil)
  '(org-catch-invisible-edits (quote smart))
  '(org-enforce-todo-checkbox-dependencies t)
  '(org-enforce-todo-dependencies t)
  '(org-from-is-user-regexp nil)
  '(org-startup-folded "showeverything")
- '(linum-relative-plusp-offset 1)
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (csharp-mode xterm-color cloc package-build flycheck-package web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode evil espuds ein company color-theme cider better-defaults auto-complete auctex 2048-game)))
+    (omnisharp csharp-mode xterm-color cloc package-build flycheck-package web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode evil espuds ein company color-theme cider better-defaults auto-complete auctex 2048-game)))
  '(safe-local-variable-values
    (quote
     ((TeX-master . "proposal")
@@ -245,4 +245,5 @@ Check out your .emacs."))
 
 ;;; if everything loaded correctly, clear that last message
 (message "")
+(setq init-loaded-fully t)
 (put 'upcase-region 'disabled nil)

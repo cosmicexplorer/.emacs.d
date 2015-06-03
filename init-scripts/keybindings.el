@@ -189,9 +189,11 @@
 (global-set-key (kbd "M-#") 'replace-regexp)
 
 ;;; org-mode
-(define-key org-mode-map (kbd "<tab>") #'smart-tab)
-(define-key org-mode-map (kbd "C-c a") #'org-agenda)
-(define-key org-mode-map (kbd "C-c c") #'org-capture)
+(eval-after-load "org-mode"
+  '(progn
+     (define-key org-mode-map (kbd "<tab>") #'smart-tab)
+     (define-key org-mode-map (kbd "C-c a") #'org-agenda)
+     (define-key org-mode-map (kbd "C-c c") #'org-capture)))
 
 ;;; convenience bindings from working with windows
 (global-set-key (kbd "C-a") #'mark-whole-buffer)

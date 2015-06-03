@@ -22,10 +22,10 @@
                       cider
                       cloc              ; YEAH!!!
                       clojure-mode
-                      csharp-mode
                       coffee-mode
                       color-theme
                       company
+                      csharp-mode
                       dash
                       ein
                       epl
@@ -47,6 +47,7 @@
                       misc-cmds
                       multiple-cursors
                       noflet
+                      omnisharp
                       package-build
                       paredit
                       php-mode

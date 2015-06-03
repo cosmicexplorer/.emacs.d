@@ -414,6 +414,3 @@ Check out your .emacs.\n")))))
 ;;; i like being able to search for w3m buffers
 ;;; TODO: doesn't work, let's fix
 ;; (add-hook 'w3m-select-buffer-hook #'w3m-rename-buf)
-
-;;; company
-(global-company-mode)
