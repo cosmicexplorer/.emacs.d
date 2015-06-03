@@ -1067,24 +1067,25 @@ the line containing `region-end'."
     (let ((insert-begin-str
            (concat comment-start
                    (make-string (1- (or num-stars 2)) (str2char "*"))
-                   (if (and one-line num-stars) comment-padding "\n"))))
+                   (if num-stars comment-padding "\n"))))
       (insert insert-begin-str)
       (setq begin-insertions (length insert-begin-str)))
     (goto-char (+ end begin-insertions))
     (let ((insert-end-str
-           (concat (if (and one-line num-stars) comment-padding "\n")
-                   ;; push the closing delimiter out a space when javadocking
-                   (if num-stars "" " ")
+           ;; push the closing delimiter out a space when javadocking
+           (concat (if num-stars comment-padding "\n ")
                    (make-string (1- (or num-stars 1)) (str2char "*"))
                    comment-end)))
       (insert insert-end-str)
-      (setq end-insertions (+ begin-insertions (length insert-end-str))))
+      (setq end-insertions (length insert-end-str)))
     (unless num-stars
       (insert-string-before-each-line-in-range
        (concat "*" comment-padding)
        (if (save-excursion (goto-char beg) (bolp)) (1+ beg) beg)
        (+ end begin-insertions)))
-    (c-indent-region beg (+ end begin-insertions end-insertions) t)
+    (let ((real-beg beg)
+          (real-end (+ end begin-insertions end-insertions)))
+      (c-indent-region real-beg real-end t))
     ;; c-indent-region is loud and annoying
     (message "")))
 

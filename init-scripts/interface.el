@@ -100,7 +100,8 @@
 (setq linum-format 'fix-linum-relative)
 ;;; make it weird
 (defvar linum-relative-symbols
-  "+-~>"
+  ">"                                   ; i like this but it's super distracting
+  ;; "+-~>"
   ;; "->X☢☣☠⚠☤⚕⚚†☯⚖☮⚘⚔☭⚒⚓⚛⚜⚡⚶☥✠✙✞✟✧⋆★☆✪✫✬✭✮✯✰⚝✡☫☬☸✵❂☘♡♥❤⚘❀❃❁✼☀✌♫♪☃❄❅❆☕☂❦✈♕♛♖♜☁☾"
   "A vector of strings to represent the marker on the current line. Used in
 `get-linum-relative-symbol'.")
