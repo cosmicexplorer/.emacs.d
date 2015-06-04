@@ -1101,6 +1101,9 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 ;;; (get/set) and methods in c# and see if there's a way to hook into
 ;;; ido-find-file so that it doesn't fail completely???
 
+(defun in-comment-p ()
+  (nth 4 (syntax-ppss)))
+
 (defun csharp-hack-newline ()
   (interactive)
   (let ((annoying-identifiers
@@ -1109,24 +1112,30 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                   (c-lang-const c-block-stmt-1-kwds csharp)
                   (c-lang-const c-block-stmt-2-kwds csharp)
                   '("else")))))
-    (cond ((string-match-p
-             (concat (regexp-opt annoying-identifiers) "\s*$")
-             (buffer-substring-no-properties
-              (line-beginning-position) (point)))
-           (let ((pt (point))
-                 (next-pt nil))
-             (insert ";")
-             (newline-and-indent)
-             (setq next-pt (point))
-             (goto-char pt)
-             (delete-char 1)
-             (goto-char (1- next-pt))))
-          ((and (string-match-p
-                "(\s*$" (buffer-substring-no-properties
-                         (line-beginning-position) (point)))
-                (char-equal (char-after) (str2char ")")))
-           (newline) (indent-for-tab-command))
-          (t (newline-and-indent)))))
+    (cond
+     ((and (char-equal (char-before) (str2char "."))
+           (not (in-comment-p)))
+      (backward-char)
+      (newline-and-indent)
+      (forward-char))
+     ((string-match-p
+       (concat (regexp-opt annoying-identifiers) "\s*$")
+       (buffer-substring-no-properties
+        (line-beginning-position) (point)))
+      (let ((pt (point))
+            (next-pt nil))
+        (insert ";")
+        (newline-and-indent)
+        (setq next-pt (point))
+        (goto-char pt)
+        (delete-char 1)
+        (goto-char (1- next-pt))))
+     ((and (string-match-p
+            "(\s*$" (buffer-substring-no-properties
+                     (line-beginning-position) (point)))
+           (char-equal (char-after) (str2char ")")))
+      (newline) (indent-for-tab-command))
+     (t (newline-and-indent)))))
 
 (defun csharp-hack-braces ()
   (interactive)
@@ -1167,3 +1176,42 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (goto-char pt)
     (delete-char 1)
     (goto-char (1- next-pt))))
+
+(defun csharp-hack-period ()
+  (interactive)
+  (let ((string-past-point
+         (buffer-substring-no-properties (point) (line-end-position))))
+    (when (and
+           (= 1 (count (str2char ")") string-past-point))
+           (= 0 (count (str2char ",") string-past-point)))
+      (loop until (char-equal (char-before) (str2char ")")) do (forward-char))))
+  (insert "."))
+
+(defun csharp-hack-parenthesis ()
+  (interactive)
+  (when (and
+           (not (whitespacep (char-before)))
+           (string-match-p
+            (concat (regexp-opt
+                     (c-lang-const c-block-stmt-2-kwds csharp) 'words)
+                    "\s*$")
+            (buffer-substring-no-properties
+             (line-beginning-position) (point))))
+    (insert " "))
+  (insert "()")
+  (backward-char))
+
+(defun csharp-hack-equals ()
+  (interactive)
+  (let ((prev-char (char-before)))
+    (cond ((char-equal (str2char "=") prev-char)
+           (delete-backward-char 1))
+          ((not (or (whitespacep (char-before))
+                    (char-equal (str2char "!") prev-char)))
+           (insert " "))))
+  (insert "="))
+
+(defun csharp-hack-semicolon ()
+  (interactive)
+  (end-of-line)
+  (insert ";"))
