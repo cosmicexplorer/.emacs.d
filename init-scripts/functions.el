@@ -1153,8 +1153,9 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                                         (line-end-position))))
               "" comment-padding)
           comment-start comment-padding)
-  (save-excursion
-    (insert comment-padding comment-end)))
+  (unless (string-equal comment-end "")
+    (save-excursion
+      (insert comment-padding comment-end))))
 
 ;;; TODO: fix csharp-maybe-insert-codedoc and the indentation of attributes
 ;;; (get/set) and methods in c# and see if there's a way to hook into
