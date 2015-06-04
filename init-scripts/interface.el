@@ -100,7 +100,8 @@
 (setq linum-format 'fix-linum-relative)
 ;;; make it weird
 (defvar linum-relative-symbols
-  "+-~>"
+  ">"                                   ; i like this but it's super distracting
+  ;; "+-~>"
   ;; "->X☢☣☠⚠☤⚕⚚†☯⚖☮⚘⚔☭⚒⚓⚛⚜⚡⚶☥✠✙✞✟✧⋆★☆✪✫✬✭✮✯✰⚝✡☫☬☸✵❂☘♡♥❤⚘❀❃❁✼☀✌♫♪☃❄❅❆☕☂❦✈♕♛♖♜☁☾"
   "A vector of strings to represent the marker on the current line. Used in
 `get-linum-relative-symbol'.")
@@ -416,6 +417,3 @@ Check out your .emacs.\n")))))
 ;;; i like being able to search for w3m buffers
 ;;; TODO: doesn't work, let's fix
 ;; (add-hook 'w3m-select-buffer-hook #'w3m-rename-buf)
-
-;;; company
-(global-company-mode)

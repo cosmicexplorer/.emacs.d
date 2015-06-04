@@ -797,23 +797,29 @@ Note the weekly scope of the command's precision.")
                (forward-line)))
     (kill-buffer)))
 
-(defun save-visiting-files-to-buffer ()
-    (interactive)
+(defvar init-loaded-fully nil
+  "Set to t after init loads fully.")
+(defun save-visiting-files-to-buffer (&optional is-called-interactively)
+  (interactive "p")
+  (when (or is-called-interactively
+            ;; used so that init failures (which do not load any files from the
+            ;; saved-files file) do not delete all history
+            init-loaded-fully)
     ;; TODO: make this more error-resistant, somehow. having to send emacs a
     ;; sigterm because this function fails on quit is annoying.
     (with-current-buffer (find-file saved-files)
-         (erase-buffer)
-         (loop for buf in (buffer-list)
-               do (let ((bufname (buffer-file-name buf))
-                        (buf-pt (with-current-buffer buf (point))))
-                    (unless (or (not bufname)
-                                (string-equal bufname saved-files))
-                      (insert (concat "visit" ":\""
-                                      bufname "\":"
-                                      (number-to-string buf-pt)))
-                      (newline))))
-         (save-buffer)
-         (kill-buffer)))
+      (erase-buffer)
+      (loop for buf in (buffer-list)
+            do (let ((bufname (buffer-file-name buf))
+                     (buf-pt (with-current-buffer buf (point))))
+                 (unless (or (not bufname)
+                             (string-equal bufname saved-files))
+                   (insert (concat "visit" ":\""
+                                   bufname "\":"
+                                   (number-to-string buf-pt)))
+                   (newline))))
+      (save-buffer)
+      (kill-buffer))))
 
 ;;; checking for features
 (defmacro with-feature (feature-sym &rest body)
@@ -964,13 +970,54 @@ of `linum-relative-symbols' from calling `sxhash' on the result of
           (substring linum-relative-symbols index (1+ index)))))
 
 ;;; commenting is dumb
-(defun insert-string-before-each-line-in-range (str beg end)
+;; (defun insert-string-before-each-line-in-range
+;;     (str beg end &optional trim-whitespace)
+;;   "Inserts STR at beginning of each line in range denoted by BEG and END. If
+;; range doesn't begin at the beginning of the line, then the first line in the
+;; range is not marked. Cuts off whitespace from the ends of lines if
+;; TRIM-WHITESPACE is non-nil."
+;;   (let ((orig-pos (point)))
+;;     (goto-char beg)
+;;     (loop with num-insertions-before-point = 0
+;;           with total-insertion-length = 0
+;;           and cur-end = end
+;;           and str-length = (length str)
+;;           while (< (point) cur-end)
+;;           do (progn
+;;                (when (bolp)
+;;                  (when (<= (point) orig-pos)
+;;                    (incf num-insertions-before-point str-length))
+;;                  (insert str)
+;;                  (incf cur-end str-length)
+;;                  (incf total-insertion-length str-length)
+;;                  (when trim-whitespace
+;;                    (let ((prev-pt (point)))
+;;                      (loop while
+;;                            (and (whitespacep (char-after))
+;;                                 (not (char-equal (char-after) (str2char "\n"))))
+;;                            do (forward-char))
+;;                      (decf total-insertion-length (- (point) prev-pt))
+;;                      (decf cur-end (- (point) prev-pt))
+;;                      (delete-region prev-pt (point))
+;;                      (goto-char prev-pt))
+;;                    ;; super inefficient lol
+;;                    (nuke-trailing-whitespace)))
+;;                (forward-char))
+;;           finally (progn
+;;                     (goto-char (+ orig-pos num-insertions-before-point))
+;;                     (throw t)
+;;                     (return total-insertion-length)))))
+
+(defun insert-string-before-each-line-in-range
+    (str beg end &optional trim-whitespace)
   "Inserts STR at beginning of each line in range denoted by BEG and END. If
 range doesn't begin at the beginning of the line, then the first line in the
-range is not marked."
+range is not marked. Cuts off whitespace from the ends of lines if
+TRIM-WHITESPACE is non-nil."
   (let ((orig-pos (point)))
     (goto-char beg)
     (loop with num-insertions-before-point = 0
+          with total-insertion-length = 0
           and cur-end = end
           and str-length = (length str)
           while (< (point) cur-end)
@@ -978,10 +1025,13 @@ range is not marked."
                (when (bolp)
                  (when (<= (point) orig-pos)
                    (incf num-insertions-before-point str-length))
+                 (insert str)
                  (incf cur-end str-length)
-                 (insert str))
+                 (incf total-insertion-length str-length))
                (forward-char))
-          finally (goto-char (+ orig-pos num-insertions-before-point)))))
+          finally (progn
+                    (goto-char (+ orig-pos num-insertions-before-point))
+                    (return total-insertion-length)))))
 
 (defun frontier-of-text-for-line (left-or-right &optional pos)
   "Returns the position either the leftmost or rightmost character in the line
@@ -1052,6 +1102,8 @@ the line containing `region-end'."
               (list #'frontier-of-text-for-line 'right)))
         (begin-insertions 0)
         (end-insertions 0)
+        (star-insertions 0)
+        (trim-deletions 0)
         (one-line nil))
     (setq one-line (loop for char across (buffer-substring reg-beg reg-end)
                          do (when (char-equal char (str2char "\n"))
@@ -1061,24 +1113,31 @@ the line containing `region-end'."
     (let ((insert-begin-str
            (concat comment-start
                    (make-string (1- (or num-stars 2)) (str2char "*"))
-                   (if (and one-line num-stars) comment-padding "\n"))))
+                   (if num-stars comment-padding "\n"))))
       (insert insert-begin-str)
       (setq begin-insertions (length insert-begin-str)))
     (goto-char (+ end begin-insertions))
     (let ((insert-end-str
-           (concat (if (and one-line num-stars) comment-padding "\n")
-                   ;; push the closing delimiter out a space when javadocking
-                   (if num-stars "" " ")
+           (concat (if num-stars comment-padding "\n")
                    (make-string (1- (or num-stars 1)) (str2char "*"))
                    comment-end)))
       (insert insert-end-str)
-      (setq end-insertions (+ begin-insertions (length insert-end-str))))
+      (setq end-insertions (length insert-end-str)))
     (unless num-stars
-      (insert-string-before-each-line-in-range
-       (concat "*" comment-padding)
-       (if (save-excursion (goto-char beg) (bolp)) (1+ beg) beg)
-       (+ end begin-insertions)))
-    (c-indent-region beg (+ end begin-insertions end-insertions) t)
+      (setq trim-deletions
+            (trim-whitespace-in-region beg (+ end begin-insertions)))
+      (with-current-buffer "*scratch*"
+        (insert (number-to-string trim-deletions) "\n"))
+      (setq star-insertions
+            (insert-string-before-each-line-in-range
+             (concat "*" comment-padding)
+             (if (save-excursion (goto-char beg) (bolp)) (1+ beg) beg)
+             (- (+ end begin-insertions) trim-deletions))))
+     (let ((real-beg beg)
+           (real-end
+            (- (+ end begin-insertions star-insertions end-insertions)
+               trim-deletions)))
+      (c-indent-region real-beg real-end t))
     ;; c-indent-region is loud and annoying
     (message "")))
 
@@ -1094,8 +1153,9 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                                         (line-end-position))))
               "" comment-padding)
           comment-start comment-padding)
-  (save-excursion
-    (insert comment-padding comment-end)))
+  (unless (string-equal comment-end "")
+    (save-excursion
+      (insert comment-padding comment-end))))
 
 ;;; TODO: fix csharp-maybe-insert-codedoc and the indentation of attributes
 ;;; (get/set) and methods in c# and see if there's a way to hook into
@@ -1215,3 +1275,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (interactive)
   (end-of-line)
   (insert ";"))
+
+;;; todo: try creating a namespace, then a class, in an empty file, see what
+;;; happens. fix that.
