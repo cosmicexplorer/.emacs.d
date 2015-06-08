@@ -1292,19 +1292,16 @@ way I prefer, and regards `comment-padding', unlike the standard version."
          (left-pt
           (loop while (and (whitespacep (char-before)) (not (bolp)))
                 do (backward-char)
-                finally (let ((res (point)))
-                          ;; (with-current-buffer "*scratch*"
-                          ;;   (insert (prin1-to-string res) ","))
-                          (return res))))
+                finally (let ((res (point)))  (return res))))
          (right-pt
           (loop while (and (whitespacep (char-after)) (not (eolp)))
                 do (forward-char)
-                finally (let ((res (point)))
-                          ;; (with-current-buffer "*scratch*"
-                          ;;   (insert (prin1-to-string res)))
-                          (return res))))
-         (buf-str (buffer-substring left-pt right-pt))
-         (offset (- right-pt orig-pt)))
+                ;; if we're not at the end of a line, we do want whitespace
+                ;; eradicated 
+                finally (return (if (eolp) (point) nil))))
+         (buf-str (and right-pt (buffer-substring left-pt right-pt)))
+         (offset (and right-pt (- right-pt orig-pt))))
     (delete-trailing-whitespace)
-    (insert buf-str)
-    (backward-char offset)))
+    (when right-pt
+      (insert buf-str)
+      (backward-char offset))))
