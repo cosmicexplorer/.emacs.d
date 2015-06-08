@@ -25,6 +25,7 @@
 (require 'ido)
 (require 'saveplace)
 (require 'qmake)
+(require 'ansi-color)
 (require 'browse-kill-ring)
 (require 'color-theme)
 (require 'color-theme-danny)            ; mine

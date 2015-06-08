@@ -1278,3 +1278,33 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 ;;; todo: try creating a namespace, then a class, in an empty file, see what
 ;;; happens. fix that.
+
+;;; compilation-mode
+(defun colorize-compilation-buffer ()
+  (toggle-read-only)
+  (ansi-color-apply-on-region (point-min) (point-max))
+  (toggle-read-only))
+
+;;; basic utilities
+(defun nuke-whitespace-except-this-line ()
+  (interactive)
+  (let* ((orig-pt (point))
+         (left-pt
+          (loop while (and (whitespacep (char-before)) (not (bolp)))
+                do (backward-char)
+                finally (let ((res (point)))
+                          ;; (with-current-buffer "*scratch*"
+                          ;;   (insert (prin1-to-string res) ","))
+                          (return res))))
+         (right-pt
+          (loop while (and (whitespacep (char-after)) (not (eolp)))
+                do (forward-char)
+                finally (let ((res (point)))
+                          ;; (with-current-buffer "*scratch*"
+                          ;;   (insert (prin1-to-string res)))
+                          (return res))))
+         (buf-str (buffer-substring left-pt right-pt))
+         (offset (- right-pt orig-pt)))
+    (delete-trailing-whitespace)
+    (insert buf-str)
+    (backward-char offset)))

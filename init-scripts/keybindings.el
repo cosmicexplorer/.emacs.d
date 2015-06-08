@@ -214,3 +214,9 @@
 ;;; blegh
 (global-set-key (kbd "<insertchar>") nil)
 (global-set-key (kbd "<insert>") nil)
+
+;;; markdown
+(eval-after-load "markdown-mode"
+  '(progn
+     (define-key markdown-mode-map (kbd "M-n") #'mc/mark-next-like-this)
+     (define-key markdown-mode-map (kbd "M-p") #'mc/mark-previous-like-this)))

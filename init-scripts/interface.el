@@ -40,7 +40,7 @@
 
 ;; Remove trailing whitespace from a line
 (setq-default nuke-trailing-whitespace-p t)
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(add-hook 'before-save-hook 'nuke-whitespace-except-this-line)
 
 ;;; only show whitespace sometimes
 (add-hook 'after-change-major-mode-hook
@@ -417,3 +417,6 @@ Check out your .emacs.\n")))))
 ;;; i like being able to search for w3m buffers
 ;;; TODO: doesn't work, let's fix
 ;; (add-hook 'w3m-select-buffer-hook #'w3m-rename-buf)
+
+;;; compilation-mode
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
