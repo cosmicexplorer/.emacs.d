@@ -205,6 +205,8 @@ Check out your .emacs."))
  '(erc-track-mode t)
  '(erc-track-position-in-mode-line nil)
  '(fill-column 80)
+ '(grep-command (concat init-home-folder-dir "switch-grep.sh" " "))
+ '(grep-use-null-device nil)
  '(gud-key-prefix "")
  '(hippie-expand-try-functions-list
    (quote

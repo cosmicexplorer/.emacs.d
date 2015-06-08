@@ -230,17 +230,20 @@ which is defined in `smart-compile-alist'."
            (or (file-readable-p "binding.gyp")
                (file-readable-p "../binding.gyp")
                (file-readable-p "../../binding.gyp")))
-      (if (y-or-n-p "binding.gyp found. Try 'npm build'?")
+      (if (y-or-n-p "binding.gyp found. Try 'node-gyp'?")
           (progn
             (cond
              ((file-readable-p "../../binding.gyp")
               (set
-               (make-local-variable 'compile-command) "npm build ../.."))
+               (make-local-variable 'compile-command)
+               "node-gyp configure && node-gyp build"))
              ((file-readable-p "../binding.gyp")
               (set
-               (make-local-variable 'compile-command) "npm build .."))
+               (make-local-variable 'compile-command)
+               "node-gyp configure && node-gyp build"))
              (t
-              (set (make-local-variable 'compile-command) "npm build .")))
+              (set (make-local-variable 'compile-command)
+                   "node-gyp configure && node-gyp build")))
             (call-interactively 'compile)
             (setq not-yet nil))
         (setq smart-compile-check-gyp nil)))

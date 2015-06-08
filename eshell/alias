@@ -1,6 +1,6 @@
-alias ec emacsclient -n $*
-alias s ls -Arlt $*
-alias l ls -Arlt $*
-alias sl ls -Arlt $*
 alias ls ls -Arlt --si $*
-alias g grep -rnPH $*
+alias sl ls -Arlt $*
+alias l ls -Arlt $*
+alias s ls -Arlt $*
+alias g grep -rnPH --binary-files=without-match $*
+alias ec emacsclient -n $*
