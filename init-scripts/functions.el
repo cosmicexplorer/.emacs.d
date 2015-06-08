@@ -22,7 +22,7 @@
 (defun coffeescript-comment-do-what-i-really-mean (arg)
   (interactive "*P")
   (coffee-comment-dwim arg)
-  (when (char-equal (char-before) 35)   ; 35 == '#'
+  (when (and (char-before) (char-equal (char-before) 35))   ; 35 == '#'
     (insert " ")))
 
 ;; allow for backtab to force '\t'
@@ -1173,7 +1173,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                   (c-lang-const c-block-stmt-2-kwds csharp)
                   '("else")))))
     (cond
-     ((and (char-equal (char-before) (str2char "."))
+     ((and (char-before) (char-equal (char-before) (str2char "."))
            (not (in-comment-p)))
       (backward-char)
       (newline-and-indent)
@@ -1211,7 +1211,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
       (loop while (whitespacep (char-before)) do (delete-char -1))
       (let ((text-saved (buffer-substring (point) (line-end-position))))
         (delete-region (point) (line-end-position))
-        (loop until (char-equal (char-before) (str2char "}")) do (forward-char))
+        (loop until (and (char-before) (char-equal (char-before) (str2char "}"))) do (forward-char))
         (newline-and-indent)
         (insert text-saved))))
   (when
@@ -1244,7 +1244,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (when (and
            (= 1 (count (str2char ")") string-past-point))
            (= 0 (count (str2char ",") string-past-point)))
-      (loop until (char-equal (char-before) (str2char ")")) do (forward-char))))
+      (loop until (or (bobp) (char-equal (char-before) (str2char ")"))) do (forward-char))))
   (insert "."))
 
 (defun csharp-hack-parenthesis ()
