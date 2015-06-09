@@ -778,12 +778,13 @@ Note the weekly scope of the command's precision.")
                           (match-string 2 cur-line))
                          (active-point
                           (match-string 3 cur-line)))
-                     (unless (or (string= cur-line saved-files)
+                     (unless (or (string= active-filename saved-files)
                                  (string= cur-line ""))
                        (cond ((string= active-filetype "visit")
-                              (with-current-buffer
-                                  (find-file-noselect active-filename)
-                                (goto-char (string-to-number active-point))))
+                              (with-demoted-errors "save-session: %S"
+                                (with-current-buffer
+                                    (find-file-noselect active-filename)
+                                  (goto-char (string-to-number active-point)))))
                              (t (throw 'no-such-active-filetype
                                        (concat "i don't recognize "
                                                active-filetype "!"))))
