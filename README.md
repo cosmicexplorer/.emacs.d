@@ -3,6 +3,8 @@
 
 Because I've gone through hell and back to make this the best editor on the planet. If I say I've "set up" something, it means I downloaded it from the brilliant people who spent their valuable time to make it and ingraciously shoved it into my own unified configuration. The most meaningful contribution I've done is find usable non-conflicting keybindings for all of these, although I've received multiple reports that the keybindings are "weird" and "dumb." Ah well. Genius is rarely understood in its own time.
 
+There's a lot of experimental stuff in here that I play around with that may not work completely or may do unexpected things, so test out any code you pull from this before using it. I apologize for the few 50+ line functions in advance. Maybe I'll refactor them someday.
+
 This is all licensed under GPLv3, which means do whatever you want with it except sell it.
 
 #### Major functionality beyond what's available in MELPA:
