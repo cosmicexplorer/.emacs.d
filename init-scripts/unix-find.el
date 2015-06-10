@@ -191,44 +191,44 @@ function, returning a negation of the function if IS-NOT is non-nil."
 (defun unix-find-argparse (args)
   "Parses arguments for `unix-find'. Returns list of matching functions."
   (loop for arg in (unix-find-group-args args)
-        with max-min-depths = nil
+        with max-mindepths = nil
         and lambdas = nil
         do (if (apply-logic-op-to-predicate or (car arg) eq
-                 :max-depth :min-depth)
-               (prependn arg max-min-depths)
+                 :maxdepth :mindepth)
+               (prependn arg max-mindepths)
              (prependn (unix-find-create-matcher arg) lambdas))
-        finally (return (list (reverse lambdas) (reverse max-min-depths)))))
+        finally (return (list (reverse lambdas) (reverse max-mindepths)))))
 
-(defun unix-find-get-max-min-depths (max-min-depths-list)
+(defun unix-find-get-max-mindepths (max-mindepths-list)
   (let* ((depths-list
          (list
           (car (reverse (remove-if-not
-                         (lambda (arg) (eq (car arg) :max-depth))
-                         max-min-depths-list)))
+                         (lambda (arg) (eq (car arg) :maxdepth))
+                         max-mindepths-list)))
           (car (reverse (remove-if-not
-                         (lambda (arg) (eq (car arg) :min-depth))
-                         max-min-depths-list)))))
+                         (lambda (arg) (eq (car arg) :mindepth))
+                         max-mindepths-list)))))
          (max-dep (second (first depths-list)))
          (min-dep (second (second depths-list))))
     (when (and (numberp max-dep) (numberp min-dep) (< max-dep min-dep))
       (throw 'unix-find-depth-failure
-             (concat ":max-depth (" (number-to-string max-dep) ") must be "
-                     "greater than or equal to :min-depth ("
+             (concat ":maxdepth (" (number-to-string max-dep) ") must be "
+                     "greater than or equal to :mindepth ("
                      (number-to-string min-dep) ")")))
     (when (and (numberp max-dep) (< max-dep 1))
       (throw 'unix-find-depth-failure
-             (concat ":max-depth (" (number-to-string max-dep)
+             (concat ":maxdepth (" (number-to-string max-dep)
                      ") must be >= 1")))
     (when (and (numberp min-dep) (< min-dep 1))
       (throw 'unix-find-depth-failure
-             (concat ":min-depth (" (number-to-string min-dep)
+             (concat ":mindepth (" (number-to-string min-dep)
                      ") must be >= 1")))
     depths-list))
 
 (defun files-except-tree (dir)
   "Returns all files under the current directory except for . and .., and
 concatenates DIR with them (e.g. ./file.txt)."
-  (setq dir (replace-regexp-in-string "//" "/" dir))
+  (setq dir (replace-regexp-in-string "/+" "/" dir))
   (mapcar
    (lambda (file) (concat dir "/" file))
    (remove-if
@@ -237,9 +237,9 @@ concatenates DIR with them (e.g. ./file.txt)."
 
 ;;;###autoload
 (defun unix-find (dir &rest args)
-  "Recognizes :[i]name, :[i]wholename, :[i]regex, :not, :max-depth, :min-depth,
+  "Recognizes :[i]name, :[i]wholename, :[i]regex, :not, :maxdepth, :mindepth,
 :type, :perm, :binary (which uses `file-binary-p'), and :size. Doesn't care
-about the positioning of :max-depth and :min-depth. :type recognizes 'd', 'f',
+about the positioning of :maxdepth and :mindepth. :type recognizes 'd', 'f',
 'p', 'l', and 's', and :size only accepts a number of bytes, as well as a > or <
 sign in front. Performs breadth-first search. Probably pretty slow."
   (let ((buf nil))
@@ -250,12 +250,14 @@ sign in front. Performs breadth-first search. Probably pretty slow."
     (let* ((parse-results (and (car args)
                                (unix-find-argparse args)))
            (checker-lambdas (first parse-results))
-           (max-min-depths
+           (max-mindepths
             (and parse-results
-                 (unix-find-get-max-min-depths
+                 (unix-find-get-max-mindepths
                   (second parse-results))))
-           (max-depth (first max-min-depths))
-           (min-depth (second max-min-depths)))
+           (maxdepth (and (first max-mindepths)
+                          (string-to-number (second (first max-mindepths)))))
+           (mindepth (and (second max-mindepths)
+                          (string-to-number (second (second max-mindepths))))))
       (cl-flet ((passes (name)
                         (reduce (lambda (a b) (and a b))
                                 (mapcar (lambda (fun) (funcall fun name))
@@ -264,17 +266,20 @@ sign in front. Performs breadth-first search. Probably pretty slow."
         (loop with dir-list = (list dir)
               and cur-depth = 1
               and res = nil
-              while (and dir-list (if max-depth (<= cur-depth max-depth) t))
+              while (and dir-list (if maxdepth (<= cur-depth maxdepth) t))
               do (let ((next-files (mapcan #'files-except-tree dir-list))
                        (prev-dir-list dir-list))
+                   ;; (with-current-buffer "*scratch*"
+                   ;;   (loop for item in next-files
+                   ;;         do (insert item ",")
+                   ;;         finally (insert "\n")))
                    (setq dir-list (remove-if-not #'file-directory-p next-files))
-                   (unless (and min-depth (< cur-depth min-depth))
+                   (unless (and mindepth (< cur-depth mindepth))
                      (let ((new-added
                             (remove-if-not
                              #'passes (append prev-dir-list next-files))))
-                       (if buf (with-current-buffer buf
-                                 (loop for item in new-added
-                                       do (insert item ":0:0\n")))
+                       (if buf (loop for item in new-added
+                                     do (insert item ":0:0\n"))
                          (setq res (append new-added res)))))
                    (incf cur-depth))
               finally (return res))))))
@@ -353,20 +358,23 @@ etc). Displays default prompt according to `unix-find-begin-prompt'."
          (find-cmd-parsed
           (unix-find-parse-arg-string find-command)))
     (if (>= (length find-cmd-parsed) 2)
-        (with-current-buffer
-            (get-buffer-create
-             (generate-new-buffer-name
-              (concat "*Find* " find-command "@"
-                      (format-time-string "%H:%M:%S,%Y-%M-%d"))))
-          (find-mode)
-          (toggle-read-only)
-          (make-variable-buffer-local 'compilation-error-regexp-alist)
-          (setq compilation-error-regexp-alist
-                '(("\\([^:\n]+\\):\\(0\\):\\(0\\)" 1 2 3 1)
-                  ("\\(Find results\\):\s*\\([^\n]*\\)" nil 2 nil nil nil
-                   (1 font-lock-function-name-face)
-                   (2 font-lock-variable-name-face))))
-          (insert "Find results: " find-command "\n\n")
-          (switch-to-buffer (current-buffer))
-          (apply #'unix-find (cons (current-buffer) (cdr find-cmd-parsed))))
+        (let ((buf
+               (get-buffer-create
+                (generate-new-buffer-name
+                 (concat "*Find* " find-command "@"
+                         (format-time-string "%H:%M:%S,%Y-%M-%d"))))))
+          (with-current-buffer buf
+            (find-mode)
+            (toggle-read-only)
+            (make-variable-buffer-local 'compilation-error-regexp-alist)
+            (setq compilation-error-regexp-alist
+                  '(("\\([^:\n]+\\):\\(0\\):\\(0\\)" 1 2 3 1)
+                    ("\\(Find results\\):\s*\\([^\n]*\\)" nil 2 nil nil nil
+                     (1 font-lock-function-name-face)
+                     (2 font-lock-variable-name-face))))
+            (insert "Find results: " find-command "\n\n")
+            (display-buffer buf)
+            (apply #'unix-find (cons (current-buffer) (cdr find-cmd-parsed)))
+            (set-buffer-modified-p nil)
+            (toggle-read-only)))
       (message "%s: %s" "Could not parse input to find" find-command))))

@@ -1297,7 +1297,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                           (goto-char orig-pt)
                           (return res))))
          (right-pt
-          (loop while (and (whitespacep (char-after)) (not (eolp)))
+          (loop while (and (not (eolp)) (whitespacep (char-after)))
                 do (forward-char)
                 ;; if we're not at the end of a line, we do want whitespace
                 ;; eradicated
