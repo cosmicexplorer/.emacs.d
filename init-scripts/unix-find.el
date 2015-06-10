@@ -3,6 +3,9 @@
 ;;; implementation of unix find in pure elisp
 ;;; might put this on melpa?? idk why anyone would care lol
 
+;;; TODO: get some interactive version of this, perhaps using a form of
+;;; compile-mode (check out `grep.el', it does something similar)
+
 ;;; matching functions
 (defun unix-find-name-matcher-regexp (match-str)
   "Creates shell-like wildcard semantics for MATCH-STR by transforming into the
