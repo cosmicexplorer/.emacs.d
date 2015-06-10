@@ -153,7 +153,7 @@ bits."
               (unix-find-get-perm-string name))))
           ((eq type :binary)
            (lambda (name)
-             (and arg (file-binary-p name))))
+             (and (if (stringp arg) (read arg) arg) (file-binary-p name))))
           ((eq type :size)
            (cond ((char-equal (str2char ">") (aref arg 0))
                   (lambda (name)
@@ -171,7 +171,7 @@ bits."
   "Groups arguments for `unix-find'. Consumed by `unix-find-argparse'."
   (loop with cur-arg-ptr = args
         and arg-group-list = nil
-        until (null cur-arg-ptr)
+        while cur-arg-ptr
         do (let ((item (car cur-arg-ptr)))
              (if (eq item :not)
                  (prependn (nthcdraf 3 cur-arg-ptr) arg-group-list)
@@ -226,40 +226,147 @@ function, returning a negation of the function if IS-NOT is non-nil."
     depths-list))
 
 (defun files-except-tree (dir)
+  "Returns all files under the current directory except for . and .., and
+concatenates DIR with them (e.g. ./file.txt)."
+  (setq dir (replace-regexp-in-string "//" "/" dir))
   (mapcar
    (lambda (file) (concat dir "/" file))
    (remove-if
     (lambda (file) (or (string-equal file ".") (string-equal file "..")))
     (directory-files dir))))
 
+;;;###autoload
 (defun unix-find (dir &rest args)
   "Recognizes :[i]name, :[i]wholename, :[i]regex, :not, :max-depth, :min-depth,
 :type, :perm, :binary (which uses `file-binary-p'), and :size. Doesn't care
 about the positioning of :max-depth and :min-depth. :type recognizes 'd', 'f',
 'p', 'l', and 's', and :size only accepts a number of bytes, as well as a > or <
 sign in front. Performs breadth-first search. Probably pretty slow."
-  (let* ((parse-results (unix-find-argparse args))
-         (checker-lambdas (first parse-results))
-         (max-min-depths
-          (unix-find-get-max-min-depths (second parse-results)))
-         (max-depth (first max-min-depths))
-         (min-depth (second max-min-depths)))
-    (cl-flet ((passes (name)
-                      (reduce (lambda (a b) (and a b))
-                              (mapcar (lambda (fun) (funcall fun name))
-                                      checker-lambdas)
-                              :initial-value t)))
-      (loop with dir-list = (list dir)
-            and cur-depth = 1
-            and res = nil
-            while (and dir-list (if max-depth (<= cur-depth max-depth) t))
-            do (let ((next-files (mapcan #'files-except-tree dir-list))
-                     (prev-dir-list dir-list))
-                 (setq dir-list (remove-if-not #'file-directory-p next-files))
-                 (unless (and min-depth (< cur-depth min-depth))
-                   (setq
-                    res (append (remove-if-not
-                                 #'passes (append prev-dir-list next-files))
-                                res)))
-                 (incf cur-depth))
-            finally (return res)))))
+  (let ((buf nil))
+    (when (bufferp dir)
+      (setq buf dir
+            dir (car args)
+            args (cdr args)))
+    (let* ((parse-results (and (car args)
+                               (unix-find-argparse args)))
+           (checker-lambdas (first parse-results))
+           (max-min-depths
+            (and parse-results
+                 (unix-find-get-max-min-depths
+                  (second parse-results))))
+           (max-depth (first max-min-depths))
+           (min-depth (second max-min-depths)))
+      (cl-flet ((passes (name)
+                        (reduce (lambda (a b) (and a b))
+                                (mapcar (lambda (fun) (funcall fun name))
+                                        checker-lambdas)
+                                :initial-value t)))
+        (loop with dir-list = (list dir)
+              and cur-depth = 1
+              and res = nil
+              while (and dir-list (if max-depth (<= cur-depth max-depth) t))
+              do (let ((next-files (mapcan #'files-except-tree dir-list))
+                       (prev-dir-list dir-list))
+                   (setq dir-list (remove-if-not #'file-directory-p next-files))
+                   (unless (and min-depth (< cur-depth min-depth))
+                     (let ((new-added
+                            (remove-if-not
+                             #'passes (append prev-dir-list next-files))))
+                       (if buf (with-current-buffer buf
+                                 (loop for item in new-added
+                                       do (insert item ":0:0\n")))
+                         (setq res (append new-added res)))))
+                   (incf cur-depth))
+              finally (return res))))))
+
+(defun unix-find-modify-arg (arg-string)
+  (cond ((and (>= (length arg-string) 2)
+              (string-equal "\\-" (substring arg-string 0 2)))
+         (concat "\"" (substring arg-string 1) "\""))
+        ((and (>= (length arg-string) 2)
+              (string-equal "-" (substring arg-string 0 1)))
+         (concat ":" (substring arg-string 1)))
+        (t (concat "\"" arg-string "\""))))
+
+(defun unix-find-concat-quotes-split (string)
+  (loop for char across string with results = nil
+        and is-quote = nil and is-backslash = nil
+        and cur-str = ""
+        do (cond ((char-equal char (str2char "\\"))
+                  (if is-backslash
+                      (setq cur-str (concat cur-str (char-to-string char))
+                            is-backslash nil)
+                    (setq is-backslash t)))
+                 ((char-equal char (str2char "\""))
+                  (if is-backslash
+                      (setq cur-str (concat cur-str (char-to-string char)))
+                    (setq is-quote (not is-quote))))
+                 ((string-match-p "[[:space:]]" (char-to-string char))
+                  (if (or is-backslash is-quote)
+                      (setq cur-str (concat cur-str (char-to-string char)))
+                    (unless (string-equal cur-str "")
+                      (setq results (cons cur-str results)
+                            cur-str ""))))
+                 (t (setq cur-str (concat cur-str (char-to-string char)))))
+        finally (return (reverse (cons cur-str results)))))
+
+(defun unix-find-parse-arg-string (str)
+  (loop with list-ptr = (unix-find-concat-quotes-split str)
+        and results = nil
+        while list-ptr
+        do (let ((cur-str (car list-ptr)))
+             (if (and (second list-ptr)
+                      (char-equal (aref cur-str (1- (length cur-str)))
+                                  (str2char "\\")))
+                 (setq
+                  results (cons (concat (substring
+                                         cur-str 0 (1- (length cur-str)))
+                                        " " (second list-ptr))
+                                results)
+                  list-ptr (nthcdr 2 list-ptr))
+               (setq results (cons cur-str results)
+                     list-ptr (cdr list-ptr))))
+        finally (return
+                 (read
+                  (concat
+                   "("
+                   (mapconcat #'identity
+                              (mapcar #'unix-find-modify-arg (reverse results))
+                              " ")
+                   ")")))))
+
+(defcustom unix-find-begin-prompt "find "
+  "Default prompt for `find'."
+  :group 'unix-find)
+
+(define-compilation-mode find-mode "*Find*"
+  "Compilation derived mode to display results of `find'")
+
+;;;###autoload
+(defun find ()
+  "Interactive form of `unix-find'. Parses and converts arguments with hyphen
+syntax (-name, -regex, etc) to colon atoms for input (:name, :regex,
+etc). Displays default prompt according to `unix-find-begin-prompt'."
+  (interactive)
+  (let* ((find-command
+          (read-from-minibuffer "call find like: " "find "))
+         (find-cmd-parsed
+          (unix-find-parse-arg-string find-command)))
+    (if (>= (length find-cmd-parsed) 2)
+        (with-current-buffer
+            (get-buffer-create
+             (generate-new-buffer-name
+              (concat "*Find* " find-command "@"
+                      (format-time-string "%H:%M:%S,%Y-%M-%d"))))
+          (find-mode)
+          (toggle-read-only)
+          (make-variable-buffer-local 'compilation-error-regexp-alist)
+          (setq compilation-error-regexp-alist
+                '(("\\([^:\n]+\\):\\(0\\):\\(0\\)" 1 2 3 1)
+                  ("\\(Find results\\):\s*\\([^\n]*\\)" nil 2 nil nil nil
+                   (1 font-lock-function-name-face)
+                   (2 font-lock-variable-name-face))))
+          (insert "Find results: " find-command "\n\n")
+          (switch-to-buffer (current-buffer))
+          (apply #'unix-find (cons (current-buffer) (cdr find-cmd-parsed))))
+      (message "%s: %s" "Could not parse input to find" find-command))))
