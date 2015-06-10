@@ -27,10 +27,83 @@ appropriate regular expression."
 (defun unix-find-get-file-size (filename)
   (nth 7 (file-attributes filename)))
 
-(defun str2num (str-or-num)
-  (if (stringp str-or-num)
-      (string-to-number str-or-num)
-    str-or-num))
+(defun unix-find-get-perm-string (filename)
+  (substring (nth 8 (file-attributes filename)) 1))
+
+(defun unix-find-strip-leading-zeroes (str)
+  (loop for i from 0 to (1- (length str))
+        do (unless (char-equal (aref str i) (str2char "0"))
+             (return (substring str i)))
+        finally (return "0")))
+
+(defun unix-find-num-to-perm-three-bits (num)
+  (let ((arg (cond ((characterp num) (string-to-number (char-to-string num)))
+                   ((numberp num) num)
+                   ((stringp num) (string-to-number num)))))
+    (cond ((= arg 7) "rwx")
+          ((= arg 6) "rw\\-")
+          ((= arg 5) "r\\-x")
+          ((= arg 4) "r\\-\\-")
+          ((= arg 3) "\\-wx")
+          ((= arg 2) "\\-w\\-")
+          ((= arg 1) "\\-\\-x")
+          ((= arg 0) "\\-\\-\\-")
+          (t (throw 'unix-find-invalid-perm-three-bits num)))))
+
+(defun unix-find-num-str-to-perm-string (num-str)
+  (unless (= 3 (length num-str))
+    (throw 'unix-find-invalid-perm-str num-str))
+  (reduce #'concat
+          (loop for char across num-str
+                collect (unix-find-num-to-perm-three-bits char))))
+
+(defun unix-find-get-index-of-perm-type (char)
+  (cond ((= char (str2char "r")) 0)
+        ((= char (str2char "w")) 1)
+        ((= char (str2char "x")) 2)
+        (t (throw 'unix-find-unrecognized-perm-type-char
+                  (char-to-string char)))))
+
+(defun unix-find-set-perm-bit (bitset str)
+  (let ((op (aref str 0))
+        (idx (aref str 1)))
+    (cond ((or (char-equal op (str2char "="))
+               (char-equal op (str2char "+")))
+           (setf (nth (unix-find-get-index-of-perm-type idx) bitset)
+                 (char-to-string idx)))
+          ((char-equal op (str2char "-"))
+           (setf (nth (unix-find-get-index-of-perm-type idx) bitset)
+                 "\\-"))
+          (t (throw 'unix-find-unrecognized-op (char-to-string op))))))
+
+(defun unix-find-perm-delimiter-string-to-num-str (perm-delim-str)
+  "Takes PERM-DELIM-STR as something like \"u+w,g-w\" and converts to perm
+bits."
+  (concat
+   "^"
+   (if (string-match-p "^[0-9]+$" perm-delim-str)
+       (unix-find-num-str-to-perm-string perm-delim-str)
+     (let ((unchosen-read "[r\\-]")
+           (unchosen-write "[w\\-]")
+           (unchosen-execute "[x\\-]"))
+       (loop for item in (split-string perm-delim-str ",")
+             with user = (list unchosen-read unchosen-write unchosen-execute)
+             and group = (list unchosen-read unchosen-write unchosen-execute)
+             and all = (list unchosen-read unchosen-write unchosen-execute)
+             do (let ((scope-bit (aref item 0)))
+                  (cond ((char-equal scope-bit (str2char "u"))
+                         (unix-find-set-perm-bit user (substring item 1)))
+                        ((char-equal scope-bit (str2char "g"))
+                         (unix-find-set-perm-bit group (substring item 1)))
+                        ((char-equal scope-bit (str2char "a"))
+                         (unix-find-set-perm-bit all (substring item 1)))
+                        (t (throw 'unix-find-unrecognized-scope
+                                  (char-to-string scope-bit)))))
+             finally (return
+                      (reduce (lambda (prev grp)
+                                (concat prev (reduce #'concat grp)))
+                              (list user group all) :initial-value "")))))
+   "$"))
 
 (defun unix-find-regex-matcher (match-regexp str-to-match)
   (string-match-p match-regexp str-to-match))
@@ -72,7 +145,9 @@ appropriate regular expression."
                            (if (string-equal arg "f") "-" arg))))
           ((eq type :perm)
            (lambda (name)
-             t))
+             (string-match-p
+              (unix-find-perm-delimiter-string-to-num-str arg)
+              (unix-find-get-perm-string name))))
           ((eq type :binary)
            (lambda (name)
              (and arg (file-binary-p name))))
@@ -155,11 +230,11 @@ function, returning a negation of the function if IS-NOT is non-nil."
     (directory-files dir))))
 
 (defun unix-find (dir &rest args)
-  "Recognizes :name, :whole-name, :regex, :not, :max-depth, :min-depth, :type,
-:perm, :binary (which uses `file-binary-p'), and :size. Doesn't care about the
-positioning of :max-depth and :min-depth. :type recognizes 'd', 'f', 'p', 'l',
-and 's', and :size only accepts a number of bytes, as well as a > or < sign in
-front. Performs breadth-first search. Probably pretty slow."
+  "Recognizes :[i]name, :[i]wholename, :[i]regex, :not, :max-depth, :min-depth,
+:type, :perm, :binary (which uses `file-binary-p'), and :size. Doesn't care
+about the positioning of :max-depth and :min-depth. :type recognizes 'd', 'f',
+'p', 'l', and 's', and :size only accepts a number of bytes, as well as a > or <
+sign in front. Performs breadth-first search. Probably pretty slow."
   (let* ((parse-results (unix-find-argparse args))
          (checker-lambdas (first parse-results))
          (max-min-depths

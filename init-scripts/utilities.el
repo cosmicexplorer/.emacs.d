@@ -71,6 +71,11 @@ A representative example might be:
 ;;; documentation
 (defun str2char (str) (aref str 0))
 
+(defun str2num (str-or-num)
+  (if (stringp str-or-num)
+      (string-to-number str-or-num)
+    str-or-num))
+
 (defun line-before-you ()
   (buffer-substring-no-properties (line-beginning-position) (point)))
 
@@ -153,6 +158,9 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
 (defmacro apply-logic-op-to-predicate (logic-op val pred &rest args)
   `(,logic-op ,@(mapcar (lambda (arg) `(,pred ,val ,arg)) args)))
 (put 'apply-logic-op-to-predicate 'lisp-indent-function 3)
+;;; same as above, accepting list instead of varargs
+(defmacro apply-log-op-to-pred-list (logic-op val pred args)
+  `(,logic-op ,@(mapcar (lambda (arg) `(,pred ,val ,arg)) args)))
 
 (defmacro make-lambda-maybe-not (arg-name not-p &rest body)
   `(lambda (,arg-name)
