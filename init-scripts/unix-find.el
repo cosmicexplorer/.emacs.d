@@ -376,5 +376,19 @@ etc). Displays default prompt according to `unix-find-begin-prompt'."
             (display-buffer buf)
             (apply #'unix-find (cons (current-buffer) (cdr find-cmd-parsed)))
             (set-buffer-modified-p nil)
-            (toggle-read-only)))
+            (toggle-read-only))
+          (select-window (get-buffer-window buf))
+          (with-current-buffer buf
+            (goto-char (point-min))
+            (forward-line 2)))
       (message "%s: %s" "Could not parse input to find" find-command))))
+
+(defun cleanup-find-buffers ()
+  (interactive)
+  (loop for buf in (buffer-list)
+        with sum = 0
+        do (with-current-buffer buf
+             (when (eq major-mode 'find-mode)
+               (incf sum)
+               (kill-buffer)))
+        finally (message "%d %s" sum "buffer(s) killed")))
