@@ -109,9 +109,10 @@ the null char, else nil. It should be noted that this is a *HEURISTIC*."
 (defun file-binary-p (file-path &optional byte-check-limit)
   "See documentation for `buffer-binary-p'. Does not affect whether or not emacs
 is visiting the specified file."
-  (with-temp-buffer
-    (insert-file-contents-literally file-path nil 0 byte-check-limit)
-    (buffer-binary-p nil byte-check-limit)))
+  (unless (file-directory-p file-path)
+    (with-temp-buffer
+      (insert-file-contents-literally file-path nil 0 byte-check-limit)
+      (buffer-binary-p nil byte-check-limit))))
 
 (defmacro cdrf (arg)
   "Destructive cdr."

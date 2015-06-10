@@ -3,9 +3,6 @@
 ;;; implementation of unix find in pure elisp
 ;;; might put this on melpa?? idk why anyone would care lol
 
-;;; TODO: get some interactive version of this, perhaps using a form of
-;;; compile-mode (check out `grep.el', it does something similar)
-
 ;;; matching functions
 (defun unix-find-name-matcher-regexp (match-str)
   "Creates shell-like wildcard semantics for MATCH-STR by transforming into the
@@ -269,10 +266,6 @@ sign in front. Performs breadth-first search. Probably pretty slow."
               while (and dir-list (if maxdepth (<= cur-depth maxdepth) t))
               do (let ((next-files (mapcan #'files-except-tree dir-list))
                        (prev-dir-list dir-list))
-                   ;; (with-current-buffer "*scratch*"
-                   ;;   (loop for item in next-files
-                   ;;         do (insert item ",")
-                   ;;         finally (insert "\n")))
                    (setq dir-list (remove-if-not #'file-directory-p next-files))
                    (unless (and mindepth (< cur-depth mindepth))
                      (let ((new-added
@@ -350,8 +343,9 @@ sign in front. Performs breadth-first search. Probably pretty slow."
 ;;;###autoload
 (defun find ()
   "Interactive form of `unix-find'. Parses and converts arguments with hyphen
-syntax (-name, -regex, etc) to colon atoms for input (:name, :regex,
-etc). Displays default prompt according to `unix-find-begin-prompt'."
+syntax (-name, -regex, etc) to colonized atoms as a sexp for input to
+`unix-find' (:name, :regex, etc). Displays default prompt according to
+`unix-find-begin-prompt'."
   (interactive)
   (let* ((find-command
           (read-from-minibuffer "call find like: " "find "))
@@ -364,6 +358,7 @@ etc). Displays default prompt according to `unix-find-begin-prompt'."
                  (concat "*Find* " find-command "@"
                          (format-time-string "%H:%M:%S,%Y-%M-%d"))))))
           (with-current-buffer buf
+            ;; compilation-minor-mode doesn't respect regexps for some reason
             (find-mode)
             (toggle-read-only)
             (make-variable-buffer-local 'compilation-error-regexp-alist)
@@ -374,13 +369,14 @@ etc). Displays default prompt according to `unix-find-begin-prompt'."
                      (2 font-lock-variable-name-face))))
             (insert "Find results: " find-command "\n\n")
             (display-buffer buf)
-            (apply #'unix-find (cons (current-buffer) (cdr find-cmd-parsed)))
-            (set-buffer-modified-p nil)
-            (toggle-read-only))
-          (select-window (get-buffer-window buf))
-          (with-current-buffer buf
-            (goto-char (point-min))
-            (forward-line 2)))
+            (unwind-protect
+                (apply #'unix-find
+                       (cons (current-buffer) (cdr find-cmd-parsed)))
+              (set-buffer-modified-p nil)
+              (toggle-read-only)
+              (select-window (get-buffer-window buf))
+              (goto-char (point-min))
+              (forward-line 2))))
       (message "%s: %s" "Could not parse input to find" find-command))))
 
 (defun cleanup-find-buffers ()
