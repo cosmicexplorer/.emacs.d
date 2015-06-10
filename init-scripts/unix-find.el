@@ -175,15 +175,14 @@ bits."
                (prependn (nthcdraf 2 cur-arg-ptr) arg-group-list)))
         finally (return (reverse arg-group-list))))
 
-(defun unix-find-create-matcher (arg-group &optional is-not)
+(defun unix-find-create-matcher (arg-group)
   "Turns an argument group from `unix-find-group-args' into a matching
 function, returning a negation of the function if IS-NOT is non-nil."
-  (let ((fun (unix-find-create-matcher-helper arg-group)))
-    (if is-not
-        ;; annoying, but macros aren't working, so this is the best we can do
-        (lambda (arg-group)
-          (not (funcall fun)))
-      fun)))
+  (if (eq (car arg-group) :not)
+      ;; annoying, but macros aren't working, so this is the best we can do
+      (lambda (&rest args)
+        (not (apply (unix-find-create-matcher-helper (cdr arg-group)) args)))
+    (unix-find-create-matcher-helper arg-group)))
 
 (defun unix-find-argparse (args)
   "Parses arguments for `unix-find'. Returns list of matching functions."
@@ -355,7 +354,7 @@ syntax (-name, -regex, etc) to colonized atoms as a sexp for input to
         (let ((buf
                (get-buffer-create
                 (generate-new-buffer-name
-                 (concat "*Find* " find-command "@"
+                 (concat find-command "@"
                          (format-time-string "%H:%M:%S,%Y-%M-%d"))))))
           (with-current-buffer buf
             ;; compilation-minor-mode doesn't respect regexps for some reason
