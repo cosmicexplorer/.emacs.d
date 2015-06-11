@@ -126,11 +126,15 @@
 
 (defun re.pl ()
   (interactive)
-  (pop-to-buffer
-   (make-comint-in-buffer
-    "re.pl" nil (concat init-home-folder-dir
-                        "init-scripts/perl-repl-helper.sh")))
-  (perl-repl-mode))
+  (if (executable-find "re.pl")
+      (progn
+        (pop-to-buffer
+         (make-comint-in-buffer
+          "re.pl" nil (convert-standard-filename
+                       (concat init-home-folder-dir
+                               "init-scripts/perl-repl-helper.sh"))))
+        (perl-repl-mode))
+    (message "Sorry, re.pl must be installed for this command to work.")))
 
 ;;; c/c++/java
 (setq-default c-basic-offset 2) ;; cc-mode uses this instead of tab-width
