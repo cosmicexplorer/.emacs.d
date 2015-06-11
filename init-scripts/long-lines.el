@@ -11,9 +11,9 @@
   (message "%s %d %s" "moved to long line of"
            fin-col "characters"))
 
-(defun long-line-message-not-found ()
-  (message "%s %d %s" "no succeeding line of greater than"
-            long-lines-length "characters found"))
+(defun long-line-message-not-found (is-first)
+  (message "%s%s%s %d %s" "no " (if is-first "" "succeeding ")
+           "line of greater than" long-lines-length "characters found"))
 
 (defun long-line-goto-next ()
   (interactive)
@@ -30,7 +30,7 @@
             (long-line-message-found fin-col))
           (move-to-column long-lines-length))
       (when (called-interactively-p)
-        (long-line-message-not-found))
+        (long-line-message-not-found nil))
       (goto-char prev-pt))
     fin-col))
 
@@ -43,7 +43,7 @@
           (when (called-interactively-p)
             (long-line-message-found res))
           (when (called-interactively-p)
-            (long-line-message-not-found))
+            (long-line-message-not-found t))
           (goto-char prev))
       res)))
 

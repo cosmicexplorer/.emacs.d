@@ -27,6 +27,7 @@
 (require 'qmake)
 (require 'ansi-color)
 (require 'browse-kill-ring)
+(require 'comint)
 (require 'color-theme)
 (require 'color-theme-danny)            ; mine
 (require 'web-beautify)
