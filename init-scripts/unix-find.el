@@ -3,9 +3,6 @@
 ;;; implementation of unix find in pure elisp
 ;;; might put this on melpa?? idk why anyone would care lol
 
-;;; TODO: get some interactive version of this, perhaps using a form of
-;;; compile-mode (check out `grep.el', it does something similar)
-
 ;;; matching functions
 (defun unix-find-name-matcher-regexp (match-str)
   "Creates shell-like wildcard semantics for MATCH-STR by transforming into the
@@ -111,29 +108,34 @@ bits."
 (defun unix-find-regex-matcher (match-regexp str-to-match)
   (string-match-p match-regexp str-to-match))
 
+(defun unix-find-xor-helper (a b)
+  (cond ((and a (not b)) t)
+        ((and b (not a)) t)
+        (t nil)))
+
+(defun unix-find-xor (&rest args)
+  (reduce #'unix-find-xor-helper args))
+
 (defun unix-find-create-matcher-helper (arg-group)
-  (let ((type (car arg-group))
-        (arg (second arg-group)))
+  (let* ((type (car arg-group))
+         (arg (second arg-group))
+         (reg (unix-find-name-matcher-regexp arg)))
     (cond ((eq type :name)
-           (let ((reg (unix-find-name-matcher-regexp arg)))
-             (lambda (name)
-               (let ((case-fold-search nil))
-                 (unix-find-regex-matcher reg (file-name-nondirectory name))))))
+           (lambda (name)
+             (let ((case-fold-search nil))
+               (unix-find-regex-matcher reg (file-name-nondirectory name)))))
           ((eq type :iname)
-           (let ((reg (unix-find-name-matcher-regexp arg)))
-             (lambda (name)
-               (let ((case-fold-search t))
-                 (unix-find-regex-matcher reg (file-name-nondirectory name))))))
+           (lambda (name)
+             (let ((case-fold-search t))
+               (unix-find-regex-matcher reg (file-name-nondirectory name)))))
           ((eq type :wholename)
-           (let ((reg (unix-find-name-matcher-regexp arg)))
-             (lambda (name)
-               (let ((case-fold-search nil))
-                 (unix-find-regex-matcher reg name)))))
+           (lambda (name)
+             (let ((case-fold-search nil))
+               (unix-find-regex-matcher reg name))))
           ((eq type :iwholename)
-           (let ((reg (unix-find-name-matcher-regexp arg)))
-             (lambda (name)
-               (let ((case-fold-search t))
-                 (unix-find-regex-matcher reg name)))))
+           (lambda (name)
+             (let ((case-fold-search t))
+               (unix-find-regex-matcher reg name))))
           ((eq type :regex)
            (lambda (name)
              (let ((case-fold-search nil))
@@ -153,7 +155,8 @@ bits."
               (unix-find-get-perm-string name))))
           ((eq type :binary)
            (lambda (name)
-             (and (if (stringp arg) (read arg) arg) (file-binary-p name))))
+             (not (unix-find-xor (if (stringp arg) (read arg) arg)
+                                 (file-binary-p name)))))
           ((eq type :size)
            (cond ((char-equal (str2char ">") (aref arg 0))
                   (lambda (name)
@@ -178,15 +181,14 @@ bits."
                (prependn (nthcdraf 2 cur-arg-ptr) arg-group-list)))
         finally (return (reverse arg-group-list))))
 
-(defun unix-find-create-matcher (arg-group &optional is-not)
+(defun unix-find-create-matcher (arg-group)
   "Turns an argument group from `unix-find-group-args' into a matching
 function, returning a negation of the function if IS-NOT is non-nil."
-  (let ((fun (unix-find-create-matcher-helper arg-group)))
-    (if is-not
-        ;; annoying, but macros aren't working, so this is the best we can do
-        (lambda (arg-group)
-          (not (funcall fun)))
-      fun)))
+  (if (eq (car arg-group) :not)
+      ;; annoying, but macros aren't working, so this is the best we can do
+      (lambda (&rest args)
+        (not (apply (unix-find-create-matcher-helper (cdr arg-group)) args)))
+    (unix-find-create-matcher-helper arg-group)))
 
 (defun unix-find-argparse (args)
   "Parses arguments for `unix-find'. Returns list of matching functions."
@@ -269,10 +271,6 @@ sign in front. Performs breadth-first search. Probably pretty slow."
               while (and dir-list (if maxdepth (<= cur-depth maxdepth) t))
               do (let ((next-files (mapcan #'files-except-tree dir-list))
                        (prev-dir-list dir-list))
-                   ;; (with-current-buffer "*scratch*"
-                   ;;   (loop for item in next-files
-                   ;;         do (insert item ",")
-                   ;;         finally (insert "\n")))
                    (setq dir-list (remove-if-not #'file-directory-p next-files))
                    (unless (and mindepth (< cur-depth mindepth))
                      (let ((new-added
@@ -350,8 +348,9 @@ sign in front. Performs breadth-first search. Probably pretty slow."
 ;;;###autoload
 (defun find ()
   "Interactive form of `unix-find'. Parses and converts arguments with hyphen
-syntax (-name, -regex, etc) to colon atoms for input (:name, :regex,
-etc). Displays default prompt according to `unix-find-begin-prompt'."
+syntax (-name, -regex, etc) to colonized atoms as a sexp for input to
+`unix-find' (:name, :regex, etc). Displays default prompt according to
+`unix-find-begin-prompt'."
   (interactive)
   (let* ((find-command
           (read-from-minibuffer "call find like: " "find "))
@@ -361,9 +360,10 @@ etc). Displays default prompt according to `unix-find-begin-prompt'."
         (let ((buf
                (get-buffer-create
                 (generate-new-buffer-name
-                 (concat "*Find* " find-command "@"
+                 (concat find-command "@"
                          (format-time-string "%H:%M:%S,%Y-%M-%d"))))))
           (with-current-buffer buf
+            ;; compilation-minor-mode doesn't respect regexps for some reason
             (find-mode)
             (toggle-read-only)
             (make-variable-buffer-local 'compilation-error-regexp-alist)
@@ -374,13 +374,14 @@ etc). Displays default prompt according to `unix-find-begin-prompt'."
                      (2 font-lock-variable-name-face))))
             (insert "Find results: " find-command "\n\n")
             (display-buffer buf)
-            (apply #'unix-find (cons (current-buffer) (cdr find-cmd-parsed)))
-            (set-buffer-modified-p nil)
-            (toggle-read-only))
-          (select-window (get-buffer-window buf))
-          (with-current-buffer buf
-            (goto-char (point-min))
-            (forward-line 2)))
+            (unwind-protect
+                (apply #'unix-find
+                       (cons (current-buffer) (cdr find-cmd-parsed)))
+              (set-buffer-modified-p nil)
+              (toggle-read-only)
+              (select-window (get-buffer-window buf))
+              (goto-char (point-min))
+              (forward-line 2))))
       (message "%s: %s" "Could not parse input to find" find-command))))
 
 (defun cleanup-find-buffers ()
