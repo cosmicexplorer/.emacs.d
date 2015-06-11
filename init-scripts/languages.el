@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 ;;; configuration for various language modes
 
 ;;; indentation silliness
@@ -41,6 +43,94 @@
 ;;; perl
 (fset 'perl-mode 'cperl-mode)
 (setq cperl-indent-level 2)
+
+(defun perl-repl-get-real-str ()
+  (buffer-substring-no-properties
+   comint-last-output-start
+   (process-mark (get-buffer-process (current-buffer)))))
+
+(defun perl-repl-fix-both-early-and-late-insertions (str)
+  (goto-char (point-max))
+  ;; the noerror argument shouldn't matter, but provided anyway
+  (re-search-backward (regexp-quote perl-repl-prompt) nil t)
+  (let ((inhibit-read-only t))
+    (when (and (> (point) comint-last-output-start)
+               (not (char-equal (char-before) (str2char "\n"))))
+      (insert "\n")
+      (delete-region (point) (+ (point) (length perl-repl-prompt)))
+      (goto-char (1- (process-mark (get-buffer-process (current-buffer)))))
+      (let ((next-char (char-after))
+            (insert-string (concat "\n" perl-repl-prompt)))
+        (insert insert-string)
+        (delete-char 1)
+        (backward-char (length insert-string))
+        (insert (char-to-string next-char)))))
+  (goto-char (point-max)))
+
+(defun perl-repl-fix-late-insertions (str)
+  (let ((real-str (perl-repl-get-real-str)))
+    (when (and (string-match-p (concat "\\`" (regexp-quote perl-repl-prompt))
+                               real-str)
+               (not (string-equal str ""))
+               (not (string-equal str perl-repl-prompt)))
+      (let ((inhibit-read-only t))
+        (backward-char (length real-str))
+        (insert (buffer-substring-no-properties
+                 (+ (point) (length perl-repl-prompt))
+                 (point-max)))
+        (forward-char (length perl-repl-prompt))
+        (delete-region (point) (point-max))
+        (goto-char (point-max))))))
+
+(defun perl-repl-fix-early-insertions (str)
+  (let ((real-str (perl-repl-get-real-str)))
+    (backward-char (length perl-repl-prompt))
+    (when (and (string-equal
+                (buffer-substring-no-properties (point) (point-max))
+                perl-repl-prompt)
+               (not (string-equal real-str perl-repl-prompt)))
+      (while (char-equal (char-before) (str2char "\n"))
+        (delete-char -1))
+      (insert "\n"))
+    (goto-char (point-max))))
+
+(defvar perl-repl-prompt "$ ")
+
+(defvar perl-repl-prompt-regexp (concat "^" (regexp-quote perl-repl-prompt)))
+
+(defvar perl-repl-output-filter-functions
+      '(perl-repl-fix-both-early-and-late-insertions
+        perl-repl-fix-late-insertions
+        perl-repl-fix-early-insertions
+        ansi-color-process-output
+        comint-postoutput-scroll-to-bottom
+        comint-watch-for-password-prompt))
+
+(define-derived-mode perl-repl-mode comint-mode "re.pl"
+  "Docs
+
+\\<cperl-mode-map>"
+  :syntax-table cperl-mode-syntax-table
+  (save-excursion
+    (hi-lock-mode 1)
+    (hi-lock-set-pattern "\\`Welcome to the perl re.pl!"
+                         'font-lock-variable-name-face))
+  (set (make-local-variable 'font-lock-defaults)
+       '(cperl-font-lock-keywords t))
+  (setf comint-prompt-read-only t)
+  (setf comint-use-prompt-regexp t)
+  (setf comint-prompt-regexp perl-repl-prompt-regexp)
+  (setf comint-output-filter-functions perl-repl-output-filter-functions)
+  (set (make-local-variable 'paragraph-separate) "\\'")
+  (set (make-local-variable 'paragraph-start) perl-repl-prompt-regexp))
+
+(defun re.pl ()
+  (interactive)
+  (pop-to-buffer
+   (make-comint-in-buffer
+    "re.pl" nil (concat init-home-folder-dir
+                        "init-scripts/perl-repl-helper.sh")))
+  (perl-repl-mode))
 
 ;;; c/c++/java
 (setq-default c-basic-offset 2) ;; cc-mode uses this instead of tab-width

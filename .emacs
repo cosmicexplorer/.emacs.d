@@ -158,7 +158,9 @@ Check out your .emacs."))
 (load-my-init-script "utilities")
 ;;; functions used throughout
 (load-my-init-script "functions")
+;;; extras
 (load-my-init-script "unix-find")
+(load-my-init-script "long-lines")
 ;;; for compatibility between different operating environments
 (load-my-init-script "compat")
 ;;; enforce my strong opinions on the default emacs ui

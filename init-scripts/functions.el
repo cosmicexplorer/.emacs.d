@@ -1310,3 +1310,14 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (when right-pt
       (insert buf-str)
       (backward-char offset))))
+
+;;; read-only text
+
+(defun make-readonly-region-modifiable (beg end)
+  (interactive "r")
+  (let ((inhibit-read-only t))
+    (put-text-property beg end 'read-only nil)))
+
+(defun make-all-readonly-text-in-buffer-modifiable ()
+  (interactive)
+  (make-readonly-region-modifiable (point-min) (point-max)))
