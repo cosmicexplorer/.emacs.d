@@ -226,7 +226,8 @@ Check out your .emacs."))
     (omnisharp csharp-mode xterm-color cloc package-build flycheck-package web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode evil espuds ein company color-theme cider better-defaults auto-complete auctex 2048-game)))
  '(safe-local-variable-values
    (quote
-    ((TeX-master . "proposal")
+    ((major-mode . sh-mode)
+     (TeX-master . "proposal")
      (add-log-time-format lambda nil
                           (progn
                             (setq tz
