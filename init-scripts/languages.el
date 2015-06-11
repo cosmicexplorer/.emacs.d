@@ -50,10 +50,6 @@
    (process-mark (get-buffer-process (current-buffer)))))
 
 (defun perl-repl-fix-both-early-and-late-insertions (str)
-  (let ((real-str (perl-repl-get-real-str)))
-    (with-current-buffer "*scratch*"
-      (goto-char (point-max))
-      (insert "\n\n**\n" real-str "\n**\n\n")))
   (goto-char (point-max))
   ;; the noerror argument shouldn't matter, but provided anyway
   (re-search-backward (regexp-quote perl-repl-prompt) nil t)
@@ -73,9 +69,6 @@
 
 (defun perl-repl-fix-late-insertions (str)
   (let ((real-str (perl-repl-get-real-str)))
-    (with-current-buffer "*scratch*"
-      (goto-char (point-max))
-      (insert "\n\n--\n" real-str "\n--\n\n"))
     (when (and (string-match-p (concat "\\`" (regexp-quote perl-repl-prompt))
                                real-str)
                (not (string-equal str ""))
@@ -91,9 +84,6 @@
 
 (defun perl-repl-fix-early-insertions (str)
   (let ((real-str (perl-repl-get-real-str)))
-    (with-current-buffer "*scratch*"
-      (goto-char (point-max))
-      (insert "\n\n++\n" real-str "\n++\n\n"))
     (backward-char (length perl-repl-prompt))
     (when (and (string-equal
                 (buffer-substring-no-properties (point) (point-max))
@@ -104,21 +94,13 @@
       (insert "\n"))
     (goto-char (point-max))))
 
-(defun perl-repl-diagnostic-function (str)
-  (let ((string (perl-repl-get-real-str)))
-    (with-current-buffer "*scratch*"
-      (goto-char (point-max))
-      (insert "->" string "\n:>" str "\n\n"))))
-
 (defvar perl-repl-prompt "$ ")
 
 (defvar perl-repl-prompt-regexp (concat "^" (regexp-quote perl-repl-prompt)))
 
 (defvar perl-repl-output-filter-functions
       '(perl-repl-fix-both-early-and-late-insertions
-        perl-repl-diagnostic-function
         perl-repl-fix-late-insertions
-        perl-repl-diagnostic-function
         perl-repl-fix-early-insertions
         ansi-color-process-output
         comint-postoutput-scroll-to-bottom
