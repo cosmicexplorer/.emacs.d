@@ -41,9 +41,9 @@
 ;;; Code:
 
 ;;; TODO: refactor that folder to use requires
-(load-file "../init-scripts/unix-find.el")
-(load-file "../init-scripts/functions.el")
-(load-file "../init-scripts/utilities.el")
+(load-file (concat default-directory "/../init-scripts/unix-find.el"))
+(load-file (concat default-directory "/../init-scripts/functions.el"))
+(load-file (concat default-directory "/../init-scripts/utilities.el"))
 
 (defgroup smart-compile nil
   "An interface to `compile'."

@@ -2,10 +2,10 @@
 
 ;;; add packages that don't exist on melpa; typically from emacswiki, but some
 ;;; are from more dubious sources
-(add-to-list 'load-path (concat init-home-folder-dir "/lisp"))
+(add-to-list 'load-path (concat init-home-folder-dir "lisp"))
 
 ;;; get my colors themes up!
-(add-to-list 'load-path (concat init-home-folder-dir "/color-themes"))
+(add-to-list 'load-path (concat init-home-folder-dir "color-themes"))
 
 ;;; ESS is done in `./package-setup.el'
 
@@ -17,7 +17,7 @@
 (require 'helm-config)
 (require 'helm-swoop)
 (require 'revbufs)
-;; (require 'smart-compile)
+(require 'smart-compile)
 (require 'undo-tree)
 (require 'smart-tab)
 (require 'linum-relative)
