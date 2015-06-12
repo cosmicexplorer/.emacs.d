@@ -43,6 +43,7 @@
 ;;; TODO: refactor that folder to use requires
 (load-file "../init-scripts/unix-find.el")
 (load-file "../init-scripts/functions.el")
+(load-file "../init-scripts/utilities.el")
 
 (defgroup smart-compile nil
   "An interface to `compile'."
@@ -196,46 +197,46 @@ which is defined in `smart-compile-alist'."
      ;; (prin1-to-string
      ;;  (macroexpand-all
      ;;   '
-          (macrolet
-            ((add-build-system
-              (cmd file-regexp depth use-dir)
-              (let ((build-file (gensym))
-                    (decided-against-it (gensym)))
-                (make-variable-buffer-local build-file)
-                (make-variable-buffer-local decided-against-it)
-                (set build-file nil)
-                (set decided-against-it t)
-                `(when (setq
-                    ,build-file
-                    (and ,decided-against-it
-                         (or
-                          ,@(loop
-                             for i from 0 to depth
-                             collect `(reduce
-                                       #'or-fun
-                                       (remove-if-not
-                                        #'file-readable-p
-                                        (let ((res
-                                               (unix-find
-                                                ,(concat "./" (concat-n ".." i "/"))
-                                                :maxdepth 1
-                                                :regex ,file-regexp)))
-                                          (with-current-buffer "*scratch*"
-                                            (insert "hey"))
-                                          res)))))))
-                  (if (y-or-n-p (format "%s found. Try %s?" ,build-file ,cmd))
-                       (progn
-                         (set (make-local-variable 'compile-command)
-                              (format "%s %s" ,cmd
-                                      ,(if use-dir
-                                           `(if (file-directory-p ,build-file)
-                                                ,build-file
-                                              (file-name-directory ,build-file))
-                                         ,build-file)))
-                         (call-interactively 'compile)
-                         (setq not-yet nil))
-                     (setq ,decided-against-it nil))))))
-           (add-build-system "make -k -C" "[mM]akefile" 0 t))
+  ;;        (macrolet
+   ;;         ((add-build-system
+    ;;          (cmd file-regexp depth use-dir)
+    ;;          (let ((build-file (gensym))
+    ;;                (decided-against-it (gensym)))
+    ;;            (make-variable-buffer-local build-file)
+    ;;            (make-variable-buffer-local decided-against-it)
+    ;;            (set build-file nil)
+    ;;            (set decided-against-it t)
+    ;;            `(when (setq
+    ;;                ,build-file
+    ;;                (and ,decided-against-it
+    ;;                     (or
+    ;;                      ,@(loop
+    ;;                         for i from 0 to depth
+    ;;                         collect `(reduce
+    ;;                                   #'or-fun
+    ;;                                   (remove-if-not
+    ;;                                    #'file-readable-p
+    ;;                                    (let ((res
+    ;;                                           (unix-find
+    ;;                                            ,(concat "./" (concat-n ".." i "/"))
+    ;;                                            :maxdepth 1
+    ;;                                            :regex ,file-regexp)))
+    ;;                                      (with-current-buffer "*scratch*"
+    ;;                                        (insert "hey"))
+    ;;                                      res)))))))
+    ;;              (if (y-or-n-p (format "%s found. Try %s?" ,build-file ,cmd))
+    ;;                   (progn
+    ;;                     (set (make-local-variable 'compile-command)
+    ;;                          (format "%s %s" ,cmd
+    ;;                                  ,(if use-dir
+    ;;                                       `(if (file-directory-p ,build-file)
+    ;;                                            ,build-file
+    ;;                                          (file-name-directory ,build-file))
+    ;;                                     ,build-file)))
+    ;;                     (call-interactively 'compile)
+    ;;                     (setq not-yet nil))
+    ;;                 (setq ,decided-against-it nil))))))
+    ;;       (add-build-system "make -k -C" "[mM]akefile" 0 t))
          ;; )))
 
         (cond
