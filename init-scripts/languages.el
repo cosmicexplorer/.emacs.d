@@ -170,8 +170,6 @@
 (add-to-list 'auto-mode-alist '("\\.cxx\\'" . c++-mode))
 
 ;;; lol c#
-(eval-after-load 'csharp-mode
-  '(progn
 (defcustom csharp-indent-level 4
   "Level of indentation used for C# buffers. NOT part of csharp-mode!"
   :type 'integer
@@ -187,15 +185,6 @@
                            1 (if csharp-indent-namespaces
                                  csharp-indent-level 0)))))
     (c-basic-offset . ,csharp-indent-level)))
-(c-add-style "csharp-mode-style" csharp-cc-style)
-(add-hook 'csharp-mode-hook (lambda () (c-set-style "csharp-mode-style")))
-(eval-after-load "csharp-mode"
-  '(progn
-     (c-lang-defconst c-type-list-kwds csharp
-                      (cons "else" (c-lang-const c-type-list-kwds csharp)))
-     (font-lock-add-keywords
-      'csharp-mode
-      '(("else" . font-lock-keyword-face)))))
 
 (setup-submodule "OmniSharpserver")
 (make-submodule
@@ -204,12 +193,19 @@
        ((eq system-type 'gnu/linux) "xbuild")))
 
 (setq omnisharp-server-executable-path
-      (file-exists-p
-       (concat init-home-folder-dir
-               "OmniSharpServer/OmniSharp/bin/Debug/OmniSharp.exe")))
-(eval-after-load 'company
-  '(add-to-list 'company-backends 'company-omnisharp))
-(add-hook 'csharp-mode-hook 'omnisharp-mode)))
+      (concat init-home-folder-dir
+              "OmniSharpServer/OmniSharp/bin/Debug/OmniSharp.exe"))
+(eval-after-load 'csharp-mode
+  '(progn
+     (c-add-style "csharp-mode-style" csharp-cc-style)
+     (add-hook 'csharp-mode-hook (lambda () (c-set-style "csharp-mode-style")))
+     (font-lock-add-keywords
+      'csharp-mode
+      '(("else" . font-lock-keyword-face)))
+     (eval-after-load 'company
+       '(add-to-list 'company-backends 'company-omnisharp))
+     (when (file-exists-p omnisharp-server-executable-path)
+       (add-hook 'csharp-mode-hook 'omnisharp-mode))))
 
 ;;; shell
 (defun setup-sh-indentation ()
