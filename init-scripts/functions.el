@@ -1321,3 +1321,47 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 (defun make-all-readonly-text-in-buffer-modifiable ()
   (interactive)
   (make-readonly-region-modifiable (point-min) (point-max)))
+
+;;; for initialization
+
+(defun setup-submodule (folder-name)
+  (when (executable-find "git")
+    (let ((git-folder (concat init-home-folder-dir folder-name "/.git")))
+      (unless (file-directory-p git-folder)
+        (let ((git-submodule-buf-name "*git-submodule-errors*")
+              (prev-wd default-directory))
+          (cd init-home-folder-dir)
+          (unwind-protect
+              (let ((submodule-out-buf
+                     (get-buffer-create git-submodule-buf-name)))
+                (unless (zerop (call-process "git" nil submodule-out-buf nil
+                                             "submodule" "init"))
+                  (throw 'submodule-failure "init failed"))
+                (unless (zerop (call-process "git" nil submodule-out-buf nil
+                                             "submodule" "update"))
+                  (throw 'submodule-failure "update failed")))
+            (cd prev-wd))
+          (kill-buffer git-submodule-buf-name))))))
+
+(defun make-submodule (folder-name make-cmd &rest make-args)
+  (unless (member folder-name submodule-makes-to-ignore)
+    (if (not (executable-find make-cmd))
+        (with-current-buffer "*scratch*"
+          (insert "couldn't find " make-cmd " to build " folder-name "!"))
+      (let ((make-output-buf (get-buffer-create
+                              (concat "*" folder-name "-make-errors*")))
+            (prev-wd default-directory))
+        (cd (concat init-home-folder-dir "/" folder-name))
+        (set-process-sentinel
+         (apply #'start-process
+                (append
+                 (list (concat "make-" folder-name)
+                       (buffer-name make-output-buf) make-cmd)
+                 make-args))
+         (lambda (proc ev)
+           (if (string= ev "finished\n")
+               (kill-buffer (process-buffer proc))
+             (when (process-live-p proc) (kill-process proc))
+             (switch-to-buffer (process-buffer proc))
+             (throw 'submodule-make-failure ev))))
+        (cd prev-wd)))))

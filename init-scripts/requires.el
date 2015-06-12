@@ -17,7 +17,7 @@
 (require 'helm-config)
 (require 'helm-swoop)
 (require 'revbufs)
-(require 'smart-compile)
+;; (require 'smart-compile)
 (require 'undo-tree)
 (require 'smart-tab)
 (require 'linum-relative)

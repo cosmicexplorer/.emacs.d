@@ -2,3 +2,6 @@
 	path = ESS
 	url = http://github.com/emacs-ess/ESS.git
 	ignore = dirty
+[submodule "OmniSharpServer"]
+	path = OmniSharpServer
+	url = https://github.com/nosami/OmniSharpServer.git

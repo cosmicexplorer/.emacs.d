@@ -169,3 +169,17 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
           `(not (progn ,@body))
         `(progn ,@body))))
 (put 'make-lambda-maybe-not 'lisp-indent-function 2)
+
+(defun concat-n (str n &optional sep final-sep)
+  (if (zerop n) ""
+    (concat
+     (reduce (lambda (a b) (concat a (or sep "") b))
+             (loop for i from 1 to n
+                   collect str))
+     (or final-sep ""))))
+
+(defun and-fun (a b)
+  (and a b))
+
+(defun or-fun (a b)
+  (or a b))

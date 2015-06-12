@@ -40,6 +40,9 @@
 
 ;;; Code:
 
+;;; TODO: refactor that folder to use requires
+(load-file "../init-scripts/unix-find.el")
+
 (defgroup smart-compile nil
   "An interface to `compile'."
   :group 'processes
@@ -188,100 +191,141 @@ which is defined in `smart-compile-alist'."
 
     (save-buffer)
 
-    (cond
+     ;; (insert
+     ;; (prin1-to-string
+     ;;  (macroexpand-all
+     ;;   '(macrolet
+     ;;        ((add-build-system
+     ;;          (cmd file-regexp depth use-dir)
+     ;;          (let ((build-file (gensym)))
+     ;;            (make-variable-buffer-local build-file)
+     ;;            (set build-file nil)
+     ;;            `((setq
+     ;;                ,build-file
+     ;;                (or ,build-file
+     ;;                    (or
+     ;;                     ,@(loop
+     ;;                        for i from 0 to depth
+     ;;                        ;; unix-find returns a list of results; although we
+     ;;                        ;; could be robust about it, we're just going to take
+     ;;                        ;; the first result
+     ;;                        collect `(car
+     ;;                                  (remove-if-not
+     ;;                                   #'file-readable-p
+     ;;                                   (unix-find
+     ;;                                    ,(concat "./" (concat-n ".." i "/"))
+     ;;                                    :maxdepth 1
+     ;;                                    :regex ,file-regexp)))))))
+     ;;              (if (y-or-n-p (format "%s found. Try %s?" ,build-file ,cmd))
+     ;;                  (progn
+     ;;                    (set (make-local-variable 'compile-command)
+     ;;                         (format "%s %s" ,cmd
+     ;;                                 ,(if use-dir
+     ;;                                      `(if (file-directory-p ,build-file)
+     ;;                                           ,build-file
+     ;;                                         (file-name-directory ,build-file))
+     ;;                                    ,build-file)))
+     ;;                    (call-interactively 'compile)
+     ;;                    (setq not-yet nil))
+     ;;                (setq ,build-file nil))))))
+     ;;     (add-build-system "make -k -C" "[mM]akefile" 0 t)
+     ;;     ))))
 
-     ;; local command
-     ;; The prefix 4 (C-u M-x smart-compile) skips this section
-     ;; in order to re-generate the compile-command
-     ((and (not (= arg 4)) ; C-u M-x smart-compile
-           (local-variable-p 'compile-command)
-           compile-command)
-      (call-interactively 'compile)
-      (setq not-yet nil)
-      )
+     (cond
 
-     ;; make?
-     ((and smart-compile-check-makefile
-           (or (file-readable-p "Makefile")
-               (file-readable-p "makefile")
-               (file-readable-p "../Makefile")
-               (file-readable-p "../makefile")
-               (file-readable-p "../../Makefile")
-               (file-readable-p "../../makefile")))
-      (if (y-or-n-p "Makefile is found.  Try 'make'? ")
-          (progn
-            (cond
-             ((or (file-readable-p "../../Makefile")
-                  (file-readable-p "../../makefile"))
-              (set
-               (make-local-variable 'compile-command) "make -C ../.. -k "))
-             ((or (file-readable-p "../Makefile")
-                  (file-readable-p "../makefile"))
-              (set
-               (make-local-variable 'compile-command) "make -C .. -k "))
-             (t
-              (set (make-local-variable 'compile-command) "make -k ")))
+      ;; local command
+      ;; The prefix 4 (C-u M-x smart-compile) skips this section
+      ;; in order to re-generate the compile-command
+      ((and (not (= arg 4)) ; C-u M-x smart-compile
+            (local-variable-p 'compile-command)
+            compile-command)
+       (call-interactively 'compile)
+       (setq not-yet nil)
+       )
 
-            (call-interactively 'compile)
-            (setq not-yet nil))
-        (setq smart-compile-check-makefile nil)))
+      ;; ((add-build-system "make -k -C" "[mM]akefile" 0 t))
 
-     ((and smart-compile-check-gyp
-           (or (file-readable-p "binding.gyp")
-               (file-readable-p "../binding.gyp")
-               (file-readable-p "../../binding.gyp")))
-      (if (y-or-n-p "binding.gyp found. Try 'node-gyp'?")
-          (progn
-            (cond
-             ((file-readable-p "../../binding.gyp")
-              (set
-               (make-local-variable 'compile-command)
-               "node-gyp configure && node-gyp build"))
-             ((file-readable-p "../binding.gyp")
-              (set
-               (make-local-variable 'compile-command)
-               "node-gyp configure && node-gyp build"))
-             (t
-              (set (make-local-variable 'compile-command)
-                   "node-gyp configure && node-gyp build")))
-            (call-interactively 'compile)
-            (setq not-yet nil))
-        (setq smart-compile-check-gyp nil)))
+      ;; make:?
+      ((and smart-compile-check-makefile
+            (or (file-readable-p "Makefile")
+                (file-readable-p "makefile")
+                (file-readable-p "../Makefile")
+                (file-readable-p "../makefile")
+                (file-readable-p "../../Makefile")
+                (file-readable-p "../../makefile")))
+       (if (y-or-n-p "Makefile is found.  Try 'make'? ")
+           (progn
+             (cond
+              ((or (file-readable-p "../../Makefile")
+                   (file-readable-p "../../makefile"))
+               (set
+                (make-local-variable 'compile-command) "make -C ../.. -k "))
+              ((or (file-readable-p "../Makefile")
+                   (file-readable-p "../makefile"))
+               (set
+                (make-local-variable 'compile-command) "make -C .. -k "))
+              (t
+               (set (make-local-variable 'compile-command) "make -k ")))
+             (call-interactively 'compile)
+             (setq not-yet nil))
+         (setq smart-compile-check-makefile nil)))
 
-     ((and smart-compile-check-scons-files
-           (or (file-readable-p "SConstruct")
-               (file-readable-p "../SConstruct")
-               (file-readable-p "../../SConstruct"))) ;; if found in parent dir
-      (if (y-or-n-p "scons files are found. Try 'scons'? ")
-          (progn
-            (cond
-             ((file-readable-p "../../SConstruct")
-              (set
-               (make-local-variable
-                'compile-command) "scons -C ../.. -k "))
-             ((file-readable-p "../SConstruct")
-              (set
-               (make-local-variable 'compile-command) "scons -C .. -k "))
-             (t (set (make-local-variable 'compile-command) "scons -k "))
-             )
-            (call-interactively 'compile)
-            (setq not-yet nil))
-        (setq smart-compile-check-scons-files nil)))
+      ((and smart-compile-check-gyp
+            (or (file-readable-p "binding.gyp")
+                (file-readable-p "../binding.gyp")
+                (file-readable-p "../../binding.gyp")))
+       (if (y-or-n-p "binding.gyp found. Try 'node-gyp'?")
+           (progn
+             (cond
+              ((file-readable-p "../../binding.gyp")
+               (set
+                (make-local-variable 'compile-command)
+                "node-gyp configure && node-gyp build"))
+              ((file-readable-p "../binding.gyp")
+               (set
+                (make-local-variable 'compile-command)
+                "node-gyp configure && node-gyp build"))
+              (t
+               (set (make-local-variable 'compile-command)
+                    "node-gyp configure && node-gyp build")))
+             (call-interactively 'compile)
+             (setq not-yet nil))
+         (setq smart-compile-check-gyp nil)))
 
-     ((and smart-compile-check-cakefile
-           (or (file-readable-p "Cakefile")
-               (file-readable-p "../Cakefile")
-               (file-readable-p "../../Cakefile")))
-      (if (y-or-n-p "Cakefile found. Try 'cake'?")
-          (progn
-            (set
-             (make-local-variable
-              'compile-command) "cake build ")
-            (call-interactively 'compile)
-            (setq not-yet nil))
-        (setq smart-compile-check-cakefile nil)))
+      ((and smart-compile-check-scons-files
+            (or (file-readable-p "SConstruct")
+                (file-readable-p "../SConstruct")
+                (file-readable-p "../../SConstruct"))) ;; if found in parent dir
+       (if (y-or-n-p "scons files are found. Try 'scons'? ")
+           (progn
+             (cond
+              ((file-readable-p "../../SConstruct")
+               (set
+                (make-local-variable
+                 'compile-command) "scons -C ../.. -k "))
+              ((file-readable-p "../SConstruct")
+               (set
+                (make-local-variable 'compile-command) "scons -C .. -k "))
+              (t (set (make-local-variable 'compile-command) "scons -k "))
+              )
+             (call-interactively 'compile)
+             (setq not-yet nil))
+         (setq smart-compile-check-scons-files nil)))
 
-     ) ;; end of (cond ...)
+      ((and smart-compile-check-cakefile
+            (or (file-readable-p "Cakefile")
+                (file-readable-p "../Cakefile")
+                (file-readable-p "../../Cakefile")))
+       (if (y-or-n-p "Cakefile found. Try 'cake'?")
+           (progn
+             (set
+              (make-local-variable
+               'compile-command) "cake build ")
+             (call-interactively 'compile)
+             (setq not-yet nil))
+         (setq smart-compile-check-cakefile nil)))
+
+      ) ;; end of (cond ...)
 
     ;; compile
     (let( (alist smart-compile-alist)

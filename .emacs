@@ -80,6 +80,8 @@ init-scripts/interface.el.")
   "Default port to use for erc.")
 (defvar erc-server-pass-alist nil
   "Alist of passwords and ports for servers to connect with erc.")
+(defvar submodule-makes-to-ignore nil
+  "List of submodule makes to ignore compilation for.")
 
 ;;; used in user customizations
 (defmacro with-internet-connection (&rest body)

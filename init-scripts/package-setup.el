@@ -30,36 +30,10 @@
 ;; julia/R from ESS
 ;;; because it's not detecting this variable correctly on windows fsr
 (setq ess-lisp-directory (concat init-home-folder-dir "ESS/lisp"))
-(when (executable-find "git")
-  (let ((ess-git-folder (concat init-home-folder-dir "ESS/.git")))
-    (unless (file-directory-p ess-git-folder)
-      (let ((ess-update-buf-name "*ESS-create-errors*")
-            (prev-wd default-directory))
-        (cd init-home-folder-dir)
-        (unwind-protect
-            (let ((ess-submodule-out-buf
-                   (get-buffer-create ess-update-buf-name)))
-              (unless (zerop (call-process "git" nil ess-submodule-out-buf nil
-                                           "submodule" "init"))
-                (throw 'ess-failure "init failed"))
-              (unless (zerop (call-process "git" nil ess-submodule-out-buf nil
-                                           "submodule" "update"))
-                (throw 'ess-failure "update failed")))
-          (cd prev-wd))
-        (kill-buffer ess-update-buf-name)))))
-(when (executable-find "make")
-  (let ((ess-make-output-buf (get-buffer-create "*ESS-make-errors*")))
-    (set-process-sentinel
-     (start-process "make-ess" (buffer-name ess-make-output-buf)
-                    "make" "-C"
-                    (expand-file-name (concat init-home-folder-dir "ESS")))
 
-     (lambda (proc ev)
-       (unless (string= ev "finished\n")
-         (when (process-live-p proc) (kill-process proc))
-         (switch-to-buffer (process-buffer proc))
-         (message ev))
-       (kill-buffer (process-buffer proc))))))
+(setup-submodule "ESS")
+(make-submodule "ESS" "make")
+
 ;;; now let's load it
 (when (file-directory-p (concat init-home-folder-dir "/ESS/lisp"))
   (add-to-list 'load-path (concat init-home-folder-dir "/ESS/lisp"))

@@ -170,6 +170,8 @@
 (add-to-list 'auto-mode-alist '("\\.cxx\\'" . c++-mode))
 
 ;;; lol c#
+(eval-after-load 'csharp-mode
+  '(progn
 (defcustom csharp-indent-level 4
   "Level of indentation used for C# buffers. NOT part of csharp-mode!"
   :type 'integer
@@ -194,6 +196,20 @@
      (font-lock-add-keywords
       'csharp-mode
       '(("else" . font-lock-keyword-face)))))
+
+(setup-submodule "OmniSharpserver")
+(make-submodule
+ "OmniSharpServer"
+ (cond ((eq system-type 'windows-nt) "msbuild")
+       ((eq system-type 'gnu/linux) "xbuild")))
+
+(setq omnisharp-server-executable-path
+      (file-exists-p
+       (concat init-home-folder-dir
+               "OmniSharpServer/OmniSharp/bin/Debug/OmniSharp.exe")))
+(eval-after-load 'company
+  '(add-to-list 'company-backends 'company-omnisharp))
+(add-hook 'csharp-mode-hook 'omnisharp-mode)))
 
 ;;; shell
 (defun setup-sh-indentation ()
