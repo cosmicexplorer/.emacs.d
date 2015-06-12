@@ -1324,44 +1324,61 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 ;;; for initialization
 
+(defvar submodules-to-add nil)
 (defun setup-submodule (folder-name)
+  (add-to-list 'submodules-to-add folder-name))
+(defun actual-setup-submodules ()
   (when (executable-find "git")
-    (let ((git-folder (concat init-home-folder-dir folder-name "/.git")))
-      (unless (file-directory-p git-folder)
-        (let ((git-submodule-buf-name "*git-submodule-errors*")
-              (prev-wd default-directory))
-          (cd init-home-folder-dir)
-          (unwind-protect
-              (let ((submodule-out-buf
-                     (get-buffer-create git-submodule-buf-name)))
-                (unless (zerop (call-process "git" nil submodule-out-buf nil
-                                             "submodule" "init"))
-                  (throw 'submodule-failure "init failed"))
-                (unless (zerop (call-process "git" nil submodule-out-buf nil
-                                             "submodule" "update"))
-                  (throw 'submodule-failure "update failed")))
-            (cd prev-wd))
-          (kill-buffer git-submodule-buf-name))))))
-
-(defun make-submodule (folder-name make-cmd &rest make-args)
-  (unless (member folder-name submodule-makes-to-ignore)
-    (if (not (executable-find make-cmd))
-        (with-current-buffer "*scratch*"
-          (insert "couldn't find " make-cmd " to build " folder-name "!"))
-      (let ((make-output-buf (get-buffer-create
-                              (concat "*" folder-name "-make-errors*")))
+    (unless (reduce
+             #'and-fun
+             (mapcar (lambda (folder-name)
+                       (file-directory-p
+                        (concat init-home-folder-dir
+                                folder-name "/.git")))
+                     submodules-to-add)
+             :initial-value t)
+      (let ((git-submodule-buf-name "*git-submodule-errors*")
             (prev-wd default-directory))
-        (cd (concat init-home-folder-dir "/" folder-name))
-        (set-process-sentinel
-         (apply #'start-process
-                (append
-                 (list (concat "make-" folder-name)
-                       (buffer-name make-output-buf) make-cmd)
-                 make-args))
-         (lambda (proc ev)
-           (if (string= ev "finished\n")
-               (kill-buffer (process-buffer proc))
-             (when (process-live-p proc) (kill-process proc))
-             (switch-to-buffer (process-buffer proc))
-             (throw 'submodule-make-failure ev))))
-        (cd prev-wd)))))
+        (cd init-home-folder-dir)
+        (unwind-protect
+            (let ((submodule-out-buf
+                   (get-buffer-create git-submodule-buf-name)))
+              (unless (zerop (call-process "git" nil submodule-out-buf nil
+                                           "submodule" "init"))
+                (throw 'submodule-failure "init failed"))
+              (unless (zerop (call-process "git" nil submodule-out-buf nil
+                                           "submodule" "update"))
+                (throw 'submodule-failure "update failed")))
+          (cd prev-wd))
+        (kill-buffer git-submodule-buf-name)))))
+(add-hook 'after-load-init-hook #'actual-setup-submodules)
+
+(defvar submodules-to-make nil)
+(defun make-submodule (folder-name make-cmd &rest make-args)
+  (add-to-list 'submodules-to-make (list folder-name make-cmd make-args)))
+(defun actual-make-submodule (submodule-args)
+  (destructuring-bind (folder-name make-cmd make-args) submodule-args
+      (unless (member folder-name submodule-makes-to-ignore)
+        (if (not (executable-find make-cmd))
+            (with-current-buffer "*scratch*"
+              (insert "couldn't find " make-cmd " to build " folder-name "!"))
+          (let ((make-output-buf (get-buffer-create
+                                  (concat "*" folder-name "-make-errors*")))
+                (prev-wd default-directory))
+            (cd (concat init-home-folder-dir "/" folder-name))
+            (set-process-sentinel
+             (apply #'start-process
+                    (append
+                     (list (concat "make-" folder-name)
+                           (buffer-name make-output-buf) make-cmd)
+                     make-args))
+             (lambda (proc ev)
+               (if (string= ev "finished\n")
+                   (kill-buffer (process-buffer proc))
+                 (when (process-live-p proc) (kill-process proc))
+                 (switch-to-buffer (process-buffer proc))
+                 (throw 'submodule-make-failure ev))))
+            (cd prev-wd))))))
+(defun actual-make-all-submodules ()
+  (mapcar #'actual-make-submodule submodules-to-make))
+(add-hook 'after-load-init-hook #'actual-make-all-submodules)
