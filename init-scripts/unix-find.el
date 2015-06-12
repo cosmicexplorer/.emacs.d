@@ -139,8 +139,16 @@ bits."
           ((eq type :regex)
            (lambda (name)
              (let ((case-fold-search nil))
-               (unix-find-regex-matcher arg name))))
+               (unix-find-regex-matcher arg (file-name-nondirectory name)))))
           ((eq type :iregex)
+           (lambda (name)
+             (let ((case-fold-search t))
+               (unix-find-regex-matcher arg (file-name-nondirectory name)))))
+          ((eq type :wholeregex)
+           (lambda (name)
+             (let ((case-fold-search nil))
+               (unix-find-regex-matcher arg name))))
+          ((eq type :iwholeregex)
            (lambda (name)
              (let ((case-fold-search t))
                (unix-find-regex-matcher arg name))))
@@ -239,11 +247,12 @@ concatenates DIR with them (e.g. ./file.txt)."
 
 ;;;###autoload
 (defun unix-find (dir &rest args)
-  "Recognizes :[i]name, :[i]wholename, :[i]regex, :not, :maxdepth, :mindepth,
-:type, :perm, :binary (which uses `file-binary-p'), and :size. Doesn't care
-about the positioning of :maxdepth and :mindepth. :type recognizes 'd', 'f',
-'p', 'l', and 's', and :size only accepts a number of bytes, as well as a > or <
-sign in front. Performs breadth-first search. Probably pretty slow."
+  "Recognizes :[i]name, :[i]wholename, :[i]regex, :[i]wholeregex, :not,
+:maxdepth, :mindepth, :type, :perm, :binary (which uses `file-binary-p'), and
+:size. Doesn't care about the positioning of :maxdepth and :mindepth. :type
+recognizes 'd', 'f', 'p', 'l', and 's', and :size only accepts a number of
+bytes, as well as a > or < sign in front. Performs breadth-first
+search. Probably pretty slow."
   (let ((buf nil))
     (when (bufferp dir)
       (setq buf dir
@@ -286,7 +295,10 @@ sign in front. Performs breadth-first search. Probably pretty slow."
                                      do (insert item ":0:0\n"))
                          (setq res (append new-added res)))))
                    (incf cur-depth))
-              finally (return res))))))
+              finally (return (mapcar
+                               (lambda (result)
+                                 (replace-regexp-in-string
+                                  "/+" "/" result)) res)))))))
 
 (defun unix-find-modify-arg (arg-string)
   (cond ((and (>= (length arg-string) 2)
