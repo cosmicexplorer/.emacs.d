@@ -228,17 +228,17 @@ which is defined in `smart-compile-alist'."
                (if (y-or-n-p (format "%s found. Try %s?" ,build-file ,cmd))
                    (progn
                      (set (make-local-variable 'compile-command)
-                          (apply #'format
-                                 ,(if dir-in-command
-                                      `(list "%s %s" ,cmd
-                                            ,(if use-dir
-                                                 `(if (file-directory-p
-                                                       ,build-file)
-                                                      ,build-file
-                                                    (file-name-directory
-                                                     ,build-file))
-                                               ,build-file))
-                                    `(list "%s" ,cmd))))
+                          (format
+                           ,@(if dir-in-command
+                                 `("%s %s" ,cmd
+                                   ,(if use-dir
+                                        `(if (file-directory-p
+                                              ,build-file)
+                                             ,build-file
+                                           (file-name-directory
+                                            ,build-file))
+                                      ,build-file))
+                               `("%s" ,cmd))))
                      (call-interactively 'compile)
                      (setq not-yet nil)
                      t)
