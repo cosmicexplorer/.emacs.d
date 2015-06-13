@@ -1,10 +1,13 @@
 ;;; let's get these packages loaded
 
+;;; my own stuff matters too
+(add-to-list 'load-path (concat init-home-folder-dir "utils"))
+
 ;;; add packages that don't exist on melpa; typically from emacswiki, but some
 ;;; are from more dubious sources
 (add-to-list 'load-path (concat init-home-folder-dir "lisp"))
 
-;;; get my colors themes up!
+;;; get my color themes
 (add-to-list 'load-path (concat init-home-folder-dir "color-themes"))
 
 ;;; ESS is done in `./package-setup.el'
@@ -36,3 +39,9 @@
 (require 'erc)
 (require 'erc-nicklist)                 ; this file is in /lisp/
 (require 'erc-highlight-nicknames)      ; this file is in /lisp/
+
+;;; my stuff
+(require 'utilities)
+(require 'functions)
+(require 'long-lines)
+(require 'unix-find)

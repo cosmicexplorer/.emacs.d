@@ -41,15 +41,10 @@
 ;;; Code:
 
 ;;; TODO: refactor that folder to use requires
-(load-file (concat (if load-file-name (file-name-directory load-file-name)
-                     default-directory)
-                   "/../init-scripts/unix-find.el"))
-(load-file (concat (if load-file-name (file-name-directory load-file-name)
-                     default-directory)
-                   "/../init-scripts/functions.el"))
-(load-file (concat (if load-file-name (file-name-directory load-file-name)
-                     default-directory)
-                   "/../init-scripts/utilities.el"))
+(require 'cl)
+(require 'unix-find)
+(require 'functions)
+(require 'utilities)
 
 (defgroup smart-compile nil
   "An interface to `compile'."

@@ -67,3 +67,5 @@
     (if (called-interactively-p)
         (message "%s %d %s" "the buffer has" res "long lines")
       res)))
+
+(provide 'long-lines)

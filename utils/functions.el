@@ -1383,3 +1383,5 @@ way I prefer, and regards `comment-padding', unlike the standard version."
           (lambda ()
             (actual-setup-submodules)
             (actual-make-all-submodules)))
+
+(provide 'functions)

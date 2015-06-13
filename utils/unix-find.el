@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
+(require 'utilities)
+
 ;;; implementation of unix find in pure elisp
 ;;; might put this on melpa?? idk why anyone would care lol
 
@@ -411,3 +413,5 @@ syntax (-name, -regex, etc) to colonized atoms as a sexp for input to
                (incf sum)
                (kill-buffer)))
         finally (message "%d %s" sum "buffer(s) killed")))
+
+(provide 'unix-find)
