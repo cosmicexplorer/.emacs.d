@@ -224,6 +224,7 @@ Check out your .emacs."))
  '(erc-track-position-in-mode-line nil)
  '(fill-column 80)
  '(grep-command (concat "\"" init-home-folder-dir "switch-grep.sh\" "))
+ '(grep-highlight-matches (quote auto))
  '(grep-use-null-device nil)
  '(gud-key-prefix "")
  '(hippie-expand-try-functions-list

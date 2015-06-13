@@ -1,5 +1,7 @@
 ;;; modifications to default ui
 
+(require 'helm)
+
 ;;; prompts for (yes/no) -> (y/n)
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -226,14 +228,17 @@ lowercase, and Initial Caps versions."
         (buffer-string))
       "\n"))))
 
+(defvar warning-words-list
+  (mapcar #'regexp-quote
+          (if (and warning-words-file (file-exists-p warning-words-file))
+              (read-words-from-file-as-list-with-caps warning-words-file)
+            (read-words-from-list-with-caps warning-words))))
+
 (defvar warning-highlights-regex
   (concat
    "\\(^\\|[^[:word:]]\\)"
    "\\("
-   (regexp-opt
-    (if (and warning-words-file (file-exists-p warning-words-file))
-        (read-words-from-file-as-list-with-caps warning-words-file)
-      (read-words-from-list-with-caps warning-words)))
+   (regexp-opt warning-words-list)
    "\\)"
    "\\($\\|[^[:word:]]\\)"))
 
@@ -269,6 +274,16 @@ lowercase, and Initial Caps versions."
   (interactive)
   (helm-multi-swoop-all
    warning-highlights-regex))
+
+(defvar warning-words-grep-regex
+  (reduce (lambda (a b) (concat a "|" b)) warning-words-list))
+
+(defun find-warnings-in-dir (dir)
+  (interactive "Mdirectory: ")
+  (when (or current-prefix-arg (string-equal dir "")) (setq dir "."))
+  (grep (concat init-home-folder-dir "switch-grep.sh" " -E "
+                "\"(^|[^a-zA-Z])(" warning-words-grep-regex
+                ")([^a-zA-Z]|$)\" \"" dir "\"")))
 
 
 ;;; wrap lines in org-mode
