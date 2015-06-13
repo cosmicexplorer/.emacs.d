@@ -1,6 +1,8 @@
 ;;; some of these are mine, some are heavily adapted from emacswiki, some are
 ;;; copy/paste from emacswiki
-;;; macros at bottom
+
+(require 'cc-mode)
+(require 'csharp-mode)
 
 ;;; helper function used for loading custom scripts littered throughout here
 (defun local-file-path (filename)
