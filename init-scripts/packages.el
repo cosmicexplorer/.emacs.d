@@ -17,6 +17,7 @@
 
 (defvar my-packages '(
                       2048-game
+                      async
                       auctex
                       better-defaults
                       cider

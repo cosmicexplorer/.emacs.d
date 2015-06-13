@@ -189,8 +189,7 @@
 (setup-submodule "OmniSharpserver")
 (make-submodule
  "OmniSharpServer"
- (cond ((eq system-type 'windows-nt) "msbuild")
-       ((eq system-type 'gnu/linux) "xbuild")))
+ (if (eq system-type 'windows-nt) "msbuild.exe" "xbuild"))
 
 (setq omnisharp-server-executable-path
       (concat init-home-folder-dir
