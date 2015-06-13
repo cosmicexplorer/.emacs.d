@@ -206,6 +206,21 @@
      (when (file-exists-p omnisharp-server-executable-path)
        (add-hook 'csharp-mode-hook 'omnisharp-mode))))
 
+(defun start-omnisharp-server-for-directory (dir)
+  (interactive "Mdirectory to start omnisharp for: ")
+  (save-buffer)
+  (set-process-filter
+   (start-process (concat "omnisharp-server@" (file-truename dir))
+                  (concat "*OmniSharp-server@" (file-truename dir) "*")
+                  omnisharp-server-executable-path dir)
+   (lambda (proc ev)
+     (when (string-match-p "Solution has finished loading" ev)
+       (message "%s %s %s" "Omnisharp solution for"
+                (buffer-name (process-buffer proc)) "has finished loading."))
+     (with-current-buffer (process-buffer proc)
+       (goto-char (point-max))
+       (insert ev)))))
+
 ;;; shell
 (defun setup-sh-indentation ()
   (setq sh-basic-offset 2)
