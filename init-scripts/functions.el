@@ -1332,7 +1332,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (unless (reduce
              #'and-fun
              (mapcar (lambda (folder-name)
-                       (file-directory-p
+                       (file-exists-p
                         (concat init-home-folder-dir
                                 folder-name "/.git")))
                      submodules-to-add)
@@ -1343,12 +1343,10 @@ way I prefer, and regards `comment-padding', unlike the standard version."
         (unwind-protect
             (let ((submodule-out-buf
                    (get-buffer-create git-submodule-buf-name)))
-              (unless (zerop (call-process "git" nil submodule-out-buf nil
-                                           "submodule" "init"))
-                (throw 'submodule-failure "init failed"))
-              (unless (zerop (call-process "git" nil submodule-out-buf nil
-                                           "submodule" "update"))
-                (throw 'submodule-failure "update failed")))
+              (unless (zerop (call-process
+                              "git" nil submodule-out-buf nil
+                              "submodule" "update" "--init" "--recursive"))
+                (throw 'submodule-failure "init failed")))
           (cd prev-wd))
         (kill-buffer git-submodule-buf-name)))))
 

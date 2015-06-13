@@ -231,13 +231,13 @@ which is defined in `smart-compile-alist'."
                           (format
                            ,@(if dir-in-command
                                  `("%s %s" ,cmd
-                                   ,(if use-dir
+                                   ,@(if use-dir
                                         `(if (file-directory-p
                                               ,build-file)
                                              ,build-file
                                            (file-name-directory
                                             ,build-file))
-                                      build-file))
+                                       `(,build-file)))
                                `("%s" ,cmd))))
                      (call-interactively 'compile)
                      (setq not-yet nil)
@@ -256,8 +256,9 @@ which is defined in `smart-compile-alist'."
        ((add-build-system "node-gyp build" "^binding\\.gyp$" 2 nil nil nil))
        ((add-build-system "scons -k -C" "^SConstruct$" 2 t nil t))
        ((add-build-system "cake build" "^Cakefile$" 2 nil nil nil))
-       ((add-build-system (if (eq system-type 'windows-nt) "msbuild.exe" "xbuild")
-                          "^.*\\.sln$" 5 nil nil t))))
+       ((add-build-system
+         (if (eq system-type 'windows-nt) "msbuild.exe" "xbuild")
+         "^.*\\.sln$" 5 nil nil t))))
 
     ;; compile
     (let( (alist smart-compile-alist)
