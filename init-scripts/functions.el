@@ -1351,7 +1351,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                 (throw 'submodule-failure "update failed")))
           (cd prev-wd))
         (kill-buffer git-submodule-buf-name)))))
-(add-hook 'after-load-init-hook #'actual-setup-submodules)
 
 (defvar submodules-to-make nil)
 (defun make-submodule (folder-name make-cmd &rest make-args)
@@ -1381,4 +1380,8 @@ way I prefer, and regards `comment-padding', unlike the standard version."
             (cd prev-wd))))))
 (defun actual-make-all-submodules ()
   (mapcar #'actual-make-submodule submodules-to-make))
-(add-hook 'after-load-init-hook #'actual-make-all-submodules)
+
+(add-hook 'after-load-init-hook
+          (lambda ()
+            (actual-setup-submodules)
+            (actual-make-all-submodules)))
