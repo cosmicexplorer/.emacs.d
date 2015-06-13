@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 ;;; .....let's begin
 (package-initialize)
 
@@ -105,7 +107,9 @@ init-scripts/interface.el.")
 ;;; load custom values for these variables (this file is .gitignored)
 (let ((custom-var-file
        (concat
-        (file-name-directory (file-truename load-file-name))
+        (if load-file-name
+            (file-name-directory (file-truename load-file-name))
+          default-directory)
         "custom-vars.el"))
       (msg-string
        "Make a custom-vars.el! Only if you want, though.
@@ -146,12 +150,21 @@ Check out your .emacs."))
 
 ;;; byte-compile everything: slow on first startup, but /significantly/ faster
 ;;; during normal usage
-(byte-recompile-directory
- ;; needs expand-file-name for some reason i don't understand
- (expand-file-name init-home-folder-dir) 0)
-(when (get-buffer "*Compile-Log*")
-  ;; nobody wants to see that
-  (delete-windows-on "*Compile-Log*"))
+(add-hook
+ 'after-load-init-hook
+ (lambda ()
+   (require 'async)
+   (async-start
+    (let ((dir init-home-folder-dir))
+      (lambda ()
+        (byte-recompile-directory
+         (expand-file-name dir) 0)
+        (when (get-buffer "*Compile-Log*")
+          (delete-windows-on "*Compile-Log*"))))
+    (lambda (result)
+      (when result
+        (with-current-buffer "*scratch*"
+          (insert (prin1-to-string result))))))))
 
 ;;; load elisp
 ;;; should be /after/ byte-recompilation

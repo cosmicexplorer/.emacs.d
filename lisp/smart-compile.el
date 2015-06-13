@@ -237,7 +237,7 @@ which is defined in `smart-compile-alist'."
                                              ,build-file
                                            (file-name-directory
                                             ,build-file))
-                                      ,build-file))
+                                      build-file))
                                `("%s" ,cmd))))
                      (call-interactively 'compile)
                      (setq not-yet nil)
@@ -252,10 +252,12 @@ which is defined in `smart-compile-alist'."
              compile-command)
         (call-interactively 'compile)
         (setq not-yet nil))
-       ((add-build-system "make -k -C" "^makefile$" 2 t nil t))
+       ((add-build-system "make -k -C" "^Makefile$" 2 t nil t))
        ((add-build-system "node-gyp build" "^binding\\.gyp$" 2 nil nil nil))
        ((add-build-system "scons -k -C" "^SConstruct$" 2 t nil t))
-       ((add-build-system "cake build" "^Cakefile$" 2 nil nil nil))))
+       ((add-build-system "cake build" "^Cakefile$" 2 nil nil nil))
+       ((add-build-system (if (eq system-type 'windows-nt) "msbuild.exe" "xbuild")
+                          "^.*\\.sln$" 5 nil nil t))))
 
     ;; compile
     (let( (alist smart-compile-alist)
