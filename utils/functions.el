@@ -1,6 +1,8 @@
 ;;; some of these are mine, some are heavily adapted from emacswiki, some are
 ;;; copy/paste from emacswiki
-;;; macros at bottom
+
+(require 'cc-mode)
+(require 'csharp-mode)
 
 ;;; helper function used for loading custom scripts littered throughout here
 (defun local-file-path (filename)
@@ -1383,3 +1385,5 @@ way I prefer, and regards `comment-padding', unlike the standard version."
           (lambda ()
             (actual-setup-submodules)
             (actual-make-all-submodules)))
+
+(provide 'functions)

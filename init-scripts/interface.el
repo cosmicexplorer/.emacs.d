@@ -435,3 +435,6 @@ Check out your .emacs.\n")))))
 
 ;;; compilation-mode
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+
+;;; so i can manually git commit from within eshell on windows
+(setenv "EDITOR" "emacsclient")
