@@ -18,7 +18,7 @@ This is all licensed under GPLv3, which means do whatever you want with it excep
 * a simple not-very-robust script to remember files previously opened and restore them upon startup
 * a really dope implementation of [web-beautify](https://github.com/yasuyk/web-beautify) and [clang-format](http://clang.llvm.org/docs/ClangFormat.html) for editing js/html/css and c/c++/obj-c
 * a "warning words" system to highlight certain specified text in `font-lock-warning-face`.
-* an few scripts to setup ssh-agent on startup so you don't have to type in your ssh password constantly when using git/etc.
+* a few scripts to setup ssh-agent on startup so you don't have to type in your ssh password constantly when using git/etc.
 
 #### Setup
 
