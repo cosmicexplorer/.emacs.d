@@ -1240,16 +1240,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (delete-char 1)
     (goto-char (1- next-pt))))
 
-(defun csharp-hack-period ()
-  (interactive)
-  (let ((string-past-point
-         (buffer-substring-no-properties (point) (line-end-position))))
-    (when (and
-           (= 1 (count (str2char ")") string-past-point))
-           (= 0 (count (str2char ",") string-past-point)))
-      (loop until (or (bobp) (char-equal (char-before) (str2char ")"))) do (forward-char))))
-  (insert "."))
-
 (defun csharp-hack-parenthesis ()
   (interactive)
   (when (and
@@ -1273,11 +1263,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                     (char-equal (str2char "!") prev-char)))
            (insert " "))))
   (insert "="))
-
-(defun csharp-hack-semicolon ()
-  (interactive)
-  (end-of-line)
-  (insert ";"))
 
 ;;; todo: try creating a namespace, then a class, in an empty file, see what
 ;;; happens. fix that.
