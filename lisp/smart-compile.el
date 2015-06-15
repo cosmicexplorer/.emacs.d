@@ -226,7 +226,7 @@ which is defined in `smart-compile-alist'."
                           (format
                            ,@(if dir-in-command
                                  `("%s %s" ,cmd
-                                   ,@(if use-dir
+                                   ,(if use-dir
                                         `(if (file-directory-p
                                               ,build-file)
                                              ,build-file
