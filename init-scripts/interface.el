@@ -438,3 +438,10 @@ Check out your .emacs.\n")))))
 
 ;;; so i can manually git commit from within eshell on windows
 (setenv "EDITOR" "emacsclient")
+
+;;; setup submodules and make them
+(add-hook 'after-load-init-hook
+          (lambda ()
+            (actual-setup-submodules)
+            (actual-make-all-submodules)))
+(add-hook 'after-load-init-hook #'update-all-packages)

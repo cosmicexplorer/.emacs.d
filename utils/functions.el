@@ -792,7 +792,8 @@ Note the weekly scope of the command's precision.")
                        (cond ((string= active-filetype "visit")
                               (with-demoted-errors "save-session: %S"
                                 (with-current-buffer
-                                    (find-file-noselect active-filename)
+                                    (find-file-noselect
+                                     (file-truename active-filename))
                                   (goto-char (string-to-number active-point)))))
                              (t (throw 'no-such-active-filetype
                                        (concat "i don't recognize "
@@ -820,7 +821,7 @@ Note the weekly scope of the command's precision.")
     (with-current-buffer (find-file saved-files)
       (erase-buffer)
       (loop for buf in (buffer-list)
-            do (let ((bufname (buffer-file-name buf))
+            do (let ((bufname (file-truename (buffer-file-name buf)))
                      (buf-pt (with-current-buffer buf (point))))
                  (unless (or (not bufname)
                              (string-equal bufname saved-files))
@@ -1355,11 +1356,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 (defun actual-make-all-submodules ()
   (mapcar #'actual-make-submodule submodules-to-make))
 
-(add-hook 'after-load-init-hook
-          (lambda ()
-            (actual-setup-submodules)
-            (actual-make-all-submodules)))
-
 (defun update-packages-in-list ()
   (remove-hook 'tabulated-list-revert-hook #'update-packages-in-list)
   (package-menu-mark-upgrades)
@@ -1387,7 +1383,5 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (with-current-buffer package-buf
       (make-local-variable 'tabulated-list-revert-hook)
       (add-hook 'tabulated-list-revert-hook #'update-packages-in-list))))
-
-(add-hook 'after-load-init-hook #'update-all-packages)
 
 (provide 'functions)
