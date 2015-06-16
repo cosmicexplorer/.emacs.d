@@ -440,8 +440,9 @@ Check out your .emacs.\n")))))
 (setenv "EDITOR" "emacsclient")
 
 ;;; setup submodules and make them
-(add-hook 'after-load-init-hook
-          (lambda ()
-            (actual-setup-submodules)
-            (actual-make-all-submodules)))
-(add-hook 'after-load-init-hook #'update-all-packages)
+(with-internet-connection
+ (add-hook 'after-load-init-hook
+           (lambda ()
+             (actual-setup-submodules)
+             (actual-make-all-submodules)))
+ (add-hook 'after-load-init-hook #'update-all-packages))

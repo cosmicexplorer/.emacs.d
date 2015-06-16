@@ -362,47 +362,78 @@ search. Probably pretty slow."
   "Default prompt for `find'."
   :group 'unix-find)
 
-(define-compilation-mode find-mode "*Find*"
+(defvar unix-find-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map compilation-mode-map)
+    (define-key map "g" #'find)
+    (define-key map "G" #'unix-find-clear-prev-cmd-and-refind)
+    map))
+
+(defvar unix-find-prev-find-command nil
+  "Previous find command run.")
+(make-variable-buffer-local 'unix-find-prev-find-command)
+
+(define-compilation-mode unix-find-mode "Find"
   "Compilation derived mode to display results of `find'")
+
+(defun unix-find-get-buf-base-name (find-command)
+  (concat find-command "@"
+          (format-time-string "%H:%M:%S,%Y-%M-%d")))
 
 ;;;###autoload
 (defun find ()
-  "Interactive form of `unix-find'. Parses and converts arguments with hyphen
-syntax (-name, -regex, etc) to colonized atoms as a sexp for input to
-`unix-find' (:name, :regex, etc). Displays default prompt according to
-`unix-find-begin-prompt'."
+  "Parses and converts arguments with hyphen syntax (-name, -regex, etc) to
+atoms as a sexp for input to `unix-find' (:name, :regex, etc). Displays default
+prompt according to `unix-find-begin-prompt'."
   (interactive)
   (let* ((find-command
-          (read-from-minibuffer "call find like: " "find "))
+          (or (and (derived-mode-p 'unix-find-mode) unix-find-prev-find-command)
+              (read-from-minibuffer "call find like: " "find ")))
          (find-cmd-parsed
           (unix-find-parse-arg-string find-command)))
     (if (>= (length find-cmd-parsed) 2)
         (let ((buf
-               (get-buffer-create
-                (generate-new-buffer-name
-                 (concat find-command "@"
-                         (format-time-string "%H:%M:%S,%Y-%M-%d"))))))
+               (if (derived-mode-p 'unix-find-mode)
+                   (progn
+                     (rename-buffer
+                      (generate-new-buffer-name
+                       (unix-find-get-buf-base-name find-command)
+                       (buffer-name)))
+                     (current-buffer))
+                 (generate-new-buffer
+                  (unix-find-get-buf-base-name find-command)))))
           (with-current-buffer buf
             ;; compilation-minor-mode doesn't respect regexps for some reason
-            (find-mode)
-            (toggle-read-only)
-            (make-variable-buffer-local 'compilation-error-regexp-alist)
-            (setq compilation-error-regexp-alist
-                  '(("\\([^:\n]+\\):\\(0\\):\\(0\\)" 1 2 3 1)
-                    ("\\(Find results\\):\s*\\([^\n]*\\)" nil 2 nil nil nil
-                     (1 font-lock-function-name-face)
-                     (2 font-lock-variable-name-face))))
-            (insert "Find results: " find-command "\n\n")
-            (display-buffer buf)
-            (unwind-protect
-                (apply #'unix-find
-                       (cons (current-buffer) (cdr find-cmd-parsed)))
-              (set-buffer-modified-p nil)
-              (toggle-read-only)
-              (select-window (get-buffer-window buf))
-              (goto-char (point-min))
-              (forward-line 2))))
+            (unless (derived-mode-p 'unix-find-mode)
+              (unix-find-mode)
+              (make-variable-buffer-local 'compilation-error-regexp-alist)
+              (setq compilation-error-regexp-alist
+                    '(("\\([^:\n]+\\):\\(0\\):\\(0\\)" 1 2 3 1)
+                      ("\\(Find results\\):\s*\\([^\n]*\\)" nil 2 nil nil nil
+                       (1 font-lock-function-name-face)
+                       (2 font-lock-variable-name-face)))))
+            (unix-find-do-find buf find-command find-cmd-parsed)))
       (message "%s: %s" "Could not parse input to find" find-command))))
+
+(defun unix-find-clear-prev-cmd-and-refind ()
+  (interactive)
+  (setq unix-find-prev-find-command nil)
+  (find))
+
+(defun unix-find-do-find (buf find-command find-cmd-parsed)
+  (setq unix-find-prev-find-command find-command)
+  (read-only-mode 0)
+  (erase-buffer)
+  (insert "Find results: " find-command "\n\n")
+  (display-buffer buf)
+  (unwind-protect
+      (apply #'unix-find
+             (cons (current-buffer) (cdr find-cmd-parsed)))
+    (set-buffer-modified-p nil)
+    (read-only-mode 1)
+    (select-window (get-buffer-window buf))
+    (goto-char (point-min))
+    (forward-line 2)))
 
 (defun cleanup-find-buffers ()
   (interactive)

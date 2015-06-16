@@ -23,7 +23,7 @@
 ;;; FILE'S UNDO-TREE-HISTORY in ~/.emacs.d/undo-tree-history/!!!!!!!!!!!
 
 ;;; let's not hardcode everything like back in 9th grade
-(defvar init-home-folder-dir user-emacs-directory
+(defvar init-home-folder-dir (expand-file-name user-emacs-directory)
   "Location of this home directory.")
 
 ;;; CUSTOM VARS
@@ -154,12 +154,11 @@ Check out your .emacs."))
  (lambda ()
    (require 'async)
    (async-start
-    (let ((dir init-home-folder-dir))
-      (lambda ()
-        (byte-recompile-directory
-         (expand-file-name dir) 0)
-        (when (get-buffer "*Compile-Log*")
-          (delete-windows-on "*Compile-Log*"))))
+    (lambda ()
+      (byte-recompile-directory
+       user-emacs-directory 0)
+      (when (get-buffer "*Compile-Log*")
+        (delete-windows-on "*Compile-Log*")))
     (lambda (result)
       (when result
         (with-current-buffer "*scratch*"
@@ -181,6 +180,11 @@ Check out your .emacs."))
 
 ;;; let's do it
 (run-hooks 'after-load-init-hook)
+
+;;; if everything loaded correctly, clear that last message
+(message "")
+(setq init-loaded-fully t)
+(put 'upcase-region 'disabled nil)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -260,8 +264,3 @@ Check out your .emacs."))
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-
-;;; if everything loaded correctly, clear that last message
-(message "")
-(setq init-loaded-fully t)
-(put 'upcase-region 'disabled nil)
