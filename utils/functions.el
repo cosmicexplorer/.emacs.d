@@ -1308,7 +1308,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (make-readonly-region-modifiable (point-min) (point-max)))
 
 ;;; for initialization
-(defvar dont-ask-about-git nil)
 (defun actual-setup-submodules ()
   (if (not (executable-find "git"))
       (unless dont-ask-about-git
@@ -1364,8 +1363,21 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 (defun update-packages-in-list ()
   (remove-hook 'tabulated-list-revert-hook #'update-packages-in-list)
   (package-menu-mark-upgrades)
-  ;; TODO: add check for marked packages here
-  (package-menu-execute))
+  ;; below is ripped from `package.el'
+  (let (install-list delete-list cmd pkg-desc)
+    (save-excursion
+      (goto-char (point-min))
+      (while (not (eobp))
+        (setq cmd (char-after))
+        (unless (eq cmd ?\s)
+          (setq pkg-desc (tabulated-list-get-id))
+          (cond ((eq cmd ?D)
+                 (push pkg-desc delete-list))
+                ((eq cmd ?I)
+                 (push pkg-desc install-list))))
+        (forward-line)))
+    (when (or install-list delete-list)
+      (package-menu-execute t))))
 
 (defun update-all-packages ()
   (interactive)

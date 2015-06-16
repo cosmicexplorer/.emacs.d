@@ -84,6 +84,8 @@ init-scripts/interface.el.")
   "Alist of passwords and ports for servers to connect with erc.")
 (defvar submodule-makes-to-ignore nil
   "List of submodule makes to ignore compilation for.")
+(defvar dont-ask-about-git nil
+  "If git not installed, don't worry about it.")
 
 ;;; used in user customizations
 (defmacro with-internet-connection (&rest body)

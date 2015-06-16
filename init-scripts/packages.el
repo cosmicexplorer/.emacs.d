@@ -69,3 +69,5 @@
 (loop for p in my-packages
   do (unless (package-installed-p p)
       (package-install p)))
+
+(when (get-buffer "*Compile-Log*") (delete-windows-on "*Compile-Log*"))
