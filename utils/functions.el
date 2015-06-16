@@ -1261,16 +1261,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (insert "()")
   (backward-char))
 
-(defun csharp-hack-equals ()
-  (interactive)
-  (let ((prev-char (char-before)))
-    (cond ((char-equal (str2char "=") prev-char)
-           (delete-backward-char 1))
-          ((not (or (whitespacep (char-before))
-                    (char-equal (str2char "!") prev-char)))
-           (insert " "))))
-  (insert "="))
-
 ;;; todo: try creating a namespace, then a class, in an empty file, see what
 ;;; happens. fix that.
 
