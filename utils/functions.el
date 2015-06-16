@@ -7,7 +7,9 @@
 (defun send-message-to-scratch (msg)
   (with-current-buffer (get-buffer-create "*scratch*")
     (goto-char (point-max))
-    (insert msg)))
+    (insert msg)
+    (unless (bolp)
+      (newline))))
 
 ;;; helper function used for loading custom scripts littered throughout here
 (defun local-file-path (filename)
