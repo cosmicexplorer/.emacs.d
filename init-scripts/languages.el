@@ -186,7 +186,6 @@
                                  csharp-indent-level 0)))))
     (c-basic-offset . ,csharp-indent-level)))
 
-(setup-submodule "OmniSharpserver")
 (make-submodule
  "OmniSharpServer"
  (if (eq system-type 'windows-nt) "msbuild.exe" "xbuild"))

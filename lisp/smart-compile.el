@@ -197,7 +197,9 @@ which is defined in `smart-compile-alist'."
         ((add-build-system
           (cmd file-regexp depth use-dir case-matters dir-in-command)
           (let ((build-file (gensym))
-                (decided-against-it (gensym)))
+                (decided-against-it (gensym))
+                (cmd-result (gensym)))
+            (set cmd-result cmd)
             (make-variable-buffer-local build-file)
             (make-variable-buffer-local decided-against-it)
             (set build-file nil)
@@ -220,12 +222,13 @@ which is defined in `smart-compile-alist'."
                                          ,(if case-matters :regex :iregex)
                                          ,file-regexp))
                                        :initial-value nil)))))
-               (if (y-or-n-p (format "%s found. Try %s?" ,build-file ,cmd))
+               (if (y-or-n-p (format "%s found. Try %s?" ,build-file
+                                     ,cmd-result))
                    (progn
                      (set (make-local-variable 'compile-command)
                           (format
                            ,@(if dir-in-command
-                                 `("%s %s" ,cmd
+                                 `("%s %s" ,cmd-result
                                    ,(if use-dir
                                         `(if (file-directory-p
                                               ,build-file)
@@ -233,7 +236,7 @@ which is defined in `smart-compile-alist'."
                                            (file-name-directory
                                             ,build-file))
                                        build-file))
-                               `("%s" ,cmd))))
+                               `("%s" ,cmd-result))))
                      (call-interactively 'compile)
                      (setq not-yet nil)
                      t)
@@ -247,7 +250,7 @@ which is defined in `smart-compile-alist'."
              compile-command)
         (call-interactively 'compile)
         (setq not-yet nil))
-       ((add-build-system "make -k -C" "^Makefile$" 2 t nil t))
+       ((add-build-system "make -k -C" "^Makefile$" 4 t nil t))
        ((add-build-system "node-gyp build" "^binding\\.gyp$" 2 nil nil nil))
        ((add-build-system "scons -k -C" "^SConstruct$" 2 t nil t))
        ((add-build-system "cake build" "^Cakefile$" 2 nil nil nil))

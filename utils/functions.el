@@ -4,6 +4,11 @@
 (require 'cc-mode)
 (require 'csharp-mode)
 
+(defun send-message-to-scratch (msg)
+  (with-current-buffer (get-buffer-create "*scratch*")
+    (goto-char (point-max))
+    (insert msg)))
+
 ;;; helper function used for loading custom scripts littered throughout here
 (defun local-file-path (filename)
   (concat (expand-file-name
@@ -285,8 +290,9 @@ annoying. This fixes that."
       (progn
         (loop for letter-index from 1 upto (- fin-point cur-point)
               while (= cap-letter-index (- fin-point cur-point))
-              do (if (char-is-capitalized-p
-                      (char-after (+ cur-point letter-index)))
+              do (if (and (char-after (+ cur-point letter-index))
+                          (char-is-capitalized-p
+                           (char-after (+ cur-point letter-index))))
                      (setq cap-letter-index letter-index)))
         (goto-char (+ cur-point cap-letter-index))))))
 
@@ -303,8 +309,9 @@ annoying. This fixes that."
       (progn
         (loop for letter-index from -1 downto (- fin-point cur-point)
               while (= cap-letter-index (- fin-point cur-point))
-              do (if (char-is-capitalized-p
-                      (char-after (+ cur-point letter-index)))
+              do (if (and (char-after (+ cur-point letter-index))
+                      (char-is-capitalized-p
+                       (char-after (+ cur-point letter-index))))
                      (setq cap-letter-index letter-index)))
         (goto-char (+ cur-point cap-letter-index))))))
 
@@ -1311,32 +1318,24 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (make-readonly-region-modifiable (point-min) (point-max)))
 
 ;;; for initialization
-
-(defvar submodules-to-add nil)
-(defun setup-submodule (folder-name)
-  (add-to-list 'submodules-to-add folder-name))
+(defvar dont-ask-about-git nil)
 (defun actual-setup-submodules ()
-  (when (executable-find "git")
-    (unless (reduce
-             #'and-fun
-             (mapcar (lambda (folder-name)
-                       (file-exists-p
-                        (concat init-home-folder-dir
-                                folder-name "/.git")))
-                     submodules-to-add)
-             :initial-value t)
-      (let ((git-submodule-buf-name "*git-submodule-errors*")
-            (prev-wd default-directory))
-        (cd init-home-folder-dir)
-        (unwind-protect
-            (let ((submodule-out-buf
-                   (get-buffer-create git-submodule-buf-name)))
-              (unless (zerop (call-process
-                              "git" nil submodule-out-buf nil
-                              "submodule" "update" "--init" "--recursive"))
-                (throw 'submodule-failure "init failed")))
-          (cd prev-wd))
-        (kill-buffer git-submodule-buf-name)))))
+  (if (not (executable-find "git"))
+      (unless dont-ask-about-git
+        (send-message-to-scratch
+         "git not installed! some features will be unavailable."))
+    (let ((git-submodule-buf-name "*git-submodule-errors*")
+          (prev-wd default-directory))
+      (cd init-home-folder-dir)
+      (unwind-protect
+          (let ((submodule-out-buf
+                 (get-buffer-create git-submodule-buf-name)))
+            (unless (zerop (call-process
+                            "git" nil submodule-out-buf nil
+                            "submodule" "update" "--init" "--recursive"))
+              (throw 'submodule-failure "init failed")))
+        (cd prev-wd))
+      (kill-buffer git-submodule-buf-name))))
 
 (defvar submodules-to-make nil)
 (defun make-submodule (folder-name make-cmd &rest make-args)
@@ -1371,5 +1370,22 @@ way I prefer, and regards `comment-padding', unlike the standard version."
           (lambda ()
             (actual-setup-submodules)
             (actual-make-all-submodules)))
+
+(defun update-packages-in-list ()
+  (remove-hook 'tabulated-list-revert-hook #'update-packages-in-list)
+  (package-menu-mark-upgrades)
+  ;; TODO: add check for marked packages here
+  (package-menu-execute))
+
+(defun update-all-packages ()
+  (interactive)
+  (package-list-packages)
+  (let ((package-buf (current-buffer)))
+    (bury-buffer)
+    (with-current-buffer package-buf
+      (make-local-variable 'tabulated-list-revert-hook)
+      (add-hook 'tabulated-list-revert-hook #'update-packages-in-list))))
+
+(add-hook 'after-load-init-hook #'update-all-packages)
 
 (provide 'functions)

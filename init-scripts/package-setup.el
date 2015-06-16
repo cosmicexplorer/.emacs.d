@@ -31,7 +31,6 @@
 ;;; because it's not detecting this variable correctly on windows fsr
 (setq ess-lisp-directory (concat init-home-folder-dir "ESS/lisp"))
 
-(setup-submodule "ESS")
 (make-submodule "ESS" "make")
 
 ;;; now let's load it
