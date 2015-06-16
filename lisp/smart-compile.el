@@ -232,7 +232,7 @@ which is defined in `smart-compile-alist'."
                                              ,build-file
                                            (file-name-directory
                                             ,build-file))
-                                       `(,build-file)))
+                                       build-file))
                                `("%s" ,cmd))))
                      (call-interactively 'compile)
                      (setq not-yet nil)
