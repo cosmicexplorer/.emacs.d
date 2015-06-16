@@ -1278,13 +1278,14 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (interactive)
   (let* ((orig-pt (point))
          (left-pt
-          (loop while (and (whitespacep (char-before)) (not (bolp)))
+          (loop while (and (char-before) (whitespacep (char-before))
+                           (not (bolp)))
                 do (backward-char)
                 finally (let ((res (point)))
                           (goto-char orig-pt)
                           (return res))))
          (right-pt
-          (loop while (and (not (eolp)) (whitespacep (char-after)))
+          (loop while (and (not (eolp)) (char-after) (whitespacep (char-after)))
                 do (forward-char)
                 ;; if we're not at the end of a line, we do want whitespace
                 ;; eradicated
