@@ -206,8 +206,7 @@
   '(progn
      (define-key csharp-mode-map (kbd "RET") #'csharp-hack-newline)
      (define-key csharp-mode-map (kbd "{") #'csharp-hack-braces)
-     (define-key csharp-mode-map (kbd "(") #'csharp-hack-parenthesis)
-     (define-key csharp-mode-map (kbd "=") #'csharp-hack-equals)))
+     (define-key csharp-mode-map (kbd "(") #'csharp-hack-parenthesis)))
 
 ;;; blegh
 (global-set-key (kbd "<insertchar>") nil)
