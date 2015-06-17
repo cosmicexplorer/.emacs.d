@@ -3,7 +3,7 @@
 
 ;; fix input issues in xterm (can't hold down shift and up arrow to
 ;; highlight stuff)
-(when (string-match "xterm" (if (tty-type) (tty-type) ""))
+(when (string-match-p "xterm" (or (tty-type) ""))
   (define-key input-decode-map "\e[1;2A" [S-up])
   (define-key input-decode-map "\033[4~" [end]))
 
@@ -19,3 +19,11 @@
                                      (executable-find "bash")
                                      (executable-find "sh"))
         shell-file-name explicit-shell-file-name))
+
+(defvar is-cygwin
+  (and (executable-find "uname")
+       (let ((name-start
+              (upcase (substring (shell-command-to-string "uname -a") 0 5))))
+         (cond ((string-equal name-start "MINGW") t)
+               ((string-equal name-start "CYGWI") t)
+               (t nil)))))
