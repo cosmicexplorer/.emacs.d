@@ -60,7 +60,8 @@
             ".bash_history"
             "TAGS")
            eos)))
-  "Files to ignore when searching buffers via \\[search-all-buffers]."
+  "Files to ignore when searching buffers via `search-all-buffers'
+(\\[search-all-buffers])."
   :type 'editable-list)
 
 (defun point-in-comment ()
