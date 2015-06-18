@@ -199,7 +199,6 @@ which is defined in `smart-compile-alist'."
           (let ((build-file (gensym))
                 (decided-against-it (gensym))
                 (cmd-result (gensym)))
-            (set cmd-result cmd)
             (make-variable-buffer-local build-file)
             (make-variable-buffer-local decided-against-it)
             (set build-file nil)
@@ -207,6 +206,7 @@ which is defined in `smart-compile-alist'."
             (set decided-against-it t)
             (set-default decided-against-it t)
             `(when (setq
+                    ,cmd-result ,cmd 
                     ,build-file
                     (and ,decided-against-it
                          (or
