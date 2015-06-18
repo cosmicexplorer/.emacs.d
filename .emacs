@@ -94,7 +94,7 @@ init-scripts/interface.el.")
      (url-queue-retrieve
       ;; arbitrary url, chosen because github's uptime is ridiculous (remember
       ;; when all of china ddos'd them? incredible)
-      "http://github.com"
+      "https://github.com"
       (lambda (status)
         (let ((err (plist-get status :error)))
           (unless err ,@body)))
