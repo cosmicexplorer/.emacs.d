@@ -255,7 +255,7 @@ concatenates DIR with them (e.g. ./file.txt)."
 recognizes 'd', 'f', 'p', 'l', and 's', and :size only accepts a number of
 bytes, as well as a > or < sign in front. Performs breadth-first
 search. Probably pretty slow."
-  (let ((buf nil))
+  (let (buf)
     (when (bufferp dir)
       (setq buf dir
             dir (car args)
