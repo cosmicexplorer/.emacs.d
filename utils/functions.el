@@ -1171,12 +1171,18 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (save-excursion
       (insert comment-padding comment-end))))
 
+(defun in-comment-p ()
+  (nth 4 (syntax-ppss)))
+
 ;;; TODO: fix csharp-maybe-insert-codedoc and the indentation of attributes
 ;;; (get/set) and methods in c# and see if there's a way to hook into
 ;;; ido-find-file so that it doesn't fail completely???
 
-(defun in-comment-p ()
-  (nth 4 (syntax-ppss)))
+(defun just-electric-bracket ()
+  (interactive) (insert "{}") (backward-char 1))
+
+(defun just-semicolon ()
+  (interactive) (insert ";"))
 
 (defun csharp-hack-newline ()
   (interactive)
@@ -1210,46 +1216,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
            (char-equal (char-after) (str2char ")")))
       (newline) (indent-for-tab-command))
      (t (newline-and-indent)))))
-
-(defun csharp-hack-braces ()
-  (interactive)
-  (let* ((blocks (append (c-lang-const c-block-stmt-1-kwds csharp)
-                         (c-lang-const c-block-stmt-2-kwds csharp)
-                         (c-lang-const c-type-list-kwds csharp)
-                         '("else")))
-         (block-regex (regexp-opt blocks 'words)))
-    (when (string-match-p
-           (concat "[^\s]\s*" block-regex)
-           (buffer-substring-no-properties (line-beginning-position) (point)))
-      (re-search-backward block-regex)
-      (loop while (whitespacep (char-before)) do (delete-char -1))
-      (let ((text-saved (buffer-substring (point) (line-end-position))))
-        (delete-region (point) (line-end-position))
-        (loop until (and (char-before) (char-equal (char-before) (str2char "}"))) do (forward-char))
-        (newline-and-indent)
-        (insert text-saved))))
-  (when
-      (and
-       (string-match-p
-        (regexp-opt (c-lang-const c-block-stmt-2-kwds csharp) 'words)
-        (buffer-substring-no-properties (line-beginning-position) (point)))
-       (= 1 (count (str2char ")")
-                   (buffer-substring-no-properties
-                    (point) (line-end-position)))))
-    (end-of-line))
-  (unless (string-match-p
-           "^\s+$" (buffer-substring-no-properties
-                    (line-beginning-position) (point)))
-    (loop while (whitespacep (char-before)) do (delete-char -1))
-    (csharp-hack-newline))
-  (let ((pt (point))
-        (next-pt nil))
-    (setq pt (point))
-    (insert ";{}")
-    (setq next-pt (1- (point)))
-    (goto-char pt)
-    (delete-char 1)
-    (goto-char (1- next-pt))))
 
 (defun csharp-hack-parenthesis ()
   (interactive)
