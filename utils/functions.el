@@ -203,7 +203,7 @@ Toggles between: lowercase->ALL CAPS->Initial Caps->(cycle)."
       (set-mark end))))
 
 (defadvice toggle-letter-case (after deactivate-mark-nil activate)
-  (when (called-interactively-p)
+  (when (called-interactively-p 'any)
     (setq deactivate-mark nil)))
 
 (defun newline-and-indent-fix-cc-mode ()
@@ -695,29 +695,27 @@ Note the weekly scope of the command's precision.")
 ;;; asynchronous support variables used for communication between process and
 ;;; emacs
 (defvar async-load-is-buffer-modified-outside nil)
-(setq-default async-load-is-buffer-modified-outside nil)
 (make-variable-buffer-local 'async-load-is-buffer-modified-outside)
+(setq-default async-load-is-buffer-modified-outside nil)
 (defvar async-load-is-modifying-buffer nil)
-(setq-default async-load-is-modifying-buffer nil)
 (make-variable-buffer-local 'async-load-is-modifying-buffer)
-(defvar async-load-line-count 0)
-(setq-default async-load-line-count 0)
-(make-variable-buffer-local 'async-load-line-count)
-
-(defun async-load-after-change-function (beg end len)
-  (unless async-load-is-modifying-buffer
-    (setq async-load-is-buffer-modified-outside t)))
+(setq-default async-load-is-modifying-buffer nil)
 
 (defmacro with-async-load-modification (buffer &rest body)
   `(with-current-buffer ,buffer
-     (setq async-load-is-modifying-buffer t)
-     (save-excursion
+     (let ((prev-pt (point)))
        (goto-char (point-max))
-       ,@body)
-     (setq async-load-is-modifying-buffer nil)))
+       ,@body
+       (goto-char prev-pt))))
 ;;; makes it more aesthetically pleasing to use this
 (put 'with-async-load-modification 'lisp-indent-function 1)
 
+(defvar async-load-buffer-size 10000
+  "Size of string before string shoved into file.")
+(defvar async-load-buffer ""
+  "Per-file async loading buffer.")
+(make-variable-buffer-local 'async-load-buffer)
+(setq-default async-load-buffer "")
 (defun async-load-file (filepath)
   (unless (and (file-exists-p filepath)
                (not (file-directory-p filepath))
@@ -741,26 +739,20 @@ Note the weekly scope of the command's precision.")
      arg-proc
      (lambda (proc str)
        (with-async-load-modification (process-buffer proc)
-         (let ((prev-async-load-line-count async-load-line-count)
-               ;; newline is ascii code 10
-               (added-line-count (cl-count 10 str)))
-           (insert str)
-           (setq async-load-line-count (+ prev-async-load-line-count
-                                          added-line-count))
-           ;; update modes here because first two lines of file can often
-           ;; contain fun things like file-local variables caught by normal-mode
-           (when (and (< prev-async-load-line-count 2)
-                      (>= async-load-line-count 2))
-             (normal-mode))))))
+         (setq async-load-buffer (concat async-load-buffer str))
+         (when (> (length async-load-buffer) async-load-buffer-size)
+           (insert async-load-buffer)
+           (setq async-load-buffer "")))))
     (set-process-sentinel
      arg-proc
      (lambda (proc ev)
-       (if (string= ev "finished\n")
-           ;; update modes again here after the whole file has loaded
-           ;; in case file-local variables/etc have been defined again
-           (with-current-buffer (process-buffer proc)
-             (normal-mode)
-             (set-buffer-modified-p async-load-is-buffer-modified-outside))
+       ;; update modes again here after the whole file has loaded
+       (with-async-load-modification (process-buffer proc)
+         (insert async-load-buffer)
+         (setq async-load-buffer "")
+         (normal-mode)
+         (set-buffer-modified-p nil))
+       (unless (and (stringp ev) (string= ev "finished\n"))
          ;; alert the user that SOMETHING BAD HAS HAPPENED!!!!
          (switch-to-buffer (process-buffer proc))
          (goto-char (point-max))
@@ -794,10 +786,13 @@ Note the weekly scope of the command's precision.")
                                  (string= cur-line ""))
                        (cond ((string= active-filetype "visit")
                               (with-demoted-errors "save-session: %S"
+                                ;; (async-load-file
+                                ;;  (file-truename active-filename))
                                 (with-current-buffer
                                     (find-file-noselect
                                      (file-truename active-filename))
-                                  (goto-char (string-to-number active-point)))))
+                                  (goto-char (string-to-number active-point)))
+                                 ))
                              (t (throw 'no-such-active-filetype
                                        (concat "i don't recognize "
                                                active-filetype "!"))))
@@ -1319,7 +1314,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                            (buffer-name make-output-buf) make-cmd)
                      make-args))
              (lambda (proc ev)
-               (if (string= ev "finished\n")
+               (if (and (stringp ev) (string= ev "finished\n"))
                    (kill-buffer (process-buffer proc))
                  (when (process-live-p proc) (kill-process proc))
                  (switch-to-buffer (process-buffer proc))
@@ -1328,6 +1323,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 (defun actual-make-all-submodules ()
   (mapcar #'actual-make-submodule submodules-to-make))
 
+;;; TODO: make this work lol
 (defun update-packages-in-list ()
   (remove-hook 'tabulated-list-revert-hook #'update-packages-in-list)
   (package-menu-mark-upgrades)

@@ -445,4 +445,5 @@ Check out your .emacs.\n")))))
           (lambda ()
             (actual-setup-submodules)
             (actual-make-all-submodules)))
-(add-hook 'after-load-init-hook #'update-all-packages)
+;; (add-hook 'after-load-init-hook #'update-all-packages)
+ 

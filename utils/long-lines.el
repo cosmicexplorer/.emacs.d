@@ -28,10 +28,10 @@
     (setq fin-col (if (eobp) nil (current-column)))
     (if fin-col
         (progn
-          (when (called-interactively-p)
+          (when (called-interactively-p 'any)
             (long-line-message-found fin-col))
           (move-to-column long-lines-length))
-      (when (called-interactively-p)
+      (when (called-interactively-p 'any)
         (long-line-message-not-found nil))
       (goto-char prev-pt))
     fin-col))
@@ -42,9 +42,9 @@
     (goto-char (point-min))
     (let ((res (long-line-goto-next)))
       (if res
-          (when (called-interactively-p)
+          (when (called-interactively-p 'any)
             (long-line-message-found res))
-          (when (called-interactively-p)
+          (when (called-interactively-p 'any)
             (long-line-message-not-found t))
           (goto-char prev))
       res)))
@@ -59,14 +59,14 @@
                  do (let ((res (setq cur-col (long-line-goto-next))))
                       (prependn (cons (line-number-at-pos) res) results))
                  finally (return (reverse (cdr results)))))))
-    (if (called-interactively-p)
+    (if (called-interactively-p 'any)
         (message "%S" res)
       res)))
 
 (defun long-line-get-lines ()
   (interactive)
   (let ((res (length (long-line-get-long-lines-alist))))
-    (if (called-interactively-p)
+    (if (called-interactively-p 'any)
         (message "%s %d %s" "the buffer has" res "long line(s)")
       res)))
 
