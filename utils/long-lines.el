@@ -1,5 +1,7 @@
 ;;; finds long lines in buffers
 
+(require 'utilities)
+
 (defcustom long-lines-length 80
   "Maximum length of source code lines."
   :group 'long-lines)
@@ -65,7 +67,7 @@
   (interactive)
   (let ((res (length (long-line-get-long-lines-alist))))
     (if (called-interactively-p)
-        (message "%s %d %s" "the buffer has" res "long lines")
+        (message "%s %d %s" "the buffer has" res "long line(s)")
       res)))
 
 (provide 'long-lines)

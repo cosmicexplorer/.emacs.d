@@ -5,6 +5,8 @@
 ;;; indentation silliness
 (setq-default indent-tabs-mode nil)     ;; use spaces not tabs
 (setq tab-width 2)                      ; 4-spacers get at me
+(add-hook 'prog-mode-hook (lambda () (setq fill-column 80)))
+(add-hook 'text-mode-hook (lambda () (setq fill-column 80)))
 
 ;;; commenting
 (defun make-comments-like-c ()
@@ -25,12 +27,8 @@
 ;;; highlight cursor and auto-fill when over 80 chars in certain modes
 (add-hook 'prog-mode-hook #'highlight-80+-mode)
 (add-hook 'prog-mode-hook #'auto-fill-mode)
-(add-hook 'prog-mode-hook
-          (lambda () (set-fill-column 80)))
 (add-hook 'text-mode-hook #'highlight-80+-mode)
 (add-hook 'text-mode-hook #'auto-fill-mode)
-(add-hook 'text-mode-hook
-          (lambda () (set-fill-column 80)))
 
 ;;; ...but not others
 (add-hook 'LaTeX-mode-hook (lambda ()
@@ -190,20 +188,24 @@
  "OmniSharpServer"
  (if (eq system-type 'windows-nt) "msbuild.exe" "xbuild"))
 
-(setq omnisharp-server-executable-path
-      (concat init-home-folder-dir
-              "OmniSharpServer/OmniSharp/bin/Debug/OmniSharp.exe"))
 (eval-after-load 'csharp-mode
   '(progn
      (c-add-style "csharp-mode-style" csharp-cc-style)
      (add-hook 'csharp-mode-hook (lambda () (c-set-style "csharp-mode-style")))
-     (font-lock-add-keywords
-      'csharp-mode
-      '(("else" . font-lock-keyword-face)))
-     (eval-after-load 'company
-       '(add-to-list 'company-backends 'company-omnisharp))
-     (when (file-exists-p omnisharp-server-executable-path)
-       (add-hook 'csharp-mode-hook 'omnisharp-mode))))
+     (font-lock-add-keywords 'csharp-mode '(("else" . font-lock-keyword-face)))
+     (when use-omnisharp
+       (eval-after-load 'omnisharp
+         '(progn
+            (setq omnisharp-server-executable-path
+                  (concat init-home-folder-dir
+                          "OmniSharpServer/OmniSharp/bin/Debug/OmniSharp.exe"))
+            (when (file-exists-p omnisharp-server-executable-path)
+              (if (not (executable-find "curl"))
+                  (send-message-to-scratch
+                   "Omnisharp built, but curl not found! fix it.")
+                (eval-after-load 'company
+                  '(add-to-list 'company-backends 'company-omnisharp))
+                (add-hook 'csharp-mode-hook 'omnisharp-mode))))))))
 
 (defun start-omnisharp-server-for-directory (dir)
   (interactive "Mdirectory to start omnisharp for: ")

@@ -39,6 +39,7 @@
 (require 'erc)
 (require 'erc-nicklist)                 ; this file is in /lisp/
 (require 'erc-highlight-nicknames)      ; this file is in /lisp/
+(require 'omnisharp)
 
 ;;; my stuff
 (require 'utilities)

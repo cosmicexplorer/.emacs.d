@@ -1181,6 +1181,9 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 (defun just-electric-bracket ()
   (interactive) (insert "{}") (backward-char 1))
 
+(defun just-electric-parens ()
+  (interactive) (insert "()") (backward-char 1))
+
 (defun just-semicolon ()
   (interactive) (insert ";"))
 
@@ -1279,22 +1282,22 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 ;;; for initialization
 (defun actual-setup-submodules ()
-  (if (not (executable-find "git"))
-      (unless dont-ask-about-git
+  (unless dont-ask-about-git
+    (if (not (executable-find "git"))
         (send-message-to-scratch
-         "git not installed! some features will be unavailable."))
-    (let ((git-submodule-buf-name "*git-submodule-errors*")
-          (prev-wd default-directory))
-      (cd init-home-folder-dir)
-      (unwind-protect
-          (let ((submodule-out-buf
-                 (get-buffer-create git-submodule-buf-name)))
-            (unless (zerop (call-process
-                            "git" nil submodule-out-buf nil
-                            "submodule" "update" "--init" "--recursive"))
-              (throw 'submodule-failure "init failed")))
-        (cd prev-wd))
-      (kill-buffer git-submodule-buf-name))))
+         "git not installed! some features will be unavailable.")
+      (let ((git-submodule-buf-name "*git-submodule-errors*")
+            (prev-wd default-directory))
+        (cd init-home-folder-dir)
+        (unwind-protect
+            (let ((submodule-out-buf
+                   (get-buffer-create git-submodule-buf-name)))
+              (unless (zerop (call-process
+                              "git" nil submodule-out-buf nil
+                              "submodule" "update" "--init" "--recursive"))
+                (throw 'submodule-failure "init failed")))
+          (cd prev-wd))
+        (kill-buffer git-submodule-buf-name)))))
 
 (defvar submodules-to-make nil)
 (defun make-submodule (folder-name make-cmd &rest make-args)
