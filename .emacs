@@ -23,7 +23,7 @@
 ;;; FILE'S UNDO-TREE-HISTORY in ~/.emacs.d/undo-tree-history/!!!!!!!!!!!
 
 ;;; let's not hardcode everything like back in 9th grade
-(defvar init-home-folder-dir (expand-file-name user-emacs-directory)
+(defvar init-home-folder-dir (file-truename user-emacs-directory)
   "Location of this home directory.")
 
 ;;; CUSTOM VARS
