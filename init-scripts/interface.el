@@ -470,3 +470,7 @@ Check out your .emacs.\n")))))
 
 ;;; shell-mode echoes commands lol
 (add-hook 'comint-mode-hook (lambda () (setq comint-process-echoes t)))
+(add-hook 'shell-mode-hook
+          (lambda () (set-process-query-on-exit-flag
+                      (get-buffer-process (current-buffer))
+                      nil)))
