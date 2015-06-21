@@ -218,3 +218,5 @@
   '(progn
      (define-key markdown-mode-map (kbd "M-n") #'mc/mark-next-like-this)
      (define-key markdown-mode-map (kbd "M-p") #'mc/mark-previous-like-this)))
+
+(define-key grep-mode-map (kbd "G") #'refind-or-grep)

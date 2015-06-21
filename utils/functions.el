@@ -1,6 +1,7 @@
 ;;; some of these are mine, some are heavily adapted from emacswiki, some are
 ;;; copy/paste from emacswiki
 
+(require 'utilities)
 (require 'cc-mode)
 (require 'csharp-mode)
 
@@ -49,7 +50,7 @@
       (when (and (buffer-file-name) (file-exists-p (buffer-file-name))
                  (not
                   (buffer-modified-p)))
-        (revert-buffer t t t) )))
+        (revert-buffer t t t))))
   (message "Refreshed open files.") )
 
 (defcustom search-all-buffers-ignored-files
@@ -1344,6 +1345,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
       (package-menu-execute t))))
 
 (defun update-all-packages ()
+  ;; TODO: fix this lol
   (interactive)
   (package-list-packages)
   (let ((package-buf (current-buffer)))
@@ -1351,5 +1353,33 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (with-current-buffer package-buf
       (make-local-variable 'tabulated-list-revert-hook)
       (add-hook 'tabulated-list-revert-hook #'update-packages-in-list))))
+
+;;; a grep for the modern world
+(defun regrep ()
+  (interactive)
+  (let ((cmd
+         (read-shell-command
+          "Run grep (like this): " (or (car grep-history) grep-command)
+          'grep-history)))
+    (prependn cmd grep-history)
+    (grep cmd)))
+
+(defun refind ()
+  (interactive)
+  (let ((cmd
+         (read-shell-command
+          "Run find-grep (like this): "
+          (or (car grep-find-history) grep-find-command)
+          'grep-find-history)))
+    (prependn cmd grep-find-history)
+    (grep-find cmd)))
+
+(defun refind-or-grep ()
+  (interactive)
+  (let ((prev-comp (car compilation-arguments))
+        (mode (second compilation-arguments)))
+    (if (not (string-equal (substring prev-comp 0 4) "find"))
+        (regrep)
+      (refind))))
 
 (provide 'functions)
