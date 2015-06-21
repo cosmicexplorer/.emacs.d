@@ -286,7 +286,7 @@ lowercase, and Initial Caps versions."
                 ")([^a-zA-Z]|$)\" \"" dir "\"")))
 
 
-;;; wrap lines in org-mode
+;;; wrap lines in org-mode, mostly, but also other places
 (visual-line-mode)
 
 
@@ -319,6 +319,19 @@ lowercase, and Initial Caps versions."
     "File containing all eshell I/O from all eshell buffers.")
   (add-hook 'eshell-pre-command-hook #'eshell-send-input-to-history)
   (add-hook 'eshell-post-command-hook #'eshell-send-output-to-history))
+
+;;; now let's do the same for shell-mode!
+(defun sh-power-ranger ()
+  (interactive)
+  (shell (generate-new-buffer (concat "shell: " default-directory))))
+
+(defadvice comint-send-input (after shell-set-pwd-name-on-cd)
+  (when (eq major-mode 'shell-mode)
+    (rename-buffer
+     (generate-new-buffer-name
+      (concat "shell: " default-directory)
+      (buffer-name)))))
+(ad-activate 'comint-send-input)
 
 
 ;;; save and reset window configuration to ring
@@ -446,4 +459,6 @@ Check out your .emacs.\n")))))
             (actual-setup-submodules)
             (actual-make-all-submodules)))
 ;; (add-hook 'after-load-init-hook #'update-all-packages)
- 
+
+;;; shell-mode echoes commands lol
+(add-hook 'comint-mode-hook (lambda () (setq comint-process-echoes t)))'
