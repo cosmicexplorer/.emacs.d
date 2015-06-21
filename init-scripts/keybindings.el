@@ -220,3 +220,18 @@
      (define-key markdown-mode-map (kbd "M-p") #'mc/mark-previous-like-this)))
 
 (define-key grep-mode-map (kbd "G") #'refind-or-grep)
+
+(define-key emacs-lisp-mode-map (kbd "C-M-h") nil)
+(define-key emacs-lisp-mode-map (kbd "C-h d") #'describe-function-or-variable)
+(define-key emacs-lisp-mode-map (kbd "C-M-h d")
+  #'describe-function-or-variable-at-point)
+;;; TODO: write this
+;; (define-key emacs-lisp-mode-map (kbd "C-h C-d") #'find-function-or-variable)
+(define-key emacs-lisp-mode-map (kbd "C-M-h C-d")
+  #'find-function-or-variable-at-point)
+(define-key emacs-lisp-mode-map (kbd "C-M-h f") #'describe-function-at-point)
+(define-key emacs-lisp-mode-map (kbd "C-M-h v") #'describe-variable-at-point)
+(define-key emacs-lisp-mode-map (kbd "C-h C-f") #'find-function)
+(define-key emacs-lisp-mode-map (kbd "C-M-h C-f") #'find-function-at-point)
+(define-key emacs-lisp-mode-map (kbd "C-h C-v") #'find-variable)
+(define-key emacs-lisp-mode-map (kbd "C-M-h C-v") #'find-variable-at-point)

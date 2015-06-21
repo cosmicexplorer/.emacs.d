@@ -1382,4 +1382,33 @@ way I prefer, and regards `comment-padding', unlike the standard version."
         (regrep)
       (refind))))
 
+;;; finding things in emacs lisp
+(defun describe-function-at-point ()
+  (interactive)
+  (let ((symb (function-called-at-point)))
+    (when symb
+      (describe-function symb))))
+
+(defun describe-variable-at-point ()
+  (interactive)
+  (let ((symb (variable-at-point)))
+    (when (and symb (not (equal symb 0)))
+      (describe-variable symb))))
+
+(defun describe-function-or-variable-at-point ()
+  (interactive)
+  (let ((symb (variable-at-point)))
+    (if (and symb (not (equal symb 0)))
+        (describe-variable symb)
+      (let ((fun-symb (function-called-at-point)))
+        (when fun-symb (describe-function fun-symb))))))
+
+(defun find-function-or-variable-at-point ()
+  (interactive)
+  (let ((symb (variable-at-point)))
+    (if (and symb (not (equal symb 0)))
+        (find-variable symb)
+      (let ((fun-symb (function-called-at-point)))
+        (when fun-symb (find-function fun-symb))))))
+
 (provide 'functions)
