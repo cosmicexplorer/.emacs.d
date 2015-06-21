@@ -333,6 +333,14 @@ lowercase, and Initial Caps versions."
       (buffer-name)))))
 (ad-activate 'comint-send-input)
 
+;;; helm-swoop sends me angry error messages if i don't do this
+;;; this is a super hack but it works reliably, and since recentering is more of
+;;; an aesthetic action than anything else (i.e. won't affect correct execution
+;;; of lisp code), i don't think it's too harmful
+(defadvice recenter (around ignore-recenter-errors)
+  (ignore-errors ad-do-it))
+(ad-activate 'recenter)
+
 
 ;;; save and reset window configuration to ring
 (defvar window-configuration-ring nil
