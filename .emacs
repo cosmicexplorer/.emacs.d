@@ -3,18 +3,12 @@
 ;;; .....let's begin
 (package-initialize)
 
+(add-to-list 'load-path "/home/cosmicexplorer/tools/helm-swoop/")
+
 ;;; add wherever emacs was invoked from to path
 ;;; done at top so we know we're not changing any directories
 (defvar emacs-start-command (car command-line-args)
   "Command used to start emacs.")
-(let ((emacs-bin-path (file-name-directory emacs-start-command)))
-  (when emacs-bin-path
-    (setenv
-     "PATH"
-     (concat
-      (getenv "PATH")
-      (if (eq system-type 'windows-nt) ";" ":")
-      (expand-file-name (convert-standard-filename emacs-bin-path))))))
 
 ;;; emacs config, aka the root node of a massively unbalanced configuration tree
 ;;; by Danny McClanahan, <danieldmcclanahan@gmail.com>, 2014-2015
@@ -145,6 +139,9 @@ Check out your .emacs."))
 (defun load-my-init-script (file-name)
   "Loads script located in init-scripts directory."
   (load-file (concat init-home-folder-dir "init-scripts/" file-name ".el")))
+
+(add-hook 'after-load-init-hook
+          (lambda () (load-my-init-script "visuals")))
 
 ;;; load the packages i like
 (load-my-init-script "packages")

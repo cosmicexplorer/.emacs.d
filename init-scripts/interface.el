@@ -1,4 +1,6 @@
-;;; modifications to default ui
+;;; just a grab bag of stuff to change lol
+;;; in general, functions go in `functions.el', and `interface.el' calls them in
+;;; some way, shape, or form
 
 (require 'helm)
 
@@ -15,23 +17,6 @@
 
 ;;; c-h a -> apropos
 (define-key help-map "a" 'apropos)      ; get useful help for once
-
-;;; remove toolbars
-(menu-bar-mode 0)                       ;  remove menu bar for a line of space
-(tool-bar-mode 0)                       ; and tool bar for graphical
-
-;;; configure scrolling
-(setq scroll-step 1)
-(setq scroll-conservatively 10000)
-(scroll-bar-mode 0)
-(setq scroll-preserve-screen-position t)
-
-;;; set font size and type
-(set-face-attribute 'default nil :height 100)
-(when (member "Telegrama" (font-family-list))
-  (add-to-list 'default-frame-alist '(font . "Telegrama 10"))
-  (set-face-attribute 'default t :font "Telegrama 10")
-  (set-frame-font "Telegrama 10"))
 
 ;;; the mark is stupid as a ui concept even if it's great in scripts
 (transient-mark-mode 0)
@@ -52,9 +37,6 @@
                          (eq major-mode 'ibuffer-mode)
                          (eq major-mode 'undo-tree-visualizer-mode))
                (setq show-trailing-whitespace t))))
-
-;;; have normal delete/selection (type over selected text to delete)
-(delete-selection-mode 1)
 
 ;; do backups well and put them into a separate folder
 (setq backup-directory-alist
@@ -152,7 +134,7 @@
 
 
 ;;; misc
-(load-display-time)
+(add-hook 'after-load-init-hook #'load-display-time)
 (put 'downcase-region 'disabled nil)
 (put 'erase-buffer 'disabled nil)
 (setq auto-save-interval 600)     ; half as often as default
@@ -332,14 +314,6 @@ lowercase, and Initial Caps versions."
       (concat "shell: " default-directory)
       (buffer-name)))))
 (ad-activate 'comint-send-input)
-
-;;; helm-swoop sends me angry error messages if i don't do this
-;;; this is a super hack but it works reliably, and since recentering is more of
-;;; an aesthetic action than anything else (i.e. won't affect correct execution
-;;; of lisp code), i don't think it's too harmful
-;; (defadvice recenter (around ignore-recenter-errors)
-;;   (ignore-errors ad-do-it))
-;; (ad-activate 'recenter)
 
 
 ;;; save and reset window configuration to ring
