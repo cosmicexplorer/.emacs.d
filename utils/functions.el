@@ -1,15 +1,18 @@
 ;;; some of these are mine, some are heavily adapted from emacswiki, some are
 ;;; copy/paste from emacswiki
 
+(require 'utilities)
 (require 'cc-mode)
 (require 'csharp-mode)
 
-(defun send-message-to-scratch (msg)
-  (with-current-buffer (get-buffer-create "*scratch*")
-    (goto-char (point-max))
-    (insert msg)
-    (unless (bolp)
-      (newline))))
+(defun send-message-to-scratch (&rest msg-args)
+  (let ((str (apply #'concat msg-args)))
+    (with-current-buffer (get-buffer-create "*scratch*")
+      (goto-char (point-max))
+      (insert str)
+      (unless (bolp)
+        (newline)))
+    str))
 
 ;;; helper function used for loading custom scripts littered throughout here
 (defun local-file-path (filename)
@@ -49,7 +52,7 @@
       (when (and (buffer-file-name) (file-exists-p (buffer-file-name))
                  (not
                   (buffer-modified-p)))
-        (revert-buffer t t t) )))
+        (revert-buffer t t t))))
   (message "Refreshed open files.") )
 
 (defcustom search-all-buffers-ignored-files
@@ -203,7 +206,7 @@ Toggles between: lowercase->ALL CAPS->Initial Caps->(cycle)."
       (set-mark end))))
 
 (defadvice toggle-letter-case (after deactivate-mark-nil activate)
-  (when (called-interactively-p)
+  (when (called-interactively-p 'any)
     (setq deactivate-mark nil)))
 
 (defun newline-and-indent-fix-cc-mode ()
@@ -646,12 +649,83 @@ Note the weekly scope of the command's precision.")
                      (buffer-substring-no-properties
                       (marker-position eshell-last-input-end)
                       (marker-position eshell-last-output-start))))
-            (res (string-match "\n" str)))
-       (if res
-           str
-         (concat str "\n")))
+            (res (string-match-p "\n$" str)))
+       (if res str (concat str "\n")))
      nil eshell-user-output-file)
     (message "")))
+
+(defun mostly-whitespace-p (str)
+  (>
+   (/
+    (cl-count-if
+     (lambda (s) (string-match-p "[\s\r\n]" (char-to-string s)))
+     str)
+    (float (length str)))
+   0.8))
+
+(when save-shell-history
+  (defvar prev-shell-input "")
+  (make-variable-buffer-local 'prev-shell-input)
+  (defvar was-last-output nil)
+  (make-variable-buffer-local 'was-last-output)
+
+  (defun shell-send-input-to-history (str-to-send)
+    (append-to-file
+     (ansi-color-filter-apply
+      (let* ((str
+              (concat "\n" "--in--: " default-directory ": "
+                      (format-time-string current-date-time-format
+                                          (current-time))
+                      "\n"
+                      str-to-send))
+             (res (string-match-p "\n$" str)))
+        (if res str (concat str "\n"))))
+     nil shell-user-output-file)
+    (setq prev-shell-input str-to-send)
+    (setq was-last-output nil)
+    (message ""))
+
+  (defvar my-shell-prompt-pattern "^[^#%$>
+-]*[#$%>] *")
+
+  (defun shell-send-output-to-history (str-to-send)
+    (let ((extra-prompt-regexen
+           (list (concat ".\\{,4\\}"
+                         (regexp-quote (user-login-name))
+                         "@.*$")
+                 my-shell-prompt-pattern)))
+      (let ((treated-str
+             (trim-whitespace
+              (replace-regexp-in-string
+               "%[\s\r\n]*\\'"
+               ""
+               (replace-regexp-in-string
+                (concat
+                 "\\("
+                 (reduce (lambda (a b) (concat a "\\|" b))
+                         extra-prompt-regexen)
+                 "\\)")
+                ""
+                (replace-regexp-in-string
+                 (regexp-quote
+                  (trim-whitespace prev-shell-input))
+                 ""
+                 (ansi-color-filter-apply str-to-send))))))
+            (whitespace-regex "\\`[\s\r\n]*\\'")
+            (header-str (if was-last-output ""
+                          (concat "--out--: " default-directory ": "
+                                  (format-time-string current-date-time-format
+                                                      (current-time))
+                                  "\n"))))
+        (setq was-last-output t)
+        (unless (or (string-match-p whitespace-regex str-to-send)
+                    (string-match-p whitespace-regex treated-str))
+          (append-to-file
+           (concat header-str
+                   treated-str
+                   (if was-last-output "" "\n"))
+           nil shell-user-output-file)
+          (message ""))))))
 
 ;;; functions to save and reset window configuration to a list
 ;;; since i only use a single frame mostly the intricacies of multiple frames
@@ -695,29 +769,27 @@ Note the weekly scope of the command's precision.")
 ;;; asynchronous support variables used for communication between process and
 ;;; emacs
 (defvar async-load-is-buffer-modified-outside nil)
-(setq-default async-load-is-buffer-modified-outside nil)
 (make-variable-buffer-local 'async-load-is-buffer-modified-outside)
+(setq-default async-load-is-buffer-modified-outside nil)
 (defvar async-load-is-modifying-buffer nil)
-(setq-default async-load-is-modifying-buffer nil)
 (make-variable-buffer-local 'async-load-is-modifying-buffer)
-(defvar async-load-line-count 0)
-(setq-default async-load-line-count 0)
-(make-variable-buffer-local 'async-load-line-count)
-
-(defun async-load-after-change-function (beg end len)
-  (unless async-load-is-modifying-buffer
-    (setq async-load-is-buffer-modified-outside t)))
+(setq-default async-load-is-modifying-buffer nil)
 
 (defmacro with-async-load-modification (buffer &rest body)
   `(with-current-buffer ,buffer
-     (setq async-load-is-modifying-buffer t)
-     (save-excursion
+     (let ((prev-pt (point)))
        (goto-char (point-max))
-       ,@body)
-     (setq async-load-is-modifying-buffer nil)))
+       ,@body
+       (goto-char prev-pt))))
 ;;; makes it more aesthetically pleasing to use this
 (put 'with-async-load-modification 'lisp-indent-function 1)
 
+(defvar async-load-buffer-size 10000
+  "Size of string before string shoved into file.")
+(defvar async-load-buffer ""
+  "Per-file async loading buffer.")
+(make-variable-buffer-local 'async-load-buffer)
+(setq-default async-load-buffer "")
 (defun async-load-file (filepath)
   (unless (and (file-exists-p filepath)
                (not (file-directory-p filepath))
@@ -741,26 +813,20 @@ Note the weekly scope of the command's precision.")
      arg-proc
      (lambda (proc str)
        (with-async-load-modification (process-buffer proc)
-         (let ((prev-async-load-line-count async-load-line-count)
-               ;; newline is ascii code 10
-               (added-line-count (cl-count 10 str)))
-           (insert str)
-           (setq async-load-line-count (+ prev-async-load-line-count
-                                          added-line-count))
-           ;; update modes here because first two lines of file can often
-           ;; contain fun things like file-local variables caught by normal-mode
-           (when (and (< prev-async-load-line-count 2)
-                      (>= async-load-line-count 2))
-             (normal-mode))))))
+         (setq async-load-buffer (concat async-load-buffer str))
+         (when (> (length async-load-buffer) async-load-buffer-size)
+           (insert async-load-buffer)
+           (setq async-load-buffer "")))))
     (set-process-sentinel
      arg-proc
      (lambda (proc ev)
-       (if (string= ev "finished\n")
-           ;; update modes again here after the whole file has loaded
-           ;; in case file-local variables/etc have been defined again
-           (with-current-buffer (process-buffer proc)
-             (normal-mode)
-             (set-buffer-modified-p async-load-is-buffer-modified-outside))
+       ;; update modes again here after the whole file has loaded
+       (with-async-load-modification (process-buffer proc)
+         (insert async-load-buffer)
+         (setq async-load-buffer "")
+         (normal-mode)
+         (set-buffer-modified-p nil))
+       (unless (and (stringp ev) (string= ev "finished\n"))
          ;; alert the user that SOMETHING BAD HAS HAPPENED!!!!
          (switch-to-buffer (process-buffer proc))
          (goto-char (point-max))
@@ -794,10 +860,13 @@ Note the weekly scope of the command's precision.")
                                  (string= cur-line ""))
                        (cond ((string= active-filetype "visit")
                               (with-demoted-errors "save-session: %S"
+                                ;; (async-load-file
+                                ;;  (file-truename active-filename))
                                 (with-current-buffer
                                     (find-file-noselect
                                      (file-truename active-filename))
-                                  (goto-char (string-to-number active-point)))))
+                                  (goto-char (string-to-number active-point)))
+                                 ))
                              (t (throw 'no-such-active-filetype
                                        (concat "i don't recognize "
                                                active-filetype "!"))))
@@ -1319,7 +1388,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                            (buffer-name make-output-buf) make-cmd)
                      make-args))
              (lambda (proc ev)
-               (if (string= ev "finished\n")
+               (if (and (stringp ev) (string= ev "finished\n"))
                    (kill-buffer (process-buffer proc))
                  (when (process-live-p proc) (kill-process proc))
                  (switch-to-buffer (process-buffer proc))
@@ -1328,6 +1397,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 (defun actual-make-all-submodules ()
   (mapcar #'actual-make-submodule submodules-to-make))
 
+;;; TODO: make this work lol
 (defun update-packages-in-list ()
   (remove-hook 'tabulated-list-revert-hook #'update-packages-in-list)
   (package-menu-mark-upgrades)
@@ -1348,6 +1418,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
       (package-menu-execute t))))
 
 (defun update-all-packages ()
+  ;; TODO: fix this lol
   (interactive)
   (package-list-packages)
   (let ((package-buf (current-buffer)))
@@ -1355,5 +1426,83 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (with-current-buffer package-buf
       (make-local-variable 'tabulated-list-revert-hook)
       (add-hook 'tabulated-list-revert-hook #'update-packages-in-list))))
+
+;;; a grep for the modern world
+(defun regrep ()
+  (interactive)
+  (let ((cmd
+         (read-shell-command
+          "Run grep (like this): " (or (car grep-history) grep-command)
+          'grep-history)))
+    (prependn cmd grep-history)
+    (grep cmd)))
+
+(defun refind ()
+  (interactive)
+  (let ((cmd
+         (read-shell-command
+          "Run find-grep (like this): "
+          (or (car grep-find-history) grep-find-command)
+          'grep-find-history)))
+    (prependn cmd grep-find-history)
+    (grep-find cmd)))
+
+(defun refind-or-grep ()
+  (interactive)
+  (let ((prev-comp (car compilation-arguments))
+        (mode (second compilation-arguments)))
+    (if (not (string-equal (substring prev-comp 0 4) "find"))
+        (regrep)
+      (refind))))
+
+;;; finding things in emacs lisp
+(defun describe-function-at-point ()
+  (interactive)
+  (let ((symb (function-called-at-point)))
+    (when symb
+      (describe-function symb))))
+
+(defun describe-variable-at-point ()
+  (interactive)
+  (let ((symb (variable-at-point)))
+    (when (and symb (not (equal symb 0)))
+      (describe-variable symb))))
+
+(defun describe-function-or-variable-at-point ()
+  (interactive)
+  (let ((symb (variable-at-point)))
+    (if (and symb (not (equal symb 0)))
+        (describe-variable symb)
+      (let ((fun-symb (function-called-at-point)))
+        (when fun-symb (describe-function fun-symb))))))
+
+(defun find-function-or-variable-at-point ()
+  (interactive)
+  (let ((symb (variable-at-point)))
+    (if (and symb (not (equal symb 0)))
+        (find-variable symb)
+      (let ((fun-symb (function-called-at-point)))
+        (when fun-symb (find-function fun-symb))))))
+
+;;; http://stackoverflow.com/a/21047199/2518889
+(defun shelllike-filter (proc string)
+  (let* ((buffer (process-buffer proc))
+         (window (get-buffer-window buffer)))
+    (with-current-buffer buffer
+      (if (not (mark)) (push-mark))
+      (exchange-point-and-mark) ;Use the mark to represent the cursor location
+      (dolist (char (append string nil))
+    (cond ((char-equal char ?\r)
+           (move-beginning-of-line 1))
+          ((char-equal char ?\n)
+           (move-end-of-line 1) (newline))
+          (t
+           (if (/= (point) (point-max)) ;Overwrite character
+           (delete-char 1))
+           (insert char))))
+      (exchange-point-and-mark))
+    (if window
+      (with-selected-window window
+        (goto-char (point-max))))))
 
 (provide 'functions)

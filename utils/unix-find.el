@@ -381,11 +381,11 @@ search. Probably pretty slow."
           (format-time-string "%H:%M:%S,%Y-%M-%d")))
 
 ;;;###autoload
-(defun find ()
+(defun find (&optional prefix-arg)
   "Parses and converts arguments with hyphen syntax (-name, -regex, etc) to
 atoms as a sexp for input to `unix-find' (:name, :regex, etc). Displays default
 prompt according to `unix-find-begin-prompt'."
-  (interactive)
+  (interactive "P")
   (let* ((find-command
           (or (and (derived-mode-p 'unix-find-mode) unix-find-prev-find-command)
               (read-from-minibuffer "call find like: " "find ")))

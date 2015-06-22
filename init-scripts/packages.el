@@ -19,6 +19,7 @@
                       2048-game
                       async
                       auctex
+                      auto-complete
                       better-defaults
                       cider
                       cloc              ; YEAH!!!

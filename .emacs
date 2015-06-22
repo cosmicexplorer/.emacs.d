@@ -3,18 +3,12 @@
 ;;; .....let's begin
 (package-initialize)
 
+(add-to-list 'load-path "/home/cosmicexplorer/tools/helm-swoop/")
+
 ;;; add wherever emacs was invoked from to path
 ;;; done at top so we know we're not changing any directories
 (defvar emacs-start-command (car command-line-args)
   "Command used to start emacs.")
-(let ((emacs-bin-path (file-name-directory emacs-start-command)))
-  (when emacs-bin-path
-    (setenv
-     "PATH"
-     (concat
-      (getenv "PATH")
-      (if (eq system-type 'windows-nt) ";" ":")
-      (expand-file-name (convert-standard-filename emacs-bin-path))))))
 
 ;;; emacs config, aka the root node of a massively unbalanced configuration tree
 ;;; by Danny McClanahan, <danieldmcclanahan@gmail.com>, 2014-2015
@@ -23,7 +17,7 @@
 ;;; FILE'S UNDO-TREE-HISTORY in ~/.emacs.d/undo-tree-history/!!!!!!!!!!!
 
 ;;; let's not hardcode everything like back in 9th grade
-(defvar init-home-folder-dir (expand-file-name user-emacs-directory)
+(defvar init-home-folder-dir (file-truename user-emacs-directory)
   "Location of this home directory.")
 
 ;;; CUSTOM VARS
@@ -67,6 +61,8 @@ session. Used later in this file.")
 (defvar save-eshell-history t
   "Whether or not to save eshell history to disk. Used in
 init-scripts/interface.el.")
+(defvar save-shell-history t
+  "Whether or not to save shell history to disk. Used in init-scripts/interface.el.")
 (defvar save-nonvisiting-files t
   "Whether or not to persist all buffers not visiting files to disk. Used in
 init-scripts/interface.el.")
@@ -102,6 +98,8 @@ init-scripts/interface.el.")
 
 (defvar after-load-init-hook nil
   "Hook to run whatever after loading packages n functions n whatever.")
+(defvar use-omnisharp t
+  "C#!!!!!!!")
 
 ;;; load custom values for these variables (this file is .gitignored)
 (let ((custom-var-file
@@ -144,29 +142,22 @@ Check out your .emacs."))
   "Loads script located in init-scripts directory."
   (load-file (concat init-home-folder-dir "init-scripts/" file-name ".el")))
 
+(add-hook 'after-load-init-hook
+          (lambda () (load-my-init-script "visuals")))
+
 ;;; load the packages i like
 (load-my-init-script "packages")
-
-;;; byte-compile everything: slow on first startup, but /significantly/ faster
-;;; during normal usage
-(add-hook
- 'after-load-init-hook
- (lambda ()
-   (require 'async)
-   (async-start
-    (lambda ()
-      (byte-recompile-directory
-       user-emacs-directory 0)
-      (when (get-buffer "*Compile-Log*")
-        (delete-windows-on "*Compile-Log*")))
-    (lambda (result)
-      (when result
-        (with-current-buffer "*scratch*"
-          (insert (prin1-to-string result))))))))
 
 ;;; load elisp
 ;;; should be /after/ byte-recompilation
 (load-my-init-script "requires")
+
+(defvar my-init-files
+  (cons (concat user-emacs-directory ".emacs")
+        (unix-find
+         user-emacs-directory :name "*.el" :not :iwholename "*elpa*"
+         :not :iwholename "*ESS*")))
+
 ;;; for compatibility between different operating environments
 (load-my-init-script "compat")
 ;;; enforce my strong opinions on the default emacs ui
@@ -177,6 +168,16 @@ Check out your .emacs."))
 (load-my-init-script "languages")
 ;;; cause what else is emacs for
 (load-my-init-script "keybindings")
+
+;;; byte-compile everything: slow on first startup, but /significantly/ faster
+;;; during normal usage
+(add-hook
+ 'after-load-init-hook
+ (lambda ()
+   (async-start
+    (lambda ()
+      (byte-recompile-directory user-emacs-directory 0))
+    'ignore)))
 
 ;;; let's do it
 (run-hooks 'after-load-init-hook)
@@ -191,9 +192,73 @@ Check out your .emacs."))
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(TeX-engine (quote luatex))
+ '(asm-comment-char 35)
+ '(cloc-use-3rd-gen t)
+ '(coffee-tab-width 2)
+ '(dabbrev-case-replace nil)
+ '(erc-autojoin-mode t)
+ '(erc-button-mode t)
+ '(erc-fill-mode t)
+ '(erc-highlight-nicknames-mode t)
+ '(erc-irccontrols-mode t)
+ '(erc-join-buffer (quote bury))
+ '(erc-list-mode t)
+ '(erc-match-mode t)
+ '(erc-menu-mode nil)
+ '(erc-move-to-prompt-mode t)
+ '(erc-netsplit-mode t)
+ '(erc-networks-mode t)
+ '(erc-nicklist-icons-directory "~/images/")
+ '(erc-noncommands-mode t)
+ '(erc-pcomplete-mode t)
+ '(erc-prompt (quote get-erc-prompt))
+ '(erc-readonly-mode t)
+ '(erc-ring-mode t)
+ '(erc-stamp-mode t)
+ '(erc-track-minor-mode t)
+ '(erc-track-mode t)
+ '(erc-track-position-in-mode-line nil)
+ '(fill-column 80)
+ '(grep-command (concat "\"" init-home-folder-dir "switch-grep.sh\" "))
+ '(grep-highlight-matches (quote auto))
+ '(grep-use-null-device nil)
+ '(gud-key-prefix "")
+ '(hippie-expand-try-functions-list
+   (quote
+    (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)))
+ '(initial-buffer-choice t)
+ '(linum-relative-plusp-offset 1)
+ '(nxml-slash-auto-complete-flag t)
+ '(org-agenda-files nil t)
+ '(org-catch-invisible-edits (quote smart))
+ '(org-enforce-todo-checkbox-dependencies t)
+ '(org-enforce-todo-dependencies t)
+ '(org-from-is-user-regexp nil)
+ '(org-startup-folded "showeverything" t)
+ '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (xterm-color web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game))))
+    (omnisharp csharp-mode xterm-color cloc package-build flycheck-package web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode evil espuds ein company color-theme cider better-defaults auto-complete auctex 2048-game)))
+ '(safe-local-variable-values
+   (quote
+    ((major-mode . sh-mode)
+     (TeX-master . "proposal")
+     (add-log-time-format lambda nil
+                          (progn
+                            (setq tz
+                                  (getenv "TZ"))
+                            (setq time
+                                  (format-time-string "%a %b %e %H:%M:%S %Z %Y"
+                                                      (current-time)))
+                            (set-time-zone-rule tz)
+                            time)))))
+ '(smart-tab-using-hippie-expand t)
+ '(warning-suppress-types (quote ((undo discard-info))))
+ '(yank-pop-change-selection t)
+ '(package-selected-packages
+   (quote
+    (company xterm-color web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein color-theme cloc cider better-defaults auctex 2048-game))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

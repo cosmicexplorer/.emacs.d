@@ -2,6 +2,4 @@
 
 echo "Welcome to the perl re.pl!"
 
-echo HEY
-
-# re.pl
+re.pl
