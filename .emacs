@@ -230,16 +230,16 @@ Check out your .emacs."))
  '(initial-buffer-choice t)
  '(linum-relative-plusp-offset 1)
  '(nxml-slash-auto-complete-flag t)
- '(org-agenda-files nil t)
+ '(org-agenda-files nil)
  '(org-catch-invisible-edits (quote smart))
  '(org-enforce-todo-checkbox-dependencies t)
  '(org-enforce-todo-dependencies t)
  '(org-from-is-user-regexp nil)
- '(org-startup-folded "showeverything" t)
+ '(org-startup-folded "showeverything")
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (omnisharp csharp-mode xterm-color cloc package-build flycheck-package web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode evil espuds ein company color-theme cider better-defaults auto-complete auctex 2048-game)))
+    (ggtags company xterm-color web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein color-theme cloc cider better-defaults auctex 2048-game)))
  '(safe-local-variable-values
    (quote
     ((major-mode . sh-mode)
@@ -255,10 +255,7 @@ Check out your .emacs."))
                             time)))))
  '(smart-tab-using-hippie-expand t)
  '(warning-suppress-types (quote ((undo discard-info))))
- '(yank-pop-change-selection t)
- '(package-selected-packages
-   (quote
-    (company xterm-color web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein color-theme cloc cider better-defaults auctex 2048-game))))
+ '(yank-pop-change-selection t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

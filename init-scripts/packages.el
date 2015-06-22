@@ -35,6 +35,7 @@
                       evil
                       flycheck
                       flycheck-package
+                      ggtags
                       go-mode
                       helm
                       helm-swoop
