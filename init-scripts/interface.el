@@ -272,28 +272,21 @@ lowercase, and Initial Caps versions."
 (visual-line-mode)
 
 
-;;; defadvice used here because even recent emacs (the default version for
-;;; ubuntu, for example) don't support advice-add yet (which is /so/ much
-;;; better). oh well.
-;;; advice used below because for some reason when using add-hook
-;;; generate-new-buffer-name doesn't respect its "ignore" argument
-;;; mark eshell buffers with their current directory
-(defadvice eshell (after eshell-set-pwd-name)
-  (rename-buffer
-   (generate-new-buffer-name (concat "eshell: " default-directory))))
-(ad-activate 'eshell)
 
-;;; resets name on every input send to every command, not just cd. the overhead
-;;; is negligible. the bigger issue is that if "exit" is used to quit eshell
-;;; instead of kill-buffer, the buffer switched to after eshell exits is renamed
-;;; as described below. this is fixed by the "when" statement.
-(defadvice eshell-send-input (after eshell-set-pwd-name-on-cd)
-  (when (eq major-mode 'eshell-mode)
-    (rename-buffer
-     (generate-new-buffer-name
-      (concat "eshell: " default-directory)
-      (buffer-name)))))
-(ad-activate 'eshell-send-input)
+(defvar mode-fun-regex "\\-mode\\'"
+  "Regex at the end of all modes.")
+
+(defun rename-shell-buffer (&optional my-mode)
+  (let ((mode (or my-mode major-mode)))
+    (when (eq major-mode mode)
+      (rename-buffer
+       (generate-new-buffer-name
+        (format "%s: %s"
+                (replace-regexp-in-string
+                 mode-fun-regex ""
+                 (symbol-name mode))
+                default-directory)
+        (buffer-name))))))
 
 ;;; output eshell buffers to file
 (when save-eshell-history
@@ -301,11 +294,6 @@ lowercase, and Initial Caps versions."
     "File containing all eshell I/O from all eshell buffers.")
   (add-hook 'eshell-pre-command-hook #'eshell-send-input-to-history)
   (add-hook 'eshell-post-command-hook #'eshell-send-output-to-history))
-
-;;; now let's do the same for shell-mode!
-(defun sh-power-ranger ()
-  (interactive)
-  (shell (generate-new-buffer (concat "shell: " default-directory))))
 
 (when save-shell-history
   (make-variable-buffer-local 'comint-input-filter-functions)
@@ -319,13 +307,63 @@ lowercase, and Initial Caps versions."
      (add-hook 'comint-output-filter-functions
                #'shell-send-output-to-history))))
 
-(defadvice comint-send-input (after shell-set-pwd-name-on-cd)
-  (when (eq major-mode 'shell-mode)
+;;; same for info and help
+(defun help-info-get-buffer-name (&optional my-mode)
+  (let ((mode (or my-mode major-mode)))
     (rename-buffer
      (generate-new-buffer-name
-      (concat "shell: " default-directory)
+      (let ((mode-str
+             (replace-regexp-in-string mode-fun-regex "" (symbol-name mode))))
+        (cond ((eq major-mode 'Info-mode)
+               (format "%s: %s->%s"
+                       mode-str
+                       (file-name-nondirectory Info-current-file)
+                       Info-current-node))
+              ((eq major-mode 'help-mode)
+               (format "%s: %s (%s)"
+                       mode-str
+                       (first help-xref-stack-item)
+                       (second help-xref-stack-item)))
+              (t (buffer-name))))
       (buffer-name)))))
-(ad-activate 'comint-send-input)
+
+(defmacro better-navigation (&rest args)
+  "ARGS are of form ((start-func change-func generate-buffer-name-func
+mode-name &optional advice-type advice-forms-as-list)). If you set 'around as
+advice-type, you should definitely change advice-forms-as-list to have ad-do-it
+at some point, or else the function will never fire."
+  `(progn
+     ,@(mapcar
+        (lambda (arg)
+          `(progn
+             ,(unless (null (first arg))
+                `(defadvice ,(first arg) (,(or (fifth arg) 'after)
+                                          ,(gensym) activate)
+                   ,(or (sixth arg)
+                        `(funcall ,(third arg) (quote ,(fourth arg))))))
+             ,(unless (null (second arg))
+                `(defadvice ,(second arg) (,(or (fifth arg) 'after)
+                                           ,(gensym) activate)
+                   ,(or (sixth arg)
+                        `(funcall ,(third arg) (quote ,(fourth arg))))))
+             (defun ,(intern (concat "cleanup-"
+                                     (replace-regexp-in-string
+                                      mode-fun-regex ""
+                                      (symbol-name (fourth arg)))
+                                     "-buffers")) ()
+               (interactive)
+               (loop for buf in (buffer-list)
+                     do (with-current-buffer buf
+                          (when (eq major-mode (quote ,(fourth arg)))
+                            (kill-buffer buf)))))))
+        args)))
+
+(better-navigation
+ (eshell eshell-send-input #'rename-shell-buffer eshell-mode)
+ (shell comint-send-input #'rename-shell-buffer shell-mode)
+ (info Info-goto-node #'help-info-get-buffer-name Info-mode)
+ (nil help-follow-symbol #'help-info-get-buffer-name help-mode))
+(add-hook 'help-mode-hook (lambda () (help-info-get-buffer-name 'help-mode)))
 
 
 ;;; save and reset window configuration to ring

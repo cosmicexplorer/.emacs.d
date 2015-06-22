@@ -97,9 +97,6 @@
 ;; smart-compile stuff!!!!
 (global-set-key (kbd "C-c C-k") 'smart-compile)
 
-;; translate stuff into hex (and back??)
-(global-set-key (kbd "C-x h") 'hexl-mode)
-
 ;;; w3m
 (when (executable-find "w3m")
   (define-key w3m-mode-map (kbd "C-<tab>") 'w3m-tab-next-buffer)
