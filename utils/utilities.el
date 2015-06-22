@@ -184,4 +184,9 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
 (defun or-fun (a b)
   (or a b))
 
+(defun trim-whitespace (str)
+  (replace-regexp-in-string
+   "[\s\r\n]+\\'" ""
+   (replace-regexp-in-string "\\`[\s\r\n]+" "" str)))
+
 (provide 'utilities)

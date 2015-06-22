@@ -61,6 +61,8 @@ session. Used later in this file.")
 (defvar save-eshell-history t
   "Whether or not to save eshell history to disk. Used in
 init-scripts/interface.el.")
+(defvar save-shell-history t
+  "Whether or not to save shell history to disk. Used in init-scripts/interface.el.")
 (defvar save-nonvisiting-files t
   "Whether or not to persist all buffers not visiting files to disk. Used in
 init-scripts/interface.el.")

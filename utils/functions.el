@@ -10,7 +10,8 @@
     (goto-char (point-max))
     (insert msg)
     (unless (bolp)
-      (newline))))
+      (newline)))
+  msg)
 
 ;;; helper function used for loading custom scripts littered throughout here
 (defun local-file-path (filename)
@@ -647,12 +648,83 @@ Note the weekly scope of the command's precision.")
                      (buffer-substring-no-properties
                       (marker-position eshell-last-input-end)
                       (marker-position eshell-last-output-start))))
-            (res (string-match "\n" str)))
-       (if res
-           str
-         (concat str "\n")))
+            (res (string-match-p "\n$" str)))
+       (if res str (concat str "\n")))
      nil eshell-user-output-file)
     (message "")))
+
+(defun mostly-whitespace-p (str)
+  (>
+   (/
+    (cl-count-if
+     (lambda (s) (string-match-p "[\s\r\n]" (char-to-string s)))
+     str)
+    (float (length str)))
+   0.8))
+
+(when save-shell-history
+  (defvar prev-shell-input "")
+  (make-variable-buffer-local 'prev-shell-input)
+  (defvar was-last-output nil)
+  (make-variable-buffer-local 'was-last-output)
+
+  (defun shell-send-input-to-history (str-to-send)
+    (append-to-file
+     (ansi-color-filter-apply
+      (let* ((str
+              (concat "\n" "--in--: " default-directory ": "
+                      (format-time-string current-date-time-format
+                                          (current-time))
+                      "\n"
+                      str-to-send))
+             (res (string-match-p "\n$" str)))
+        (if res str (concat str "\n"))))
+     nil shell-user-output-file)
+    (setq prev-shell-input str-to-send)
+    (setq was-last-output nil)
+    (message ""))
+
+  (defvar my-shell-prompt-pattern "^[^#%$>
+-]*[#$%>] *")
+
+  (defun shell-send-output-to-history (str-to-send)
+    (let ((extra-prompt-regexen
+           (list (concat ".\\{,4\\}"
+                         (regexp-quote (user-login-name))
+                         "@.*$")
+                 my-shell-prompt-pattern)))
+      (let ((treated-str
+             (trim-whitespace
+              (replace-regexp-in-string
+               "%[\s\r\n]*\\'"
+               ""
+               (replace-regexp-in-string
+                (concat
+                 "\\("
+                 (reduce (lambda (a b) (concat a "\\|" b))
+                         extra-prompt-regexen)
+                 "\\)")
+                ""
+                (replace-regexp-in-string
+                 (regexp-quote
+                  (trim-whitespace prev-shell-input))
+                 ""
+                 (ansi-color-filter-apply str-to-send))))))
+            (whitespace-regex "\\`[\s\r\n]*\\'")
+            (header-str (if was-last-output ""
+                          (concat "--out--: " default-directory ": "
+                                  (format-time-string current-date-time-format
+                                                      (current-time))
+                                  "\n"))))
+        (setq was-last-output t)
+        (unless (or (string-match-p whitespace-regex str-to-send)
+                    (string-match-p whitespace-regex treated-str))
+          (append-to-file
+           (concat header-str
+                   treated-str
+                   (if was-last-output "" "\n"))
+           nil shell-user-output-file)
+          (message ""))))))
 
 ;;; functions to save and reset window configuration to a list
 ;;; since i only use a single frame mostly the intricacies of multiple frames

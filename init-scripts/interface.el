@@ -307,6 +307,18 @@ lowercase, and Initial Caps versions."
   (interactive)
   (shell (generate-new-buffer (concat "shell: " default-directory))))
 
+(when save-shell-history
+  (make-variable-buffer-local 'comint-input-filter-functions)
+  (make-variable-buffer-local 'comint-output-filter-functions)
+  (defvar shell-user-output-file (concat init-home-folder-dir "shell-output"))
+  (add-hook
+   'shell-mode-hook
+   (lambda ()
+     (add-hook 'comint-input-filter-functions
+               #'shell-send-input-to-history)
+     (add-hook 'comint-output-filter-functions
+               #'shell-send-output-to-history))))
+
 (defadvice comint-send-input (after shell-set-pwd-name-on-cd)
   (when (eq major-mode 'shell-mode)
     (rename-buffer
