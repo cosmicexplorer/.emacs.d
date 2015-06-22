@@ -1484,4 +1484,25 @@ way I prefer, and regards `comment-padding', unlike the standard version."
       (let ((fun-symb (function-called-at-point)))
         (when fun-symb (find-function fun-symb))))))
 
+;;; http://stackoverflow.com/a/21047199/2518889
+(defun shelllike-filter (proc string)
+  (let* ((buffer (process-buffer proc))
+         (window (get-buffer-window buffer)))
+    (with-current-buffer buffer
+      (if (not (mark)) (push-mark))
+      (exchange-point-and-mark) ;Use the mark to represent the cursor location
+      (dolist (char (append string nil))
+    (cond ((char-equal char ?\r)
+           (move-beginning-of-line 1))
+          ((char-equal char ?\n)
+           (move-end-of-line 1) (newline))
+          (t
+           (if (/= (point) (point-max)) ;Overwrite character
+           (delete-char 1))
+           (insert char))))
+      (exchange-point-and-mark))
+    (if window
+      (with-selected-window window
+        (goto-char (point-max))))))
+
 (provide 'functions)
