@@ -363,7 +363,9 @@ at some point, or else the function will never fire."
  (shell comint-send-input #'rename-shell-buffer shell-mode)
  (info Info-goto-node #'help-info-get-buffer-name Info-mode)
  (nil help-follow-symbol #'help-info-get-buffer-name help-mode))
-(add-hook 'help-mode-hook (lambda () (help-info-get-buffer-name 'help-mode)))
+(add-hook 'help-mode-hook
+          (lambda ()
+            (help-info-get-buffer-name 'help-mode)))
 
 
 ;;; save and reset window configuration to ring
