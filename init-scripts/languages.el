@@ -39,75 +39,95 @@
                                 (highlight-80+-mode -1)))
 
 ;;; perl
+(require 'cperl-mode)
 (fset 'perl-mode 'cperl-mode)
 (setq cperl-indent-level 2)
 
+;;; yes, this perl re.pl business is a massive hack. i claim none of it would be
+;;; required if re.pl wasn't also a massive hack (who doesn't put newlines after
+;;; their own repl's output????)
 (defun perl-repl-get-real-str ()
   (buffer-substring-no-properties
    comint-last-output-start
    (process-mark (get-buffer-process (current-buffer)))))
 
+;;; fixes 'print "hey"'
 (defun perl-repl-fix-both-early-and-late-insertions (str)
   (goto-char (point-max))
   ;; the noerror argument shouldn't matter, but provided anyway
-  (re-search-backward (regexp-quote perl-repl-prompt) nil t)
-  (let ((inhibit-read-only t))
-    (when (and (> (point) comint-last-output-start)
-               (not (char-equal (char-before) (str2char "\n"))))
-      (insert "\n")
-      (delete-region (point) (+ (point) (length perl-repl-prompt)))
-      (goto-char (1- (process-mark (get-buffer-process (current-buffer)))))
-      (let ((next-char (char-after))
-            (insert-string (concat "\n" perl-repl-prompt)))
-        (insert insert-string)
+  (let ((real-str (perl-repl-get-real-str))
+        (inhibit-read-only t))
+    (when (string-match-p
+           (concat (regexp-quote perl-repl-prompt) ".+\\'") real-str)
+      (backward-char (length real-str))
+      (re-search-forward (regexp-quote perl-repl-prompt))
+      (delete-region (- (point) (length perl-repl-prompt)) (point))
+      (newline)
+      (goto-char (1- (point-max)))
+      (let ((prev-final-char (char-after)))
+        (insert perl-repl-prompt)
         (delete-char 1)
-        (backward-char (length insert-string))
-        (insert (char-to-string next-char)))))
+        (backward-char (length perl-repl-prompt))
+        (insert prev-final-char)
+        (newline))))
   (goto-char (point-max)))
 
+;;; fixes 'foreach ((1, 2, 3)) { print "$_ hey " }'
 (defun perl-repl-fix-late-insertions (str)
-  (let ((real-str (perl-repl-get-real-str)))
-    (when (and (string-match-p (concat "\\`" (regexp-quote perl-repl-prompt))
-                               real-str)
-               (not (string-equal str ""))
-               (not (string-equal str perl-repl-prompt)))
-      (let ((inhibit-read-only t))
-        (backward-char (length real-str))
-        (insert (buffer-substring-no-properties
-                 (+ (point) (length perl-repl-prompt))
-                 (point-max)))
-        (forward-char (length perl-repl-prompt))
-        (delete-region (point) (point-max))
-        (goto-char (point-max))))))
+  (ignore-errors
+    (goto-char (point-max))
+    (let ((real-str (perl-repl-get-real-str)))
+      (when (and (or (string-match-p (concat "\\`"
+                                             (regexp-quote perl-repl-prompt))
+                                     real-str)
+                     (not (string-match-p (regexp-quote perl-repl-prompt)
+                                          real-str)))
+                 (not (string-match-p "Welcome to the perl re\\.pl!" real-str)))
+        (let ((inhibit-read-only t))
+          (backward-char (length real-str))
+          (when (< (+ (point) (length perl-repl-prompt)) (point-max))
+            (insert (buffer-substring-no-properties
+                     (+ (point) (length perl-repl-prompt))
+                     (point-max))))
+          (forward-char (length perl-repl-prompt))
+          (delete-region (point) (point-max))
+          (goto-char (point-max)))))))
 
+;;; fixes '2 + 2'
 (defun perl-repl-fix-early-insertions (str)
+  (goto-char (point-max))
   (let ((real-str (perl-repl-get-real-str)))
     (backward-char (length perl-repl-prompt))
     (when (and (string-equal
                 (buffer-substring-no-properties (point) (point-max))
                 perl-repl-prompt)
-               (not (string-equal real-str perl-repl-prompt)))
-      (while (char-equal (char-before) (str2char "\n"))
-        (delete-char -1))
-      (insert "\n"))
+               (not (char-equal (char-before) (str2char "\n"))))
+      (newline))
     (goto-char (point-max))))
+
+(defun perl-repl-trim-leading-whitespace (str)
+  (let ((real-str (perl-repl-get-real-str)))
+    (when (string-match-p (regexp-quote perl-repl-prompt) real-str)
+      (goto-char (- (point) (length real-str)))
+      (while (string-match-p "[\s\r\n]" (char-to-string (char-after)))
+        (delete-char 1))
+      (goto-char (point-max)))))
 
 (defvar perl-repl-prompt "$ ")
 
 (defvar perl-repl-prompt-regexp (concat "^" (regexp-quote perl-repl-prompt)))
 
-(defvar perl-repl-output-filter-functions
+(setq perl-repl-output-filter-functions
       '(perl-repl-fix-both-early-and-late-insertions
         perl-repl-fix-late-insertions
         perl-repl-fix-early-insertions
+        perl-repl-trim-leading-whitespace
         ansi-color-process-output
         comint-postoutput-scroll-to-bottom
         comint-watch-for-password-prompt))
 
 (define-derived-mode perl-repl-mode comint-mode "re.pl"
-  "Docs
-
-\\<cperl-mode-map>"
+  "\\<cperl-mode-map>"
   :syntax-table cperl-mode-syntax-table
   (save-excursion
     (hi-lock-mode 1)

@@ -5,13 +5,14 @@
 (require 'cc-mode)
 (require 'csharp-mode)
 
-(defun send-message-to-scratch (msg)
-  (with-current-buffer (get-buffer-create "*scratch*")
-    (goto-char (point-max))
-    (insert msg)
-    (unless (bolp)
-      (newline)))
-  msg)
+(defun send-message-to-scratch (&rest msg-args)
+  (let ((str (apply #'concat msg-args)))
+    (with-current-buffer (get-buffer-create "*scratch*")
+      (goto-char (point-max))
+      (insert str)
+      (unless (bolp)
+        (newline)))
+    str))
 
 ;;; helper function used for loading custom scripts littered throughout here
 (defun local-file-path (filename)
