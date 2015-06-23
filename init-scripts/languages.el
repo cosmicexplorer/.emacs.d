@@ -171,9 +171,6 @@
      c++-mode-map
      java-mode-map)))
 
-(setq-local hippie-expand-try-functions-list
-            (cons 'ggtags-try-complete-tag hippie-expand-try-functions-list))
-
 (make-variable-buffer-local 'comment-region-function)
 (make-variable-buffer-local 'comment-insert-comment-function)
 (defun add-star-comment-region ()

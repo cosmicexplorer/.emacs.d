@@ -151,23 +151,20 @@ Toggles between: lowercase->ALL CAPS->Initial Caps->(cycle)."
            (reg (buffer-substring-no-properties beg end))
            (case-fold-search nil))
       (cond
-       ((not (string-match "[A-Z]" reg))
-        ;; if no uppercase (all lowercase)
-        ;; -> ALL CAPS
+       ((not (string-match-p "[a-z]" reg))
+        ;; if no lowercase (all uppercase)
+        ;; -> lowercase
         (loop
-         ;; not sure why the 1- is required
-         ;; i think it's some silly intricacy of emacs region selection
          for pt from 0 upto (1- (- end beg))
          with next-char = 0
          do (progn
               (setq next-char (aref reg pt))
-              (when (lowercasep next-char)
+              (when (uppercasep next-char)
                 (goto-char (+ beg pt))
-                ;; delete, then insert; net zero change
                 (delete-char 1)
-                (insert-char (upcase next-char) 1 t)))))
-       ((not (string-match "[a-z]" reg))
-        ;; if no lowercase (all uppercase)
+                (insert-char (downcase next-char) 1 t)))))
+       ((not (string-match-p "[A-Z]" reg))
+        ;; if no uppercase (all lowercase)
         ;; -> Initial Caps
         (let ((before-first-char (char-before beg))
               (first-char (char-after beg)))
@@ -194,16 +191,19 @@ Toggles between: lowercase->ALL CAPS->Initial Caps->(cycle)."
                      (insert-char (downcase next-char) 1 t))))))
        (t
         ;; if mixture of upper/lowercase, "assume" Init Caps
-        ;; -> lowercase
+        ;; -> ALL CAPS
         (loop
+         ;; not sure why the 1- is required
+         ;; i think it's some silly intricacy of emacs region selection
          for pt from 0 upto (1- (- end beg))
          with next-char = 0
          do (progn
               (setq next-char (aref reg pt))
-              (when (uppercasep next-char)
+              (when (lowercasep next-char)
                 (goto-char (+ beg pt))
+                ;; delete, then insert; net zero change
                 (delete-char 1)
-                (insert-char (downcase next-char) 1 t))))))
+                (insert-char (upcase next-char) 1 t))))))
       (goto-char orig-pt)
       (set-mark end))))
 
@@ -1517,5 +1517,27 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (when (null (mark t)) (ding))
     (setq mark-ring (nbutlast mark-ring))
     (goto-char (marker-position (car (last mark-ring))))))
+
+(eval-after-load 'helm
+  '(defun cleanup-helm-buffers ()
+     (interactive)
+     (loop for buf in (buffer-list)
+           do (with-current-buffer buf
+                (when (string-match-p "^\\*[hH]elm[\s\\-]" (buffer-name))
+                  (kill-buffer))))))
+(eval-after-load 'magit
+  '(defun cleanup-magit-buffers ()
+     (interactive)
+     (loop for buf in (buffer-list)
+           do (with-current-buffer buf
+                (when (string-match-p "^magit\\-" (symbol-name major-mode))
+                  (kill-buffer))))))
+(eval-after-load 'dired
+  '(defun cleanup-dired-buffers ()
+     (interactive)
+     (loop for buf in (buffer-list)
+           do (with-current-buffer buf
+                (when (eq major-mode 'dired-mode)
+                  (kill-buffer))))))
 
 (provide 'functions)

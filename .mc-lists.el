@@ -7,6 +7,7 @@
         camel-case-right-word
         coffee-dedent-line-backspace
         paredit-backspace-delete-highlight
+        paredit-forward
         ))
 
 (setq mc/cmds-to-run-once
