@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 ;;; some of these are mine, some are heavily adapted from emacswiki, some are
 ;;; copy/paste from emacswiki
 
@@ -717,14 +719,13 @@ Note the weekly scope of the command's precision.")
                                   (format-time-string current-date-time-format
                                                       (current-time))
                                   "\n"))))
-        (setq was-last-output t)
         (unless (or (string-match-p whitespace-regex str-to-send)
                     (string-match-p whitespace-regex treated-str))
           (append-to-file
            (concat header-str
-                   treated-str
-                   (if was-last-output "" "\n"))
+                   treated-str)
            nil shell-user-output-file)
+          (setq was-last-output t)
           (message ""))))))
 
 ;;; functions to save and reset window configuration to a list
@@ -1504,5 +1505,17 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (if window
       (with-selected-window window
         (goto-char (point-max))))))
+
+;;; mark stuff
+;;; http://stackoverflow.com/a/14539202/2518889
+(defun unpop-to-mark-command ()
+  "Unpop off mark ring. Does nothing if mark ring is empty."
+  (interactive)
+  (when mark-ring
+    (setq mark-ring (cons (copy-marker (mark-marker)) mark-ring))
+    (set-marker (mark-marker) (car (last mark-ring)) (current-buffer))
+    (when (null (mark t)) (ding))
+    (setq mark-ring (nbutlast mark-ring))
+    (goto-char (marker-position (car (last mark-ring))))))
 
 (provide 'functions)

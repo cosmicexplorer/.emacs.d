@@ -29,6 +29,7 @@
                       company
                       csharp-mode
                       dash
+                      ecb
                       ein
                       epl
                       espuds
@@ -38,6 +39,7 @@
                       ggtags
                       go-mode
                       helm
+                      helm-gtags
                       helm-swoop
                       js2-mode
                       less-css-mode
