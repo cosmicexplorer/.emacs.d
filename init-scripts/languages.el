@@ -174,22 +174,6 @@
 (setq-local hippie-expand-try-functions-list
             (cons 'ggtags-try-complete-tag hippie-expand-try-functions-list))
 
-(eval-after-load 'ggtags
-  '(progn
-     (add-hook 'c-mode-hook #'ggtags-mode)
-     (add-hook 'c++-mode-hook #'ggtags-mode)
-     (add-hook 'java-mode-hook #'ggtags-mode)
-     (add-hook 'asm-mode-hook #'ggtags-mode)))
-
-(eval-after-load 'helm-gtags
-  '(progn
-     (add-hook 'c-mode-hook 'helm-gtags-mode)
-     (add-hook 'c++-mode-hook 'helm-gtags-mode)
-     (add-hook 'asm-mode-hook 'helm-gtags-mode)
-     (add-hook 'java-mode-hook #'helm-gtags-mode)))
-
-(setq-local eldoc-documentation-function #'ggtags-eldoc-function)
-
 (make-variable-buffer-local 'comment-region-function)
 (make-variable-buffer-local 'comment-insert-comment-function)
 (defun add-star-comment-region ()
