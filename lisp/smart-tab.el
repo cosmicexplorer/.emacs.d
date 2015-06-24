@@ -131,8 +131,9 @@ the text at point."
   (if smart-tab-debug
       (message "default"))
   (if (use-region-p)
-      (cond ((or (eq major-mode 'c-mode)
-                 (eq major-mode 'c++-mode))
+      (cond ((and (or (eq major-mode 'c-mode)
+                      (eq major-mode 'c++-mode))
+                  (executable-find "clang-format"))
              (clang-format-buffer))
             ((eq major-mode 'js2-mode)
              (web-beautify-js))
@@ -145,8 +146,9 @@ the text at point."
             (t
              (indent-region (region-beginning)
                             (region-end))))
-    (cond ((or (eq major-mode 'c-mode)
-               (eq major-mode 'c++-mode))
+    (cond ((and (or (eq major-mode 'c-mode)
+                    (eq major-mode 'c++-mode))
+                (executable-find "clang-format"))
            (clang-format-buffer))
           ((eq major-mode 'js2-mode)
            ;; (if (is-buffer-beautifiable (buffer-file-name))
