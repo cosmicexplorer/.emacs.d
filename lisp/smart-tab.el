@@ -133,7 +133,9 @@ the text at point."
   (if (use-region-p)
       (cond ((and (or (eq major-mode 'c-mode)
                       (eq major-mode 'c++-mode))
-                  (executable-find "clang-format"))
+                  (or (executable-find "clang-format")
+                      (not
+                       (message "clang-format not found"))))
              (clang-format-buffer))
             ((eq major-mode 'js2-mode)
              (web-beautify-js))
@@ -148,7 +150,9 @@ the text at point."
                             (region-end))))
     (cond ((and (or (eq major-mode 'c-mode)
                     (eq major-mode 'c++-mode))
-                (executable-find "clang-format"))
+                (or (executable-find "clang-format")
+                    (not
+                     (message "clang-format not found"))))
            (clang-format-buffer))
           ((eq major-mode 'js2-mode)
            ;; (if (is-buffer-beautifiable (buffer-file-name))
