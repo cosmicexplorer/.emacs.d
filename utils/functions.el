@@ -1043,6 +1043,7 @@ also affects negative line numbers, even though it says it doesn't."
 			   (number-to-string diff)))
 	 (face (if current-p 'linum-relative-current-face 'linum)))
     (propertize (format linum-relative-format current-symbol) 'face face)))
+
 (defun get-linum-relative-symbol ()
   "Makes the string `linum-relative' uses to point to the current line any one
 of `linum-relative-symbols' from calling `sxhash' on the result of
@@ -1052,45 +1053,6 @@ of `linum-relative-symbols' from calling `sxhash' on the result of
         (let ((index
                (mod (sxhash (buffer-name)) (length linum-relative-symbols))))
           (substring linum-relative-symbols index (1+ index)))))
-
-;;; commenting is dumb
-;; (defun insert-string-before-each-line-in-range
-;;     (str beg end &optional trim-whitespace)
-;;   "Inserts STR at beginning of each line in range denoted by BEG and END. If
-;; range doesn't begin at the beginning of the line, then the first line in the
-;; range is not marked. Cuts off whitespace from the ends of lines if
-;; TRIM-WHITESPACE is non-nil."
-;;   (let ((orig-pos (point)))
-;;     (goto-char beg)
-;;     (loop with num-insertions-before-point = 0
-;;           with total-insertion-length = 0
-;;           and cur-end = end
-;;           and str-length = (length str)
-;;           while (< (point) cur-end)
-;;           do (progn
-;;                (when (bolp)
-;;                  (when (<= (point) orig-pos)
-;;                    (incf num-insertions-before-point str-length))
-;;                  (insert str)
-;;                  (incf cur-end str-length)
-;;                  (incf total-insertion-length str-length)
-;;                  (when trim-whitespace
-;;                    (let ((prev-pt (point)))
-;;                      (loop while
-;;                            (and (whitespacep (char-after))
-;;                                 (not (char-equal (char-after) (str2char "\n"))))
-;;                            do (forward-char))
-;;                      (decf total-insertion-length (- (point) prev-pt))
-;;                      (decf cur-end (- (point) prev-pt))
-;;                      (delete-region prev-pt (point))
-;;                      (goto-char prev-pt))
-;;                    ;; super inefficient lol
-;;                    (nuke-trailing-whitespace)))
-;;                (forward-char))
-;;           finally (progn
-;;                     (goto-char (+ orig-pos num-insertions-before-point))
-;;                     (throw t)
-;;                     (return total-insertion-length)))))
 
 (defun insert-string-before-each-line-in-range
     (str beg end &optional trim-whitespace)
@@ -1141,7 +1103,7 @@ nor 'right is given as an argument, assumes right."
                            (and (not (eq left-or-right 'left))
                                 (eolp)))
                    (setq was-final-char t))
-                 (if (eq left-or-right 'left) (backward-char)
+                 (if (eq left-or-right 'left) (or (bobp) (backward-char))
                    (forward-char)))
             finally
             (return final-text-char)))))
