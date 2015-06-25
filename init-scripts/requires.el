@@ -42,6 +42,7 @@
 (require 'omnisharp)
 (require 'ggtags)
 (require 'helm-gtags)
+(require 'ecb)
 
 ;;; my stuff
 (require 'utilities)
