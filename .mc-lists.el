@@ -6,6 +6,7 @@
       '(
         camel-case-right-word
         coffee-dedent-line-backspace
+        smart-tab
         ))
 
 (setq mc/cmds-to-run-once
