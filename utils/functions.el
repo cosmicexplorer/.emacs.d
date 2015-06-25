@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 ;;; some of these are mine, some are heavily adapted from emacswiki, some are
 ;;; copy/paste from emacswiki
 
@@ -149,23 +151,20 @@ Toggles between: lowercase->ALL CAPS->Initial Caps->(cycle)."
            (reg (buffer-substring-no-properties beg end))
            (case-fold-search nil))
       (cond
-       ((not (string-match "[A-Z]" reg))
-        ;; if no uppercase (all lowercase)
-        ;; -> ALL CAPS
+       ((not (string-match-p "[a-z]" reg))
+        ;; if no lowercase (all uppercase)
+        ;; -> lowercase
         (loop
-         ;; not sure why the 1- is required
-         ;; i think it's some silly intricacy of emacs region selection
          for pt from 0 upto (1- (- end beg))
          with next-char = 0
          do (progn
               (setq next-char (aref reg pt))
-              (when (lowercasep next-char)
+              (when (uppercasep next-char)
                 (goto-char (+ beg pt))
-                ;; delete, then insert; net zero change
                 (delete-char 1)
-                (insert-char (upcase next-char) 1 t)))))
-       ((not (string-match "[a-z]" reg))
-        ;; if no lowercase (all uppercase)
+                (insert-char (downcase next-char) 1 t)))))
+       ((not (string-match-p "[A-Z]" reg))
+        ;; if no uppercase (all lowercase)
         ;; -> Initial Caps
         (let ((before-first-char (char-before beg))
               (first-char (char-after beg)))
@@ -192,16 +191,19 @@ Toggles between: lowercase->ALL CAPS->Initial Caps->(cycle)."
                      (insert-char (downcase next-char) 1 t))))))
        (t
         ;; if mixture of upper/lowercase, "assume" Init Caps
-        ;; -> lowercase
+        ;; -> ALL CAPS
         (loop
+         ;; not sure why the 1- is required
+         ;; i think it's some silly intricacy of emacs region selection
          for pt from 0 upto (1- (- end beg))
          with next-char = 0
          do (progn
               (setq next-char (aref reg pt))
-              (when (uppercasep next-char)
+              (when (lowercasep next-char)
                 (goto-char (+ beg pt))
+                ;; delete, then insert; net zero change
                 (delete-char 1)
-                (insert-char (downcase next-char) 1 t))))))
+                (insert-char (upcase next-char) 1 t))))))
       (goto-char orig-pt)
       (set-mark end))))
 
@@ -717,14 +719,13 @@ Note the weekly scope of the command's precision.")
                                   (format-time-string current-date-time-format
                                                       (current-time))
                                   "\n"))))
-        (setq was-last-output t)
         (unless (or (string-match-p whitespace-regex str-to-send)
                     (string-match-p whitespace-regex treated-str))
           (append-to-file
            (concat header-str
-                   treated-str
-                   (if was-last-output "" "\n"))
+                   treated-str)
            nil shell-user-output-file)
+          (setq was-last-output t)
           (message ""))))))
 
 ;;; functions to save and reset window configuration to a list
@@ -1042,6 +1043,7 @@ also affects negative line numbers, even though it says it doesn't."
 			   (number-to-string diff)))
 	 (face (if current-p 'linum-relative-current-face 'linum)))
     (propertize (format linum-relative-format current-symbol) 'face face)))
+
 (defun get-linum-relative-symbol ()
   "Makes the string `linum-relative' uses to point to the current line any one
 of `linum-relative-symbols' from calling `sxhash' on the result of
@@ -1051,45 +1053,6 @@ of `linum-relative-symbols' from calling `sxhash' on the result of
         (let ((index
                (mod (sxhash (buffer-name)) (length linum-relative-symbols))))
           (substring linum-relative-symbols index (1+ index)))))
-
-;;; commenting is dumb
-;; (defun insert-string-before-each-line-in-range
-;;     (str beg end &optional trim-whitespace)
-;;   "Inserts STR at beginning of each line in range denoted by BEG and END. If
-;; range doesn't begin at the beginning of the line, then the first line in the
-;; range is not marked. Cuts off whitespace from the ends of lines if
-;; TRIM-WHITESPACE is non-nil."
-;;   (let ((orig-pos (point)))
-;;     (goto-char beg)
-;;     (loop with num-insertions-before-point = 0
-;;           with total-insertion-length = 0
-;;           and cur-end = end
-;;           and str-length = (length str)
-;;           while (< (point) cur-end)
-;;           do (progn
-;;                (when (bolp)
-;;                  (when (<= (point) orig-pos)
-;;                    (incf num-insertions-before-point str-length))
-;;                  (insert str)
-;;                  (incf cur-end str-length)
-;;                  (incf total-insertion-length str-length)
-;;                  (when trim-whitespace
-;;                    (let ((prev-pt (point)))
-;;                      (loop while
-;;                            (and (whitespacep (char-after))
-;;                                 (not (char-equal (char-after) (str2char "\n"))))
-;;                            do (forward-char))
-;;                      (decf total-insertion-length (- (point) prev-pt))
-;;                      (decf cur-end (- (point) prev-pt))
-;;                      (delete-region prev-pt (point))
-;;                      (goto-char prev-pt))
-;;                    ;; super inefficient lol
-;;                    (nuke-trailing-whitespace)))
-;;                (forward-char))
-;;           finally (progn
-;;                     (goto-char (+ orig-pos num-insertions-before-point))
-;;                     (throw t)
-;;                     (return total-insertion-length)))))
 
 (defun insert-string-before-each-line-in-range
     (str beg end &optional trim-whitespace)
@@ -1140,7 +1103,7 @@ nor 'right is given as an argument, assumes right."
                            (and (not (eq left-or-right 'left))
                                 (eolp)))
                    (setq was-final-char t))
-                 (if (eq left-or-right 'left) (backward-char)
+                 (if (eq left-or-right 'left) (or (bobp) (backward-char))
                    (forward-char)))
             finally
             (return final-text-char)))))
@@ -1504,5 +1467,39 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (if window
       (with-selected-window window
         (goto-char (point-max))))))
+
+;;; mark stuff
+;;; http://stackoverflow.com/a/14539202/2518889
+(defun unpop-to-mark-command ()
+  "Unpop off mark ring. Does nothing if mark ring is empty."
+  (interactive)
+  (when mark-ring
+    (setq mark-ring (cons (copy-marker (mark-marker)) mark-ring))
+    (set-marker (mark-marker) (car (last mark-ring)) (current-buffer))
+    (when (null (mark t)) (ding))
+    (setq mark-ring (nbutlast mark-ring))
+    (goto-char (marker-position (car (last mark-ring))))))
+
+(eval-after-load 'helm
+  '(defun cleanup-helm-buffers ()
+     (interactive)
+     (loop for buf in (buffer-list)
+           do (with-current-buffer buf
+                (when (string-match-p "^\\*[hH]elm[\s\\-]" (buffer-name))
+                  (kill-buffer))))))
+(eval-after-load 'magit
+  '(defun cleanup-magit-buffers ()
+     (interactive)
+     (loop for buf in (buffer-list)
+           do (with-current-buffer buf
+                (when (string-match-p "^magit\\-" (symbol-name major-mode))
+                  (kill-buffer))))))
+(eval-after-load 'dired
+  '(defun cleanup-dired-buffers ()
+     (interactive)
+     (loop for buf in (buffer-list)
+           do (with-current-buffer buf
+                (when (eq major-mode 'dired-mode)
+                  (kill-buffer))))))
 
 (provide 'functions)

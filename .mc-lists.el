@@ -6,6 +6,8 @@
       '(
         camel-case-right-word
         coffee-dedent-line-backspace
+        paredit-backspace-delete-highlight
+        paredit-forward
         smart-tab
         ))
 

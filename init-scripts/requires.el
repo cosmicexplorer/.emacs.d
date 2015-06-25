@@ -40,6 +40,8 @@
 (require 'erc-nicklist)                 ; this file is in /lisp/
 (require 'erc-highlight-nicknames)      ; this file is in /lisp/
 (require 'omnisharp)
+(require 'ggtags)
+(require 'helm-gtags)
 
 ;;; my stuff
 (require 'utilities)

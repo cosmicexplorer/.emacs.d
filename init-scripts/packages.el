@@ -29,14 +29,17 @@
                       company
                       csharp-mode
                       dash
+                      ecb
                       ein
                       epl
                       espuds
                       evil
                       flycheck
                       flycheck-package
+                      ggtags
                       go-mode
                       helm
+                      helm-gtags
                       helm-swoop
                       js2-mode
                       less-css-mode

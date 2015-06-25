@@ -1,3 +1,5 @@
+;;; -*- lexical-binding: t -*-
+
 ;;; setup done for large packages which need a kick in the pants to get going
 
 ;;; ein
@@ -80,9 +82,9 @@
          ("json" (filename . "\\.json\\'"))
          ("gyp" (filename . "\\.gyp\\'"))
          ("javascript" (mode . js2-mode))
-         ("emacs-config" (or (filename . ".emacs.d")
+         ("emacs-config" (or (filename . "\\.emacs\\.d")
                              (filename . "emacs-config")
-                             (filename . ".emacs")
+                             (filename . "\\.emacs")
                              (filename . ,user-init-file)))
          ("doc-view" (mode . doc-view-mode))
          ("web" (or (mode . html-mode)
@@ -201,3 +203,9 @@
 
 ;;; company
 (add-hook 'after-load-init-hook #'global-company-mode)
+
+;;; ggtags is dumb lol
+(defadvice ggtags-find-tag-dwim (before advice-ggtags-set-mark activate)
+  (push-mark))
+(defadvice ggtags-find-definition (before advice-ggtags-set-more-mark activate)
+  (push-mark))
