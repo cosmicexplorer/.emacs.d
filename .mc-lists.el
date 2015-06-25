@@ -8,6 +8,7 @@
         coffee-dedent-line-backspace
         paredit-backspace-delete-highlight
         paredit-forward
+        paredit-forward-delete
         smart-tab
         ))
 
