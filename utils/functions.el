@@ -1502,4 +1502,10 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                 (when (eq major-mode 'dired-mode)
                   (kill-buffer))))))
 
+(defun magit-kill-commit-buffer-no-query ()
+  (interactive)
+  (setq kill-buffer-query-functions
+        (remove 'git-commit-kill-buffer-noop kill-buffer-query-functions))
+  (kill-this-buffer))
+
 (provide 'functions)

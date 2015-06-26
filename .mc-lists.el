@@ -4,13 +4,23 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        camel-case-left-word
         camel-case-right-word
         coffee-dedent-line-backspace
+        end-of-visual-line
+        ido-find-file
+        isearch-abort
+        isearch-delete-char
+        isearch-forward-regexp
+        isearch-printing-char
+        isearch-repeat-backward
         paredit-backspace-delete-highlight
         paredit-forward
         smart-tab
+        transpose-words
         ))
 
 (setq mc/cmds-to-run-once
       '(
+        isearch-delete-char
         ))
