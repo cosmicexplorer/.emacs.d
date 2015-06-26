@@ -18,6 +18,7 @@
         paredit-forward
         smart-tab
         transpose-words
+        paredit-forward-delete
         ))
 
 (setq mc/cmds-to-run-once
