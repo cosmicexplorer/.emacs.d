@@ -1508,4 +1508,10 @@ way I prefer, and regards `comment-padding', unlike the standard version."
         (remove 'git-commit-kill-buffer-noop kill-buffer-query-functions))
   (kill-this-buffer))
 
+(defun eval-buffer-and-message (prefix-given)
+  (interactive "P")
+  (eval-buffer)
+  (unless prefix-given
+    (message "%s %s" "evaluated" (buffer-name))))
+
 (provide 'functions)

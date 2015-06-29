@@ -192,8 +192,10 @@ Check out your .emacs."))
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(TeX-engine (quote luatex))
  '(asm-comment-char 35)
  '(cloc-use-3rd-gen t)
+ '(coffee-args-compile (quote ("-c" "-b" "--no-header")))
  '(coffee-tab-width 2)
  '(dabbrev-case-replace nil)
  '(ecb-options-version "2.40")
@@ -218,12 +220,14 @@ Check out your .emacs."))
  '(erc-stamp-mode t)
  '(erc-track-minor-mode t)
  '(erc-track-mode t)
- '(erc-track-position-in-mode-line nil)
  '(fill-column 80)
  '(grep-command (concat "\"" init-home-folder-dir "switch-grep.sh\" "))
  '(grep-highlight-matches (quote auto))
  '(grep-use-null-device nil)
  '(gud-key-prefix "")
+ '(hippie-expand-try-functions-list
+   (quote
+    (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)))
  '(initial-buffer-choice t)
  '(linum-relative-plusp-offset 1)
  '(nxml-slash-auto-complete-flag t)
@@ -234,19 +238,9 @@ Check out your .emacs."))
  '(org-from-is-user-regexp nil)
  '(org-startup-folded "showeverything")
  '(org-support-shift-select (quote always))
- '(smart-tab-using-hippie-expand t)
- '(TeX-engine (quote luatex))
- '(warning-suppress-types (quote ((undo discard-info))))
- '(yank-pop-change-selection t)
-
- '(hippie-expand-try-functions-list
+ '(package-selected-packages
    (quote
-    (try-complete-file-name-partially try-complete-file-name
-                                      try-expand-all-abbrevs try-expand-dabbrev
-                                      try-expand-dabbrev-all-buffers
-                                      try-expand-dabbrev-from-kill
-                                      try-complete-lisp-symbol-partially
-                                      try-complete-lisp-symbol)))
+    (helm-gtags ggtags ecb xterm-color web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
  '(safe-local-variable-values
    (quote
     ((major-mode . sh-mode)
@@ -260,7 +254,9 @@ Check out your .emacs."))
                                                       (current-time)))
                             (set-time-zone-rule tz)
                             time)))))
- '(package-selected-packages (quote (helm-gtags ggtags ecb xterm-color web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game))))
+ '(smart-tab-using-hippie-expand t)
+ '(warning-suppress-types (quote ((undo discard-info))))
+ '(yank-pop-change-selection t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

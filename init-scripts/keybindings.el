@@ -251,3 +251,9 @@
 (global-set-key (kbd "C-x M-h") #'unpop-to-mark-command)
 (global-set-key (kbd "C-x C-p") #'previous-buffer)
 (global-set-key (kbd "C-x M-p") #'next-buffer)
+
+;;; more emacs lisp stuff
+(define-key emacs-lisp-mode-map (kbd "C-M-x") #'eval-buffer-and-message)
+
+;;; erc stuff
+(global-set-key (kbd "C-c M-e") #'message-erc-modded-chans)

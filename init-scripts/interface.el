@@ -376,7 +376,8 @@ at some point, or else the function will never fire."
 ;;; do ssh-agent stuff
 (defun setup-ssh-agent ()
   (interactive)
-  (when (eq system-type 'gnu/linux)
+  (when (and (eq system-type 'gnu/linux)
+             (not (getenv "SSH_AUTH_SOCK")))
     (if id-rsa-path
         (when (and (executable-find "ssh-agent")
                    (executable-find "ssh-add"))
@@ -441,29 +442,47 @@ Check out your .emacs.\n")))))
         do (with-current-buffer buf
              (when (eq major-mode 'erc-mode)
                (kill-this-buffer)))))
-(defun message-erc-modded-chans ()
-  (interactive)
-  (message "%s" erc-modified-channels-object))
+(defun create-erc-modded-chans-string (erc-modded-chans-alist)
+  (concat
+   "["
+   (reduce
+    (lambda (a b) (concat a " " b))
+    (remove-if
+     #'null
+     (mapcar
+      (lambda (el)
+        (let ((face (if (listp (nthcdr 2 el)) (fourth el) (nthcdr 2 el))))
+          (and (buffer-name (first el)) face
+               (propertize (buffer-name (first el)) 'face face))))
+      erc-modded-chans-alist)))
+   "]"))
+(defun message-erc-modded-chans (prefix-given)
+  (interactive "P")
+  (message
+   "%s"
+   (if prefix-given erc-modified-channels-object
+     (create-erc-modded-chans-string erc-modified-channels-alist))))
 (defun message-erc-modded-chans-when-erc-mode ()
   (when (eq major-mode 'erc-mode)
-    (message-erc-modded-chans)))
+    (message-erc-modded-chans nil)))
 ;;; update me with irc activity, but only if i'm in an erc buffer
-(defadvice erc-server-filter-function (after update-erc-status-on-erc-bufs)
+(defadvice erc-server-filter-function
+    (after update-erc-status-on-erc-bufs activate)
+  (setq mode-line-modes
+        (remove '(t erc-modified-channels-object) mode-line-modes))
   (message-erc-modded-chans-when-erc-mode))
-(ad-activate 'erc-server-filter-function)
 ;;; update me with activity when i switch to an erc buffer
-(defadvice switch-to-buffer (after update-erc-status-on-switch-to-erc-buf)
+(defadvice switch-to-buffer
+    (after update-erc-status-on-switch-to-erc-buf activate)
   (message-erc-modded-chans-when-erc-mode))
-(ad-activate 'switch-to-buffer)
-(defadvice windmove-do-window-select (after update-erc-status-on-windmove)
+(defadvice windmove-do-window-select
+    (after update-erc-status-on-windmove activate)
   (message-erc-modded-chans-when-erc-mode))
-(ad-activate 'windmove-do-window-select)
 ;;; don't open up windows randomly!!!!
-(defadvice erc-cmd-JOIN (around erc-bufs-do-not-explode)
+(defadvice erc-cmd-JOIN (around erc-bufs-do-not-explode activate)
   (let ((prev-win-conf (current-window-configuration)))
     ad-do-it
     (set-window-configuration prev-win-conf)))
-(ad-activate 'erc-cmd-JOIN)
 
 ;;; save visited files to buffer
 (when save-visited-files
