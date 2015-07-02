@@ -235,10 +235,11 @@ Check out your .emacs."))
  '(nxml-slash-auto-complete-flag t)
  '(org-agenda-files nil)
  '(org-catch-invisible-edits (quote smart))
+ '(org-confirm-babel-evaluate nil)
  '(org-enforce-todo-checkbox-dependencies t)
  '(org-enforce-todo-dependencies t)
  '(org-from-is-user-regexp nil)
- '(org-startup-folded "showeverything" t)
+ '(org-startup-folded "showeverything")
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
