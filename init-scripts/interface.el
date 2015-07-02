@@ -433,7 +433,6 @@ Check out your .emacs.\n")))))
 
 
 ;;; erc setup
-;; (add-hook 'erc-mode-hook 'erc-nicklist)
 (add-to-list 'erc-modules 'highlight-nicknames)
 (erc-update-modules)
 (defun destroy-all-erc-stuff ()

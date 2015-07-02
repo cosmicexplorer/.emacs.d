@@ -29,7 +29,14 @@
                        :foreground "black"
                        :underline nil
                        :overline nil
-                       :weight light)))))))
-
+                       :weight light))))
+     (org-block-begin-line
+      ((t (:underline "#A7A6AA" :foreground "#5555ee"
+                      :background "#333333"))))
+     (org-block-background
+      ((t (:background "#001133"))))
+     (org-block-end-line
+      ((t (:overline "#A7A6AA" :foreground "#5555ee"
+                     :background "#333333")))))))
 
 (provide 'color-theme-danny)

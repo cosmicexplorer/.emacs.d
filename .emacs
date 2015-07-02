@@ -1,5 +1,7 @@
 ;;; -*lexical-binding: t -*-
 
+(setq org-src-fontify-natively t)
+
 ;;; .....let's begin
 (package-initialize)
 
@@ -236,11 +238,11 @@ Check out your .emacs."))
  '(org-enforce-todo-checkbox-dependencies t)
  '(org-enforce-todo-dependencies t)
  '(org-from-is-user-regexp nil)
- '(org-startup-folded "showeverything")
+ '(org-startup-folded "showeverything" t)
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (helm-gtags ggtags ecb xterm-color web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
+    (org helm-gtags ggtags ecb xterm-color web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
  '(safe-local-variable-values
    (quote
     ((major-mode . sh-mode)

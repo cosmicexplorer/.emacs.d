@@ -49,3 +49,4 @@
 (require 'functions)
 (require 'long-lines)
 (require 'unix-find)
+(require 'ob-coffee)

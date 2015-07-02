@@ -53,6 +53,7 @@
                       multiple-cursors
                       noflet
                       omnisharp
+                      org
                       package-build
                       paredit
                       php-mode

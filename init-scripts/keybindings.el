@@ -155,7 +155,8 @@
 (eval-after-load "coffee-mode"
   '(progn
      (define-key coffee-mode-map (kbd "C-c C-k") 'smart-compile)
-     (define-key coffee-mode-map (kbd "C-c C-c") 'coffee-compile-buffer)))
+     (define-key coffee-mode-map (kbd "C-c C-c") 'coffee-compile-buffer)
+     (define-key coffee-mode-map (kbd "C-M-h") nil)))
 
 ;;; js
 (eval-after-load "js.el"

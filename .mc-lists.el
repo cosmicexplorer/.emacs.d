@@ -15,13 +15,15 @@
         isearch-printing-char
         isearch-repeat-backward
         paredit-backspace-delete-highlight
+        paredit-backward
         paredit-forward
+        paredit-forward-delete
         smart-tab
         transpose-words
-        paredit-forward-delete
         ))
 
 (setq mc/cmds-to-run-once
       '(
+        eval-buffer-and-message
         isearch-delete-char
         ))

@@ -25,6 +25,7 @@
                                  this-directory "/error-log")))
                   (throw 'setup-failure "quicklisp extended setup failed")
                 (load-file slime-helper-file)
+                (slime-setup '(slime-company))
                 (call-process "rm" nil nil nil "-f"
                               (concat this-directory "quicklisp.lisp")
                               (concat this-directory "error-log")))))
@@ -33,4 +34,4 @@
                           "manually since this is not a gnu/linux system. "
                           "Check out "
                 "http://www.mohiji.org/2011/01/31/modern-common-lisp-on-linux/."
-                          "\nFeel free to contribute your changes back!")))))))
+                     "\nFeel free to contribute your changes back (lol)!")))))))
