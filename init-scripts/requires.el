@@ -2,13 +2,11 @@
 
 ;;; my own stuff matters too
 (add-to-list 'load-path (concat init-home-folder-dir "utils"))
+(add-to-list 'load-path (concat init-home-folder-dir "integrations"))
 
 ;;; add packages that don't exist on melpa; typically from emacswiki, but some
 ;;; are from more dubious sources
 (add-to-list 'load-path (concat init-home-folder-dir "lisp"))
-
-;;; get my color themes
-(add-to-list 'load-path (concat init-home-folder-dir "color-themes"))
 
 ;;; ESS is done in `./package-setup.el'
 
@@ -32,7 +30,6 @@
 (require 'browse-kill-ring)
 (require 'comint)
 (require 'color-theme)
-(require 'color-theme-danny)            ; mine
 (require 'web-beautify)
 (require 'cloc)
 (require 'pp-c-l)

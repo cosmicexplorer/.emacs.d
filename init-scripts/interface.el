@@ -505,10 +505,13 @@ Check out your .emacs.\n")))))
 (setenv "EDITOR" "emacsclient")
 
 ;;; setup submodules and make them
-
 (add-hook 'after-load-init-hook
           (lambda ()
-            (actual-setup-submodules)
+            (actual-setup-submodules
+             (lambda ()
+               (add-to-list
+                'load-path (concat init-home-folder-dir "emacs-color-themes"))
+               (require 'color-theme-danny)))
             (actual-make-all-submodules)))
 ;; (add-hook 'after-load-init-hook #'update-all-packages)
 

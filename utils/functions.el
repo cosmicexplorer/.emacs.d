@@ -366,6 +366,7 @@ SLIME and Paredit. Not for the faint of heart."
                                         ; it's annoying and i don't use it
   (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-add-parens-in-front)
   (define-key paredit-mode-map (kbd "M-a M-s") 'paredit-remove-function-wrapper)
+  (define-key paredit-mode-map (kbd "M-q") #'fill-paragraph)
   (global-set-key (kbd "RET") 'newline-and-indent) ; set as global because
                                         ; define-key doesn't work, not sure why
   (define-key paredit-mode-map (kbd "M-a M-<right>")
@@ -1313,7 +1314,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (make-readonly-region-modifiable (point-min) (point-max)))
 
 ;;; for initialization
-(defun actual-setup-submodules ()
+(defun actual-setup-submodules (&optional cb)
   (unless dont-ask-about-git
     (if (not (executable-find "git"))
         (send-message-to-scratch
@@ -1329,7 +1330,8 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                               "submodule" "update" "--init" "--recursive"))
                 (throw 'submodule-failure "init failed")))
           (cd prev-wd))
-        (kill-buffer git-submodule-buf-name)))))
+        (kill-buffer git-submodule-buf-name)
+        (when cb (funcall cb))))))
 
 (defvar submodules-to-make nil)
 (defun make-submodule (folder-name make-cmd &rest make-args)

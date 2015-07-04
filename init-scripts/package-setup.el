@@ -172,7 +172,7 @@
 (setq ibuffer-show-empty-filter-groups nil) ;; only show full filter groups
 
 ;;; personal color theme initialization
-(eval-after-load "color-theme"
+(eval-after-load "color-theme-danny"
   '(progn
      (color-theme-initialize)
      (color-theme-danny)))

@@ -14,6 +14,7 @@
         isearch-forward-regexp
         isearch-printing-char
         isearch-repeat-backward
+        org-self-insert-command
         paredit-backspace-delete-highlight
         paredit-backward
         paredit-forward
@@ -25,5 +26,6 @@
 (setq mc/cmds-to-run-once
       '(
         eval-buffer-and-message
+        eval-expression
         isearch-delete-char
         ))

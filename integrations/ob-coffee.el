@@ -24,9 +24,8 @@
 
 ;;; Code:
 (require 'ob)
-(eval-when-compile (require 'cl-lib))
+(require 'cl-lib)
 
-(declare-function org-remove-indentation "org")
 (declare-function run-coffee "ext:coffee" (cmd &optional dedicated show))
 
 (defvar org-babel-tangle-lang-exts)
@@ -34,11 +33,35 @@
 
 (defvar org-babel-default-header-args:coffee nil)
 
-(defcustom org-babel-coffee-command "coffee"
+(defcustom org-babel-coffee-command "coffee -s"
+  "Name of command to execute coffeescript code."
   :group 'org-babel
   :type 'string)
 
+;;; sessions are annoying
 (defun org-babel-execute:coffee (body params)
-  )
+    "Execute a block of coffeescript code with org-babel.
+This function is called by `org-babel-execute-src-block'"
+    (let ((org-babel-coffee-cmd (or (cdr (assoc :cmd params))
+                                    org-babel-coffee-command))
+          (result-type (cdr (assoc :result-type params)))
+          (full-body (org-babel-expand-body:generic
+                      body params
+                      (org-babel-variable-assignments:coffee params))))
+        (format "%S|%S" full-body params)))
+
+(defun org-babel-coffee-var-to-coffee (var)
+  "Convert VAR into a coffeescript variable. Convert an elisp value into a
+string of coffeescript source code specifying a variable of the same value."
+  (if (listp var)
+      (concat "[" (mapconcat #'org-babel-coffee-var-to-coffee var ", ") "]")
+    (replace-regexp-in-string "\n" "\\\\n" (format "%S" var))))
+
+(defun org-babel-variable-assignments:coffee (params)
+  "Return list of coffeescript statements assigning the block's variables."
+  (mapcar
+   (lambda (pair)
+     (format "%s = %s") (car pair) (org-babel-coffee-var-to-coffee (cdr pair)))
+   (mapcar #'cdr (org-babel-get-header params :var))))
 
 (provide 'ob-coffee)
