@@ -187,12 +187,14 @@
 (global-set-key (kbd "M-#") 'replace-regexp)
 
 ;;; org-mode
-(eval-after-load "org-mode"
+(eval-after-load 'org
   '(progn
      (define-key org-mode-map (kbd "<tab>") #'smart-tab)
      (define-key org-mode-map (kbd "C-c a") #'org-agenda)
      (define-key org-mode-map (kbd "C-c c") #'org-capture)
-     (define-key org-mode-map (kbd "C-c C-k") #'smart-compile)))
+     (add-to-list
+      'org-mode-hook
+      (lambda () (define-key org-mode-map (kbd "C-c C-k") #'smart-compile)))))
 
 ;;; convenience bindings from working with windows
 (global-set-key (kbd "C-a") #'mark-whole-buffer)

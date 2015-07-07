@@ -206,7 +206,7 @@ which is defined in `smart-compile-alist'."
             (set decided-against-it t)
             (set-default decided-against-it t)
             `(when (setq
-                    ,cmd-result ,cmd 
+                    ,cmd-result ,cmd
                     ,build-file
                     (and ,decided-against-it
                          (or
@@ -250,9 +250,9 @@ which is defined in `smart-compile-alist'."
              compile-command)
         (call-interactively 'compile)
         (setq not-yet nil))
-       ((add-build-system "make -k -C" "^Makefile$" 4 t nil t))
+       ((add-build-system "make -C" "^Makefile$" 4 t nil t))
        ((add-build-system "node-gyp build" "^binding\\.gyp$" 2 nil nil nil))
-       ((add-build-system "scons -k -C" "^SConstruct$" 2 t nil t))
+       ((add-build-system "scons -C" "^SConstruct$" 2 t nil t))
        ((add-build-system "cake build" "^Cakefile$" 2 nil nil nil))
        ((add-build-system
          (if (eq system-type 'windows-nt) "msbuild.exe" "xbuild")

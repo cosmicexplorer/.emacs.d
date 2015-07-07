@@ -40,6 +40,7 @@
 (require 'ggtags)
 (require 'helm-gtags)
 (require 'ecb)
+(require 'org)
 
 ;;; my stuff
 (require 'utilities)

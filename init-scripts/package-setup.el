@@ -158,9 +158,9 @@
            (name . "Info")
            (name . "info")
            (name . "doc")
-           (name . "Doc")))
+           (name . "Doc")
+           (mode . Man-mode)))
          ("yaml" (filename . "\\.yaml\\'"))
-         ("man pages" (mode . Man-mode))
          ("default" (name . "")))))
 
 ;;; more ibuffer stuff

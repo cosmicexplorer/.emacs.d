@@ -7,6 +7,7 @@
         camel-case-left-word
         camel-case-right-word
         coffee-dedent-line-backspace
+        cperl-electric-terminator
         end-of-visual-line
         ido-find-file
         isearch-abort

@@ -377,8 +377,9 @@ at some point, or else the function will never fire."
 (defun setup-ssh-agent ()
   (interactive)
   (when (and (eq system-type 'gnu/linux)
-             (not (getenv "SSH_AUTH_SOCK")))
-    (if id-rsa-path
+;             (not (getenv "SSH_AUTH_SOCK"))
+             )
+    (if (and id-rsa-path (file-exists-p id-rsa-path))
         (when (and (executable-find "ssh-agent")
                    (executable-find "ssh-add"))
           (let ((command-results (shell-command-to-string "ssh-agent -s"))
@@ -395,19 +396,24 @@ at some point, or else the function will never fire."
             (let ((prev-display (getenv "DISPLAY"))
                   (prev-ssh-askpass (getenv "SSH_ASKPASS")))
               (setenv "DISPLAY" ":0")
-              (setenv "SSH_ASKPASS" (local-file-path "read-ssh-pass.sh"))
+              (setenv "SSH_ASKPASS"
+                      (expand-file-name
+                       (concat init-home-folder-dir
+                               "init-scripts/read-ssh-pass.sh")))
               (with-temp-buffer
                 (loop with ssh-add-success = nil
                       with ssh-did-fail = nil
                       while (not ssh-add-success)
                       do (progn
-                           (insert (read-passwd
-                                    (if ssh-did-fail
-                                        "incorrect password. ssh password: "
-                                      "ssh password: ")))
-                           (if (zerop (call-process-region
+                           (insert
+                            (or (and (not ssh-did-fail) ssh-pass)
+                                (read-passwd
+                                 (if ssh-did-fail
+                                     "incorrect password. ssh password: "
+                                   "ssh password: "))))
+                           (if (zerop (shell-command-on-region
                                        (point-min) (point-max)
-                                       "ssh-add" t nil nil id-rsa-path))
+                                       (concat "ssh-add \"" id-rsa-path "\"")))
                                (setq ssh-add-success t)
                              (erase-buffer)
                              (setq ssh-did-fail t)))))
@@ -422,7 +428,10 @@ at some point, or else the function will never fire."
 Check out your .emacs.\n")))))
 
 (when do-ssh-agent-command-on-start
-  (setup-ssh-agent))
+  (add-hook 'after-load-init-hook #'setup-ssh-agent))
+
+;;; org
+(setq org-src-fontify-natively t)
 
 
 ;;; TODO: persist buffers not visiting files to disk as well because apparently
@@ -521,3 +530,7 @@ Check out your .emacs.\n")))))
           (lambda () (set-process-query-on-exit-flag
                       (get-buffer-process (current-buffer))
                       nil)))
+
+;;; ibuffer moves things around when i mark things and this scares me
+(defadvice ibuffer-mark-interactive (after re-recenter activate)
+  (recenter))

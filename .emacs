@@ -1,11 +1,7 @@
 ;;; -*lexical-binding: t -*-
 
-(setq org-src-fontify-natively t)
-
 ;;; .....let's begin
 (package-initialize)
-
-(add-to-list 'load-path "/home/cosmicexplorer/tools/helm-swoop/")
 
 ;;; add wherever emacs was invoked from to path
 ;;; done at top so we know we're not changing any directories
@@ -55,6 +51,8 @@ correctly. Set in custom-vars.el")
                       (if (file-exists-p id-rsa-path) id-rsa-path nil))
   "Path to desired id_rsa file for ssh. Used in init-scripts/interface.el to
 stop ssh from prompting you every time you run git.")
+(defvar ssh-pass nil
+  "Default password to use for ssh-agent. Keep this secure.")
 (defvar save-visited-files t
   "Whether or not to restore all files that were visited during the previous
 session. Used later in this file.")
@@ -64,7 +62,8 @@ session. Used later in this file.")
   "Whether or not to save eshell history to disk. Used in
 init-scripts/interface.el.")
 (defvar save-shell-history t
-  "Whether or not to save shell history to disk. Used in init-scripts/interface.el.")
+  "Whether or not to save shell history to disk. Used in
+init-scripts/interface.el.")
 (defvar save-nonvisiting-files t
   "Whether or not to persist all buffers not visiting files to disk. Used in
 init-scripts/interface.el.")
@@ -136,9 +135,11 @@ Check out your .emacs."))
 ;; starts emacs in server form so i can use emacsclient to add files
 ;; but only if server isn't already started
 (require 'server)
-(if (and (fboundp 'server-running-p)
-         (not (eq (server-running-p) t)))
-    (server-start))
+(when (fboundp 'server-running-p)
+  (if (not (eq (server-running-p) t))
+      (server-start)
+    (setq do-ssh-agent-command-on-start nil)
+    (setq save-visited-files nil)))
 
 (defun load-my-init-script (file-name)
   "Loads script located in init-scripts directory."
@@ -232,6 +233,7 @@ Check out your .emacs."))
     (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)))
  '(initial-buffer-choice t)
  '(linum-relative-plusp-offset 1)
+ '(magit-revert-buffers 5)
  '(nxml-slash-auto-complete-flag t)
  '(org-agenda-files nil)
  '(org-catch-invisible-edits (quote smart))

@@ -51,7 +51,6 @@
                       minimap
                       misc-cmds
                       multiple-cursors
-                      noflet
                       omnisharp
                       org
                       package-build
