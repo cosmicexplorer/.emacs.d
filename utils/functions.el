@@ -1330,8 +1330,8 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                               "submodule" "update" "--init" "--recursive"))
                 (throw 'submodule-failure "init failed")))
           (cd prev-wd))
-        (kill-buffer git-submodule-buf-name)
-        (when cb (funcall cb))))))
+        (kill-buffer git-submodule-buf-name))))
+  (when cb (funcall cb)))
 
 (defvar submodules-to-make nil)
 (defun make-submodule (folder-name make-cmd &rest make-args)

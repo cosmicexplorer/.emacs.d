@@ -520,7 +520,6 @@ Check out your .emacs.\n")))))
                 'load-path (concat init-home-folder-dir "emacs-color-themes"))
                (require 'color-theme-danny)))
             (actual-make-all-submodules)))
-;; (add-hook 'after-load-init-hook #'update-all-packages)
 
 ;;; shell-mode echoes commands lol
 (add-hook 'comint-mode-hook (lambda () (setq comint-process-echoes t)))
