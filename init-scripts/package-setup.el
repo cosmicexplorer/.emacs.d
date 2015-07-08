@@ -209,3 +209,5 @@
   (push-mark))
 (defadvice ggtags-find-definition (before advice-ggtags-set-more-mark activate)
   (push-mark))
+
+(defadvice web-beautify-js (after dont-move activate) (recenter))

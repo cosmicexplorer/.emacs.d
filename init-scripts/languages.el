@@ -23,6 +23,7 @@
 (add-hook 'lisp-mode-hook (lambda () (setq comment-start ";; " comment-end "")))
 (add-hook 'cmake-mode-hook (lambda () (setq comment-start "# " comment-end "")))
 (add-hook 'asm-mode-hook (lambda () (setq comment-start "# " comment-end "")))
+(add-hook 'js2-mode-hook (lambda () (setq comment-start "// " comment-end "")))
 
 ;;; highlight cursor and auto-fill when over 80 chars in certain modes
 (add-hook 'prog-mode-hook #'highlight-80+-mode)
