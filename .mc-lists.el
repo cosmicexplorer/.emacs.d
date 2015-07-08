@@ -15,6 +15,7 @@
         isearch-forward-regexp
         isearch-printing-char
         isearch-repeat-backward
+        markdown-exdent-or-delete
         org-self-insert-command
         paredit-backspace-delete-highlight
         paredit-backward

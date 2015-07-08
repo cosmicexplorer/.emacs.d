@@ -376,9 +376,7 @@ at some point, or else the function will never fire."
 ;;; do ssh-agent stuff
 (defun setup-ssh-agent ()
   (interactive)
-  (when (and (eq system-type 'gnu/linux)
-;             (not (getenv "SSH_AUTH_SOCK"))
-             )
+  (when (and (eq system-type 'gnu/linux))
     (if (and id-rsa-path (file-exists-p id-rsa-path))
         (when (and (executable-find "ssh-agent")
                    (executable-find "ssh-add"))
