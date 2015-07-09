@@ -397,7 +397,9 @@ SLIME and Paredit. Not for the faint of heart."
   (define-key paredit-mode-map (kbd "C-M-p") 'mc/unmark-previous-like-this)
   (define-key paredit-mode-map (kbd "C-x C-a") 'mc/mark-all-like-this)
   (define-key paredit-mode-map (kbd "C-M-y") 'paredit-yank-push)
-  (define-key paredit-mode-map (kbd "DEL") 'paredit-backspace-delete-highlight))
+  (define-key paredit-mode-map (kbd "DEL") 'paredit-backspace-delete-highlight)
+  (define-key paredit-mode-map (kbd "M-S-<up>") #'paredit-backward-up)
+  (define-key paredit-mode-map (kbd "M-S-<down>") #'paredit-forward-up))
 
 ;; so that paredit-kill works the way it should on regions
 (defadvice paredit-kill (around paredit-kill-region-dwim)
