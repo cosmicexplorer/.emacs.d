@@ -1579,13 +1579,22 @@ way I prefer, and regards `comment-padding', unlike the standard version."
               (t (camel-case-left-word))))
     (sgml-skip-tag-backward 1)))
 
+(defun html-newline-indent ()
+  (interactive)
+  (newline-and-indent)
+  (save-excursion
+    (forward-line 1)
+    (indent-according-to-mode)))
+
 (defun html-insert-xhtml-header ()
   (interactive)
-  (insert "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" "\n"
-          "<!DOCTYPE html>" "\n"
-          "<html><head></head><body></body></html>")
-  (web-beautify-html-buffer)
-  (goto-char (point-min)))
+  (let ((val (point-max)))
+    (insert "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" "\n"
+            "<!DOCTYPE html>" "\n")
+    (when (= val 1)
+      (insert "<html><head></head><body></body></html>")
+      (web-beautify-html-buffer)
+      (goto-char (point-min)))))
 
 (defun html-kill-tag-after-point-int (prefix)
   (interactive "P")

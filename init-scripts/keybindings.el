@@ -273,3 +273,4 @@
 (define-key html-mode-map (kbd "C->") (lambda () (interactive) (insert ">")))
 (define-key html-mode-map (kbd "C-<tab>") #'web-beautify-html)
 (define-key html-mode-map (kbd "C-c C-h") #'html-insert-xhtml-header)
+(define-key html-mode-map (kbd "RET") #'html-newline-indent)
