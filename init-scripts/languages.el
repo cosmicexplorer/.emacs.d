@@ -361,7 +361,13 @@ Lisp code." t)
   '(define-key coffee-mode-map (kbd "M-;")
      'coffeescript-comment-do-what-i-really-mean))
 (add-hook 'coffee-mode-hook (lambda () (setq coffee-tab-width 2)))
-(add-to-list 'auto-mode-alist '("\\.cjsx\\'" . coffee-mode))
+(define-derived-mode cjsx-mode coffee-mode "CJSX"
+  "Major mode for editing CJSX."
+  (coffee-mode)
+  (set (make-local-variable 'coffee-command) "cjsx")
+  (setq mode-name "CJSX")
+  (setq major-mode 'cjsx-mode))
+(add-to-list 'auto-mode-alist '("\\.cjsx\\'" . cjsx-mode))
 
 ;;; latex
 (setq LaTeX-command-style '(("" "%(PDF)%(latex) -file-line-error %S%(PDFout)")))

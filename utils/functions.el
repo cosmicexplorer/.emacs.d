@@ -1586,13 +1586,23 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (forward-line 1)
     (indent-according-to-mode)))
 
-(defun html-insert-xhtml-header ()
-  (interactive)
+(defun html-insert-xhtml-header (prefix)
+  (interactive "P")
   (let ((val (point-max)))
+    (when prefix (erase-buffer))
     (insert "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" "\n"
-            "<!DOCTYPE html>" "\n")
-    (when (= val 1)
-      (insert "<html><head></head><body></body></html>")
+            "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"" "\n"
+            "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" "\n")
+    (when prefix
+      (insert "<html xmlns=\"http://www.w3.org/1999/xhtml\" "
+              "lang=\"en\" xml:lang=\"en\">" "\n"
+              "<meta http-equiv=\"Content-Type\" "
+              "content=\"text/html;charset=utf-8\" />" "\n"
+              "<meta name=\"viewport\" "
+              "content=\"width=device-width, initial-scale=1\" />" "\n"
+              "<head></head>" "\n"
+              "<body></body>" "\n"
+              "</html>")
       (web-beautify-html-buffer)
       (goto-char (point-min)))))
 
@@ -1639,5 +1649,15 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (and context
          (> pt (aref context 2))
          (< pt (aref context 3)))))
+
+;;; dired
+(defun dired-touch-file ()
+  (interactive)
+  (let ((res
+         (shell-command-to-string
+          (format "\"%s\" \"%s\"" "touch"
+                  (read-from-minibuffer "filename: ")))))
+    (revert-buffer)
+    (message "%s" res)))
 
 (provide 'functions)
