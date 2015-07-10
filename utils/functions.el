@@ -1518,4 +1518,115 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (unless prefix-given
     (message "%s %s" "evaluated" (buffer-name))))
 
+;;; html functions
+(defun html-autoclose-tag ()
+  (interactive)
+  (if (not (within-tag-p))
+      (sgml-close-tag)
+    (let ((context (car (save-excursion (sgml-get-context)))))
+      (if (assoc (save-excursion (backward-char) (aref context 4))
+                   html-autoclosable-tags)
+          (progn
+            (goto-char (aref context 3))
+            (delete-backward-char 1)
+            (sgml-close-tag))
+        (goto-char (aref context 3))
+        (sgml-close-tag)
+        (goto-char (aref context 3))))))
+
+(defun sgml-beginning-of-tag-int ()
+  (interactive)
+  (let ((pt (point)))
+    (sgml-beginning-of-tag)
+    (when (= pt (point))
+      (backward-char)
+      (sgml-beginning-of-tag))))
+
+(defun sgml-end-of-tag-int ()
+  (interactive)
+  (sgml-beginning-of-tag-int)
+  (sgml-skip-tag-forward))
+
+(defun html-skip-tag-or-token-forward ()
+  (interactive)
+  (if (within-tag-p)
+      (let ((context (car (save-excursion (sgml-get-context)))))
+        (if (> (save-excursion (camel-case-right-word) (point))
+               (aref context 3))
+            (goto-char (aref context 3))
+          (camel-case-right-word)))
+    (sgml-skip-tag-forward 1)))
+
+(defun html-skip-tag-or-token-backward ()
+  (interactive)
+  (if (within-tag-p)
+      (let ((context (car (save-excursion (sgml-get-context)))))
+        (if (< (save-excursion (camel-case-left-word) (point))
+               (aref context 2))
+            (goto-char (aref context 2))
+          (camel-case-left-word)))
+    (sgml-skip-tag-backward 1)))
+
+(defun test-fun (prefix)
+  (interactive "P")
+  (message "%S" prefix))
+
+(defun html-kill-tag-after-point-int (prefix)
+  (interactive "P")
+  (if (or (numberp prefix) (car prefix))
+      (kill-line prefix)
+    (html-kill-tag-after-point))
+  (sgml-indent-line))
+
+(defun html-kill-tag-after-point ()
+  (let* ((e-o-l (1+ (line-end-position)))
+         (line-str (buffer-substring (point) e-o-l)))
+    (if (string-match-p "\\`[[:space:]]*\\'" line-str)
+        (progn
+          (delete-region (point) e-o-l)
+          (kill-append line-str nil))
+      (let (prev-pt)
+        (if (within-tag-p)
+            (progn (re-search-backward "<") (html-kill-tag-after-point))
+          (ignore-errors (backward-char))
+          (re-search-forward "<")
+          (setq prev-pt
+                (if (char-equal (char-after) ?/)
+                    (save-excursion
+                      (progn (sgml-skip-tag-backward 1) (point)))
+                  (backward-char 1)
+                  (point)))
+          (sgml-skip-tag-forward 1)
+          (let ((str (buffer-substring prev-pt (point))))
+            (delete-region prev-pt (point))
+            (kill-new str)))))))
+
+(defvar html-autoclosable-tags
+  '(("link" . t)))
+
+(defun within-tag-p ()
+  (let* ((context
+          (save-excursion
+            (car (sgml-get-context))))
+         (pt (point)))
+    (and context
+         (> pt (aref context 2))
+         (< pt (aref context 3)))))
+
+(defun html-close-tag-on-creation-as-required ()
+  (interactive)
+  (if (not (within-tag-p))
+      (insert " ")
+    (let ((prev-pt (point)))
+      (re-search-backward "<")
+      (forward-char)
+      (let ((tag-name (buffer-substring (point) prev-pt)))
+        (goto-char prev-pt)
+        (if (assoc tag-name html-autoclosable-tags)
+            (progn
+              (insert "  /")
+              (backward-char 2))
+          (html-autoclose-tag)
+          (backward-char 1))))))
+
 (provide 'functions)

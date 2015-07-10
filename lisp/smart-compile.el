@@ -88,7 +88,7 @@
 (defcustom smart-compile-alist '(
                                  (emacs-lisp-mode    . (emacs-lisp-byte-compile))
                                  (lisp-mode          . (byte-compile-file-and-remove)) ;; may want to take advantage of the formatting emacs does when byte-compiling files!
-                                 ("\\.jl\\'"          . "julia %f") ;; for some reason detecting purely by "julia-mode" doesn't work
+                                 ("\\.jl\\'"         . "julia %f") ;; for some reason detecting purely by "julia-mode" doesn't work
                                  (html-mode          . (browse-url-of-buffer))
                                  (nxhtml-mode        . (browse-url-of-buffer))
                                  (html-helper-mode   . (browse-url-of-buffer))
@@ -105,6 +105,7 @@
                                  ("\\.tex\\'"        . (tex-file))
                                  ("\\.texi\\'"       . "makeinfo %f")
                                  ("\\.mp\\'"         . "mptopdf %f")
+                                 ("\\.cjsx\\'"      . "cjsx -bc --no-header %f")
                                  (perl-mode          . "perl -cw %f")
                                  (ruby-mode          . "ruby -cw %f")
                                  (haskell-mode       . "ghc %f -o %n")

@@ -341,6 +341,7 @@ Lisp code." t)
   '(define-key coffee-mode-map (kbd "M-;")
      'coffeescript-comment-do-what-i-really-mean))
 (add-hook 'coffee-mode-hook (lambda () (setq coffee-tab-width 2)))
+(add-to-list 'auto-mode-alist '("\\.cjsx\\'" . coffee-mode))
 
 ;;; latex
 (setq LaTeX-command-style '(("" "%(PDF)%(latex) -file-line-error %S%(PDFout)")))

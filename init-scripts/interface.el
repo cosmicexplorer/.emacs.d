@@ -531,3 +531,8 @@ Check out your .emacs.\n")))))
 ;;; ibuffer moves things around when i mark things and this scares me
 (defadvice ibuffer-mark-interactive (after re-recenter activate)
   (recenter))
+
+;;; dired doesn't color the bottom file in a listing upon pressing
+;;; TODO: submit fix for this
+(defadvice dired-mark (after dont-lie-to-me activate)
+  (revert-buffer))

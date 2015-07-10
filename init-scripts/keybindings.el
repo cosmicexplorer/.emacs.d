@@ -261,3 +261,14 @@
 
 ;;; erc stuff
 (global-set-key (kbd "C-c M-e") #'message-erc-modded-chans)
+
+;;; html stuff
+(define-key html-mode-map (kbd ">") #'html-autoclose-tag)
+(define-key html-mode-map (kbd "M-s") #'sgml-delete-tag)
+(define-key html-mode-map (kbd "M-S-<up>") #'sgml-beginning-of-tag-int)
+(define-key html-mode-map (kbd "C-<left>") #'html-skip-tag-or-token-backward)
+(define-key html-mode-map (kbd "M-S-<down>") #'sgml-end-of-tag-int)
+(define-key html-mode-map (kbd "C-<right>") #'html-skip-tag-or-token-forward)
+(define-key html-mode-map (kbd "C-k") #'html-kill-tag-after-point-int)
+(define-key html-mode-map (kbd "C->") (lambda () (interactive) (insert ">")))
+(define-key html-mode-map (kbd "C-<tab>") #'web-beautify-html)
