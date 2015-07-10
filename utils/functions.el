@@ -1554,7 +1554,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
           (t (error "i didn't know what to do in this situation")))))
 
 (defun html-skip-tag-or-token-forward ()
-  (interactive)
+  (interactive "^")
   (if (within-tag-p)
       (let ((context (car (save-excursion (sgml-get-context)))))
         (cond ((and (= (point) (1+ (aref context 2)))
@@ -1567,7 +1567,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (sgml-skip-tag-forward 1)))
 
 (defun html-skip-tag-or-token-backward ()
-  (interactive)
+  (interactive "^")
   (if (within-tag-p)
       (let ((context (car (save-excursion (sgml-get-context)))))
         (cond ((and (= (point) (1- (aref context 3)))
@@ -1639,21 +1639,5 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (and context
          (> pt (aref context 2))
          (< pt (aref context 3)))))
-
-(defun html-close-tag-on-creation-as-required ()
-  (interactive)
-  (if (not (within-tag-p))
-      (insert " ")
-    (let ((prev-pt (point)))
-      (re-search-backward "<")
-      (forward-char)
-      (let ((tag-name (buffer-substring (point) prev-pt)))
-        (goto-char prev-pt)
-        (if (assoc tag-name html-autoclosable-tags)
-            (progn
-              (insert "  /")
-              (backward-char 2))
-          (html-autoclose-tag)
-          (backward-char 1))))))
 
 (provide 'functions)

@@ -307,6 +307,26 @@ Lisp code." t)
 (add-to-list 'auto-mode-alist '("\\.gyp\\'" . js-mode))
 (add-to-list 'auto-mode-alist '("\\.json$" . js-mode))
 
+(defun html-eldoc-function ()
+  (let ((context (car (last (save-excursion (sgml-get-context))))))
+    (when context
+      (let ((ctx-ref (cdr (assoc (aref context 4) html-tag-help))))
+        (when ctx-ref
+          (format
+           "%s: %s"
+           (propertize
+            (aref context 4)
+            'face
+            (or (cdr (assoc (aref context 4) html-tag-face-alist))
+                'font-lock-function-name-face))
+           ctx-ref))))))
+(add-hook
+ 'html-mode-hook
+ (lambda ()
+   (set (make-local-variable 'eldoc-documentation-function)
+        #'html-eldoc-function)
+   (eldoc-mode)))
+
 ;;; syntax highlighting
 (global-font-lock-mode 1)               ; turn on syntax highlighting
 (setq font-lock-maximum-decoration t)   ; turn it ALL the way on
