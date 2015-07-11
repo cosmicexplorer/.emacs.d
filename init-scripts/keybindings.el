@@ -275,8 +275,8 @@
 (define-key html-mode-map (kbd "M-s") #'sgml-delete-tag)
 (define-key html-mode-map (kbd "M-S-<up>") #'html-beginning-of-tag)
 (define-key html-mode-map (kbd "C-<left>") #'html-skip-tag-or-token-backward)
-(define-key html-mode-map (kbd "M-S-<left>") #'html-beginning-of-tag)
-(define-key html-mode-map (kbd "M-S-<right>") #'html-end-of-tag)
+(define-key html-mode-map (kbd "M-S-<left>") #'html-skip-to-beginning-of-tag)
+(define-key html-mode-map (kbd "M-S-<right>") #'html-skip-to-end-of-tag)
 (define-key html-mode-map (kbd "C-S-k") #'html-kill-tag-contents)
 (define-key html-mode-map (kbd "M-S-<down>") #'html-end-of-tag)
 (define-key html-mode-map (kbd "C-<right>") #'html-skip-tag-or-token-forward)
@@ -285,6 +285,10 @@
 (define-key html-mode-map (kbd "C-<tab>") #'web-beautify-html)
 (define-key html-mode-map (kbd "C-c C-h") #'html-insert-xhtml-header)
 (define-key html-mode-map (kbd "RET") #'html-newline-indent)
+(define-key html-mode-map (kbd "M-a M-<right>") #'html-slurp-tag-forward)
+(define-key html-mode-map (kbd "M-a M-<left>") #'html-slurp-tag-backward)
+(define-key html-mode-map (kbd "C-M-a C-M-<right>") #'html-barf-tag-forward)
+(define-key html-mode-map (kbd "C-M-a C-M-<left>") #'html-barf-tag-backward)
 
 ;;; dired
 (define-key dired-mode-map (kbd "M-t") #'dired-touch-file)
