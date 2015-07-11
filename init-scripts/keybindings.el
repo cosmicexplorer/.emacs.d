@@ -272,7 +272,8 @@
 
 ;;; html stuff
 (define-key html-mode-map (kbd ">") #'html-autoclose-tag)
-(define-key html-mode-map (kbd "M-s") #'sgml-delete-tag)
+(define-key html-mode-map (kbd "M-s") #'html-split-tag)
+(define-key html-mode-map (kbd "M-r") #'html-raise-tag)
 (define-key html-mode-map (kbd "M-S-<up>") #'html-beginning-of-tag)
 (define-key html-mode-map (kbd "C-<left>") #'html-skip-tag-or-token-backward)
 (define-key html-mode-map (kbd "M-S-<left>") #'html-skip-to-beginning-of-tag)
