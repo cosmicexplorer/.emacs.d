@@ -536,3 +536,7 @@ Check out your .emacs.\n")))))
 ;;; TODO: submit fix for this
 (defadvice dired-mark (after dont-lie-to-me activate)
   (revert-buffer))
+
+;;; tail compilations/greps
+(add-hook 'compilation-mode-hook
+          (lambda () (set-window-point (get-buffer-window) (point-max))))

@@ -161,6 +161,12 @@
 ;;; js
 (eval-after-load "js.el"
   '(define-key js-mode-map (kbd "RET") 'newline-and-indent-fix-js-mode))
+(eval-after-load 'js2-mode
+  '(define-key js2-mode-map (kbd "C-<tab>") #'web-beautify-js))
+
+;;; css
+(eval-after-load 'css-mode
+  '(define-key css-mode-map (kbd "C-<tab>") #'web-beautify-css))
 
 ;;; CPerl-mode
 (add-hook 'cperl-mode-hook
@@ -194,7 +200,9 @@
      (define-key org-mode-map (kbd "C-c c") #'org-capture)
      (add-to-list
       'org-mode-hook
-      (lambda () (define-key org-mode-map (kbd "C-c C-k") #'smart-compile)))))
+      (lambda () (define-key org-mode-map (kbd "C-c C-k") #'smart-compile)))
+     (define-key org-mode-map (kbd "S-<up>") #'org-shiftup)
+     (define-key org-mode-map (kbd "S-<down>") #'org-shiftdown)))
 
 ;;; convenience bindings from working with windows
 (global-set-key (kbd "C-a") #'mark-whole-buffer)

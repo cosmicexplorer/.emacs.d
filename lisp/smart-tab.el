@@ -137,10 +137,6 @@ the text at point."
                       (not
                        (message "clang-format not found"))))
              (clang-format-buffer))
-            ((eq major-mode 'js2-mode)
-             (web-beautify-js))
-            ((eq major-mode 'css-mode)
-             (web-beautify-css))
             ((eq major-mode 'org-mode)
              (org-cycle))
             (t
@@ -152,25 +148,6 @@ the text at point."
                     (not
                      (message "clang-format not found"))))
            (clang-format-buffer))
-          ((eq major-mode 'js2-mode)
-           ;; (if (is-buffer-beautifiable (buffer-file-name))
-           ;;     (web-beautify-js)
-           ;;   (js-indent-line)
-           ;;   (web-beautify-format-region
-           ;;    web-beautify-js-program
-           ;;    (get-beginning-of-prev-line) (get-end-of-next-line)))
-           ;; ;; (web-beautify-js)
-           (web-beautify-js)
-            )
-          ((eq major-mode 'css-mode)
-           ;; (if (is-buffer-beautifiable (buffer-file-name))
-           ;;     (web-beautify-css)
-           ;;   (web-beautify-format-region
-           ;;    web-beautify-css-program
-           ;;    (get-beginning-of-prev-line) (get-end-of-next-line)))
-           ;; ;; (web-beautify-css)
-           (web-beautify-css)
-            )
           ((eq major-mode 'org-mode)
            (org-cycle))
           (t
