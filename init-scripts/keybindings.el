@@ -292,3 +292,6 @@
 
 ;;; dired
 (define-key dired-mode-map (kbd "M-t") #'dired-touch-file)
+
+;;; random
+(global-set-key (kbd "C-c C-w") #'clear-whitespace)

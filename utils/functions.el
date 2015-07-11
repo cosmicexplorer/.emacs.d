@@ -1573,7 +1573,15 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                     (aref context 3))
                  (goto-char (aref context 3)))
                 (t (camel-case-right-word))))
-      (sgml-skip-tag-forward 1))))
+      (let* ((prev-ctx (car (save-excursion (sgml-get-context))))
+             (prev-pt (point)))
+        (sgml-skip-tag-forward 1)
+        (unless (= (aref prev-ctx 2)
+                   (aref (car (save-excursion (sgml-get-context))) 2))
+          (backward-char)
+          (html-inner-tag))
+        (when (= (point) prev-pt)
+          (sgml-skip-tag-forward 1))))))
 
 (defun html-skip-to-end-of-tag ()
   (interactive)
@@ -1593,11 +1601,20 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                     (aref context 2))
                  (goto-char (aref context 2)))
                 (t (camel-case-left-word))))
-      (sgml-skip-tag-backward 1))))
+      (let ((prev-ctx (car (save-excursion (sgml-get-context)))))
+        (if (= (point) (aref prev-ctx 3)) (sgml-skip-tag-backward 1)
+          (sgml-skip-tag-backward 1)
+          (unless (= (aref prev-ctx 2)
+                     (aref (car (save-excursion (sgml-get-context))) 2))
+            (forward-char)
+            (html-inner-tag)))))))
 
 (defun html-newline-indent ()
+  "`newline-and-indent' is weird for `html-mode' for some reason. This bypasses
+that."
   (interactive)
-  (newline-and-indent)
+  (insert "\n")
+  (indent-according-to-mode)
   (save-excursion
     (forward-line 1)
     (indent-according-to-mode)))
@@ -1806,5 +1823,11 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                   (read-from-minibuffer "filename: ")))))
     (revert-buffer)
     (message "%s" res)))
+
+;;; random
+(defun clear-whitespace ()
+  (interactive)
+  (delete-horizontal-space)
+  (indent-according-to-mode))
 
 (provide 'functions)
