@@ -1615,7 +1615,10 @@ that."
   (interactive)
   (clear-whitespace)
   (let ((is-at-end-of-ctx
-         (= (point) (aref (car (save-excursion (sgml-get-context))) 3))))
+         (and (= (point) (aref (car (save-excursion (sgml-get-context))) 3))
+              (not (string-match-p
+                    "\\`[[:space:]]*\\'"
+                    (buffer-substring (point) (line-end-position)))))))
     (insert "\n")
     (indent-according-to-mode)
     (save-excursion
