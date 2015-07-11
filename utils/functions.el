@@ -1519,6 +1519,8 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (message "%s %s" "evaluated" (buffer-name))))
 
 ;;; html functions
+(require 'sgml-mode)
+
 (defun html-autoclose-tag ()
   (interactive)
   (if (not (within-tag-p))
@@ -1624,7 +1626,21 @@ way I prefer, and regards `comment-padding', unlike the standard version."
           (kill-append line-str nil))
       (let (prev-pt)
         (if (within-tag-p)
-            (progn (re-search-backward "<") (html-kill-tag-after-point))
+            (progn
+              (let* ((context (car (save-excursion (sgml-get-context))))
+                     (final-point (1- (aref context 3))))
+                (when (char-equal (char-before final-point) ?/)
+                  (decf final-point))
+                (loop until (or (whitespacep (char-before))
+                                (= (point) (aref context 2)))
+                      do (backward-char)
+                      finally (when (= (point) (aref context 2))
+                                (camel-case-right-word)
+                                (loop while (not (whitespacep (char-after)))
+                                      do (forward-char))))
+                (kill-region (point) final-point)
+                (unless (whitespacep (char-before))
+                  (insert " "))))
           (ignore-errors (backward-char))
           (re-search-forward "<")
           (setq prev-pt
