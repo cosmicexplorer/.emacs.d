@@ -1659,6 +1659,8 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                      (final-point (1- (aref context 3))))
                 (when (char-equal (char-before final-point) ?/)
                   (decf final-point))
+                ;; TODO: make this actually parse stuff, a space within quotes
+                ;; doesn't matter to us
                 (if (whitespacep (char-after))
                     (loop while (whitespacep (char-after))
                           do (forward-char))

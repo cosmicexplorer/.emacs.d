@@ -303,9 +303,14 @@ Lisp code." t)
 ;;; js/css/html
 (setq js-indent-level 2)
 (setq css-indent-offset 2)
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.gyp\\'" . js-mode))
-(add-to-list 'auto-mode-alist '("\\.json$" . js-mode))
+(add-to-list 'auto-mode-alist '("\\.json\\'" . js-mode))
+(add-to-list 'auto-mode-alist '("\\.cshtml\\'" . html-mode))
+
+;;; config files
+(add-to-list 'auto-mode-alist '("\\.jsbeautifyrc\\'" . js-mode))
+(add-to-list 'auto-mode-alist '("\\.clang-format\\'" . conf-mode))
 
 (defun html-eldoc-function ()
   (let ((context (car (last (save-excursion (sgml-get-context))))))
