@@ -1543,8 +1543,8 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 (defun html-end-of-tag ()
   (interactive)
-  (let ((context (car (save-excursion (sgml-get-context)))))
-    (goto-char (aref context 3))))
+  (html-beginning-of-tag)
+  (sgml-skip-tag-forward 1))
 
 (defun html-inner-tag ()
   (interactive)
@@ -1688,7 +1688,9 @@ way I prefer, and regards `comment-padding', unlike the standard version."
             (kill-new str)))))))
 
 (defvar html-autoclosable-tags
-  '(("link" . t)))
+  '(("link" . t)
+    ("hr" . t)
+    ("br" . t)))
 
 (defun within-tag-p ()
   (let* ((context
