@@ -1709,8 +1709,8 @@ that."
                                   (loop while (not (whitespacep (char-after)))
                                         do (forward-char)))))
                 (kill-region (point) final-point)
-                (unless (whitespacep (char-before))
-                  (insert " "))))
+                (loop while (whitespacep (char-before))
+                      do (delete-backward-char 1))))
           (ignore-errors (backward-char))
           (re-search-forward "<")
           (setq prev-pt

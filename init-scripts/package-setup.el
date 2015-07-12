@@ -210,4 +210,5 @@
 (defadvice ggtags-find-definition (before advice-ggtags-set-more-mark activate)
   (push-mark))
 
+;;; web-beautify-js makes my cursor move around
 (defadvice web-beautify-js (after dont-move activate) (recenter))
