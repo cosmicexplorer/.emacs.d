@@ -1613,7 +1613,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   "`newline-and-indent' is weird for `html-mode' for some reason. This bypasses
 that."
   (interactive)
-  (clear-whitespace)
+  (save-excursion (clear-whitespace))
   (let ((is-at-end-of-ctx
          (and (= (point) (aref (car (save-excursion (sgml-get-context))) 3))
               (not (string-match-p
@@ -1625,7 +1625,7 @@ that."
       (forward-line 1)
       (indent-according-to-mode))
     (when is-at-end-of-ctx
-      (clear-whitespace)
+      (save-excursion (clear-whitespace))
       (insert "\n")
       (indent-according-to-mode)
       (forward-line -1)

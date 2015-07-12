@@ -540,3 +540,6 @@ Check out your .emacs.\n")))))
 ;;; tail compilations/greps
 (add-hook 'compilation-mode-hook
           (lambda () (set-window-point (get-buffer-window) (point-max))))
+
+;;; colorssssssss
+(add-hook 'html-mode-hook #'rainbow-mode)
