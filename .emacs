@@ -224,6 +224,7 @@ Check out your .emacs."))
  '(erc-track-minor-mode t)
  '(erc-track-mode t)
  '(fill-column 80)
+ '(global-rainbow-delimiters-mode t)
  '(grep-command (concat "\"" init-home-folder-dir "switch-grep.sh\" "))
  '(grep-highlight-matches (quote auto))
  '(grep-use-null-device nil)
@@ -246,6 +247,11 @@ Check out your .emacs."))
  '(package-selected-packages
    (quote
     (org helm-gtags ggtags ecb xterm-color web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
+ '(rainbow-ansi-colors t)
+ '(rainbow-html-colors t)
+ '(rainbow-latex-colors t)
+ '(rainbow-r-colors t)
+ '(rainbow-x-colors t)
  '(safe-local-variable-values
    (quote
     ((major-mode . sh-mode)

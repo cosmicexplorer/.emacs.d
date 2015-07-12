@@ -1653,13 +1653,31 @@ that."
 
 (defun html-kill-tag-after-point-int (prefix)
   (interactive "P")
-  (cond ((use-region-p)
+  (cond ((eq last-command 'html-kill-tag-after-point-int)
+         (html-kill-tag-after-point t))
+        ((use-region-p)
          (kill-region (region-beginning) (region-end)))
         ((numberp prefix)
          (kill-line prefix))
         ((car prefix) (html-kill-tag-contents))
         (t (html-kill-tag-after-point)))
   (sgml-indent-line))
+
+(defun html-yank (&optional pfx)
+  (interactive "P")
+  (let ((pt (point)))
+    (yank pfx)
+    (indent-region pt (point))
+    (indent-according-to-mode)))
+
+(defun html-yank-pop (&optional pfx)
+  (interactive "P")
+  (let ((pt (point)))
+    (setq last-command 'yank)
+    (yank-pop pfx)
+    ;; yank-pop sets mark to beginning of pasted text, so this works
+    (indent-region (mark) (point))
+    (indent-according-to-mode)))
 
 (defun html-kill-tag-contents ()
   (interactive)
@@ -1682,7 +1700,7 @@ that."
                      finally (return ctx)))))
         (kill-region (point) (aref close-context 2))))))
 
-(defun html-kill-tag-after-point ()
+(defun html-kill-tag-after-point (&optional append-arg)
   (let* ((e-o-l (1+ (line-end-position)))
          (line-str (buffer-substring (point) e-o-l)))
     (if (string-match-p "\\`[[:space:]]*\\'" line-str)
@@ -1708,7 +1726,9 @@ that."
                                   (camel-case-right-word)
                                   (loop while (not (whitespacep (char-after)))
                                         do (forward-char)))))
-                (kill-region (point) final-point)
+                (if append-arg
+                    (kill-append (buffer-substring (point) final-point) nil)
+                  (kill-region (point) final-point))
                 (loop while (whitespacep (char-before))
                       do (delete-backward-char 1))))
           (ignore-errors (backward-char))
@@ -1722,7 +1742,9 @@ that."
           (sgml-skip-tag-forward 1)
           (let ((str (buffer-substring prev-pt (point))))
             (delete-region prev-pt (point))
-            (kill-new str)))))))
+            (if append-arg
+                (kill-append str nil)
+              (kill-new str))))))))
 
 (defvar html-autoclosable-tags
   '(("link" . t)
@@ -1788,6 +1810,10 @@ that."
       (indent-region new-pt-begin new-pt)
       (sgml-skip-tag-backward 1))))
 
+(defsubst destroy-whitespace-around-me ()
+  (loop while (whitespacep (char-before)) do (delete-backward-char 1))
+  (loop while (whitespacep (char-after)) do (delete-char 1)))
+
 (defun html-barf-tag-forward ()
   (interactive)
   (let ((pt (point)))
@@ -1801,9 +1827,14 @@ that."
       (delete-region beg-tag-pt end-tag-pt)
       (sgml-skip-tag-forward 1)
       (insert "\n" tag-str)
+      (indent-region (- (point) (length tag-str)) (point))
+      (goto-char beg-tag-pt)
+      (loop while (whitespacep (char-before)) do (delete-backward-char 1))
+      (loop while (whitespacep (char-after)) do (delete-char 1))
+      (insert "\n")
       (indent-according-to-mode))
     (goto-char pt)
-    (delete-horizontal-space)
+    (beginning-of-line)
     (indent-according-to-mode)))
 
 (defun html-barf-tag-backward ()
@@ -1819,11 +1850,13 @@ that."
       (delete-region beg-tag-pt end-tag-pt)
       (sgml-skip-tag-backward 1)
       (insert tag-str "\n")
+      (indent-region (- (point) (1+ (length tag-str))) pt)
+      (goto-char end-tag-pt)
+      (destroy-whitespace-around-me)
+      (insert "\n")
       (indent-according-to-mode))
-    (forward-char)
-    (html-inner-tag)
-    (forward-char)
-    (delete-horizontal-space)
+    (goto-char pt)
+    (beginning-of-line)
     (indent-according-to-mode)))
 
 (defun html-split-tag ()
@@ -1887,9 +1920,12 @@ that."
     (message "%s" res)))
 
 ;;; random
-(defun clear-whitespace ()
-  (interactive)
-  (delete-horizontal-space)
+(defun clear-whitespace (&optional prefix)
+  (interactive "P")
+  (if prefix
+      (delete-horizontal-space)
+    (destroy-whitespace-around-me)
+    (insert "\n"))
   (indent-according-to-mode))
 
 (provide 'functions)

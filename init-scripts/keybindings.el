@@ -290,6 +290,8 @@
 (define-key html-mode-map (kbd "M-a M-<left>") #'html-slurp-tag-backward)
 (define-key html-mode-map (kbd "C-M-a C-M-<right>") #'html-barf-tag-forward)
 (define-key html-mode-map (kbd "C-M-a C-M-<left>") #'html-barf-tag-backward)
+(define-key html-mode-map (kbd "C-y") #'html-yank)
+(define-key html-mode-map (kbd "M-y") #'html-yank-pop)
 
 ;;; dired
 (define-key dired-mode-map (kbd "M-t") #'dired-touch-file)
