@@ -1619,19 +1619,16 @@ that."
   (interactive)
   (save-excursion (clear-whitespace))
   (let ((is-at-end-of-ctx
-         (and (= (point) (aref (car (save-excursion (sgml-get-context))) 3))
-              (not (string-match-p
-                    "\\`[[:space:]]*\\'"
-                    (buffer-substring (point) (line-end-position)))))))
-    (clear-whitespace)
+         (save-excursion
+           (backward-char)
+           (= (1+ (point))
+              (aref (car (save-excursion (sgml-get-context))) 3)))))
+    (save-excursion (clear-whitespace))
     (save-excursion
       (forward-line 1)
       (indent-according-to-mode))
     (when is-at-end-of-ctx
-      (save-excursion (clear-whitespace))
       (insert "\n")
-      (indent-according-to-mode)
-      (forward-line -1)
       (indent-according-to-mode))))
 
 (defun html-insert-xhtml-header (prefix)
