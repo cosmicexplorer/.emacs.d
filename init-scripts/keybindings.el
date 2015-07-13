@@ -146,8 +146,6 @@
               'newline-and-indent-ctrl-j)
 	    (define-key c++-mode-map (kbd "{") 'insert-brackets)))
 
-;;; magit
-(global-set-key (kbd "C-x g") 'magit-status)
 ;;; cool but never used cause lol search key
 (global-set-key (kbd "<XF86Search>") 'helm-multi-swoop-all)
 
@@ -298,3 +296,13 @@
 
 ;;; random
 (global-set-key (kbd "C-c C-w") #'clear-whitespace)
+
+;;; magit
+(eval-after-load "magit"
+  '(progn
+     (global-set-key (kbd "C-c g") 'magit-status)
+     (global-set-key (kbd "C-c b") #'magit-blame)
+     (global-set-key (kbd "C-c d") #'magit-diff)
+     (global-set-key (kbd "C-c c") #'magit-show-commit)
+     (define-key magit-mode-map (kbd "<tab>") #'magit-tab-dwim)
+     (define-key magit-mode-map (kbd "<backtab>") #'magit-section-up)))

@@ -118,6 +118,10 @@ also."
   (interactive)
   (set-face-attribute 'default nil :height 100))
 
+(defun tiny-text ()
+  (interactive)
+  (set-face-attribute 'default nil :height 50))
+
 ;; Switching to ibuffer puts the cursor on the most recent buffer
 (defadvice ibuffer (around ibuffer-point-to-most-recent) ()
   "Open ibuffer with cursor pointed to most recent buffer name"
@@ -1749,7 +1753,8 @@ that."
 (defvar html-autoclosable-tags
   '(("link" . t)
     ("hr" . t)
-    ("br" . t)))
+    ("br" . t)
+    ("meta" . t)))
 
 (defun within-tag-p ()
   (let* ((context
@@ -1927,5 +1932,33 @@ that."
     (destroy-whitespace-around-me)
     (insert "\n"))
   (indent-according-to-mode))
+
+(defun strip-char-from-format-string (char fmt-str)
+  "Removes all instances of %<CHAR> from FMT-STR, where %<CHAR> is not preceded
+by another percent."
+  (let ((case-fold-search nil))
+    (replace-regexp-in-string
+     (format "\\(\\(?:[^%%]\\|\\`\\)\\(?:%%%%\\)*\\)%%%s"
+             (regexp-quote (char-to-string char)))
+     "\\1"
+     fmt-str)))
+
+(defun strip-multiple-chars-from-format-string (chars fmt-str)
+  (let ((cur-str fmt-str))
+    (loop for char in chars
+          do (setq cur-str (strip-char-from-format-string char cur-str))
+          finally (return cur-str))))
+
+;;; cl extensions
+(defun find-multiple-in-seq (seq &rest find-args)
+  (if (null find-args) t
+    (and (cl-find-if (lambda (item) (equal item (car find-args))) seq)
+         (apply #'find-multiple-in-seq (cons seq (cdr find-args))))))
+(defun remove-multiple-in-seq (seq &rest remove-args)
+  (if (null remove-args) seq
+    (apply
+     #'remove-multiple-in-seq
+     (cons (cl-remove-if (lambda (item) (equal item (car remove-args))) seq)
+           (cdr remove-args)))))
 
 (provide 'functions)

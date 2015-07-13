@@ -49,6 +49,22 @@
 ;; automatically revert unmodified (saved) buffers that magit changes through
 ;; e.g. pull, merge
 (setq magit-auto-revert-mode t)
+;;; this is pretty brittle to internal changes in magit, hopefully it stays
+;;; relatively stable
+(defvar magit-header-section-args '((diffstat) (headers)))
+(defun magit-tab-dwim ()
+  (interactive)
+  (let* ((sec (magit-section-ident (magit-current-section)))
+         (sec-diff
+          (if (apply #'find-multiple-in-seq
+                     (cons sec magit-header-section-args))
+              (apply #'remove-multiple-in-seq
+                     (cons sec magit-header-section-args))
+            sec)))
+    (if (= (length sec) (length sec-diff))
+        (call-interactively #'magit-section-toggle)
+      (push-mark)
+      (magit-section-goto (magit-get-section sec-diff)))))
 
 ;;; parenthesis matching and more
 ;;; turn pair parens on

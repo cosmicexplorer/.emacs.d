@@ -41,6 +41,7 @@
 (require 'helm-gtags)
 (require 'ecb)
 (require 'org)
+(require 'magit)
 
 ;;; my stuff
 (require 'utilities)
