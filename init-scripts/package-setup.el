@@ -56,8 +56,10 @@
   (interactive)
   (let* ((sec (magit-section-ident (magit-current-section)))
          (sec-diff
-          (if (apply #'find-multiple-in-seq
-                     (cons sec magit-header-section-args))
+          (if (cl-find-if
+               (lambda (item)
+                 (equal item '(diffstat)))
+               sec)
               (apply #'remove-multiple-in-seq
                      (cons sec magit-header-section-args))
             sec)))

@@ -1623,8 +1623,7 @@ that."
               (not (string-match-p
                     "\\`[[:space:]]*\\'"
                     (buffer-substring (point) (line-end-position)))))))
-    (insert "\n")
-    (indent-according-to-mode)
+    (clear-whitespace)
     (save-excursion
       (forward-line 1)
       (indent-according-to-mode))
@@ -1710,7 +1709,8 @@ that."
     (if (string-match-p "\\`[[:space:]]*\\'" line-str)
         (progn
           (delete-region (point) e-o-l)
-          (kill-append line-str nil))
+          (when append-arg
+            (kill-append line-str nil)))
       (let (prev-pt)
         (if (within-tag-p)
             (progn
