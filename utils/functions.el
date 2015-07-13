@@ -758,7 +758,7 @@ Note the weekly scope of the command's precision.")
         cur-window-config nil))
 
 ;;; clear out all files which no longer exist or have moved
-(defun clear-all-buffers-to-deleted-files ()
+(defun clean-all-buffers-to-deleted-files ()
   (interactive)
   (loop for buf in (buffer-list)
         do (with-current-buffer buf
