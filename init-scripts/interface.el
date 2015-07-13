@@ -93,8 +93,9 @@
 (add-hook 'after-change-major-mode-hook 'get-linum-relative-symbol)
 
 ;;; RAINBOW
-(add-hook 'prog-mode-hook #'rainbow-mode)
 (add-hook 'text-mode-hook #'rainbow-mode)
+(add-hook 'prog-mode-hook #'rainbow-mode)
+(add-hook 'html-mode-hook #'rainbow-mode)
 
 ;;; get and update the current number of lines within the buffer
 (defvar my-mode-line-buffer-line-count nil)
@@ -541,5 +542,5 @@ Check out your .emacs.\n")))))
 (add-hook 'compilation-mode-hook
           (lambda () (set-window-point (get-buffer-window) (point-max))))
 
-;;; colorssssssss
-(add-hook 'html-mode-hook #'rainbow-mode)
+;;; i like living on the edge
+(setq dired-deletion-confirmer (lambda (&rest args) t))

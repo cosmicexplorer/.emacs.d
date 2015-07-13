@@ -42,6 +42,8 @@
 (require 'ecb)
 (require 'org)
 (require 'magit)
+(require 'rainbow-mode)
+(require 'rainbow-delimiters)
 
 ;;; my stuff
 (require 'utilities)
