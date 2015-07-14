@@ -1623,12 +1623,14 @@ that."
            (backward-char)
            (= (1+ (point))
               (aref (car (save-excursion (sgml-get-context))) 3)))))
-    (save-excursion (clear-whitespace))
+    (clear-whitespace)
     (save-excursion
       (forward-line 1)
       (indent-according-to-mode))
     (when is-at-end-of-ctx
       (insert "\n")
+      (indent-according-to-mode)
+      (forward-line -1)
       (indent-according-to-mode))))
 
 (defun html-insert-xhtml-header (prefix)
@@ -1786,6 +1788,8 @@ that."
       (indent-region new-pt next-pt)
       (goto-char new-pt))))
 
+;;; TODO: don't do anything (and leave a message) if there's nothing to slurp or
+;;; barf
 (defun html-slurp-tag-forward ()
   (interactive)
   (let ((pt (point)))

@@ -30,4 +30,5 @@
         eval-buffer-and-message
         eval-expression
         isearch-delete-char
+        smart-compile
         ))
