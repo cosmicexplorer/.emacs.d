@@ -21,6 +21,7 @@
         paredit-backward
         paredit-forward
         paredit-forward-delete
+        sgml-slash
         smart-tab
         transpose-words
         ))
