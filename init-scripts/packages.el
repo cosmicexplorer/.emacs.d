@@ -22,7 +22,7 @@
                       auto-complete
                       better-defaults
                       cider
-                      cloc              ; YEAH!!!
+                      cloc
                       clojure-mode
                       coffee-mode
                       color-theme
@@ -32,6 +32,7 @@
                       ecb
                       ein
                       epl
+                      epresent
                       espuds
                       evil
                       flycheck
