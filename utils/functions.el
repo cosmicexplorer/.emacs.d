@@ -1962,4 +1962,6 @@ by another percent."
      (cons (cl-remove-if (lambda (item) (equal item (car remove-args))) seq)
            (cdr remove-args)))))
 
+;;; TODO: transpose-tags function
+
 (provide 'functions)
