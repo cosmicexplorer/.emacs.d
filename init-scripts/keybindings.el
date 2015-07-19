@@ -306,3 +306,6 @@
      (global-set-key (kbd "C-c c") #'magit-show-commit)
      (define-key magit-mode-map (kbd "<tab>") #'magit-tab-dwim)
      (define-key magit-mode-map (kbd "<backtab>") #'magit-section-up)))
+
+;;; LOL MAIL
+(global-set-key (kbd "C-x m") nil)
