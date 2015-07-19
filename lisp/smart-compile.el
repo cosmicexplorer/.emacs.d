@@ -51,6 +51,13 @@
   :group 'processes
   :prefix "smart-compile")
 
+(defun strip-minus-c (str)
+  (replace-regexp-in-string
+   (concat
+    "\\(?:[[:space:]]*\\-C\\'\\|"
+    "[[:space:]]*\\-C[[:space:]]*./\\'\\)")
+   "" str))
+
 (defun byte-compile-file-and-remove ()
   (interactive)
   (byte-compile-file (file-name-nondirectory (buffer-file-name)))
@@ -196,13 +203,16 @@ which is defined in `smart-compile-alist'."
     (save-buffer)
     (macrolet
         ((add-build-system
-          (cmd file-regexp depth use-dir case-matters dir-in-command)
+          (cmd file-regexp depth use-dir case-matters dir-in-command
+               &optional filter-command)
           (let ((build-file (gensym))
                 (decided-against-it (gensym))
-                (cmd-result (gensym)))
+                (cmd-result (gensym))
+                (filter-cmd (gensym)))
             (make-variable-buffer-local build-file)
             (make-variable-buffer-local decided-against-it)
             (set build-file nil)
+            (set filter-cmd filter-command)
             (set-default build-file nil)
             (set decided-against-it t)
             (set-default decided-against-it t)
@@ -224,20 +234,25 @@ which is defined in `smart-compile-alist'."
                                          ,file-regexp))
                                        :initial-value nil)))))
                (if (y-or-n-p (format "%s found. Try %s?" ,build-file
-                                     ,cmd-result))
+                                     (if ,filter-cmd
+                                         (funcall ,filter-cmd ,cmd-result)
+                                       ,cmd-result)))
                    (progn
                      (set (make-local-variable 'compile-command)
-                          (format
-                           ,@(if dir-in-command
-                                 `("%s %s" ,cmd-result
-                                   ,(if use-dir
-                                        `(if (file-directory-p
-                                              ,build-file)
-                                             ,build-file
-                                           (file-name-directory
-                                            ,build-file))
-                                       build-file))
-                               `("%s" ,cmd-result))))
+                          (let ((res
+                                 (format
+                                  ,@(if dir-in-command
+                                        `("%s %s" ,cmd-result
+                                          ,(if use-dir
+                                               `(if (file-directory-p
+                                                     ,build-file)
+                                                    ,build-file
+                                                  (file-name-directory
+                                                   ,build-file))
+                                             build-file))
+                                      `("%s" ,cmd-result)))))
+                            (if ,filter-cmd (funcall ,filter-cmd res)
+                              res)))
                      (call-interactively 'compile)
                      (setq not-yet nil)
                      t)
@@ -251,9 +266,9 @@ which is defined in `smart-compile-alist'."
              compile-command)
         (call-interactively 'compile)
         (setq not-yet nil))
-       ((add-build-system "make -C" "^Makefile$" 4 t nil t))
+       ((add-build-system "make -C" "^Makefile$" 4 t nil t strip-minus-c))
        ((add-build-system "node-gyp build" "^binding\\.gyp$" 2 nil nil nil))
-       ((add-build-system "scons -C" "^SConstruct$" 2 t nil t))
+       ((add-build-system "scons -C" "^SConstruct$" 2 t nil t strip-minus-c))
        ((add-build-system "cake build" "^Cakefile$" 2 nil nil nil))
        ((add-build-system
          (if (eq system-type 'windows-nt) "msbuild.exe" "xbuild")
