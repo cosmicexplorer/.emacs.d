@@ -375,6 +375,7 @@ Lisp code." t)
   (setq mode-name "CJSX")
   (setq major-mode 'cjsx-mode))
 (add-to-list 'auto-mode-alist '("\\.cjsx\\'" . cjsx-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx\\'" . js2-mode))
 
 ;;; latex
 (setq LaTeX-command-style '(("" "%(PDF)%(latex) -file-line-error %S%(PDFout)")))
