@@ -54,9 +54,10 @@
 (defun strip-minus-c (str)
   (replace-regexp-in-string
    (concat
-    "\\(?:[[:space:]]*\\-C\\'\\|"
-    "[[:space:]]*\\-C[[:space:]]*./\\'\\)")
-   "" str))
+    "[[:space:]]*\\-C\\'\\|"
+    "[[:space:]]*\\-C[[:space:]]*./\\'\\|"
+    "\\./\\([\\./]+\\)/")
+   "\\1" str))
 
 (defun byte-compile-file-and-remove ()
   (interactive)
