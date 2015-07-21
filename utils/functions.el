@@ -1964,4 +1964,10 @@ by another percent."
 
 ;;; TODO: transpose-tags function
 
+;;; js stuff
+(defun js-newline-indent-for-real ()
+  (interactive)
+  (newline-and-indent)
+  (save-excursion (forward-line 1) (indent-for-tab-command)))
+
 (provide 'functions)

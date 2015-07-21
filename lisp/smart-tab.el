@@ -131,24 +131,12 @@ the text at point."
   (if smart-tab-debug
       (message "default"))
   (if (use-region-p)
-      (cond ((and (or (eq major-mode 'c-mode)
-                      (eq major-mode 'c++-mode))
-                  (or (executable-find "clang-format")
-                      (not
-                       (message "clang-format not found"))))
-             (clang-format-buffer))
-            ((eq major-mode 'org-mode)
+      (cond ((eq major-mode 'org-mode)
              (org-cycle))
             (t
              (indent-region (region-beginning)
                             (region-end))))
-    (cond ((and (or (eq major-mode 'c-mode)
-                    (eq major-mode 'c++-mode))
-                (or (executable-find "clang-format")
-                    (not
-                     (message "clang-format not found"))))
-           (clang-format-buffer))
-          ((eq major-mode 'org-mode)
+    (cond ((eq major-mode 'org-mode)
            (org-cycle))
           (t
            (indent-for-tab-command)))))

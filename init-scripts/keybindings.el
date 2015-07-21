@@ -157,10 +157,12 @@
      (define-key coffee-mode-map (kbd "C-M-h") nil)))
 
 ;;; js
-(eval-after-load "js.el"
-  '(define-key js-mode-map (kbd "RET") 'newline-and-indent-fix-js-mode))
 (eval-after-load 'js2-mode
-  '(define-key js2-mode-map (kbd "C-<tab>") #'web-beautify-js))
+  '(eval-after-load 'js-mode
+     (progn
+       (define-key js2-mode-map (kbd "C-<tab>") #'web-beautify-js)
+       (add-keybinding-to-mode-maps "RET" #'js-newline-indent-for-real
+                                    js-mode-map js2-mode-map))))
 
 ;;; css
 (eval-after-load 'css-mode
@@ -258,6 +260,8 @@
 (define-key c-mode-map (kbd "C-c C-c")
   (lambda () (interactive) (ggtags-ensure-global-buffer (kill-compilation))))
 (define-key c-mode-map (kbd "C-c t") #'helm-gtags-find-tag)
+(add-keybinding-to-mode-maps "C-<tab>" #'clang-format-buffer
+                             c-mode-map c++-mode-map)
 
 ;;; in the same vein
 (global-set-key (kbd "C-x C-h") #'pop-to-mark-command)
