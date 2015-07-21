@@ -200,7 +200,10 @@
       'org-mode-hook
       (lambda () (define-key org-mode-map (kbd "C-c C-k") #'smart-compile)))
      (define-key org-mode-map (kbd "S-<up>") #'org-shiftup)
-     (define-key org-mode-map (kbd "S-<down>") #'org-shiftdown)))
+     (define-key org-mode-map (kbd "S-<down>") #'org-shiftdown)
+     (define-key org-mode-map (kbd "C-p") #'outline-previous-heading)
+     (define-key org-mode-map (kbd "C-n") #'outline-next-heading)
+     (define-key org-mode-map (kbd "C-M-u") #'outline-up-heading)))
 
 ;;; convenience bindings from working with windows
 (global-set-key (kbd "C-a") #'mark-whole-buffer)
