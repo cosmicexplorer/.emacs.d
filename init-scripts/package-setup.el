@@ -188,6 +188,8 @@
              (ibuffer-switch-to-saved-filter-groups "home")))
 (setq ibuffer-expert t) ;; only prompt when modified buffer is killed
 (setq ibuffer-show-empty-filter-groups nil) ;; only show full filter groups
+(defadvice ibuffer-toggle-filter-group (after center activate)
+  (recenter))
 
 ;;; personal color theme initialization
 (eval-after-load "color-theme-danny"
