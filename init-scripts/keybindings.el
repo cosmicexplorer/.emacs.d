@@ -311,6 +311,8 @@
      (global-set-key (kbd "C-c b") #'magit-blame)
      (global-set-key (kbd "C-c d") #'magit-diff)
      (global-set-key (kbd "C-c c") #'magit-show-commit)
+     (eval-after-load 'org
+       '(define-key org-mode-map (kbd "C-c c") #'magit-show-commit))
      (define-key magit-mode-map (kbd "<tab>") #'magit-tab-dwim)
      (define-key magit-mode-map (kbd "<backtab>") #'magit-section-up)))
 
