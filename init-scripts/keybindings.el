@@ -198,6 +198,7 @@
      (define-key org-mode-map (kbd "<tab>") #'smart-tab)
      (define-key org-mode-map (kbd "C-c a") #'org-agenda)
      (define-key org-mode-map (kbd "C-c c") #'org-capture)
+     (define-key org-mode-map (kbd "C-k") #'kill-selected-region-default)
      (add-to-list
       'org-mode-hook
       (lambda () (define-key org-mode-map (kbd "C-c C-k") #'smart-compile)))
