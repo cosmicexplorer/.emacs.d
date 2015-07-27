@@ -242,6 +242,7 @@ Check out your .emacs."))
  '(magit-no-confirm
    (quote
     (kill-process stage-all-changes unstage-all-changes)))
+ '(magit-push-always-verify nil)
  '(magit-revert-buffers 5)
  '(nxml-slash-auto-complete-flag t)
  '(org-agenda-files nil)

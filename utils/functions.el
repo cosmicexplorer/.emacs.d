@@ -4,8 +4,6 @@
 ;;; copy/paste from emacswiki
 
 (require 'utilities)
-(require 'cc-mode)
-(require 'csharp-mode)
 
 (defun send-message-to-scratch (&rest msg-args)
   (let ((str (apply #'concat msg-args)))
@@ -1226,52 +1224,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 (defun just-semicolon ()
   (interactive) (insert ";"))
 
-(defun csharp-hack-newline ()
-  (interactive)
-  (let ((annoying-identifiers
-         (delete-dups
-          (append '(")") (c-lang-const c-type-list-kwds csharp)
-                  (c-lang-const c-block-stmt-1-kwds csharp)
-                  (c-lang-const c-block-stmt-2-kwds csharp)
-                  '("else")))))
-    (cond
-     ((and (char-before) (char-equal (char-before) (str2char "."))
-           (not (in-comment-p)))
-      (backward-char)
-      (newline-and-indent)
-      (forward-char))
-     ((string-match-p
-       (concat (regexp-opt annoying-identifiers) "\s*$")
-       (buffer-substring-no-properties
-        (line-beginning-position) (point)))
-      (let ((pt (point))
-            (next-pt nil))
-        (insert ";")
-        (newline-and-indent)
-        (setq next-pt (point))
-        (goto-char pt)
-        (delete-char 1)
-        (goto-char (1- next-pt))))
-     ((and (string-match-p
-            "(\s*$" (buffer-substring-no-properties
-                     (line-beginning-position) (point)))
-           (char-equal (char-after) (str2char ")")))
-      (newline) (indent-for-tab-command))
-     (t (newline-and-indent)))))
-
-(defun csharp-hack-parenthesis ()
-  (interactive)
-  (when (and
-           (not (whitespacep (char-before)))
-           (string-match-p
-            (concat (regexp-opt
-                     (c-lang-const c-block-stmt-2-kwds csharp) 'words)
-                    "\s*$")
-            (buffer-substring-no-properties
-             (line-beginning-position) (point))))
-    (insert " "))
-  (insert "()")
-  (backward-char))
 
 ;;; todo: try creating a namespace, then a class, in an empty file, see what
 ;;; happens. fix that.

@@ -207,6 +207,54 @@
                                  csharp-indent-level 0)))))
     (c-basic-offset . ,csharp-indent-level)))
 
+(defun csharp-hack-newline ()
+  (interactive)
+  (let ((annoying-identifiers
+         (delete-dups
+          (append '(")") (c-lang-const c-type-list-kwds csharp)
+                  (c-lang-const c-block-stmt-1-kwds csharp)
+                  (c-lang-const c-block-stmt-2-kwds csharp)
+                  '("else")))))
+    (cond
+     ((and (char-before) (char-equal (char-before) (str2char "."))
+           (not (in-comment-p)))
+      (backward-char)
+      (newline-and-indent)
+      (forward-char))
+     ((string-match-p
+       (concat (regexp-opt annoying-identifiers) "\s*$")
+       (buffer-substring-no-properties
+        (line-beginning-position) (point)))
+      (let ((pt (point))
+            (next-pt nil))
+        (insert ";")
+        (newline-and-indent)
+        (setq next-pt (point))
+        (goto-char pt)
+        (delete-char 1)
+        (goto-char (1- next-pt))))
+     ((and (string-match-p
+            "(\s*$" (buffer-substring-no-properties
+                     (line-beginning-position) (point)))
+           (char-equal (char-after) (str2char ")")))
+      (newline) (indent-for-tab-command))
+     (t (newline-and-indent)))))
+
+(defun csharp-hack-parenthesis ()
+  (interactive)
+  (when (and
+           (not (whitespacep (char-before)))
+           (string-match-p
+            (concat (regexp-opt
+                     (c-lang-const c-block-stmt-2-kwds csharp) 'words)
+                    "\s*$")
+            (buffer-substring-no-properties
+             (line-beginning-position) (point))))
+    (insert " "))
+  (insert "()")
+  (backward-char))
+
+
 (make-submodule
  "OmniSharpServer"
  (if (eq system-type 'windows-nt) "msbuild.exe" "xbuild"))
@@ -250,6 +298,12 @@
   (setq sh-basic-offset 2)
   (setq sh-indentation 2))
 (add-hook 'sh-mode-hook 'setup-sh-indentation)
+(defun zsh-mode ()
+  (interactive)
+  (set (make-local-variable 'sh-shell) 'zsh)
+  (sh-mode))
+(add-to-list 'auto-mode-alist '("\\.zsh\\'" . zsh-mode))
+(add-to-list 'auto-mode-alist '("\\`\\.zshrc\\'" . zsh-mode))
 
 ;;; lisp and related
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of
