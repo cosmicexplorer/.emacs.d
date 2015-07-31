@@ -53,7 +53,6 @@
                       misc-cmds
                       multiple-cursors
                       omnisharp
-                      org
                       package-build
                       paredit
                       php-mode

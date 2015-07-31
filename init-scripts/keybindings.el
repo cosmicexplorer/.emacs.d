@@ -232,7 +232,8 @@
      (define-key markdown-mode-map (kbd "M-n") #'mc/mark-next-like-this)
      (define-key markdown-mode-map (kbd "M-p") #'mc/mark-previous-like-this)))
 
-(define-key grep-mode-map (kbd "G") #'refind-or-grep)
+(eval-after-load 'grep-mode
+  '(define-key grep-mode-map (kbd "G") #'refind-or-grep))
 
 (global-set-key (kbd "C-M-h") nil)
 (global-set-key (kbd "C-h d") #'describe-function-or-variable)

@@ -40,7 +40,6 @@
 (require 'ggtags)
 (require 'helm-gtags)
 (require 'ecb)
-(require 'org)
 (require 'magit)
 (require 'rainbow-mode)
 (require 'rainbow-delimiters)

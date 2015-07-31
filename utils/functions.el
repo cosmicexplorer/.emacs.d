@@ -1292,10 +1292,11 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (when cb (funcall cb)))
 
 (defvar submodules-to-make nil)
-(defun make-submodule (folder-name make-cmd &rest make-args)
-  (add-to-list 'submodules-to-make (list folder-name make-cmd make-args)))
+(defun make-submodule (folder-name make-cmd onfinish &rest make-args)
+  (add-to-list 'submodules-to-make
+               (list folder-name make-cmd onfinish make-args)))
 (defun actual-make-submodule (submodule-args)
-  (destructuring-bind (folder-name make-cmd make-args) submodule-args
+  (destructuring-bind (folder-name make-cmd cb make-args) submodule-args
       (unless (member folder-name submodule-makes-to-ignore)
         (if (not (executable-find make-cmd))
             (with-current-buffer "*scratch*"
@@ -1316,9 +1317,11 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                  (when (process-live-p proc) (kill-process proc))
                  (switch-to-buffer (process-buffer proc))
                  (throw 'submodule-make-failure ev))))
-            (cd prev-wd))))))
-(defun actual-make-all-submodules ()
-  (mapcar #'actual-make-submodule submodules-to-make))
+            (cd prev-wd)
+            (if cb (funcall cb)))))))
+(defun actual-make-all-submodules (&optional cb)
+  (mapcar #'actual-make-submodule submodules-to-make)
+  (if cb (funcall cb)))
 
 ;;; TODO: make this work lol
 (defun update-packages-in-list ()

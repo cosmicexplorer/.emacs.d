@@ -429,9 +429,6 @@ Check out your .emacs.\n")))))
 (when do-ssh-agent-command-on-start
   (add-hook 'after-load-init-hook #'setup-ssh-agent))
 
-;;; org
-(setq org-src-fontify-natively t)
-
 
 ;;; TODO: persist buffers not visiting files to disk as well because apparently
 ;;; sublime does this by default and we can't let sublime beat us; let's also do
