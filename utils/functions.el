@@ -1925,4 +1925,16 @@ by another percent."
   (newline-and-indent)
   (save-excursion (forward-line 1) (indent-for-tab-command)))
 
+(defun litcoffee-toggle-code-prose ()
+  (interactive)
+  (let ((cur-indent
+         (save-excursion
+           (beginning-of-line)
+           (re-search-forward "[^[:space:]]")
+           (- (point) (line-beginning-position)))))
+    (beginning-of-line)
+    (loop while (whitespacep (char-after)) do (delete-char 1))
+    (when (< cur-indent 4)
+      (loop for i from 1 to 4 do (insert " ")))))
+
 (provide 'functions)

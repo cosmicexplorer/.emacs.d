@@ -322,3 +322,7 @@
 
 ;;; LOL MAIL
 (global-set-key (kbd "C-x m") nil)
+
+(eval-after-load 'literate-coffee-mode
+  '(define-key litcoffee-mode-map (kbd "C-c C-v")
+     #'litcoffee-toggle-code-prose))
