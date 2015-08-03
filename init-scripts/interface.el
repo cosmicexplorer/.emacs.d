@@ -498,6 +498,7 @@ Check out your .emacs.\n")))))
 
 ;;; don't like seeing wraparound
 (add-hook 'text-mode-hook #'visual-line-mode)
+(add-hook 'litcoffee-mode-hook #'visual-line-mode)
 
 ;;; i like being able to search for w3m buffers
 ;;; TODO: doesn't work, let's fix

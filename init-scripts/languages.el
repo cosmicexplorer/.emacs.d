@@ -28,10 +28,14 @@
           (lambda () (setq comment-start "// " comment-end "")))
 
 ;;; highlight cursor and auto-fill when over 80 chars in certain modes
-(add-hook 'prog-mode-hook #'highlight-80+-mode)
-(add-hook 'prog-mode-hook #'auto-fill-mode)
-(add-hook 'text-mode-hook #'highlight-80+-mode)
-(add-hook 'text-mode-hook #'auto-fill-mode)
+(defvar no-auto-fill-modes '(litcoffee-mode))
+(defun selective-turn-on-auto-fill ()
+  (unless (member major-mode no-auto-fill-modes)
+    (highlight-80+-mode)
+    (auto-fill-mode)))
+(add-hook 'prog-mode-hook #'selective-turn-on-auto-fill)
+(add-hook 'text-mode-hook #'selective-turn-on-auto-fill)
+(defvar coffee-string-interpolation-regexp "#{[^}]*}")
 
 ;;; ...but not others
 (add-hook 'LaTeX-mode-hook (lambda ()
@@ -431,6 +435,10 @@ Lisp code." t)
   (setq major-mode 'cjsx-mode))
 (add-to-list 'auto-mode-alist '("\\.cjsx\\'" . cjsx-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx\\'" . js2-mode))
+(add-hook 'litcoffee-mode-hook
+          (lambda ()
+            (set (make-local-variable 'coffee-args-compile)
+                 (cons "-l" coffee-args-compile))))
 
 ;;; latex
 (setq LaTeX-command-style '(("" "%(PDF)%(latex) -file-line-error %S%(PDFout)")))
