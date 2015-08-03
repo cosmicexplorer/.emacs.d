@@ -1927,13 +1927,10 @@ by another percent."
 
 (defun litcoffee-toggle-code-prose ()
   (interactive)
-  (let ((cur-indent
-         (save-excursion
-           (beginning-of-line)
-           (re-search-forward "[^[:space:]]")
-           (- (point) (line-beginning-position)))))
+  (let ((cur-indent 0))
     (beginning-of-line)
-    (loop while (whitespacep (char-after)) do (delete-char 1))
+    (loop while (and (char-after) (whitespacep (char-after)))
+          do (progn (delete-char 1) (incf cur-indent)))
     (when (< cur-indent 4)
       (loop for i from 1 to 4 do (insert " ")))))
 
