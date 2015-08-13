@@ -251,7 +251,7 @@
 (global-set-key (kbd "C-M-h C-v") #'find-variable-at-point)
 
 ;;; now for c
-(eval-after-load 'c-mode
+(eval-after-load 'cc-mode
    '(progn
         (define-key c-mode-map (kbd "C-h C-d") #'ggtags-find-definition)
         (define-key c-mode-map (kbd "C-h r") #'ggtags-find-reference)
@@ -264,8 +264,9 @@
         (define-key c-mode-map (kbd "C-c C-c")
         (lambda () (interactive) (ggtags-ensure-global-buffer (kill-compilation))))
         (define-key c-mode-map (kbd "C-c t") #'helm-gtags-find-tag)
-        (add-keybinding-to-mode-maps "C-<tab>" #'clang-format-buffer
-                                    c-mode-map c++-mode-map)))
+        (define-key c-mode-map (kbd "C-<tab>") #'clang-format-buffer)
+        ;; and c++
+        (define-key c++-mode-map (kbd "C-<tab>") #'clang-format-buffer)))
 
 ;;; in the same vein
 (global-set-key (kbd "C-x C-h") #'pop-to-mark-command)
