@@ -453,6 +453,11 @@ Lisp code." t)
 (add-hook 'haskell-mode-hook #'interactive-haskell-mode)
 (get-buffer-create "*GHC Info*")        ; some ghc-mod things look for this lol
 
+(defun haskell-newline-actual-indent ()
+  (interactive)
+  (haskell-indentation-newline-and-indent)
+  (indent-for-tab-command))
+
 (defadvice ghc-check-syntax (around stop-ghc-syntax-check activate) nil)
 (defun disable-ghc-check ()
   (interactive)

@@ -133,15 +133,11 @@ the text at point."
   (if (use-region-p)
       (cond ((eq major-mode 'org-mode)
              (org-cycle))
-            ((eq major-mode 'haskell-mode)
-             (ghc-complete))
             (t
              (indent-region (region-beginning)
                             (region-end))))
     (cond ((eq major-mode 'org-mode)
            (org-cycle))
-          ((eq major-mode 'haskell-mode)
-           (ghc-complete))
           (t
            (indent-for-tab-command)))))
 

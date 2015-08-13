@@ -333,7 +333,13 @@
 ;;; haskell
 (eval-after-load "haskell-mode"
   '(progn
+     (define-key haskell-mode-map (kbd "<return>") #'haskell-newline-actual-indent)
      (add-hook
       'haskell-mode-hook
       (lambda ()
         (define-key haskell-mode-map (kbd "C-c C-k") #'smart-compile)))))
+
+(eval-after-load 'haskell-interactive-mode
+  '(progn
+     (define-key haskell-interactive-mode-map (kbd "C-c <tab>")
+       #'haskell-process-do-info)))
