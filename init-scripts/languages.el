@@ -452,3 +452,13 @@ Lisp code." t)
 (add-hook 'haskell-mode-hook #'ghc-init)
 (add-hook 'haskell-mode-hook #'interactive-haskell-mode)
 (get-buffer-create "*GHC Info*")        ; some ghc-mod things look for this lol
+
+(defadvice ghc-check-syntax (around stop-ghc-syntax-check activate) nil)
+(defun disable-ghc-check ()
+  (interactive)
+  (ad-activate 'ghc-check-syntax)
+  (remove-overlays (point-min) (point-max) 'ghc-check t))
+(defun enable-ghc-check ()
+  (interactive)
+  (ad-deactivate 'ghc-check-syntax)
+  (ghc-check-syntax))
