@@ -4,6 +4,7 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        beginning-of-visual-line
         camel-case-left-word
         camel-case-right-word
         coffee-dedent-line-backspace

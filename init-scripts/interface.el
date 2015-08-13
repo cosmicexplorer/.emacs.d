@@ -269,10 +269,6 @@ lowercase, and Initial Caps versions."
                 ")([^a-zA-Z]|$)\" \"" dir "\"")))
 
 
-;;; wrap lines in org-mode, mostly, but also other places
-(visual-line-mode)
-
-
 
 (defvar mode-fun-regex "\\-mode\\'"
   "Regex at the end of all modes.")

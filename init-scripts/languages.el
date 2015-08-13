@@ -343,7 +343,9 @@ Lisp code." t)
   (fix-lisp-keybindings)
   (eldoc-mode))
 
-(eval-after-load "slime"
+(setq inferior-lisp-program "sbcl")
+
+ (eval-after-load "slime"
   '(define-key slime-autodoc-mode-map (kbd "SPC")
      (lambda (arg) (interactive "p")
        (if (use-region-p)
@@ -442,3 +444,11 @@ Lisp code." t)
 
 ;;; latex
 (setq LaTeX-command-style '(("" "%(PDF)%(latex) -file-line-error %S%(PDFout)")))
+
+;;; haskell
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+(autoload 'ghc-init "ghc" nil t)
+(autoload 'ghc-debug "ghc" nil t)
+(add-hook 'haskell-mode-hook #'ghc-init)
+(add-hook 'haskell-mode-hook #'interactive-haskell-mode)
+(get-buffer-create "*GHC Info*")        ; some ghc-mod things look for this lol

@@ -27,6 +27,8 @@
                       coffee-mode
                       color-theme
                       company
+                      company-ghc
+                      company-ghci
                       csharp-mode
                       dash
                       ecb
@@ -37,8 +39,10 @@
                       evil
                       flycheck
                       flycheck-package
+                      ghc
                       ggtags
                       go-mode
+                      haskell-mode
                       helm
                       helm-gtags
                       helm-swoop
@@ -62,6 +66,7 @@
                       rainbow-mode
                       s
                       slime
+                      slime-company
                       smartrep
                       undo-tree
                       w3m

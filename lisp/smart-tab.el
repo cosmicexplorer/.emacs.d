@@ -138,6 +138,8 @@ the text at point."
                             (region-end))))
     (cond ((eq major-mode 'org-mode)
            (org-cycle))
+          ((eq major-mode 'haskell-mode)
+           (ghc-complete))
           (t
            (indent-for-tab-command)))))
 

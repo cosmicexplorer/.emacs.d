@@ -326,3 +326,13 @@
 (eval-after-load 'literate-coffee-mode
   '(define-key litcoffee-mode-map (kbd "C-c C-v")
      #'litcoffee-toggle-code-prose))
+
+(global-set-key (kbd "C-c r") 'align-regexp)
+
+;;; haskell
+(eval-after-load "haskell-mode"
+  '(progn
+     (add-hook
+      'haskell-mode-hook
+      (lambda ()
+        (define-key haskell-mode-map (kbd "C-c C-k") #'smart-compile)))))

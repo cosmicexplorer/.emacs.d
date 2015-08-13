@@ -234,6 +234,9 @@ Check out your .emacs."))
  '(grep-highlight-matches (quote auto))
  '(grep-use-null-device nil)
  '(gud-key-prefix "")
+ '(haskell-check-command "hlint")
+ '(haskell-process-type (quote cabal-repl))
+ '(haskell-tags-on-save t)
  '(hippie-expand-try-functions-list
    (quote
     (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)))
@@ -256,7 +259,7 @@ Check out your .emacs."))
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (epresent helm-gtags ggtags ecb xterm-color web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
+    (company-ghc company-ghci ghc epresent helm-gtags ggtags ecb xterm-color web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
  '(rainbow-ansi-colors t)
  '(rainbow-html-colors t)
  '(rainbow-latex-colors t)

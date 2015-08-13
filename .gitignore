@@ -31,3 +31,4 @@ quicklisp/
 node_modules/
 server/
 url/
+/quicklisp.lisp
