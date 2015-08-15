@@ -13,7 +13,7 @@
 ;;; cause otherwise this doesn't work in graphical mode
 (global-set-key (kbd "<C-return>") 'newline-and-indent)
 ;;; just destroy unused files
-(global-set-key (kbd "C-x d") 'kill-buffer-and-move-file-to-trash)
+(global-set-key (kbd "C-x C-d") 'kill-buffer-and-move-file-to-trash)
 ;;; opposite of yank-pop
 (global-set-key (kbd "C-M-y") 'yank-push)
 ;;; reset quit key combination to close
@@ -114,10 +114,6 @@
 
 ;; open new file with given filename from minibuffer, or blank filename
 (global-set-key (kbd "C-x C-n") 'open-new-file)
-
-;; bind the key that doesn't do dired but should go to dired
-;;; (C-x d is set to something else)
-(global-set-key (kbd "C-x C-d") 'dired)
 
 ;; multiple cursors fun!!!
 (global-set-key (kbd "C-x C-l") 'mc/edit-lines)
