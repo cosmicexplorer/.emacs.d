@@ -324,6 +324,18 @@ lowercase, and Initial Caps versions."
               (t (buffer-name))))
       (buffer-name)))))
 
+(defun cider-doc-get-buffer-name (&optional my-mode)
+  (rename-buffer
+   (generate-new-buffer-name
+    (format "%s: %s (%s)"
+            "cider-doc"
+            cider-docview-symbol
+            (third
+             (split-string
+              (buffer-substring-no-properties (point-min) (point-max))
+              "\n")))
+    (buffer-name))))
+
 (defmacro better-navigation (&rest args)
   "ARGS are of form ((start-func change-func generate-buffer-name-func
 mode-name &optional advice-type advice-forms-as-list)). If you set 'around as
@@ -359,7 +371,8 @@ at some point, or else the function will never fire."
  (eshell eshell-send-input #'rename-shell-buffer eshell-mode)
  (shell comint-send-input #'rename-shell-buffer shell-mode)
  (info Info-goto-node #'help-info-get-buffer-name Info-mode)
- (nil help-follow-symbol #'help-info-get-buffer-name help-mode))
+ (nil help-follow-symbol #'help-info-get-buffer-name help-mode)
+ (nil cider-doc-lookup #'cider-doc-get-buffer-name cider-docview-mode))
 (add-hook 'help-mode-hook
           (lambda ()
             (help-info-get-buffer-name 'help-mode)))

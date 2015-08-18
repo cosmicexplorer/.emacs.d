@@ -339,3 +339,8 @@
   '(progn
      (define-key haskell-interactive-mode-map (kbd "C-c <tab>")
        #'haskell-process-do-info)))
+
+;;; clojure
+(eval-after-load 'cider
+  '(progn
+     (define-key clojure-mode-map (kbd "C-h f") #'cider-doc)))
