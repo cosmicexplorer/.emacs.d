@@ -22,7 +22,11 @@
            (setup-cider-stuff))
        (when (and lein-binary clojure-binary)
          (with-temp-buffer
-           (insert (concat "{:user {:plugins [[cider/cider-nrepl"
-                           cider-version "]]}}"))
+           (insert (concat "{:user {:plugins [[cider/cider-nrepl "
+                           "\""
+                           ;; hack for now, but should be fine
+                           "LATEST"
+                           ;; cider-version
+                           "\"]]}}"))
            (write-region nil nil lein-profiles-file))
          (setup-cider-stuff)))))
