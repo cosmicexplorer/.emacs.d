@@ -33,6 +33,7 @@
                       dash
                       ecb
                       ein
+                      ensime
                       epl
                       epresent
                       espuds
@@ -65,6 +66,7 @@
                       rainbow-delimiters
                       rainbow-mode
                       s
+                      scala-mode2
                       slime
                       slime-company
                       smartrep

@@ -381,7 +381,7 @@ search. Probably pretty slow."
           (format-time-string "%H:%M:%S,%Y-%M-%d")))
 
 ;;;###autoload
-(defun find (&optional prefix-arg)
+(defun u-find (&optional prefix-arg)
   "Parses and converts arguments with hyphen syntax (-name, -regex, etc) to
 atoms as a sexp for input to `unix-find' (:name, :regex, etc). Displays default
 prompt according to `unix-find-begin-prompt'."

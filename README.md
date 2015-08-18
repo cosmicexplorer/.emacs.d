@@ -32,3 +32,7 @@ This is all licensed under GPLv3, which means do whatever you want with it excep
 4. Haskell setup (not required if you don't use haskell):
     * Install [ghc-mod](https://github.com/kazu-yamamoto/ghc-mod). You'll need to add `~/cabal/.bin` (or the corresponding directory on your operating system) to your PATH.
     * It appears from certain [issues](https://github.com/kazu-yamamoto/ghc-mod/issues/437) on the ghc-mod repo that running `cabal install ghc-mod` may not work. In that case, run `git clone git@github.com:kazu-yamamoto/ghc-mod.git && cd ghc-mod && cabal install` to install the newest release from git, which should work.
+5. Scala setup (blah blah blah) from [this page](https://github.com/ensime/ensime-emacs/wiki/Quick-Start-Guide):
+    * run `sbt` once to get the folder structure set up
+    * add `addSbtPlugin("org.ensime" % "ensime-sbt" % "0.1.7")` to `~/.sbt/0.13/plugins/plugins.sbt`
+    * run `sbt gen-ensime` to generate a per-project ensime folder

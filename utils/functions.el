@@ -1304,7 +1304,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
           (let ((make-output-buf (get-buffer-create
                                   (concat "*" folder-name "-make-errors*")))
                 (prev-wd default-directory))
-            (cd (concat init-home-folder-dir "/" folder-name))
+            (cd (concat init-home-folder-dir folder-name))
             (set-process-sentinel
              (apply #'start-process
                     (append

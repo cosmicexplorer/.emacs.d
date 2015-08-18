@@ -354,14 +354,12 @@ Lisp code." t)
              (insert " "))
          (slime-autodoc-space arg)))))
 
-;;; scons
+;;; python
 ;;; use python-mode for scons files
 (setq auto-mode-alist
       (cons '("SConstruct" . python-mode) auto-mode-alist))
 (setq auto-mode-alist
       (cons '("SConscript" . python-mode) auto-mode-alist))
-(add-hook 'js-mode-hook
-          (lambda () (setq-local electric-indent-chars nil)))
 
 ;;; js/css/html
 (setq js-indent-level 2)
@@ -467,3 +465,12 @@ Lisp code." t)
   (interactive)
   (ad-deactivate 'ghc-check-syntax)
   (ghc-check-syntax))
+
+;;; scala
+(add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
+(defadvice sbt:find-root (around spoof-root activate)
+  (let ((res ad-do-it))
+    (unless res
+      (setq ad-return-value
+            (read-file-name "sbt project root: " nil "./" nil "./")))))
+;;; also something so ensime runs "sbt gen-ensime" for you
