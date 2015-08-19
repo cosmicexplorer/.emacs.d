@@ -10,6 +10,7 @@
         coffee-dedent-line-backspace
         cperl-electric-terminator
         end-of-visual-line
+        helm-buffers-list
         ido-find-file
         isearch-abort
         isearch-delete-char

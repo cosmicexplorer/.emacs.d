@@ -141,7 +141,6 @@
 (setq auto-save-interval 600)     ; half as often as default
 (setq gc-cons-threshold 2000000)
 (setq lpr-switches '("-Pps"))
-(setq text-mode-hook 'turn-on-auto-fill)
 (setq default-truncate-lines nil)
 (setq visible-bell t)
 (setq require-final-newline t)

@@ -117,11 +117,11 @@
 
 ;; multiple cursors fun!!!
 (global-set-key (kbd "C-x C-l") 'mc/edit-lines)
-(global-set-key (kbd "M-n") 'mc/mark-next-like-this)
-(global-set-key (kbd "M-p") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-M-n") 'mc/unmark-next-like-this)
-(global-set-key (kbd "C-M-p") 'mc/unmark-previous-like-this)
-(global-set-key (kbd "C-x C-a") 'mc/mark-all-like-this)
+(global-set-key (kbd "M-n") #'mc/mark-next-like-this)
+(global-set-key (kbd "M-p") #'mc/mark-previous-like-this)
+(global-set-key (kbd "C-M-n") #'mc/unmark-next-like-this)
+(global-set-key (kbd "C-M-p") #'mc/unmark-previous-like-this)
+(global-set-key (kbd "C-x C-a") #'mc/mark-all-like-this)
 
 ;; gofmt!!!
 (add-hook 'go-mode-hook
@@ -171,9 +171,15 @@
 
 ;;; lisp
 ;;; so it's all emacsy
-(define-key lisp-mode-map (kbd "C-h f") 'slime-documentation)
-(define-key lisp-mode-map (kbd "C-h v") 'slime-documentation)
-(define-key lisp-mode-map (kbd "C-h h") 'slime-hyperspec-lookup)
+(eval-after-load 'slime
+  '(progn
+     (define-key lisp-mode-map (kbd "C-h f") 'slime-documentation)
+     (define-key lisp-mode-map (kbd "C-h v") 'slime-documentation)
+     (define-key lisp-mode-map (kbd "C-h h") 'slime-hyperspec-lookup)
+     (define-key slime-mode-indirect-map (kbd "M-p")
+       #'mc/mark-previous-like-this)
+     (define-key slime-mode-indirect-map (kbd "M-n")
+       #'mc/mark-next-like-this)))
 
 ;;; makefile
 (eval-after-load "make-mode"
@@ -329,7 +335,8 @@
 ;;; haskell
 (eval-after-load "haskell-mode"
   '(progn
-     (define-key haskell-mode-map (kbd "<return>") #'haskell-newline-actual-indent)
+     (define-key haskell-mode-map (kbd "<return>")
+       #'haskell-newline-actual-indent)
      (add-hook
       'haskell-mode-hook
       (lambda ()
@@ -343,4 +350,6 @@
 ;;; clojure
 (eval-after-load 'cider
   '(progn
-     (define-key clojure-mode-map (kbd "C-h f") #'cider-doc)))
+     (eval-after-load 'clojure-mode
+       '(progn
+          (define-key clojure-mode-map (kbd "C-h f") #'cider-doc)))))

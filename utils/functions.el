@@ -384,20 +384,16 @@ SLIME and Paredit. Not for the faint of heart."
   (define-key paredit-mode-map (kbd "C-M-a C-M-<left>")
     'paredit-backward-barf-sexp)
   (when (eq major-mode 'lisp-mode)
-    (define-key slime-mode-indirect-map (kbd "C-M-a") nil)
-    (define-key slime-mode-indirect-map (kbd "M-p") nil)
-    (define-key paredit-mode-map (kbd "M-p") nil)
-    (define-key slime-mode-indirect-map (kbd "M-n") nil)
-    (define-key paredit-mode-map (kbd "M-n") nil))
+    (define-key slime-mode-indirect-map (kbd "C-M-a") nil))
   (when (eq major-mode 'slime-repl-mode)
     (define-key slime-repl-mode-map (kbd "M-s") nil))
   ;; so that multiple-cursors can use these
   (define-key paredit-mode-map (kbd "C-x C-l") 'mc/edit-lines)
-  (define-key paredit-mode-map (kbd "M-n") 'mc/mark-next-like-this)
-  (define-key paredit-mode-map (kbd "M-p") 'mc/mark-previous-like-this)
+  (define-key paredit-mode-map (kbd "M-n") #'mc/mark-next-like-this)
+  (define-key paredit-mode-map (kbd "M-p") #'mc/mark-previous-like-this)
   (define-key paredit-mode-map (kbd "C-M-n") 'mc/unmark-next-like-this)
   (define-key paredit-mode-map (kbd "C-M-p") 'mc/unmark-previous-like-this)
-  (define-key paredit-mode-map (kbd "C-x C-a") 'mc/mark-all-like-this)
+   (define-key paredit-mode-map (kbd "C-x C-a") 'mc/mark-all-like-this)
   (define-key paredit-mode-map (kbd "C-M-y") 'paredit-yank-push)
   (define-key paredit-mode-map (kbd "DEL") 'paredit-backspace-delete-highlight)
   (define-key paredit-mode-map (kbd "M-S-<up>") #'paredit-backward-up)
@@ -1473,9 +1469,10 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 (defun eval-buffer-and-message (prefix-given)
   (interactive "P")
-  (eval-buffer)
-  (unless prefix-given
-    (message "%s %s" "evaluated" (buffer-name))))
+  (let ((reg (region-active-p)))
+    (if reg (eval-region (region-beginning) (region-end)) (eval-buffer))
+    (unless prefix-given
+      (message "%s %s" "evaluated" (if reg "region" (buffer-name))))))
 
 ;;; html functions
 (require 'sgml-mode)
