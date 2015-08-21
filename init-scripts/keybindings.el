@@ -153,6 +153,7 @@
      (define-key coffee-mode-map (kbd "C-M-h") nil)))
 
 ;;; js
+(define-key js-mode-map (kbd "C-<tab>") #'web-beautify-js)
 (eval-after-load 'js2-mode
   '(eval-after-load 'js-mode
      (progn
@@ -173,6 +174,7 @@
 ;;; so it's all emacsy
 (eval-after-load 'slime
   '(progn
+     (add-hook 'slime-repl-mode-hook #'enable-paredit-mode)
      (define-key lisp-mode-map (kbd "C-h f") 'slime-documentation)
      (define-key lisp-mode-map (kbd "C-h v") 'slime-documentation)
      (define-key lisp-mode-map (kbd "C-h h") 'slime-hyperspec-lookup)
@@ -309,7 +311,7 @@
 (define-key dired-mode-map (kbd "M-t") #'dired-touch-file)
 
 ;;; random
-(global-set-key (kbd "C-c C-w") #'clear-whitespace)
+(global-set-key (kbd "C-c C-w") #'destroy-all-whitespace-nearby)
 
 ;;; magit
 (eval-after-load "magit"
@@ -347,9 +349,67 @@
      (define-key haskell-interactive-mode-map (kbd "C-c <tab>")
        #'haskell-process-do-info)))
 
+;;; paredit
+(define-key paredit-mode-map (kbd "M-t") 'transpose-sexps)
+(define-key paredit-mode-map (kbd "M-;") 'fix-paredit-comment-dwim)
+(define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
+(define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
+(define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key
+                                        ; here (slurp-forward)
+(define-key paredit-mode-map (kbd "C-c <right>") 'paredit-forward)
+(define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward) ; remove key
+                                        ; here (slurp-backward)
+(define-key paredit-mode-map (kbd "C-c <left>") 'paredit-backward)
+(define-key paredit-mode-map (kbd "M-a") nil) ; kill this, it's a global but
+                                        ; it's annoying and i don't use it
+(define-key paredit-mode-map (kbd "M-a M-a") 'paredit-add-parens-in-front)
+(define-key paredit-mode-map (kbd "M-a M-s") 'paredit-remove-function-wrapper)
+(define-key paredit-mode-map (kbd "M-q") #'fill-paragraph)
+;; (global-set-key (kbd "RET") 'newline-and-indent)
+(define-key paredit-mode-map (kbd "M-a M-<right>")
+  'paredit-forward-slurp-sexp)
+(define-key paredit-mode-map (kbd "C-c <up>")
+  'paredit-forward-slurp-sexp)
+(define-key paredit-mode-map (kbd "M-a M-<left>")
+  'paredit-backward-slurp-sexp)
+(define-key paredit-mode-map (kbd "C-M-a C-M-<right>")
+  'paredit-forward-barf-sexp)
+(define-key paredit-mode-map (kbd "C-c <down>")
+  'paredit-forward-barf-sexp)
+(define-key paredit-mode-map (kbd "C-M-a C-M-<left>")
+  'paredit-backward-barf-sexp)
+(define-key slime-mode-indirect-map (kbd "C-M-a") nil)
+(define-key slime-repl-mode-map (kbd "M-s") nil)
+;; so that multiple-cursors can use these
+(define-key paredit-mode-map (kbd "C-x C-l") 'mc/edit-lines)
+(define-key paredit-mode-map (kbd "M-n") #'mc/mark-next-not-cider)
+(define-key paredit-mode-map (kbd "M-p") #'mc/mark-prev-not-cider)
+(define-key paredit-mode-map (kbd "C-M-n") 'mc/unmark-next-like-this)
+(define-key paredit-mode-map (kbd "C-M-p") 'mc/unmark-previous-like-this)
+(define-key paredit-mode-map (kbd "C-x C-a") 'mc/mark-all-like-this)
+(define-key paredit-mode-map (kbd "C-M-y") 'paredit-yank-push)
+(define-key paredit-mode-map (kbd "DEL") 'paredit-backspace-delete-highlight)
+(define-key paredit-mode-map (kbd "M-S-<up>") #'paredit-backward-up)
+(define-key paredit-mode-map (kbd "M-S-<down>") #'paredit-forward-up)
+
 ;;; clojure
+(defun mc/mark-next-not-cider ()
+  (interactive)
+  (if (eq major-mode 'cider-repl-mode)
+      (call-interactively #'cider-repl-next-input)
+    (call-interactively #'mc/mark-next-like-this)))
+(defun mc/mark-prev-not-cider ()
+  (interactive)
+  (if (eq major-mode 'cider-repl-mode)
+      (call-interactively #'cider-repl-previous-input)
+    (call-interactively #'mc/mark-previous-like-this)))
+(eval-after-load 'cider-mode
+  '(progn
+     (define-key cider-mode-map (kbd "C-c C-w")
+       #'destroy-all-whitespace-nearby)))
 (eval-after-load 'cider
   '(progn
+     (add-hook 'cider-repl-mode-hook #'enable-paredit-mode)
      (eval-after-load 'clojure-mode
        '(progn
           (define-key clojure-mode-map (kbd "C-h f") #'cider-doc)))))

@@ -90,7 +90,8 @@ init-scripts/interface.el.")
      ;; url-queue-retrieve used because of built-in timeout
      (url-queue-retrieve
       ;; arbitrary url, chosen because github's uptime is ridiculous (remember
-      ;; when all of china ddos'd them? incredible)
+      ;; when all of china ddos'd them? incredible) and they probably aren't
+      ;; tracking my browsing info
       "https://github.com"
       (lambda (status)
         (let ((err (plist-get status :error)))
@@ -99,8 +100,7 @@ init-scripts/interface.el.")
 
 (defvar after-load-init-hook nil
   "Hook to run whatever after loading packages n functions n whatever.")
-(defvar use-omnisharp t
-  "C#!!!!!!!")
+(defvar use-omnisharp t "C#!!!!!!!")
 
 ;;; load custom values for these variables (this file is .gitignored)
 (let ((custom-var-file
@@ -259,7 +259,7 @@ Check out your .emacs."))
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (ensime scala-mode2 company-ghc company-ghci ghc epresent helm-gtags ggtags ecb xterm-color web-beautify w3m smartrep slime rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode magit literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
+    (ensime scala-mode2 company-ghc company-ghci ghc epresent helm-gtags ggtags ecb xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
  '(rainbow-ansi-colors t)
  '(rainbow-html-colors t)
  '(rainbow-latex-colors t)

@@ -33,5 +33,7 @@
         eval-buffer-and-message
         eval-expression
         isearch-delete-char
+        mc/mark-next-not-cider
+        mc/mark-prev-not-cider
         smart-compile
         ))

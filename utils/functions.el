@@ -349,56 +349,6 @@ instead of just the final line."
                          (line-end-position)))
     (insert " ")))
 
-;; get useful keybindings for lisp editing
-(defun fix-lisp-keybindings ()
-  "Changes about three million personalized keybindings for lisp editing with
-SLIME and Paredit. Not for the faint of heart."
-  (interactive)
-  (define-key paredit-mode-map (kbd "M-t") 'transpose-sexps)
-  (define-key paredit-mode-map (kbd "M-;") 'fix-paredit-comment-dwim)
-  (define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
-  (define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
-  (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key
-                                        ; here (slurp-forward)
-  (define-key paredit-mode-map (kbd "C-c <right>") 'paredit-forward)
-  (define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward) ; remove key
-                                        ; here (slurp-backward)
-  (define-key paredit-mode-map (kbd "C-c <left>") 'paredit-backward)
-  (define-key paredit-mode-map (kbd "M-a") nil) ; kill this, it's a global but
-                                        ; it's annoying and i don't use it
-  (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-add-parens-in-front)
-  (define-key paredit-mode-map (kbd "M-a M-s") 'paredit-remove-function-wrapper)
-  (define-key paredit-mode-map (kbd "M-q") #'fill-paragraph)
-  (global-set-key (kbd "RET") 'newline-and-indent) ; set as global because
-                                        ; define-key doesn't work, not sure why
-  (define-key paredit-mode-map (kbd "M-a M-<right>")
-    'paredit-forward-slurp-sexp)
-  (define-key paredit-mode-map (kbd "C-c <up>")
-    'paredit-forward-slurp-sexp)
-  (define-key paredit-mode-map (kbd "M-a M-<left>")
-    'paredit-backward-slurp-sexp)
-  (define-key paredit-mode-map (kbd "C-M-a C-M-<right>")
-    'paredit-forward-barf-sexp)
-  (define-key paredit-mode-map (kbd "C-c <down>")
-    'paredit-forward-barf-sexp)
-  (define-key paredit-mode-map (kbd "C-M-a C-M-<left>")
-    'paredit-backward-barf-sexp)
-  (when (eq major-mode 'lisp-mode)
-    (define-key slime-mode-indirect-map (kbd "C-M-a") nil))
-  (when (eq major-mode 'slime-repl-mode)
-    (define-key slime-repl-mode-map (kbd "M-s") nil))
-  ;; so that multiple-cursors can use these
-  (define-key paredit-mode-map (kbd "C-x C-l") 'mc/edit-lines)
-  (define-key paredit-mode-map (kbd "M-n") #'mc/mark-next-like-this)
-  (define-key paredit-mode-map (kbd "M-p") #'mc/mark-previous-like-this)
-  (define-key paredit-mode-map (kbd "C-M-n") 'mc/unmark-next-like-this)
-  (define-key paredit-mode-map (kbd "C-M-p") 'mc/unmark-previous-like-this)
-   (define-key paredit-mode-map (kbd "C-x C-a") 'mc/mark-all-like-this)
-  (define-key paredit-mode-map (kbd "C-M-y") 'paredit-yank-push)
-  (define-key paredit-mode-map (kbd "DEL") 'paredit-backspace-delete-highlight)
-  (define-key paredit-mode-map (kbd "M-S-<up>") #'paredit-backward-up)
-  (define-key paredit-mode-map (kbd "M-S-<down>") #'paredit-forward-up))
-
 ;; so that paredit-kill works the way it should on regions
 (defadvice paredit-kill (around paredit-kill-region-dwim)
   (interactive "P")
@@ -1768,9 +1718,17 @@ that."
       (indent-region new-pt-begin new-pt)
       (sgml-skip-tag-backward 1))))
 
-(defsubst destroy-whitespace-around-me ()
+(defun destroy-whitespace-around-me ()
+  (interactive)
   (loop while (whitespacep (char-before)) do (delete-backward-char 1))
   (loop while (whitespacep (char-after)) do (delete-char 1)))
+
+(defun destroy-all-whitespace-nearby ()
+  (interactive)
+  (loop while (string-match-p "[[:space:]\n]" (string (char-after)))
+        do (delete-char 1))
+  (loop while (string-match-p "[[:space:]\n]" (string (char-before)))
+        do (delete-backward-char 1)))
 
 (defun html-barf-tag-forward ()
   (interactive)

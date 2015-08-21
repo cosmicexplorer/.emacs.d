@@ -320,14 +320,10 @@ Lisp code." t)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 ;;; just turn on paredit for scratch buffer
 (add-hook 'lisp-interaction-mode-hook 'paredit-mode)
-(add-hook 'lisp-interaction-mode-hook 'fix-lisp-keybindings)
-(add-hook 'emacs-lisp-mode-hook 'fix-lisp-keybindings)
-(add-hook 'slime-mode-hook 'fix-lisp-keybindings)
 
 ;;; start scratch buffer in paredit mode
 (with-current-buffer (get-buffer "*scratch*")
   (enable-paredit-mode)
-  (fix-lisp-keybindings)
   (eldoc-mode))
 
 (setq inferior-lisp-program "sbcl")
