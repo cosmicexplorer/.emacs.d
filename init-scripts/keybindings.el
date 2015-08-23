@@ -153,10 +153,10 @@
      (define-key coffee-mode-map (kbd "C-M-h") nil)))
 
 ;;; js
-(define-key js-mode-map (kbd "C-<tab>") #'web-beautify-js)
 (eval-after-load 'js2-mode
   '(eval-after-load 'js-mode
      (progn
+       (define-key js-mode-map (kbd "C-<tab>") #'web-beautify-js)
        (define-key js2-mode-map (kbd "C-<tab>") #'web-beautify-js)
        (add-keybinding-to-mode-maps "RET" #'js-newline-indent-for-real
                                     js-mode-map js2-mode-map))))

@@ -830,7 +830,8 @@ Note the weekly scope of the command's precision.")
                                    saved-files ": \"" cur-line "\""))
                    (newline)))
                (forward-line)))
-    (kill-buffer)))
+    (kill-buffer))
+  (clean-all-buffers-to-deleted-files))
 
 (defvar init-loaded-fully nil
   "Set to t after init loads fully.")
