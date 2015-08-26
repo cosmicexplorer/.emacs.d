@@ -1208,14 +1208,12 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 ;;; read-only text
 
-(defun make-readonly-region-modifiable (beg end)
-  (interactive "r")
-  (let ((inhibit-read-only t))
-    (put-text-property beg end 'read-only nil)))
-
-(defun make-all-readonly-text-in-buffer-modifiable ()
+(defun make-readonly-text-modifiable ()
   (interactive)
-  (make-readonly-region-modifiable (point-min) (point-max)))
+  (let ((inhibit-read-only t))
+    (if (use-region-p)
+        (put-text-property (region-beginning) (region-end) 'read-only nil)
+      (put-text-property (point-min) (point-max) 'read-only nil))))
 
 ;;; for initialization
 (defun actual-setup-submodules (&optional cb)

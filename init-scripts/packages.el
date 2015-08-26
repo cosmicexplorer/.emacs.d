@@ -31,7 +31,6 @@
                       company-ghci
                       csharp-mode
                       dash
-                      ecb
                       ein
                       ensime
                       epl
