@@ -329,10 +329,18 @@ lowercase, and Initial Caps versions."
     (format "%s: %s (%s)"
             "cider-doc"
             cider-docview-symbol
-            (third
-             (split-string
-              (buffer-substring-no-properties (point-min) (point-max))
-              "\n")))
+            (let ((info (cider-var-info cider-docview-symbol)))
+              (reduce
+               (lambda (a b) (if (and a b) (concat a ":" b) a))
+               (mapcar
+                (lambda (str-or-list)
+                  (if (listp str-or-list)
+                      (when (nrepl-dict-get info (car str-or-list))
+                        (car str-or-list))
+                    (nrepl-dict-get info str-or-list)))
+                (list '("macro") '("special-form") "class" "member"
+                      "super" "interfaces" "forms-str"))
+               :initial-value "")))
     (buffer-name))))
 
 (defmacro better-navigation (&rest args)
