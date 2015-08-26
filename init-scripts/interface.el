@@ -252,10 +252,10 @@ lowercase, and Initial Caps versions."
 ;;; add it to programming modes!
 (add-hook 'prog-mode-hook #'warning-highlights-mode)
 
-(defun find-warning-words ()
-  (interactive)
-  (helm-multi-swoop-all
-   warning-highlights-regex))
+(defun find-warning-words (pfx)
+  (interactive "P")
+  (if pfx (helm-multi-swoop-all warning-highlights-regex)
+    (helm-swoop :$query warning-highlights-regex)))
 
 (defvar warning-words-grep-regex
   (reduce (lambda (a b) (concat a "|" b)) warning-words-list))
