@@ -337,16 +337,15 @@ instead of just the final line."
       (kill-line lines))))
 (global-set-key (kbd "C-k") 'kill-selected-region-default)
 
-(defun fix-paredit-comment-dwim (&optional arg)
+(defun fix-paredit-comment-dwim (arg)
   "Fixed paredit-comment-dwim's behavior on inline comments."
-  (interactive)
-  (if arg
-      (paredit-comment-dwim arg)
-    (paredit-comment-dwim))
-  (unless (string-match "^[\s]*;"
-                        (buffer-substring-no-properties
-                         (line-beginning-position)
-                         (line-end-position)))
+  (interactive "P")
+  (paredit-comment-dwim arg)
+  (unless (or (string-match-p "^[[:space:]]*;"
+                            (buffer-substring-no-properties
+                             (line-beginning-position)
+                             (line-end-position)))
+              (string-match-p "[[:space:]]" (make-string 1 (char-before))))
     (insert " ")))
 
 ;; so that paredit-kill works the way it should on regions
