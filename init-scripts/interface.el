@@ -136,6 +136,9 @@
             (when (eq major-mode 'doc-view-mode)
               (linum-mode 0))))
 
+(defadvice dired-do-shell-command (after refresh activate)
+  (revert-buffer))
+
 
 ;;; misc
 (add-hook 'after-load-init-hook #'load-display-time)

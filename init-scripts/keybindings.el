@@ -10,6 +10,7 @@
 ;;; 4. remember that M-= gets word counts!
 
 ;;; globally usable basic text insertion or command-running shortcuts
+(global-set-key (kbd "C-x d") #'open-dired-the-right-way)
 ;;; cause otherwise this doesn't work in graphical mode
 (global-set-key (kbd "<C-return>") 'newline-and-indent)
 ;;; just destroy unused files

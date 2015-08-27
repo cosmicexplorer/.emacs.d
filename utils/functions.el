@@ -1891,4 +1891,8 @@ by another percent."
   (interactive)
   (eww-open-file (buffer-file-name)))
 
+(defun open-dired-the-right-way (pfx)
+  (interactive "P")
+  (if pfx (dired default-directory) (ido-dired)))
+
 (provide 'functions)
