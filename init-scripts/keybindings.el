@@ -285,6 +285,7 @@
 (global-set-key (kbd "C-c M-e") #'message-erc-modded-chans)
 
 ;;; html stuff
+(define-key html-mode-map (kbd "M-o") #'open-in-browser)
 (define-key html-mode-map (kbd ">") #'html-autoclose-tag)
 (define-key html-mode-map (kbd "M-s") #'html-split-tag)
 (define-key html-mode-map (kbd "M-r") #'html-raise-tag)

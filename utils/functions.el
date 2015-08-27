@@ -1887,4 +1887,8 @@ by another percent."
     (when (< cur-indent 4)
       (loop for i from 1 to 4 do (insert " ")))))
 
+(defun open-in-browser ()
+  (interactive)
+  (eww-open-file (buffer-file-name)))
+
 (provide 'functions)

@@ -32,10 +32,12 @@
 ;;; only show whitespace sometimes
 (add-hook 'after-change-major-mode-hook
           '(lambda ()
-             (unless (or (eq major-mode 'w3m-mode)
+             (if (or (eq major-mode 'w3m-mode)
+                         (eq major-mode 'eww-mode)
                          (eq major-mode 'eshell-mode)
                          (eq major-mode 'ibuffer-mode)
                          (eq major-mode 'undo-tree-visualizer-mode))
+                 (setq show-trailing-whitespace nil)
                (setq show-trailing-whitespace t))))
 
 ;; do backups well and put them into a separate folder
@@ -344,6 +346,14 @@ lowercase, and Initial Caps versions."
                :initial-value "")))
     (buffer-name))))
 
+(defun eww-get-buffer-name (&optional my-mode)
+  (rename-buffer
+   (generate-new-buffer-name
+    (format "%s: %s (%s)"
+            "eww" (plist-get eww-data :title)
+            (cdr (memq 'href (car (second (plist-get eww-data :dom))))))
+    (buffer-name))))
+
 (defmacro better-navigation (&rest args)
   "ARGS are of form ((start-func change-func generate-buffer-name-func
 mode-name &optional advice-type advice-forms-as-list)). If you set 'around as
@@ -380,7 +390,8 @@ at some point, or else the function will never fire."
  (shell comint-send-input #'rename-shell-buffer shell-mode)
  (info Info-goto-node #'help-info-get-buffer-name Info-mode)
  (nil help-follow-symbol #'help-info-get-buffer-name help-mode)
- (nil cider-doc-lookup #'cider-doc-get-buffer-name cider-docview-mode))
+ (nil cider-doc-lookup #'cider-doc-get-buffer-name cider-docview-mode)
+ (eww eww-follow-link #'eww-get-buffer-name eww-mode))
 (add-hook 'help-mode-hook
           (lambda ()
             (help-info-get-buffer-name 'help-mode)))
