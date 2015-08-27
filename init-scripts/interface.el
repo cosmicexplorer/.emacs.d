@@ -311,57 +311,59 @@ lowercase, and Initial Caps versions."
 
 ;;; same for info and help
 (defun help-info-get-buffer-name (&optional my-mode)
-  (let ((mode (or my-mode major-mode)))
-    (rename-buffer
-     (generate-new-buffer-name
-      (let ((mode-str
-             (replace-regexp-in-string mode-fun-regex "" (symbol-name mode))))
-        (cond ((eq major-mode 'Info-mode)
-               (format "%s: %s->%s"
-                       mode-str
-                       (file-name-nondirectory Info-current-file)
-                       Info-current-node))
-              ((eq major-mode 'help-mode)
-               (format "%s: %s (%s)"
-                       mode-str
-                       (first help-xref-stack-item)
-                       (second help-xref-stack-item)))
-              (t (buffer-name))))
-      (buffer-name)))))
+  (let* ((mode (or my-mode major-mode))
+         (mode-str
+          (replace-regexp-in-string mode-fun-regex "" (symbol-name mode))))
+    (cond ((eq major-mode 'Info-mode)
+           (format "%s: %s->%s"
+                   mode-str
+                   (file-name-nondirectory Info-current-file)
+                   Info-current-node))
+          ((eq major-mode 'help-mode)
+           (format "%s: %s (%s)"
+                   mode-str
+                   (first help-xref-stack-item)
+                   (second help-xref-stack-item)))
+          (t (buffer-name)))))
 
 (defun cider-doc-get-buffer-name (&optional my-mode)
-  (rename-buffer
-   (generate-new-buffer-name
-    (format "%s: %s (%s)"
-            "cider-doc"
-            cider-docview-symbol
-            (let ((info (cider-var-info cider-docview-symbol)))
-              (reduce
-               (lambda (a b) (if (and a b) (concat a ":" b) a))
-               (mapcar
-                (lambda (str-or-list)
-                  (if (listp str-or-list)
-                      (when (nrepl-dict-get info (car str-or-list))
-                        (car str-or-list))
-                    (nrepl-dict-get info str-or-list)))
-                (list '("macro") '("special-form") "class" "member"
-                      "super" "interfaces" "forms-str"))
-               :initial-value "")))
-    (buffer-name))))
+  (format "%s: %s (%s)"
+          "cider-doc"
+          cider-docview-symbol
+          (let ((info (cider-var-info cider-docview-symbol)))
+            (reduce
+             (lambda (a b) (if (and a b) (concat a ":" b) a))
+             (mapcar
+              (lambda (str-or-list)
+                (if (listp str-or-list)
+                    (when (nrepl-dict-get info (car str-or-list))
+                      (car str-or-list))
+                  (nrepl-dict-get info str-or-list)))
+              (list '("macro") '("special-form") "class" "member"
+                    "super" "interfaces" "forms-str"))
+             :initial-value ""))))
 
 (defun eww-get-buffer-name (&optional my-mode)
-  (rename-buffer
-   (generate-new-buffer-name
-    (format "%s: %s (%s)"
-            "eww" (plist-get eww-data :title)
-            (cdr (memq 'href (car (second (plist-get eww-data :dom))))))
-    (buffer-name))))
+  (format "%s: %s (%s)"
+          "eww" (plist-get eww-data :title)
+          (cdr (memq 'href (car (second (plist-get eww-data :dom)))))))
+
+(defun python-get-buffer-name (&optional my-mode)
+  (format "%s: (%s)" python-shell-interpreter python-shell-prev-buf))
+
+(defvar python-shell-prev-buf nil)
+(defadvice python-shell-get-buffer (around get-right-buffer activate)
+  (unless ad-do-it
+    (setq ad-return-value
+          (find-if
+           (lambda (buf)
+             (let ((cur-buf (current-buffer)))
+               (with-current-buffer buf (eq python-shell-prev-buf cur-buf))))
+           (buffer-list)))))
 
 (defmacro better-navigation (&rest args)
   "ARGS are of form ((start-func change-func generate-buffer-name-func
-mode-name &optional advice-type advice-forms-as-list)). If you set 'around as
-advice-type, you should definitely change advice-forms-as-list to have ad-do-it
-at some point, or else the function will never fire."
+mode-name &optional advice-type advice-forms))."
   `(progn
      ,@(mapcar
         (lambda (arg)
@@ -369,13 +371,19 @@ at some point, or else the function will never fire."
              ,(unless (null (first arg))
                 `(defadvice ,(first arg) (,(or (fifth arg) 'after)
                                           ,(gensym) activate)
-                   ,(or (sixth arg)
-                        `(funcall ,(third arg) (quote ,(fourth arg))))))
+                   ,@(or (nthcdr 5 arg)
+                        `(rename-buffer
+                          (generate-new-buffer-name
+                           (funcall ,(third arg) (quote ,(fourth arg)))
+                           (buffer-name))))))
              ,(unless (null (second arg))
                 `(defadvice ,(second arg) (,(or (fifth arg) 'after)
                                            ,(gensym) activate)
-                   ,(or (sixth arg)
-                        `(funcall ,(third arg) (quote ,(fourth arg))))))
+                   ,@(or (nthcdr 5 arg)
+                        `(rename-buffer
+                          (generate-new-buffer-name
+                           (funcall ,(third arg) (quote ,(fourth arg)))
+                           (buffer-name))))))
              (defun ,(intern (concat "cleanup-"
                                      (replace-regexp-in-string
                                       mode-fun-regex ""
@@ -384,20 +392,29 @@ at some point, or else the function will never fire."
                (interactive)
                (loop for buf in (buffer-list)
                      do (with-current-buffer buf
-                          (when (eq major-mode (quote ,(fourth arg)))
+                          (when (eq major-mode ,(fourth arg))
                             (kill-buffer buf)))))))
         args)))
 
 (better-navigation
- (eshell eshell-send-input #'rename-shell-buffer eshell-mode)
- (shell comint-send-input #'rename-shell-buffer shell-mode)
- (info Info-goto-node #'help-info-get-buffer-name Info-mode)
- (nil help-follow-symbol #'help-info-get-buffer-name help-mode)
- (nil cider-doc-lookup #'cider-doc-get-buffer-name cider-docview-mode)
- (eww eww-follow-link #'eww-get-buffer-name eww-mode))
-(add-hook 'help-mode-hook
-          (lambda ()
-            (help-info-get-buffer-name 'help-mode)))
+ (eshell eshell-send-input rename-shell-buffer eshell-mode)
+ (shell comint-send-input rename-shell-buffer shell-mode)
+ (info Info-goto-node help-info-get-buffer-name Info-mode)
+ (nil help-follow-symbol help-info-get-buffer-name help-mode)
+ (nil cider-doc-lookup cider-doc-get-buffer-name cider-docview-mode)
+ (eww eww-follow-link eww-get-buffer-name eww-mode)
+ (python-shell-make-comint
+  comint-send-input python-get-buffer-name inferior-python-mode after
+  (let ((buf ad-return-value))
+    (when buf                           ; when creating new python shell
+      (let ((prev-buf (current-buffer)))
+        (with-current-buffer buf
+          (set (make-local-variable 'python-shell-prev-buf) prev-buf))))
+    (with-current-buffer (or buf (current-buffer))
+      (rename-buffer
+       (generate-new-buffer-name (python-get-buffer-name) (buffer-name)))))))
+
+(add-hook 'help-mode-hook (lambda () (help-info-get-buffer-name 'help-mode)))
 
 
 ;;; save and reset window configuration to ring
@@ -529,6 +546,7 @@ Check out your .emacs.\n")))))
 
 ;;; don't like seeing wraparound
 (add-hook 'text-mode-hook #'visual-line-mode)
+(add-hook 'eww-mode-hook #'visual-line-mode)
 (add-hook 'litcoffee-mode-hook #'visual-line-mode)
 
 ;;; i like being able to search for w3m buffers

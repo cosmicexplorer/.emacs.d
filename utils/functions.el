@@ -1887,9 +1887,11 @@ by another percent."
     (when (< cur-indent 4)
       (loop for i from 1 to 4 do (insert " ")))))
 
-(defun open-in-browser ()
-  (interactive)
-  (eww-open-file (buffer-file-name)))
+(defun open-in-browser (pfx)
+  (interactive "P")
+  (let ((buf (current-buffer)))
+    (eww-open-file (buffer-file-name))
+    (when pfx (kill-buffer buf))))
 
 (defun open-dired-the-right-way (pfx)
   (interactive "P")
