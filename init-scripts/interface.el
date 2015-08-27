@@ -371,19 +371,19 @@ mode-name &optional advice-type advice-forms))."
              ,(unless (null (first arg))
                 `(defadvice ,(first arg) (,(or (fifth arg) 'after)
                                           ,(gensym) activate)
-                   ,@(or (nthcdr 5 arg)
-                        `(rename-buffer
-                          (generate-new-buffer-name
-                           (funcall ,(third arg) (quote ,(fourth arg)))
-                           (buffer-name))))))
+                   ,@(or (nthcdr 4 arg)
+                         `((rename-buffer
+                             (generate-new-buffer-name
+                              (funcall ,(third arg) (quote ,(fourth arg)))
+                              (buffer-name)))))))
              ,(unless (null (second arg))
                 `(defadvice ,(second arg) (,(or (fifth arg) 'after)
                                            ,(gensym) activate)
-                   ,@(or (nthcdr 5 arg)
-                        `(rename-buffer
-                          (generate-new-buffer-name
-                           (funcall ,(third arg) (quote ,(fourth arg)))
-                           (buffer-name))))))
+                   ,@(or (nthcdr 4 arg)
+                         `((rename-buffer
+                             (generate-new-buffer-name
+                              (funcall ,(third arg) (quote ,(fourth arg)))
+                              (buffer-name)))))))
              (defun ,(intern (concat "cleanup-"
                                      (replace-regexp-in-string
                                       mode-fun-regex ""
@@ -397,22 +397,35 @@ mode-name &optional advice-type advice-forms))."
         args)))
 
 (better-navigation
- (eshell eshell-send-input rename-shell-buffer eshell-mode)
- (shell comint-send-input rename-shell-buffer shell-mode)
- (info Info-goto-node help-info-get-buffer-name Info-mode)
- (nil help-follow-symbol help-info-get-buffer-name help-mode)
- (nil cider-doc-lookup cider-doc-get-buffer-name cider-docview-mode)
- (eww eww-follow-link eww-get-buffer-name eww-mode)
+ (eshell eshell-send-input #'rename-shell-buffer eshell-mode)
+ (shell comint-send-input #'rename-shell-buffer shell-mode after
+        (when (eq major-mode 'shell-mode)
+          (rename-buffer
+           (generate-new-buffer-name (rename-shell-buffer) (buffer-name)))))
+ (info Info-goto-node #'help-info-get-buffer-name Info-mode)
+ (nil help-follow-symbol #'help-info-get-buffer-name help-mode)
+ (nil cider-doc-lookup #'cider-doc-get-buffer-name cider-docview-mode)
+ (eww eww-follow-link #'eww-get-buffer-name eww-mode)
  (python-shell-make-comint
-  comint-send-input python-get-buffer-name inferior-python-mode after
+  nil #'python-get-buffer-name inferior-python-mode after
   (let ((buf ad-return-value))
     (when buf                           ; when creating new python shell
       (let ((prev-buf (current-buffer)))
         (with-current-buffer buf
-          (set (make-local-variable 'python-shell-prev-buf) prev-buf))))
-    (with-current-buffer (or buf (current-buffer))
-      (rename-buffer
-       (generate-new-buffer-name (python-get-buffer-name) (buffer-name)))))))
+          (set (make-local-variable 'python-shell-prev-buf) prev-buf)
+          (rename-buffer
+           (generate-new-buffer-name
+            (python-get-buffer-name) (buffer-name)))))))))
+
+(progn
+  (progn
+    (defadvice info (after G262 activate) rename-buffer
+  (generate-new-buffer-name (funcall (function help-info-get-buffer-name) (quote
+                                                                           Info-mode)) (buffer-name)))
+    (defadvice Info-goto-node (after G263 activate) rename-buffer
+  (generate-new-buffer-name (funcall (function help-info-get-buffer-name) (quote
+                                                                           Info-mode)) (buffer-name)))
+    (defun cleanup-Info-buffers nil (interactive) (loop for buf in (buffer-list) do (with-current-buffer buf (when (eq major-mode Info-mode) (kill-buffer buf)))))))
 
 (add-hook 'help-mode-hook (lambda () (help-info-get-buffer-name 'help-mode)))
 
