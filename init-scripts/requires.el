@@ -16,7 +16,6 @@
 (require 'cloc)
 (require 'color-theme)
 (require 'comint)
-(require 'ecb)
 (require 'ensime)
 (require 'erc)
 (require 'erc-highlight-nicknames)      ; this file is in /lisp/

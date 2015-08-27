@@ -56,7 +56,7 @@
 ;;; cause this needs to exist
 (define-key dired-mode-map "c" 'find-file)
 ;;; mildly useful
-(define-key dired-mode-map (kbd "F") 'dired-do-find-marked-files)
+(define-key dired-mode-map (kbd "F") #'dired-find-marked-files-no-show)
 
 ;;; split-window management
 ;; open and close

@@ -48,6 +48,17 @@
 (require 'cperl-mode)
 (fset 'perl-mode 'cperl-mode)
 (setq cperl-indent-level 2)
+(defun my-cperl-eldoc-documentation-function ()
+  "Return meaningful doc string for `eldoc-mode'."
+  (car
+   (let ((cperl-message-on-help-error nil))
+     (cperl-get-help))))
+(add-hook
+ 'cperl-mode-hook
+ (lambda ()
+   (turn-on-eldoc-mode)
+   (set (make-local-variable 'eldoc-documentation-function)
+        'my-cperl-eldoc-documentation-function)))
 
 ;;; yes, this perl re.pl business is a massive hack. i claim none of it would be
 ;;; required if re.pl wasn't also a massive hack (who doesn't put newlines after
@@ -319,7 +330,8 @@ Lisp code." t)
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 ;;; just turn on paredit for scratch buffer
-(add-hook 'lisp-interaction-mode-hook 'paredit-mode)
+(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+(add-hook 'clojure-mode-hook #'enable-paredit-mode)
 
 ;;; start scratch buffer in paredit mode
 (with-current-buffer (get-buffer "*scratch*")
