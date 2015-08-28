@@ -1902,4 +1902,8 @@ by another percent."
   (visual-line-mode)
   (visual-line-mode))
 
+;;; C-u grep moves point to beginning of buffer
+(defadvice grep (around restore-point activate)
+  (let ((pt (point))) ad-do-it (goto-char pt)))
+
 (provide 'functions)
