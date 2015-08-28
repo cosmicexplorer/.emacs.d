@@ -1897,4 +1897,9 @@ by another percent."
   (interactive "P")
   (if pfx (dired default-directory) (ido-dired)))
 
+(defun refresh-visual-line-mode ()
+  (interactive)
+  (visual-line-mode)
+  (visual-line-mode))
+
 (provide 'functions)

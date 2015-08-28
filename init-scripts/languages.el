@@ -355,6 +355,7 @@ Lisp code." t)
       (cons '("SConstruct" . python-mode) auto-mode-alist))
 (setq auto-mode-alist
       (cons '("SConscript" . python-mode) auto-mode-alist))
+(add-hook 'python-mode-hook #'eldoc-mode)
 
 ;;; js/css/html
 (setq js-indent-level 2)
@@ -387,6 +388,9 @@ Lisp code." t)
    (set (make-local-variable 'eldoc-documentation-function)
         #'html-eldoc-function)
    (eldoc-mode)))
+
+;;; eldoc everywhere!
+(global-eldoc-mode)
 
 ;;; syntax highlighting
 (global-font-lock-mode 1)               ; turn on syntax highlighting

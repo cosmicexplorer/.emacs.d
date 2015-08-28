@@ -320,9 +320,8 @@ lowercase, and Initial Caps versions."
                    (file-name-nondirectory Info-current-file)
                    Info-current-node))
           ((eq major-mode 'help-mode)
-           (format "%s: %s (%s)"
+           (format "%s: %s"
                    mode-str
-                   (first help-xref-stack-item)
                    (second help-xref-stack-item)))
           (t (buffer-name)))))
 
@@ -348,18 +347,9 @@ lowercase, and Initial Caps versions."
           "eww" (plist-get eww-data :title)
           (cdr (memq 'href (car (second (plist-get eww-data :dom)))))))
 
-(defun python-get-buffer-name (&optional my-mode)
-  (format "%s: (%s)" python-shell-interpreter python-shell-prev-buf))
-
-(defvar python-shell-prev-buf nil)
-(defadvice python-shell-get-buffer (around get-right-buffer activate)
-  (unless ad-do-it
-    (setq ad-return-value
-          (find-if
-           (lambda (buf)
-             (let ((cur-buf (current-buffer)))
-               (with-current-buffer buf (eq python-shell-prev-buf cur-buf))))
-           (buffer-list)))))
+(defadvice run-python (around no-stinkin-errors activate)
+  (with-current-buffer (process-buffer ad-do-it)
+    (rename-buffer "*Python*")))
 
 (defmacro better-navigation (&rest args)
   "ARGS are of form ((start-func change-func generate-buffer-name-func
@@ -368,22 +358,28 @@ mode-name &optional advice-type advice-forms))."
      ,@(mapcar
         (lambda (arg)
           `(progn
-             ,(unless (null (first arg))
-                `(defadvice ,(first arg) (,(or (fifth arg) 'after)
-                                          ,(gensym) activate)
-                   ,@(or (nthcdr 4 arg)
-                         `((rename-buffer
-                             (generate-new-buffer-name
-                              (funcall ,(third arg) (quote ,(fourth arg)))
-                              (buffer-name)))))))
-             ,(unless (null (second arg))
-                `(defadvice ,(second arg) (,(or (fifth arg) 'after)
-                                           ,(gensym) activate)
-                   ,@(or (nthcdr 4 arg)
-                         `((rename-buffer
-                             (generate-new-buffer-name
-                              (funcall ,(third arg) (quote ,(fourth arg)))
-                              (buffer-name)))))))
+             ,@(unless (null (first arg))
+                 (mapcar
+                  (lambda (el)
+                    `(defadvice ,el (,(or (fifth arg) 'after)
+                                              ,(gensym) activate)
+                       ,@(or (nthcdr 4 arg)
+                             `((rename-buffer
+                                (generate-new-buffer-name
+                                 (funcall ,(third arg) (quote ,(fourth arg)))
+                                 (buffer-name)))))))
+                  (if (listp (first arg)) (first arg) (list (first arg)))))
+             ,@(unless (null (second arg))
+                 (mapcar
+                  (lambda (el)
+                    `(defadvice ,el (,(or (fifth arg) 'after)
+                                     ,(gensym) activate)
+                       ,@(or (nthcdr 4 arg)
+                             `((rename-buffer
+                                (generate-new-buffer-name
+                                 (funcall ,(third arg) (quote ,(fourth arg)))
+                                 (buffer-name)))))))
+                  (if (listp (second arg)) (second arg) (list (second arg)))))
              (defun ,(intern (concat "cleanup-"
                                      (replace-regexp-in-string
                                       mode-fun-regex ""
@@ -392,7 +388,7 @@ mode-name &optional advice-type advice-forms))."
                (interactive)
                (loop for buf in (buffer-list)
                      do (with-current-buffer buf
-                          (when (eq major-mode ,(fourth arg))
+                          (when (eq major-mode (quote ,(fourth arg)))
                             (kill-buffer buf)))))))
         args)))
 
@@ -403,29 +399,9 @@ mode-name &optional advice-type advice-forms))."
           (rename-buffer
            (generate-new-buffer-name (rename-shell-buffer) (buffer-name)))))
  (info Info-goto-node #'help-info-get-buffer-name Info-mode)
- (nil help-follow-symbol #'help-info-get-buffer-name help-mode)
+ (help-mode nil #'help-info-get-buffer-name help-mode)
  (nil cider-doc-lookup #'cider-doc-get-buffer-name cider-docview-mode)
- (eww eww-follow-link #'eww-get-buffer-name eww-mode)
- (python-shell-make-comint
-  nil #'python-get-buffer-name inferior-python-mode after
-  (let ((buf ad-return-value))
-    (when buf                           ; when creating new python shell
-      (let ((prev-buf (current-buffer)))
-        (with-current-buffer buf
-          (set (make-local-variable 'python-shell-prev-buf) prev-buf)
-          (rename-buffer
-           (generate-new-buffer-name
-            (python-get-buffer-name) (buffer-name)))))))))
-
-(progn
-  (progn
-    (defadvice info (after G262 activate) rename-buffer
-  (generate-new-buffer-name (funcall (function help-info-get-buffer-name) (quote
-                                                                           Info-mode)) (buffer-name)))
-    (defadvice Info-goto-node (after G263 activate) rename-buffer
-  (generate-new-buffer-name (funcall (function help-info-get-buffer-name) (quote
-                                                                           Info-mode)) (buffer-name)))
-    (defun cleanup-Info-buffers nil (interactive) (loop for buf in (buffer-list) do (with-current-buffer buf (when (eq major-mode Info-mode) (kill-buffer buf)))))))
+ (eww (eww-follow-link eww-back-url) #'eww-get-buffer-name eww-mode))
 
 (add-hook 'help-mode-hook (lambda () (help-info-get-buffer-name 'help-mode)))
 
@@ -559,7 +535,8 @@ Check out your .emacs.\n")))))
 
 ;;; don't like seeing wraparound
 (add-hook 'text-mode-hook #'visual-line-mode)
-(add-hook 'eww-mode-hook #'visual-line-mode)
+(add-hook 'eww-mode-hook
+          (lambda () (call-interactively #'visual-line-mode)))
 (add-hook 'litcoffee-mode-hook #'visual-line-mode)
 
 ;;; i like being able to search for w3m buffers

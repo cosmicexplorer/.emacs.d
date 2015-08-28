@@ -416,3 +416,6 @@
      (eval-after-load 'clojure-mode
        '(progn
           (define-key clojure-mode-map (kbd "C-h f") #'cider-doc)))))
+
+;;; eww
+(define-key eww-mode-map (kbd "C-c v") #'refresh-visual-line-mode)
