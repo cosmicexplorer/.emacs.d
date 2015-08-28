@@ -109,6 +109,7 @@
          ("TODO" (filename . "todo"))
          ("json" (filename . "\\.json\\'"))
          ("gyp" (filename . "\\.gyp\\'"))
+         ("clojure" (mode . clojure-mode))
          ("javascript" (mode . js2-mode))
          ("emacs-config" (or (filename . "\\.emacs\\.d")
                              (filename . "emacs-config")
