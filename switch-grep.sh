@@ -7,9 +7,11 @@ for last; do true; done
 # output if allowed
 useColorArg=$(grep --color 2>&1 | grep -- --color >/dev/null && \
                 echo "" || echo "--color")
-cmd="grep -rnH --binary-files=without-match $useColorArg"
+cmd="-nH --binary-files=without-match $useColorArg"
 if [ -d "$last" ]; then
-  $cmd "${@}"
+  grep -r $cmd "${@}"
+elif [ -f "$last" ]; then
+  grep $cmd "${@}"
 else
-  $cmd "${@}" .
+  grep -r $cmd "${@}" .
 fi
