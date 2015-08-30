@@ -39,8 +39,8 @@
                       evil
                       flycheck
                       flycheck-package
-                      ghc
                       ggtags
+                      ghc
                       go-mode
                       haskell-mode
                       helm
@@ -51,6 +51,7 @@
                       linum
                       linum-relative
                       literate-coffee-mode
+                      lua
                       magit
                       markdown-mode
                       minimap

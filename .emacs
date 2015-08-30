@@ -205,7 +205,8 @@ Check out your .emacs."))
  '(dired-clean-up-buffers-too nil)
  '(dired-guess-shell-alist-user
    (quote
-    (("^[^\\.]+$" "sh")
+    (("\\.jar\\'" "java -jar")
+     ("^[^\\.]+$" "sh")
      ("\\.bash\\'" "bash")
      ("\\.zsh\\'" "zsh")
      ("\\.sh\\'" "sh")
@@ -267,7 +268,7 @@ Check out your .emacs."))
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (ensime scala-mode2 company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
+    (lua-mode ensime scala-mode2 company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
  '(rainbow-ansi-colors t)
  '(rainbow-html-colors t)
  '(rainbow-latex-colors t)

@@ -473,3 +473,6 @@ Lisp code." t)
       (setq ad-return-value
             (read-file-name "sbt project root: " nil "./" nil "./")))))
 ;;; also something so ensime runs "sbt gen-ensime" for you
+
+;;; lua stuff
+(add-to-list 'auto-mode-alist '("\\.nse$" . lua-mode))

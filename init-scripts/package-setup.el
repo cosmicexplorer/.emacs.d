@@ -125,6 +125,7 @@
          ("magit" (name . "\*magit\*"))
          ("git" (name . "\*git"))
          ("perl" (mode . cperl-mode))
+         ("lua" (mode . lua-mode))
          ("helm" (or (name . "helm")
                      (name . "Helm")))
          ("makefile" (or (filename . "\\Makefile\\'")
