@@ -365,7 +365,7 @@ search. Probably pretty slow."
 (defvar unix-find-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map compilation-mode-map)
-    (define-key map "g" #'find)
+    (define-key map "g" #'u-find)
     (define-key map "G" #'unix-find-clear-prev-cmd-and-refind)
     map))
 
@@ -378,7 +378,7 @@ search. Probably pretty slow."
 
 (defun unix-find-get-buf-base-name (find-command)
   (concat find-command "@"
-          (format-time-string "%H:%M:%S,%Y-%M-%d")))
+          (format-time-string "%H:%M:%S,%Y-%m-%d")))
 
 ;;;###autoload
 (defun u-find (&optional prefix-arg)
@@ -418,7 +418,7 @@ prompt according to `unix-find-begin-prompt'."
 (defun unix-find-clear-prev-cmd-and-refind ()
   (interactive)
   (setq unix-find-prev-find-command nil)
-  (find))
+  (u-find))
 
 (defun unix-find-do-find (buf find-command find-cmd-parsed)
   (setq unix-find-prev-find-command find-command)
