@@ -51,7 +51,7 @@
                       linum
                       linum-relative
                       literate-coffee-mode
-                      lua
+                      lua-mode
                       magit
                       markdown-mode
                       minimap

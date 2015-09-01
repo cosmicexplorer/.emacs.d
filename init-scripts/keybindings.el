@@ -420,3 +420,5 @@
 ;;; eww
 (eval-after-load 'eww
   '(define-key eww-mode-map (kbd "C-c v") #'refresh-visual-line-mode))
+
+(global-set-key (kbd "C-x l") #'num-lines-file)

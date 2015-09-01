@@ -1906,4 +1906,9 @@ by another percent."
 (defadvice grep (around restore-point activate)
   (let ((pt (point))) ad-do-it (goto-char pt)))
 
+(defun num-lines-file ()
+  (interactive)
+  (message "%s %d %s" "buffer has" (count-lines (point-min) (point-max))
+           "lines"))
+
 (provide 'functions)

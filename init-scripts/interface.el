@@ -539,10 +539,6 @@ Check out your .emacs.\n")))))
           (lambda () (call-interactively #'visual-line-mode)))
 (add-hook 'litcoffee-mode-hook #'visual-line-mode)
 
-;;; i like being able to search for w3m buffers
-;;; TODO: doesn't work, let's fix
-;; (add-hook 'w3m-select-buffer-hook #'w3m-rename-buf)
-
 ;;; compilation-mode
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
@@ -563,21 +559,14 @@ Check out your .emacs.\n")))))
 (add-hook 'comint-mode-hook (lambda () (setq comint-process-echoes t)))
 (add-hook 'shell-mode-hook
           (lambda () (set-process-query-on-exit-flag
-                      (get-buffer-process (current-buffer))
-                      nil)))
+                      (get-buffer-process (current-buffer)) nil)))
 
 ;;; ibuffer moves things around when i mark things and this scares me
-(defadvice ibuffer-mark-interactive (after re-recenter activate)
-  (recenter))
+(defadvice ibuffer-mark-interactive (after re-recenter activate) (recenter))
 
 ;;; dired doesn't color the bottom file in a listing upon pressing
 ;;; TODO: submit fix for this
-(defadvice dired-mark (after dont-lie-to-me activate)
-  (revert-buffer))
-
-;;; tail compilations/greps
-(add-hook 'compilation-mode-hook
-          (lambda () (set-window-point (get-buffer-window) (point-max))))
+(defadvice dired-mark (after dont-lie-to-me activate) (revert-buffer))
 
 ;;; i like living on the edge
 (setq dired-deletion-confirmer (lambda (&rest args) t))
@@ -585,3 +574,59 @@ Check out your .emacs.\n")))))
   "Better than `dired-do-find-marked-files'."
   (interactive)
   (dired-do-find-marked-files t))
+
+;;; dired in sync
+(defvar-local dired-watch-desc nil)
+(defvar-local dired-is-out-of-sync nil)
+
+(defface dired-out-of-date-face
+  `((default (:background "dark red")))
+  "Face used for indicating when dired buffers are out of date."
+  :group 'dired-faces)
+
+(defconst +dired-rev-max+ 200
+  "Maximum number of elements in dired buffer to revert at.")
+
+(defconst +dired-rev-msg+ "This buffer is out of date. Please refresh.")
+
+(defun revert-dired-buf (ev)
+  (destructuring-bind (desc act &rest files) ev
+    (loop for buf in (mapcan (lambda (f)
+                               (dired-buffers-for-dir (file-name-directory f)))
+                             files)
+          do (with-current-buffer buf
+               (let ((num-lines (count-lines (point-min) (point-max))))
+                 (remove-overlays (point-min) (point-max) 'dired-rev t)
+                 (if (<= num-lines +dired-rev-max+) (revert-buffer)
+                   (let ((olay (make-overlay (point-min) (point-max) nil t)))
+                     (overlay-put olay 'face 'dired-out-of-date-face)
+                     (overlay-put olay 'dired-rev t)
+                     (overlay-put olay 'help-echo +dired-rev-msg+)
+                     (setq dired-is-out-of-sync t))))))))
+
+(defun dired-rev-post-cmd-fn ()
+  (when (eq major-mode 'dired-mode)
+    (cond ((eq this-command 'revert-buffer)
+           (setq dired-is-out-of-sync nil))
+          (dired-is-out-of-sync
+           (message "%s" +dired-rev-msg+)))))
+
+(add-hook 'post-command-hook #'dired-rev-post-cmd-fn)
+
+(defun watch-dired-buffer ()
+  (interactive)
+  (if (not (eq major-mode 'dired-mode))
+      (throw 'not-dired-buffer "lol this isn't dired")
+    (unless dired-watch-desc
+      (setq dired-watch-desc
+            (file-notify-add-watch
+             dired-directory '(change attribute-change) #'revert-dired-buf)))))
+
+(defun unwatch-dired-buffer ()
+  (interactive)
+  (when dired-watch-desc
+    (file-notify-rm-watch dired-watch-desc)
+    (setq dired-watch-desc nil)))
+
+(add-hook 'kill-buffer-hook #'unwatch-dired-buffer)
+(add-hook 'dired-mode-hook #'watch-dired-buffer)

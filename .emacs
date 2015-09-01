@@ -200,8 +200,10 @@ Check out your .emacs."))
  '(cloc-use-3rd-gen t)
  '(coffee-args-compile (quote ("-c" "-b" "--no-header")))
  '(coffee-tab-width 2)
+ '(compilation-scroll-output (quote first-error))
  '(compile-command "make")
  '(dabbrev-case-replace nil)
+ '(dired-auto-revert-buffer t)
  '(dired-clean-up-buffers-too nil)
  '(dired-guess-shell-alist-user
    (quote
@@ -299,3 +301,4 @@ Check out your .emacs."))
  ;; If there is more than one, they won't work right.
  '(italic ((t (:foreground "magenta" :slant italic))))
  '(underline ((t (:foreground "yellow" :underline t)))))
+ 
