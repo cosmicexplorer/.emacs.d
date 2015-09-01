@@ -537,6 +537,7 @@ Check out your .emacs.\n")))))
 (add-hook 'text-mode-hook #'visual-line-mode)
 (add-hook 'eww-mode-hook
           (lambda () (call-interactively #'visual-line-mode)))
+(add-hook 'eww-after-render-hook #'refresh-visual-line-mode)
 (add-hook 'litcoffee-mode-hook #'visual-line-mode)
 
 ;;; compilation-mode
@@ -584,7 +585,7 @@ Check out your .emacs.\n")))))
   "Face used for indicating when dired buffers are out of date."
   :group 'dired-faces)
 
-(defconst +dired-rev-max+ 200
+(defconst +dired-rev-max+ 5000
   "Maximum number of elements in dired buffer to revert at.")
 
 (defconst +dired-rev-msg+ "This buffer is out of date. Please refresh.")
