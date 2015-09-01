@@ -1911,4 +1911,37 @@ by another percent."
   (message "%s %d %s" "buffer has" (count-lines (point-min) (point-max))
            "lines"))
 
+(defcustom dired-lisp-alist nil
+  "Alist of regexps and lisp to run on such regexps using `dired-run-lisp'."
+  :group 'dired)
+
+(defun dired-get-default-cmd (files)
+  (second
+   (car
+    (remove-if-not
+     (lambda (pair)
+       (every (lambda (f) (string-match-p (first pair) f)) files))
+     dired-lisp-alist))))
+
+(defun dired-parse-function (args-fun files)
+  (mapcar args-fun files))
+
+(defconst +dired-run-lisp-no-command-msg+ "No lisp command provided.")
+
+(defun dired-run-lisp (files default func-and-args)
+  (interactive
+   (let* ((files (dired-get-marked-files))
+          (def (dired-get-default-cmd files)))
+     (list files def
+           (read-from-minibuffer
+            (concat "lisp to run: " (if def (concat "[" def "]") ""))))))
+  (if (and (equal func-and-args "") (not default))
+      (message "%s" +dired-run-lisp-no-command-msg+)
+    (message
+     "%S"
+     (dired-parse-function
+      (if (equal func-and-args "") default
+        (car (read-from-string func-and-args)))
+      files))))
+
 (provide 'functions)
