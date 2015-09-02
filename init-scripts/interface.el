@@ -486,9 +486,7 @@ Check out your .emacs.\n")))))
 (defun create-erc-modded-chans-string (erc-modded-chans-alist)
   (concat
    "["
-   (replace-regexp-in-string
-    "\\`[[:space:]]+\\|[[:space:]]+\\'"
-    ""
+   (substring
     (reduce
      (lambda (a b) (concat a " " b))
      (remove-if
@@ -499,7 +497,8 @@ Check out your .emacs.\n")))))
            (and (buffer-name (first el)) face
                 (propertize (buffer-name (first el)) 'face face))))
        erc-modded-chans-alist))
-     :initial-value " "))
+     :initial-value " ")
+    2)
    "]"))
 (defun message-erc-modded-chans (prefix-given)
   (interactive "P")

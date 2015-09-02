@@ -1952,7 +1952,7 @@ by another percent."
         (insert out))
       (message "%s" out))))
 
-;;; TODO: make emacs async stuff
+;;; TODO: make emacs do threading async stuff
 ;; (defun dired-run-lisp-async (files default func-and-args)
 ;;   (interactive (dired-lisp-get-args))
 ;;   (async-start
