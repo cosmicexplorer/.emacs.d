@@ -54,10 +54,10 @@
 (global-set-key (kbd "C-x /") 'other-window)
 
 ;;; dired
-;;; cause this needs to exist
-(define-key dired-mode-map "c" 'find-file)
 ;;; mildly useful
 (define-key dired-mode-map (kbd "F") #'dired-find-marked-files-no-show)
+(define-key dired-mode-map (kbd "* *") #'dired-mark-files-wildcard)
+(define-key dired-mode-map (kbd "D") #'dired-flag-marked-files)
 
 ;;; split-window management
 ;; open and close
