@@ -130,7 +130,6 @@
                      (name . "Helm")))
          ("makefile" (or (filename . "\\Makefile\\'")
                          (filename . "\\makefile\\'")))
-         ("dired" (mode . dired-mode))
          ;; because just detecting julia-mode doesn't work fsr
          ("julia" (filename . "\\.jl\\'"))
          ("r" (or (filename . "\\.R\\'")
@@ -244,3 +243,7 @@
 
 ;;; web-beautify-js makes my cursor move around
 (defadvice web-beautify-js (after dont-move activate) (recenter))
+
+;;; dired async stuff
+(autoload 'dired-async-mode "dired-async.el" nil t)
+(dired-async-mode 1)

@@ -1927,21 +1927,36 @@ by another percent."
   (mapcar args-fun files))
 
 (defconst +dired-run-lisp-no-command-msg+ "No lisp command provided.")
+(defconst +dired-run-lisp-buf-name+ "*Dired Lisp*")
 
-(defun dired-run-lisp (files default func-and-args)
-  (interactive
-   (let* ((files (dired-get-marked-files))
-          (def (dired-get-default-cmd files)))
+(defun dired-lisp-get-args ()
+  (let* ((files (dired-get-marked-files))
+         (def (dired-get-default-cmd files)))
      (list files def
            (read-from-minibuffer
             (concat "lisp to run: " (if def (concat "[" def "]") ""))))))
+
+(defun dired-run-lisp (files default func-and-args)
+  (interactive (dired-lisp-get-args))
   (if (and (equal func-and-args "") (not default))
       (message "%s" +dired-run-lisp-no-command-msg+)
-    (message
-     "%S"
-     (dired-parse-function
-      (if (equal func-and-args "") default
-        (car (read-from-string func-and-args)))
-      files))))
+    (let ((out
+           (format
+            "%S"
+            (dired-parse-function
+             (if (equal func-and-args "") default
+               (read func-and-args))
+             files))))
+      (with-current-buffer (get-buffer-create +dired-run-lisp-buf-name+)
+        (erase-buffer)
+        (insert out))
+      (message "%s" out))))
+
+;;; TODO: make emacs async stuff
+;; (defun dired-run-lisp-async (files default func-and-args)
+;;   (interactive (dired-lisp-get-args))
+;;   (async-start
+;;    (lambda () (funcall #'dired-run-lisp files default func-and-args))
+;;    (lambda (msg) (message "%s" msg))))
 
 (provide 'functions)

@@ -486,16 +486,20 @@ Check out your .emacs.\n")))))
 (defun create-erc-modded-chans-string (erc-modded-chans-alist)
   (concat
    "["
-   (reduce
-    (lambda (a b) (concat a " " b))
-    (remove-if
-     #'null
-     (mapcar
-      (lambda (el)
-        (let ((face (if (listp (nthcdr 2 el)) (fourth el) (nthcdr 2 el))))
-          (and (buffer-name (first el)) face
-               (propertize (buffer-name (first el)) 'face face))))
-      erc-modded-chans-alist)))
+   (replace-regexp-in-string
+    "\\`[[:space:]]+\\|[[:space:]]+\\'"
+    ""
+    (reduce
+     (lambda (a b) (concat a " " b))
+     (remove-if
+      #'null
+      (mapcar
+       (lambda (el)
+         (let ((face (if (listp (nthcdr 2 el)) (fourth el) (nthcdr 2 el))))
+           (and (buffer-name (first el)) face
+                (propertize (buffer-name (first el)) 'face face))))
+       erc-modded-chans-alist))
+     :initial-value " "))
    "]"))
 (defun message-erc-modded-chans (prefix-given)
   (interactive "P")
@@ -585,7 +589,7 @@ Check out your .emacs.\n")))))
   "Face used for indicating when dired buffers are out of date."
   :group 'dired-faces)
 
-(defconst +dired-rev-max+ 5000
+(defconst +dired-rev-max+ 500
   "Maximum number of elements in dired buffer to revert at.")
 
 (defconst +dired-rev-msg+ "This buffer is out of date. Please refresh.")
