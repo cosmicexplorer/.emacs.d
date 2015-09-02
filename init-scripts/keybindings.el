@@ -267,11 +267,15 @@
         (define-key c-mode-map (kbd "C-M-r") #'ggtags-reload)
         (define-key c-mode-map (kbd "C-c C-k") #'smart-compile)
         (define-key c-mode-map (kbd "C-c C-c")
-        (lambda () (interactive) (ggtags-ensure-global-buffer (kill-compilation))))
+          (lambda () (interactive)
+            (ggtags-ensure-global-buffer (kill-compilation))))
         (define-key c-mode-map (kbd "C-c t") #'helm-gtags-find-tag)
-        (define-key c-mode-map (kbd "C-<tab>") #'clang-format-buffer)
+        (define-key c-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby)
+        (define-key c++-mode-map (kbd "C-c C-w")
+          #'destroy-all-whitespace-nearby)
+        (define-key c-mode-map (kbd "C-<tab>") #'clang-format-dwim)
         ;; and c++
-        (define-key c++-mode-map (kbd "C-<tab>") #'clang-format-buffer)))
+        (define-key c++-mode-map (kbd "RET") #'clang-format-dwim)))
 
 ;;; in the same vein
 (global-set-key (kbd "C-x C-h") #'pop-to-mark-command)

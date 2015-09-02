@@ -45,18 +45,32 @@
                              "-style" style)
       (goto-char (point-min))
       (let ((json-output (json-read-from-string
-                           (buffer-substring-no-properties
-                             (point-min) (line-beginning-position 2)))))
+                          (buffer-substring-no-properties
+                           (point-min) (line-beginning-position 2)))))
         (delete-region (point-min) (line-beginning-position 2))
         (goto-char (1+ (cdr (assoc 'Cursor json-output))))
         (dotimes (index (length orig-windows))
           (set-window-start (nth index orig-windows)
                             (nth index orig-window-starts)))))))
 
-;;; LOL ADDED PERSONALLY
+;;;###autoload
 (defun clang-format-line ()
-	"Use clang-format to format the current line."
-	(interactive)
-	(clang-format (line-beginning-position) (line-end-position)))
+  "Use clang-format to format the current line."
+  (interactive)
+  (clang-format (line-beginning-position) (line-end-position)))
+
+;;;###autoload
+(defun clang-format-dwim (&optional pfx)
+  (interactive)
+  (if pfx (clang-format-line)
+    (if (use-region-p)
+        (clang-format (region-beginning) (region-end))
+      (clang-format-buffer))))
+
+;;;###autoload
+(defun clang-format-newline ()
+  (interactive)
+  (clang-format-line)
+  (newline-and-indent))
 
 (provide 'clang-format)
