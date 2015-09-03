@@ -58,6 +58,7 @@
 (define-key dired-mode-map (kbd "F") #'dired-find-marked-files-no-show)
 (define-key dired-mode-map (kbd "* *") #'dired-mark-files-wildcard)
 (define-key dired-mode-map (kbd "D") #'dired-flag-marked-files)
+(define-key dired-mode-map (kbd "G") #'dired-grep-marked-files)
 
 ;;; split-window management
 ;; open and close

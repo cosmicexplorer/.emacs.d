@@ -155,12 +155,6 @@ Check out your .emacs."))
 ;;; should be /after/ byte-recompilation
 (load-my-init-script "requires")
 
-(defvar my-init-files
-  (cons (concat user-emacs-directory ".emacs")
-        (unix-find
-         user-emacs-directory :name "*.el" :not :iwholename "*elpa*"
-         :not :iwholename "*ESS*")))
-
 ;;; for compatibility between different operating environments
 (load-my-init-script "compat")
 ;;; enforce my strong opinions on the default emacs ui
