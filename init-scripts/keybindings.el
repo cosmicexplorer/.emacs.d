@@ -258,25 +258,27 @@
 
 ;;; now for c
 (eval-after-load 'cc-mode
-   '(progn
-        (define-key c-mode-map (kbd "C-h C-d") #'ggtags-find-definition)
-        (define-key c-mode-map (kbd "C-h r") #'ggtags-find-reference)
-        (define-key c-mode-map (kbd "C-h d") #'ggtags-find-tag-dwim)
-        (define-key c-mode-map (kbd "C-h C-s") #'ggtags-show-definition)
-        (define-key c-mode-map (kbd "C-h l") #'ggtags-find-file)
-        (define-key c-mode-map (kbd "C-M-h") #'ggtags-update-tags)
-        (define-key c-mode-map (kbd "C-M-r") #'ggtags-reload)
-        (define-key c-mode-map (kbd "C-c C-k") #'smart-compile)
-        (define-key c-mode-map (kbd "C-c C-c")
-          (lambda () (interactive)
-            (ggtags-ensure-global-buffer (kill-compilation))))
-        (define-key c-mode-map (kbd "C-c t") #'helm-gtags-find-tag)
-        (define-key c-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby)
-        (define-key c++-mode-map (kbd "C-c C-w")
-          #'destroy-all-whitespace-nearby)
-        (define-key c-mode-map (kbd "C-<tab>") #'clang-format-dwim)
-        ;; and c++
-        (define-key c++-mode-map (kbd "RET") #'clang-format-dwim)))
+  '(progn
+     (define-key c-mode-map (kbd "C-h C-d") #'ggtags-find-definition)
+     (define-key c-mode-map (kbd "C-h r") #'ggtags-find-reference)
+     (define-key c-mode-map (kbd "C-h d") #'ggtags-find-tag-dwim)
+     (define-key c-mode-map (kbd "C-h C-s") #'ggtags-show-definition)
+     (define-key c-mode-map (kbd "C-h l") #'ggtags-find-file)
+     (define-key c-mode-map (kbd "C-M-h") #'ggtags-update-tags)
+     (define-key c-mode-map (kbd "C-M-r") #'ggtags-reload)
+     (define-key c-mode-map (kbd "C-c C-k") #'smart-compile)
+     (define-key c-mode-map (kbd "C-c C-c")
+       (lambda () (interactive)
+         (ggtags-ensure-global-buffer (kill-compilation))))
+     (define-key c-mode-map (kbd "C-c t") #'helm-gtags-find-tag)
+     (define-key c-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby)
+     (define-key c++-mode-map (kbd "C-c C-w")
+       #'destroy-all-whitespace-nearby)
+     (define-key c-mode-map (kbd "C-<tab>") #'clang-format-buffer)
+     (define-key c++-mode-map (kbd "C-<tab>") #'clang-format-buffer)
+     ;; and c++
+     (define-key c++-mode-map (kbd "RET") #'clang-format-dwim)
+     (define-key c-mode-map (kbd "RET") #'clang-format-dwim)))
 
 ;;; in the same vein
 (global-set-key (kbd "C-x C-h") #'pop-to-mark-command)
