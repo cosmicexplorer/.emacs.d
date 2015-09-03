@@ -70,6 +70,7 @@
                       slime
                       slime-company
                       smartrep
+                      speech-tagger
                       undo-tree
                       w3m
                       web-beautify
