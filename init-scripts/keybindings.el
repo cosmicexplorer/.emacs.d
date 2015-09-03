@@ -277,8 +277,8 @@
      (define-key c-mode-map (kbd "C-<tab>") #'clang-format-buffer)
      (define-key c++-mode-map (kbd "C-<tab>") #'clang-format-buffer)
      ;; and c++
-     (define-key c++-mode-map (kbd "RET") #'clang-format-dwim)
-     (define-key c-mode-map (kbd "RET") #'clang-format-dwim)))
+     (define-key c++-mode-map (kbd "RET") #'newline-and-indent-fix-cc-mode)
+     (define-key c-mode-map (kbd "RET") #'newline-and-indent-fix-cc-mode)))
 
 ;;; in the same vein
 (global-set-key (kbd "C-x C-h") #'pop-to-mark-command)
