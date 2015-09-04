@@ -36,3 +36,7 @@ This is all licensed under GPLv3, which means do whatever you want with it excep
     * run `sbt` once to get the folder structure set up
     * add `addSbtPlugin("org.ensime" % "ensime-sbt" % "0.1.7")` to `~/.sbt/0.13/plugins/plugins.sbt`
     * run `sbt gen-ensime` to generate a per-project ensime folder
+6. ein setup
+    * install [ipython](https://ipython.org/)
+    * install the modules `notebook`, `numpy`, `sympy`, `matplotlib`, `cairocffi`, and any others you want
+    * `pip install notebook` worked for me for the above modules

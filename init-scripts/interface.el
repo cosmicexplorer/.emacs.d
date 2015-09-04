@@ -595,10 +595,12 @@ Check out your .emacs.\n")))))
 
 (defun revert-dired-buf (ev)
   (destructuring-bind (desc act &rest files) ev
+    (message "%S" ev)
     (loop for buf in (mapcan (lambda (f)
                                (dired-buffers-for-dir (file-name-directory f)))
                              files)
           do (with-current-buffer buf
+               (message "reverted: %s" (buffer-name buf))
                (let ((num-lines (count-lines (point-min) (point-max))))
                  (remove-overlays (point-min) (point-max) 'dired-rev t)
                  (if (<= num-lines +dired-rev-max+) (revert-buffer)
@@ -621,10 +623,11 @@ Check out your .emacs.\n")))))
   (interactive)
   (if (not (eq major-mode 'dired-mode))
       (throw 'not-dired-buffer "lol this isn't dired")
-    (unless dired-watch-desc
-      (setq dired-watch-desc
-            (file-notify-add-watch
-             dired-directory '(change attribute-change) #'revert-dired-buf)))))
+    (when dired-watch-desc (file-notify-rm-watch dired-watch-desc))
+    (setq dired-watch-desc
+          (file-notify-add-watch
+           (expand-file-name dired-directory)
+           '(change attribute-change) #'revert-dired-buf))))
 
 (defun unwatch-dired-buffer ()
   (interactive)
