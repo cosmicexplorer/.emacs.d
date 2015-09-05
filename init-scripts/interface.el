@@ -158,9 +158,6 @@
 (autoload 'ispell-complete-word "ispell" "Complete word at or before point" t)
 (autoload 'ispell-region "ispell" "Check spelling of region" t)
 (autoload 'ispell-buffer "ispell" "Check spelling of buffer" t)
-;;; i'm not sure what these do
-(setq trim-versions-without-asking t)
-(setq mode-line-inverse-video t)
 
 
 ;;; setup syntax highlighting for keywords i care about
@@ -510,6 +507,23 @@ Check out your .emacs.\n")))))
   (when (eq major-mode 'erc-mode)
     (message-erc-modded-chans nil)))
 ;;; update me with irc activity, but only if i'm in an erc buffer
+(setq mode-line-modes
+      (remove '(t erc-modified-channels-object) mode-line-modes))
+(let* ((first-two (list (first mode-line-modes)
+                        (second mode-line-modes)))
+       (last-two
+        (nthcdr (- (length mode-line-modes) 2) mode-line-modes))
+       (start-ind (if (and (stringp (first first-two))
+                           (string= (first first-two) "%[")
+                           (stringp (second first-two))
+                           (string= (second first-two) "("))
+                      2 0))
+       (end-ind
+        (let ((len (1- (length mode-line-modes))))
+          (if (and (string= (first last-two) ")")
+                   (string= (second last-two) "%]"))
+              (- len 2) len))))
+  (setq mode-line-modes (get-range-of-list start-ind end-ind mode-line-modes)))
 (defadvice erc-server-filter-function
     (after update-erc-status-on-erc-bufs activate)
   (setq mode-line-modes

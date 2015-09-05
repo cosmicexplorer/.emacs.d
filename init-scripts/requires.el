@@ -13,7 +13,6 @@
 (require 'ansi-color)
 (require 'browse-kill-ring)
 (require 'clang-format)
-(require 'cloc)
 (require 'color-theme)
 (require 'comint)
 (require 'ensime)

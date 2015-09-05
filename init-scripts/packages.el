@@ -54,6 +54,7 @@
                       lua-mode
                       magit
                       markdown-mode
+                      matlab-mode
                       minimap
                       misc-cmds
                       multiple-cursors
