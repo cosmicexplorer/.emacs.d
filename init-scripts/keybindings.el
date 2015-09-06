@@ -320,6 +320,7 @@
 ;;; dired
 (define-key dired-mode-map (kbd "M-t") #'dired-touch-file)
 (define-key dired-mode-map (kbd "l") #'dired-run-lisp)
+(define-key dired-mode-map (kbd "f") #'find-name-dired)
 
 ;;; random
 (global-set-key (kbd "C-c C-w") #'destroy-all-whitespace-nearby)
