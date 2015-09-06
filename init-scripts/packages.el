@@ -41,6 +41,7 @@
                       flycheck-package
                       ggtags
                       ghc
+                      git-gutter
                       go-mode
                       haskell-mode
                       helm
