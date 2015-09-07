@@ -40,7 +40,6 @@
 
 ;;; Code:
 
-;;; TODO: refactor that folder to use requires
 (require 'cl)
 (require 'unix-find)
 (require 'functions)
@@ -197,10 +196,8 @@ which is defined in `smart-compile-alist'."
   (interactive "p")
   (let ((name (buffer-file-name))
         (not-yet t))
-
     (if (not name)
         (error "cannot get filename."))
-
     (save-buffer)
     (macrolet
         ((add-build-system
