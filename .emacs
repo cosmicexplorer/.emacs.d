@@ -201,7 +201,8 @@ Check out your .emacs."))
  '(dired-clean-up-buffers-too nil)
  '(dired-guess-shell-alist-user
    (quote
-    (("\\.pl\\'" "perl")
+    (("\\.coffee\\'" "coffee")
+     ("\\.pl\\'" "perl")
      ("\\.jar\\'" "java -jar")
      ("^[^\\.]+$"
       (concat user-emacs-directory "exec-file.sh"))
