@@ -30,6 +30,7 @@
                       company-ghc
                       company-ghci
                       csharp-mode
+                      csv-mode
                       dash
                       ein
                       ensime

@@ -133,6 +133,9 @@
 ;;; (really helm-swoop is better but if you need full POSIX regex then ok)
 (global-set-key (kbd "C-c M-r") 'search-all-buffers)
 
+(eval-after-load 'java-mode
+  '(define-key java-mode-map (kbd "C-c C-w") nil))
+
 ;;; c/c++/java
 (add-hook 'c-initialization-hook
 	  (lambda ()
