@@ -44,16 +44,6 @@
     (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/"))
   (ess-toggle-underscore nil))
 
-;;; and for org-mode
-(let ((org-mode-dir
-       (expand-file-name (concat init-home-folder-dir "/org-mode/lisp"))))
-  (when (file-directory-p org-mode-dir)
-    (setq load-path (cons org-mode-dir load-path))
-    (make-submodule
-     "org-mode" "make"
-     (lambda ()
-       (load-file (expand-file-name (concat org-mode-dir "/org-src.el")))))))
-
 ;;; magit
 (setq magit-last-seen-setup-instructions "1.4.0")
 ;; automatically revert unmodified (saved) buffers that magit changes through
