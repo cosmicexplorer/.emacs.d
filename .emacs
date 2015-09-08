@@ -3,6 +3,9 @@
 ;;; .....let's begin
 (package-initialize)
 
+(defgroup my-customizations nil
+  "all `defcustom' forms in my own init scripts")
+
 ;;; add wherever emacs was invoked from to path
 ;;; done at top so we know we're not changing any directories
 (defvar emacs-start-command (car command-line-args)
@@ -250,6 +253,32 @@ Check out your .emacs."))
    (quote
     (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)))
  '(initial-buffer-choice t)
+ '(kill-buffer-trash-alist
+   (quote
+    ((markdown-mode lambda
+                    (f)
+                    (concat
+                     (file-name-sans-extension f)
+                     ".html"))
+     (coffee-mode lambda
+                  (f)
+                  (concat
+                   (file-name-sans-extension f)
+                   ".js"))
+     (java-mode lambda
+                (f)
+                (concat
+                 (file-name-sans-extension f)
+                 ".class"))
+     (csharp-mode lambda
+                  (f)
+                  (file-name-sans-extension f))
+     (c++-mode lambda
+               (f)
+               (file-name-sans-extension f))
+     (c-mode lambda
+             (f)
+             (file-name-sans-extension f)))))
  '(linum-relative-plusp-offset 1)
  '(lua-indent-level 2)
  '(magit-no-confirm
