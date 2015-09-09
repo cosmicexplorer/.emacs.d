@@ -590,8 +590,11 @@ Check out your .emacs.\n")))))
 (setq dired-deletion-confirmer (lambda (&rest args) t))
 (defun dired-find-marked-files-no-show ()
   "Better than `dired-do-find-marked-files'."
-  (interactive)
-  (dired-do-find-marked-files t))
+  (interactive) (dired-do-find-marked-files t))
 
 ;;; keep dired in sync
-(add-hook #'dired-mode-hook #'auto-revert-mode)
+(add-hook 'dired-mode-hook #'auto-revert-mode)
+
+(defadvice ansi-color-filter-apply (around no-errors activate)
+  (let ((res (ignore-errors ad-do-it)))
+    (setq ad-return-value (or res (ad-get-arg 0)))))

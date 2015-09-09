@@ -5,6 +5,8 @@
 (setq mc/cmds-to-run-for-all
       '(
         beginning-of-visual-line
+        c-electric-semi&comma
+        c-electric-slash
         camel-case-left-word
         camel-case-right-word
         coffee-dedent-line-backspace
