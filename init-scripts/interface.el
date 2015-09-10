@@ -552,8 +552,6 @@ Check out your .emacs.\n")))))
 
 ;;; don't like seeing wraparound
 (add-hook 'text-mode-hook #'visual-line-mode)
-(add-hook 'eww-mode-hook
-          (lambda () (call-interactively #'visual-line-mode)))
 (add-hook 'eww-after-render-hook #'refresh-visual-line-mode)
 (add-hook 'litcoffee-mode-hook #'visual-line-mode)
 
