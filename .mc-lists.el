@@ -4,6 +4,7 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        beg-of-line-text
         beginning-of-visual-line
         c-electric-semi&comma
         c-electric-slash
