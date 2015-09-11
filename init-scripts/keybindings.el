@@ -219,9 +219,6 @@
      (define-key org-mode-map (kbd "C-M-u") #'outline-up-heading)))
 
 ;;; convenience bindings from working with windows
-(global-set-key (kbd "C-a") #'mark-whole-buffer)
-(global-set-key (kbd "C-c C-a") #'beginning-of-line)
-(global-set-key (kbd "C-c C-e") #'end-of-line)
 (global-set-key (kbd "M-`") #'indent-regardless-of-mode)
 
 ;;; c#
