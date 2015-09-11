@@ -204,7 +204,8 @@ Check out your .emacs."))
  '(dired-clean-up-buffers-too nil)
  '(dired-guess-shell-alist-user
    (quote
-    (("\\.coffee\\'" "coffee")
+    (("\\.\\(pdf\\|ps\\)\\'" "evince")
+     ("\\.coffee\\'" "coffee")
      ("\\.pl\\'" "perl")
      ("\\.jar\\'" "java -jar")
      ("^[^\\.]+$"

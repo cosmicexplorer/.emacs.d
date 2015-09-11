@@ -435,7 +435,9 @@
 (eval-after-load 'eww
   '(define-key eww-mode-map (kbd "C-c v") #'refresh-visual-line-mode))
 
+;;; git-gutter
 (global-set-key (kbd "C-x l") #'num-lines-file)
 (global-set-key (kbd "C-c n") #'git-gutter:next-hunk)
 (global-set-key (kbd "C-c p") #'git-gutter:previous-hunk)
 (global-set-key (kbd "C-c P") #'git-gutter:popup-hunk)
+(global-set-key (kbd "C-c s") #'git-gutter:stage-hunk)
