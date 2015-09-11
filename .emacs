@@ -208,7 +208,7 @@ Check out your .emacs."))
      ("\\.coffee\\'" "coffee")
      ("\\.pl\\'" "perl")
      ("\\.jar\\'" "java -jar")
-     ("^[^\\.]+$"
+     ("^[^\\.]+\\'"
       (concat user-emacs-directory "exec-file.sh"))
      ("\\.bash\\'" "bash")
      ("\\.zsh\\'" "zsh")
