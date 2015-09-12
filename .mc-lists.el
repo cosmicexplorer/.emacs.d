@@ -22,6 +22,7 @@
         isearch-repeat-backward
         kill-selected-region-default
         markdown-exdent-or-delete
+        org-force-self-insert
         org-self-insert-command
         paredit-backspace-delete-highlight
         paredit-backward
@@ -29,6 +30,7 @@
         paredit-forward-delete
         sgml-slash
         smart-tab
+        toggle-letter-case
         transpose-words
         ))
 

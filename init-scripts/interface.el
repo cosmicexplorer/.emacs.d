@@ -596,3 +596,12 @@ Check out your .emacs.\n")))))
 (defadvice ansi-color-filter-apply (around no-errors activate)
   (let ((res (ignore-errors ad-do-it)))
     (setq ad-return-value (or res (ad-get-arg 0)))))
+
+(make-submodule
+ "org-mode" "make"
+ (lambda ()
+   (add-to-list 'load-path (concat init-home-folder-dir "org-mode/lisp/"))
+   (require 'ox)
+   (require 'ox-latex)
+   (require 'ox-html)
+   (require 'ox-publish)))

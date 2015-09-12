@@ -13,3 +13,8 @@
 	url = git@github.com:cosmicexplorer/emacs-color-themes.git
         ignore = dirty
         branch = master
+[submodule "org-mode"]
+	path = org-mode
+	url = ./org-mode
+        ignore = dirty
+        branch = master
