@@ -440,3 +440,5 @@
 (global-set-key (kbd "C-c D") #'git-gutter:popup-diff)
 (global-set-key (kbd "<home>") #'beg-of-line-text)
 (global-set-key (kbd "<end>") #'move-end-of-line)
+
+(global-set-key (kbd "C-x C-v") #'delete-whole-line)
