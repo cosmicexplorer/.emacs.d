@@ -71,6 +71,7 @@
                       rainbow-mode
                       s
                       scala-mode2
+                      skewer-mode
                       slime
                       slime-company
                       smartrep

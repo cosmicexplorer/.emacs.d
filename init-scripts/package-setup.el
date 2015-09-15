@@ -240,3 +240,7 @@
 
 ;;; GIT GUTTER IS GR8
 (global-git-gutter-mode)
+
+;;; SKEWER DIS ISH
+(skewer-setup)
+(add-hook 'skewer-repl-mode-hook (lambda () (setq comint-process-echoes nil)))

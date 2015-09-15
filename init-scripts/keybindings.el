@@ -160,12 +160,17 @@
 
 ;;; js
 (eval-after-load 'js2-mode
-  '(eval-after-load 'js-mode
-     (progn
-       (define-key js-mode-map (kbd "C-<tab>") #'web-beautify-js)
-       (define-key js2-mode-map (kbd "C-<tab>") #'web-beautify-js)
-       (add-keybinding-to-mode-maps "RET" #'js-newline-indent-for-real
-                                    js-mode-map js2-mode-map))))
+  '(progn
+     (eval-after-load skewer-mode
+        (progn
+          (define-key js2-mode-map (kbd "C-M-x")
+            #'skewer-eval-buffer-or-region)))
+     (eval-after-load 'js-mode
+        (progn
+          (define-key js-mode-map (kbd "C-<tab>") #'web-beautify-js)
+          (define-key js2-mode-map (kbd "C-<tab>") #'web-beautify-js)
+          (add-keybinding-to-mode-maps "RET" #'js-newline-indent-for-real
+                                       js-mode-map js2-mode-map)))))
 
 ;;; css
 (eval-after-load 'css-mode
