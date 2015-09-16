@@ -445,7 +445,7 @@
 (global-set-key (kbd "C-c n") #'git-gutter:next-hunk)
 (global-set-key (kbd "C-c p") #'git-gutter:previous-hunk)
 (global-set-key (kbd "C-c s") #'git-gutter:stage-hunk)
-(global-set-key (kbd "C-c D") #'git-gutter:popup-diff)
+(global-set-key (kbd "C-c D") #'git-gutter:popup-hunk)
 (global-set-key (kbd "<home>") #'beg-of-line-text)
 (global-set-key (kbd "<end>") #'move-end-of-line)
 
