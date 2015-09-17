@@ -2145,7 +2145,7 @@ by another percent."
       (skewer-flash-region start end)
       (skewer-eval string #'skewer-post-minibuffer))))
 
-(defmacro silence-messages (body)
+(defmacro silence-messages (&rest body)
   `(with-temp-message "" ,@body))
 
 (provide 'functions)
