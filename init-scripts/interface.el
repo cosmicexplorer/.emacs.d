@@ -605,3 +605,5 @@ Check out your .emacs.\n")))))
    (require 'ox-latex)
    (require 'ox-html)
    (require 'ox-publish)))
+
+(defadvice eww-follow-link (after revis activate) (refresh-visual-line-mode))
