@@ -452,6 +452,6 @@
 (global-set-key (kbd "C-c C-v") #'delete-whole-line)
 (global-set-key (kbd "C-x C-r") #'revert-buffer-no-confirm)
 
-(eval-after-load 'python-mode
+(eval-after-load 'python
   '(progn
      (define-key python-mode-map (kbd "C-c C-v") #'delete-whole-line)))
