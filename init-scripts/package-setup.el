@@ -242,5 +242,8 @@
 (global-git-gutter-mode)
 
 ;;; SKEWER DIS ISH
-(skewer-setup)
-(add-hook 'skewer-repl-mode-hook (lambda () (setq comint-process-echoes nil)))
+(eval-after-load 'skewer-mode
+  '(progn
+     (skewer-setup)
+     (add-hook 'skewer-repl-mode-hook
+               (lambda () (setq comint-process-echoes nil)))))

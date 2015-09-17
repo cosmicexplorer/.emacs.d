@@ -164,7 +164,7 @@
 ;;; js
 (eval-after-load 'js2-mode
   '(progn
-     (eval-after-load skewer-mode
+     (eval-after-load 'skewer-mode
         (progn
           (define-key js2-mode-map (kbd "C-M-x")
             #'skewer-eval-buffer-or-region)))
