@@ -2112,12 +2112,13 @@ by another percent."
 
 (defun beg-of-line-text ()
   (interactive "^")
-  (beginning-of-line)
+  (if (derived-mode-p 'text-mode) (beginning-of-visual-line)
+    (beginning-of-line))
   (while (whitespacep (char-after)) (right-char)))
 
 (defun end-of-line-text ()
   (interactive "^")
-  (end-of-line)
+  (if (derived-mode-p 'text-mode) (end-of-visual-line) (end-of-line))
   (while (whitespacep (char-before)) (left-char)))
 
 (defun delete-all-weird-buffers ()
