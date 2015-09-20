@@ -14,7 +14,7 @@
 ;;; cause otherwise this doesn't work in graphical mode
 (global-set-key (kbd "<C-return>") 'newline-and-indent)
 ;;; just destroy unused files
-(global-set-key (kbd "C-x C-d") 'kill-buffer-and-move-file-to-trash)
+(global-set-key (kbd "C-x C-M-d") 'kill-buffer-and-move-file-to-trash)
 ;;; opposite of yank-pop
 (global-set-key (kbd "C-M-y") 'yank-push)
 ;;; reset quit key combination to close

@@ -193,6 +193,7 @@ Check out your .emacs."))
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(TeX-engine (quote luatex))
+ '(TeX-newline-function (quote reindent-then-newline-and-indent))
  '(asm-comment-char 35)
  '(cloc-use-3rd-gen nil)
  '(coffee-args-compile (quote ("-c" "-b" "--no-header")))

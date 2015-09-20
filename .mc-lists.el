@@ -4,6 +4,7 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        TeX-insert-backslash
         beg-of-line-text
         beginning-of-visual-line
         c-electric-semi&comma
