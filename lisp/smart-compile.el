@@ -58,11 +58,15 @@
     "\\./\\([\\./]+\\)/")
    "\\1" str))
 
+(defun add-compile-script-name (str)
+  (concat
+   (replace-regexp-in-string "\\`sh  " "sh " str)
+   "compile.sh"))
+
 (defun byte-compile-file-and-remove ()
   (interactive)
   (byte-compile-file (file-name-nondirectory (buffer-file-name)))
-  (shell-command (concatenate 'string "rm " (buffer-file-name) ".elc")) ;; but re-adds it quickly so undo doesn't notice
-  )
+  (shell-command (concatenate 'string "rm " (buffer-file-name) ".elc")))
 
 (defun go-fmt-file ()
   (interactive)
@@ -265,9 +269,11 @@ which is defined in `smart-compile-alist'."
         (call-interactively 'compile)
         (setq not-yet nil))
        ((add-build-system "make -C" "^Makefile$" 4 t nil t strip-minus-c))
-       ((add-build-system "node-gyp build" "^binding\\.gyp$" 2 nil nil nil))
-       ((add-build-system "scons -C" "^SConstruct$" 2 t nil t strip-minus-c))
-       ((add-build-system "cake build" "^Cakefile$" 2 nil nil nil))
+       ((add-build-system "node-gyp build" "^binding\\.gyp$" 4 nil nil nil))
+       ((add-build-system "scons -C" "^SConstruct$" 4 t nil t strip-minus-c))
+       ((add-build-system "cake build" "^Cakefile$" 4 nil nil nil))
+       ((add-build-system
+         "sh " "^compile\\.sh$" 4 t nil t add-compile-script-name))
        ((add-build-system
          (if (eq system-type 'windows-nt) "msbuild.exe" "xbuild")
          "^.*\\.sln$" 5 nil nil t))))

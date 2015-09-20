@@ -171,13 +171,14 @@ Check out your .emacs."))
 
 ;;; byte-compile everything: slow on first startup, but /significantly/ faster
 ;;; during normal usage
-(add-hook
- 'after-load-init-hook
+(async-start
  (lambda ()
-   (async-start
-    (lambda ()
-      (byte-recompile-directory user-emacs-directory 0))
-    'ignore)))
+   (byte-recompile-directory user-emacs-directory 0))
+ 'ignore)
+
+;;; sometimes fails on 'require call
+(load-file (expand-file-name
+            (concat user-emacs-directory "lisp/smart-compile.el")))
 
 ;;; let's do it
 (run-hooks 'after-load-init-hook)
