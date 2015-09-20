@@ -7,6 +7,7 @@
         TeX-insert-backslash
         beg-of-line-text
         beginning-of-visual-line
+        c-electric-colon
         c-electric-semi&comma
         c-electric-slash
         camel-case-left-word

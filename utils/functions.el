@@ -219,28 +219,7 @@ Toggles between: lowercase->ALL CAPS->Initial Caps->(cycle)."
   "cc-mode's indentation procedures upon adding a new bracket or paren are
 annoying. This fixes that."
   (interactive)
-  (ignore-errors
-    (let ((left-char (char-before))
-          (right-char (char-after))
-          (move-threshold 5))
-      (clang-format-line)
-      (let ((prev-pt (point)))
-        (loop with ind = 0 while
-              (and (< ind move-threshold)
-                   (not (and (char-equal (char-before) left-char)
-                             (char-equal (char-after) right-char))))
-              do (forward-char))
-        (unless (and (char-equal (char-before) left-char)
-                     (char-equal (char-after) right-char))
-          (goto-char prev-pt))
-        (loop with ind = 0 while
-              (and (< ind move-threshold)
-                   (not (and (char-equal (char-before) left-char)
-                             (char-equal (char-after) right-char))))
-              do (backward-char))
-        (unless (and (char-equal (char-before) left-char)
-                     (char-equal (char-after) right-char))
-          (goto-char prev-pt)))))
+  (clang-format-line)
   (newline-and-indent))
 
 (defun newline-and-indent-fix-js-mode ()
@@ -2148,5 +2127,10 @@ by another percent."
 
 (defmacro silence-messages (&rest body)
   `(with-temp-message "" ,@body))
+
+(defun get-emacs-build-time ()
+  (interactive)
+  (let ((str (format-time-string "%Y-%m-%d@%H:%M:%S" emacs-build-time)))
+    (if (called-interactively-p) (message "%s" str) str)))
 
 (provide 'functions)
