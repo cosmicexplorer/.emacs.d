@@ -509,21 +509,25 @@ Check out your .emacs.\n")))))
 ;;; update me with irc activity, but only if i'm in an erc buffer
 (setq mode-line-modes
       (remove '(t erc-modified-channels-object) mode-line-modes))
-(let* ((first-two (list (first mode-line-modes)
-                        (second mode-line-modes)))
-       (last-two
-        (nthcdr (- (length mode-line-modes) 2) mode-line-modes))
-       (start-ind (if (and (stringp (first first-two))
-                           (string= (first first-two) "%[")
-                           (stringp (second first-two))
-                           (string= (second first-two) "("))
-                      2 0))
-       (end-ind
-        (let ((len (1- (length mode-line-modes))))
-          (if (and (string= (first last-two) ")")
-                   (string= (second last-two) "%]"))
-              (- len 2) len))))
-  (setq mode-line-modes (get-range-of-list start-ind end-ind mode-line-modes)))
+(setq prev-modes mode-line-modes)
+(setq mode-line-modes
+      (loop with l = mode-line-modes
+            for el in '("%[" "(" ")" "%]")
+            do (setq l (remove el l))
+            finally (return l)))
+(defun when-list (el) (let ((obj el)) (if (listp obj) obj nil)))
+(defun apply-list-funs-to-el (el &rest funs)
+  (loop for fun in funs
+        with res = el
+        do (setq res (funcall fun (when-list res)))
+        finally (return res)))
+(setq mode-line-modes
+      (remove-if
+       (lambda (el)
+         (and (listp el)
+              (eq (apply-list-funs-to-el el #'cdr #'car #'second)
+                  'minor-mode-alist)))
+                 mode-line-modes))
 (defadvice erc-server-filter-function
     (after update-erc-status-on-erc-bufs activate)
   (setq mode-line-modes
@@ -607,3 +611,11 @@ Check out your .emacs.\n")))))
    (require 'ox-publish)))
 
 (defadvice eww-follow-link (after revis activate) (refresh-visual-line-mode))
+
+((t erc-modified-channels-object) (:propertize ("" mode-name) help-echo "Major mode
+mouse-1: Display major mode menu
+mouse-2: Show help for major mode
+mouse-3: Toggle minor modes" mouse-face mode-line-highlight local-map (keymap (mode-line keymap ... ... ...))) ("" mode-line-process) (:propertize ("" minor-mode-alist) mouse-face mode-line-highlight help-echo "Minor mode
+mouse-1: Display minor mode menu
+mouse-2: Show help for minor mode
+mouse-3: Toggle minor modes" local-map (keymap (header-line keymap ...) (mode-line keymap ... ... ...))) #("%n" 0 2 (local-map (keymap ...) mouse-face mode-line-highlight help-echo "mouse-2: Remove narrowing from buffer")) ")" #("%]" 0 2 (help-echo "Recursive edit, type C-M-c to get out")) " ")
