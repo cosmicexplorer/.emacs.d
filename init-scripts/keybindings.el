@@ -455,3 +455,8 @@
 (eval-after-load 'python
   '(progn
      (define-key python-mode-map (kbd "C-c C-v") #'delete-whole-line)))
+
+(eval-after-load 'latex-mode
+  '(progn
+     (define-key LaTeX-mode-map (kbd "C-c C-w")
+       #'destroy-all-whitespace-nearby)))

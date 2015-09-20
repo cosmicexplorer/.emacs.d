@@ -12,6 +12,7 @@
         camel-case-right-word
         coffee-dedent-line-backspace
         cperl-electric-terminator
+        end-of-buffer
         end-of-visual-line
         helm-buffers-list
         ido-find-file
@@ -42,4 +43,5 @@
         mc/mark-next-not-cider
         mc/mark-prev-not-cider
         smart-compile
+        wdired-finish-edit
         ))

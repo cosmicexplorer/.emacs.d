@@ -197,6 +197,9 @@ Check out your .emacs."))
  '(cloc-use-3rd-gen nil)
  '(coffee-args-compile (quote ("-c" "-b" "--no-header")))
  '(coffee-tab-width 2)
+ '(company-dabbrev-code-modes
+   (quote
+    (prog-mode batch-file-mode csharp-mode css-mode erlang-mode haskell-mode jde-mode lua-mode python-mode)))
  '(compilation-scroll-output t)
  '(compile-command "make")
  '(dabbrev-case-replace nil)
