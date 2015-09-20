@@ -11,6 +11,7 @@
 
 ;;; globally usable basic text insertion or command-running shortcuts
 (global-set-key (kbd "C-x d") #'open-dired-the-right-way)
+(global-set-key (kbd "C-x C-d") #'open-dired-the-right-way)
 ;;; cause otherwise this doesn't work in graphical mode
 (global-set-key (kbd "<C-return>") 'newline-and-indent)
 ;;; just destroy unused files
@@ -461,4 +462,5 @@
      (define-key LaTeX-mode-map (kbd "C-c C-w")
        #'destroy-all-whitespace-nearby)))
 
-(define-key shell-mode-map (kbd "C-M-g") #'rerun-command)
+(global-set-key (kbd "C-M-g") #'rerun-command)
+(define-key sh-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby)

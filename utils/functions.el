@@ -2133,17 +2133,30 @@ by another percent."
   (let ((str (format-time-string "%Y-%m-%d@%H:%M:%S" emacs-build-time)))
     (if (called-interactively-p) (message "%s" str) str)))
 
+(defvar-local proc-command-for-buf nil)
+(defadvice start-process (after save-command activate)
+  (with-current-buffer (process-buffer ad-return-value)
+    (setq proc-command-for-buf (process-command ad-return-value))))
+(defadvice shell-command (after save-command activate)
+  (let ((shell-buf-name "*Shell Command Output*"))
+    (when (get-buffer shell-buf-name)
+      (with-current-buffer shell-buf-name
+        (setq proc-command-for-buf (split-string-and-unquote
+                                    (ad-get-arg 0)))))))
+
 (defun rerun-command (proc)
   (interactive
    (let ((proc (if current-prefix-arg nil
-                 (get-buffer-process (current-buffer)))))
+                 (or proc-command-for-buf
+                     (get-buffer-process (current-buffer))
+                     (split-string-and-unquote (car shell-command-history))))))
      (list (if proc proc
              (get-buffer-process (read-buffer "run command in buffer: "))))))
-  (let ((cmd (process-command proc))
-        (name (process-name proc))
-        (buf (process-buffer proc)))
+  (let ((cmd (if (processp proc) (process-command proc) proc))
+        (name (if (processp proc) (process-name proc) (car proc)))
+        (buf (if (processp proc) (process-buffer proc) (current-buffer))))
     (with-current-buffer buf
-      (delete-process proc)
+      (when (processp proc) (delete-process proc))
       (apply #'start-process (append (list name (current-buffer)) cmd)))))
 
 (provide 'functions)
