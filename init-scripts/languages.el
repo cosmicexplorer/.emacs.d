@@ -187,6 +187,10 @@
      c-mode-map
      c++-mode-map
      java-mode-map)))
+(defconst c-namespace-style
+  '("cc-mode"
+    (c-offsets-alist . ((innamespace . [0])))))
+(c-add-style "better-c++-mode" c-namespace-style)
 
 (make-variable-buffer-local 'comment-region-function)
 (make-variable-buffer-local 'comment-insert-comment-function)
