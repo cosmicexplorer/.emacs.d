@@ -43,6 +43,7 @@
 (require 'tramp)
 (require 'undo-tree)
 (require 'web-beautify)
+(require 'js2-mode)
 
 ;;; my stuff
 (require 'utilities)
