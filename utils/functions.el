@@ -2133,4 +2133,17 @@ by another percent."
   (let ((str (format-time-string "%Y-%m-%d@%H:%M:%S" emacs-build-time)))
     (if (called-interactively-p) (message "%s" str) str)))
 
+(defun rerun-command (proc)
+  (interactive
+   (let ((proc (if current-prefix-arg nil
+                 (get-buffer-process (current-buffer)))))
+     (list (if proc proc
+             (get-buffer-process (read-buffer "run command in buffer: "))))))
+  (let ((cmd (process-command proc))
+        (name (process-name proc))
+        (buf (process-buffer proc)))
+    (with-current-buffer buf
+      (delete-process proc)
+      (apply #'start-process (append (list name (current-buffer)) cmd)))))
+
 (provide 'functions)

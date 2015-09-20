@@ -460,3 +460,5 @@
   '(progn
      (define-key LaTeX-mode-map (kbd "C-c C-w")
        #'destroy-all-whitespace-nearby)))
+
+(define-key shell-mode-map (kbd "C-M-g") #'rerun-command)
