@@ -611,11 +611,3 @@ Check out your .emacs.\n")))))
    (require 'ox-publish)))
 
 (defadvice eww-follow-link (after revis activate) (refresh-visual-line-mode))
-
-((t erc-modified-channels-object) (:propertize ("" mode-name) help-echo "Major mode
-mouse-1: Display major mode menu
-mouse-2: Show help for major mode
-mouse-3: Toggle minor modes" mouse-face mode-line-highlight local-map (keymap (mode-line keymap ... ... ...))) ("" mode-line-process) (:propertize ("" minor-mode-alist) mouse-face mode-line-highlight help-echo "Minor mode
-mouse-1: Display minor mode menu
-mouse-2: Show help for minor mode
-mouse-3: Toggle minor modes" local-map (keymap (header-line keymap ...) (mode-line keymap ... ... ...))) #("%n" 0 2 (local-map (keymap ...) mouse-face mode-line-highlight help-echo "mouse-2: Remove narrowing from buffer")) ")" #("%]" 0 2 (help-echo "Recursive edit, type C-M-c to get out")) " ")
