@@ -12,6 +12,7 @@
 ;;; globally usable basic text insertion or command-running shortcuts
 (global-set-key (kbd "C-x d") #'open-dired-the-right-way)
 (global-set-key (kbd "C-x C-d") #'open-dired-the-right-way)
+(define-key dired-mode-map (kbd "M-f") #'find-dired)
 ;;; cause otherwise this doesn't work in graphical mode
 (global-set-key (kbd "<C-return>") 'newline-and-indent)
 ;;; just destroy unused files
@@ -463,4 +464,5 @@
        #'destroy-all-whitespace-nearby)))
 
 (global-set-key (kbd "C-M-g") #'rerun-command)
-(define-key sh-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby)
+(eval-after-load 'sh-mode
+  '(define-key sh-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby))

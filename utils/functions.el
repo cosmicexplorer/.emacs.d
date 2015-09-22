@@ -1423,13 +1423,11 @@ way I prefer, and regards `comment-padding', unlike the standard version."
       (throw 'not-dired-buf "this isn't a dired buffer!")
     (loop
      with dired-dir = (expand-file-name dired-directory)
+     with dir-reg = (concat "\\`" (regexp-quote dired-dir))
      for buf in (buffer-list)
-     do (when (and (buffer-file-name buf)
-                   (string=
-                    (expand-file-name
-                     (file-name-directory (buffer-file-name buf)))
-                    dired-dir))
-          (kill-buffer buf)))
+     do (let ((place (or (buffer-file-name buf)
+                         (with-current-buffer buf default-directory))))
+          (when (string-match-p dir-reg place) (kill-buffer buf))))
     (kill-buffer)))
 
 (defun dired-kill-marked-files ()
