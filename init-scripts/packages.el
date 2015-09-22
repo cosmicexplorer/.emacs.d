@@ -75,6 +75,7 @@
                       slime
                       slime-company
                       smartrep
+                      sml-mode
                       speech-tagger
                       undo-tree
                       w3m
