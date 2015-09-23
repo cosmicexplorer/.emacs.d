@@ -466,3 +466,6 @@
 (global-set-key (kbd "C-M-g") #'rerun-command)
 (eval-after-load 'sh-mode
   '(define-key sh-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby))
+
+(eval-after-load 'ein
+  '(define-key ein:notebook-mode-map (kbd ".") #'self-insert-command))
