@@ -469,3 +469,6 @@
 
 (eval-after-load 'ein
   '(define-key ein:notebook-mode-map (kbd ".") #'self-insert-command))
+
+;;; this is annoying
+(global-set-key (kbd "C-x C-x") nil)
