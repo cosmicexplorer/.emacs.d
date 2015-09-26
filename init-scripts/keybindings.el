@@ -468,7 +468,7 @@
 (eval-after-load 'sh-mode
   '(define-key sh-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby))
 
-(eval-after-load 'ein
+(eval-after-load 'ein-notebook
   '(define-key ein:notebook-mode-map (kbd ".") #'self-insert-command))
 
 ;;; this is annoying
