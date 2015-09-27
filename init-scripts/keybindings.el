@@ -475,4 +475,6 @@
 (global-set-key (kbd "C-x C-x") nil)
 
 (eval-after-load 'ess
-  '(define-key ess-mode-map (kbd "C-c C-v") nil))
+  '(progn
+     (define-key ess-mode-map (kbd "C-c C-v") nil)
+     (define-key ess-mode-map (kbd "C-x C-e") #'ess-eval-paragraph-and-go)))
