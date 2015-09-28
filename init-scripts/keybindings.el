@@ -478,3 +478,7 @@
   '(progn
      (define-key ess-mode-map (kbd "C-c C-v") nil)
      (define-key ess-mode-map (kbd "C-x C-e") #'ess-eval-paragraph-and-go)))
+
+(eval-after-load 'helm
+  '(progn
+     (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)))
