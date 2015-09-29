@@ -1235,9 +1235,15 @@ way I prefer, and regards `comment-padding', unlike the standard version."
         (unwind-protect
             (let ((submodule-out-buf
                    (get-buffer-create git-submodule-buf-name)))
-              (unless (zerop (call-process
-                              "git" nil submodule-out-buf nil
-                              "submodule" "update" "--init" "--recursive"))
+              (unless (and (zerop
+                            (call-process
+                             "git" nil submodule-out-buf nil
+                             "submodule" "update" "--init" "--recursive"))
+                           (zerop
+                            (call-process
+                             "git" nil submodule-out-buf nil
+                             "submodule" "foreach" "git" "pull" "origin"
+                             "master")))
                 (throw 'submodule-failure "init failed")))
           (cd prev-wd))
         (kill-buffer git-submodule-buf-name))))

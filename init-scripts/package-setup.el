@@ -4,9 +4,11 @@
 
 ;;; ein
 (require 'ein)
-(setq ein:use-auto-complete-superpack t)
-(require 'smartrep)
-(setq ein:use-smartrep t)
+(eval-after-load 'ein
+  '(progn
+     (setq ein:use-auto-complete-superpack t)
+     (require 'smartrep)
+     (setq ein:use-smartrep t)))
 
 ;;; helm
 (helm-mode t)

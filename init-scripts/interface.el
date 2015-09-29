@@ -460,9 +460,6 @@ mode-name &optional advice-type advice-forms))."
         (insert "Set up an id-rsa-path! Only if you want to, though.
 Check out your .emacs.\n")))))
 
-(when do-ssh-agent-command-on-start
-  (add-hook 'after-load-init-hook #'setup-ssh-agent))
-
 
 ;;; TODO: persist buffers not visiting files to disk as well because apparently
 ;;; sublime does this by default and we can't let sublime beat us; let's also do
@@ -605,9 +602,11 @@ Check out your .emacs.\n")))))
  "org-mode" "make"
  (lambda ()
    (add-to-list 'load-path (concat init-home-folder-dir "org-mode/lisp/"))
-   (require 'ox)
-   (require 'ox-latex)
-   (require 'ox-html)
-   (require 'ox-publish)))
+;   (require 'org)
+;   (require 'ox)
+;   (require 'ox-latex)
+;   (require 'ox-html)
+;   (require 'ox-publish)
+   ))
 
 (defadvice eww-follow-link (after revis activate) (refresh-visual-line-mode))

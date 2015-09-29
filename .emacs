@@ -180,6 +180,9 @@ Check out your .emacs."))
 (load-file (expand-file-name
             (concat user-emacs-directory "lisp/smart-compile.el")))
 
+(when do-ssh-agent-command-on-start
+  (add-hook 'after-load-init-hook #'setup-ssh-agent))
+
 ;;; let's do it
 (run-hooks 'after-load-init-hook)
 
