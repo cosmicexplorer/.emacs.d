@@ -14,6 +14,8 @@
         camel-case-right-word
         coffee-dedent-line-backspace
         cperl-electric-terminator
+        delete-whole-line
+        electric-pair-delete-pair
         end-of-buffer
         end-of-visual-line
         helm-buffers-list
@@ -26,6 +28,7 @@
         kill-selected-region-default
         markdown-exdent-or-delete
         org-force-self-insert
+        org-forward-paragraph
         org-self-insert-command
         paredit-backspace-delete-highlight
         paredit-backward
@@ -39,8 +42,11 @@
 
 (setq mc/cmds-to-run-once
       '(
+        describe-variable
         eval-buffer-and-message
         eval-expression
+        helm-swoop
+        isearch-backward-regexp
         isearch-delete-char
         mc/mark-next-not-cider
         mc/mark-prev-not-cider

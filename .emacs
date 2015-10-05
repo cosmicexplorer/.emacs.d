@@ -180,11 +180,16 @@ Check out your .emacs."))
 (load-file (expand-file-name
             (concat user-emacs-directory "lisp/smart-compile.el")))
 
-(when do-ssh-agent-command-on-start
-  (add-hook 'after-load-init-hook #'setup-ssh-agent))
+(when do-ssh-agent-command-on-start (setup-ssh-agent))
 
 ;;; let's do it
 (run-hooks 'after-load-init-hook)
+;;; reload org from submodule
+;; (require 'org)
+;; (require 'ox)
+;; (require 'ox-latex)
+;; (require 'ox-html)
+;; (require 'ox-publish)
 
 ;;; if everything loaded correctly, clear that last message
 (message "")

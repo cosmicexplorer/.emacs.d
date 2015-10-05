@@ -214,10 +214,9 @@ lowercase, and Initial Caps versions."
       "\n"))))
 
 (defvar warning-words-list
-  (mapcar #'regexp-quote
-          (if (and warning-words-file (file-exists-p warning-words-file))
-              (read-words-from-file-as-list-with-caps warning-words-file)
-            (read-words-from-list-with-caps warning-words))))
+  (if (and warning-words-file (file-exists-p warning-words-file))
+      (read-words-from-file-as-list-with-caps warning-words-file)
+    (read-words-from-list-with-caps warning-words)))
 
 (defvar warning-highlights-regex
   (concat
@@ -425,33 +424,28 @@ mode-name &optional advice-type advice-forms))."
             (if (string-match ssh-agent-pid-regex command-results)
                 (setenv "SSH_AGENT_PID" (match-string 1 command-results))
               (throw 'ssh-agent-err "PID output can't be parsed!"))
-            ;; make it ask for a password using our script
-            (let ((prev-display (getenv "DISPLAY"))
-                  (prev-ssh-askpass (getenv "SSH_ASKPASS")))
-              (setenv "DISPLAY" ":0")
-              (setenv "SSH_ASKPASS"
-                      (expand-file-name
-                       (concat init-home-folder-dir
-                               "init-scripts/read-ssh-pass.sh")))
-              (with-temp-buffer
-                (loop with ssh-add-success = nil
-                      with ssh-did-fail = nil
-                      while (not ssh-add-success)
-                      do (progn
-                           (insert
-                            (or (and (not ssh-did-fail) ssh-pass)
-                                (read-passwd
-                                 (if ssh-did-fail
-                                     "incorrect password. ssh password: "
-                                   "ssh password: "))))
-                           (if (zerop (shell-command-on-region
-                                       (point-min) (point-max)
-                                       (concat "ssh-add \"" id-rsa-path "\"")))
-                               (setq ssh-add-success t)
-                             (erase-buffer)
-                             (setq ssh-did-fail t)))))
-              (setenv "DISPLAY" prev-display)
-              (setenv "SSH_ASKPASS" prev-ssh-askpass))
+            (setenv "DISPLAY" ":0")
+            (setenv "SSH_ASKPASS"
+                    (expand-file-name
+                     (concat init-home-folder-dir
+                             "init-scripts/read-ssh-pass.sh")))
+            (with-temp-buffer
+              (loop with ssh-add-success = nil
+                    with ssh-did-fail = nil
+                    while (not ssh-add-success)
+                    do (progn
+                         (insert
+                          (or (and (not ssh-did-fail) ssh-pass)
+                              (read-passwd
+                               (if ssh-did-fail
+                                   "incorrect password. ssh password: "
+                                 "ssh password: "))))
+                         (if (zerop (shell-command-on-region
+                                     (point-min) (point-max)
+                                     (concat "ssh-add \"" id-rsa-path "\"")))
+                             (setq ssh-add-success t)
+                           (erase-buffer)
+                           (setq ssh-did-fail t)))))
             (add-hook 'kill-emacs-hook
                       (lambda ()
                         (call-process "kill" nil nil nil
@@ -601,12 +595,6 @@ Check out your .emacs.\n")))))
 (make-submodule
  "org-mode" "make"
  (lambda ()
-   (add-to-list 'load-path (concat init-home-folder-dir "org-mode/lisp/"))
-;   (require 'org)
-;   (require 'ox)
-;   (require 'ox-latex)
-;   (require 'ox-html)
-;   (require 'ox-publish)
-   ))
+   (add-to-list 'load-path (concat init-home-folder-dir "org-mode/lisp/"))))
 
 (defadvice eww-follow-link (after revis activate) (refresh-visual-line-mode))

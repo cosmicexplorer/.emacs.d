@@ -818,7 +818,9 @@ Note the weekly scope of the command's precision.")
                                 (with-current-buffer
                                     (find-file-noselect
                                      (file-truename active-filename))
-                                  (goto-char (string-to-number active-point)))))
+                                  (goto-char (string-to-number active-point))
+                                  (message
+                                   "%s" (concat "Opened " (buffer-name))))))
                              (t (throw 'no-such-active-filetype
                                        (concat "i don't recognize "
                                                active-filetype "!"))))
@@ -1224,6 +1226,17 @@ way I prefer, and regards `comment-padding', unlike the standard version."
       (put-text-property (point-min) (point-max) 'read-only nil))))
 
 ;;; for initialization
+(defun run-git-updates (submodule-out-buf)
+  (and (zerop
+        (call-process
+         "git" nil submodule-out-buf nil
+         "submodule" "update" "--init" "--recursive"))
+       (zerop
+        (call-process
+         "git" nil submodule-out-buf nil
+         "submodule" "foreach" "git" "pull" "origin"
+         "master"))))
+
 (defun actual-setup-submodules (&optional cb)
   (unless dont-ask-about-git
     (if (not (executable-find "git"))
@@ -1235,15 +1248,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
         (unwind-protect
             (let ((submodule-out-buf
                    (get-buffer-create git-submodule-buf-name)))
-              (unless (and (zerop
-                            (call-process
-                             "git" nil submodule-out-buf nil
-                             "submodule" "update" "--init" "--recursive"))
-                           (zerop
-                            (call-process
-                             "git" nil submodule-out-buf nil
-                             "submodule" "foreach" "git" "pull" "origin"
-                             "master")))
+              (unless (run-git-updates submodule-out-buf)
                 (throw 'submodule-failure "init failed")))
           (cd prev-wd))
         (kill-buffer git-submodule-buf-name))))
