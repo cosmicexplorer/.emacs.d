@@ -185,11 +185,11 @@ Check out your .emacs."))
 ;;; let's do it
 (run-hooks 'after-load-init-hook)
 ;;; reload org from submodule
-;; (require 'org)
-;; (require 'ox)
-;; (require 'ox-latex)
-;; (require 'ox-html)
-;; (require 'ox-publish)
+(require 'org)
+(require 'ox)
+(require 'ox-latex)
+(require 'ox-html)
+(require 'ox-publish)
 
 ;;; if everything loaded correctly, clear that last message
 (message "")
