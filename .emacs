@@ -202,6 +202,8 @@ Check out your .emacs."))
 (setq init-loaded-fully t)
 (put 'upcase-region 'disabled nil)
 
+(reread-visited-files-from-disk)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
