@@ -185,11 +185,17 @@ Check out your .emacs."))
 ;;; let's do it
 (run-hooks 'after-load-init-hook)
 ;;; reload org from submodule
+(require 'org-loaddefs)
 (require 'org)
 (require 'ox)
 (require 'ox-latex)
 (require 'ox-html)
 (require 'ox-publish)
+
+;;; save visited files to buffer
+(when save-visited-files
+  (add-hook 'after-load-init-hook #'reread-visited-files-from-disk)
+  (add-hook 'kill-emacs-hook #'save-visiting-files-to-buffer))
 
 ;;; if everything loaded correctly, clear that last message
 (message "")
