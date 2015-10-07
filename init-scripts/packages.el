@@ -43,6 +43,8 @@
                       ggtags
                       ghc
                       git-gutter
+                      gnuplot
+                      gnuplot-mode
                       go-mode
                       haskell-mode
                       helm

@@ -563,8 +563,8 @@ that point."
   "Format of date to insert with `insert-current-date-time' func
 See help of `format-time-string' for possible replacements")
 (defvar current-time-format "%a %H:%M:%S"
-  "Format of date to insert with `insert-current-time' func.
-Note the weekly scope of the command's precision.")
+  "Format of date to insert with `insert-current-time' func. Note the weekly
+scope of the command's precision.")
 
 ;;; the below two functions rely on eshell using eshell-last-input-start,
 ;;; eshell-last-input-end, and eshell-last-output-start internally! hopefully
@@ -790,12 +790,13 @@ Note the weekly scope of the command's precision.")
     (goto-char (point-min))
     (loop while (not (eobp))
           do (let ((cur-line (buffer-substring-no-properties
-                               (line-beginning-position)
-                               (line-end-position))))
+                              (line-beginning-position)
+                              (line-end-position))))
                ;; the \" is so that windows paths with C: are parsed correctly
-               (if (string-match
-                    "^\\([^:]+\\):\"\\([^\"]+\\)\":\\([[:digit:]]+\\)$"
-                    cur-line)
+               (if (and (string-match-p "[^[:space:]]" cur-line)
+                        (string-match
+                         "^\\([^:]+\\):\"\\([^\"]+\\)\":\\([[:digit:]]+\\)$"
+                         cur-line))
                    (let ((active-filetype
                           (match-string 1 cur-line))
                          (active-filename

@@ -249,3 +249,5 @@
      (skewer-setup)
      (add-hook 'skewer-repl-mode-hook
                (lambda () (setq comint-process-echoes nil)))))
+
+(eval-after-load 'org-mode '(require 'org-plot))

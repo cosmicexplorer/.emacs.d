@@ -224,6 +224,7 @@
       'org-mode-hook
       (lambda () (define-key org-mode-map (kbd "C-c C-k") #'smart-compile)))
      (define-key org-mode-map (kbd "S-<up>") #'org-shiftup)
+     (define-key org-mode-map (kbd "C-c e") #'org-latex-export-to-pdf)
      (define-key org-mode-map (kbd "S-<down>") #'org-shiftdown)
      (define-key org-mode-map (kbd "C-p") #'outline-previous-heading)
      (define-key org-mode-map (kbd "C-n") #'outline-next-heading)
@@ -482,3 +483,6 @@
 (eval-after-load 'helm
   '(progn
      (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)))
+
+(eval-after-load 'org-plot
+  '(progn (define-key org-mode-map (kbd "C-M-g") #'org-plot/gnuplot)))
