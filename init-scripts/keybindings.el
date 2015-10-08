@@ -161,7 +161,8 @@
      (define-key coffee-mode-map (kbd "C-c C-k") #'smart-compile)
      (define-key coffee-mode-map (kbd "C-c C-r") #'coffee-send-region)
      (define-key coffee-mode-map (kbd "C-c C-c") #'coffee-compile-buffer)
-     (define-key coffee-mode-map (kbd "C-M-h") nil)))
+     (define-key coffee-mode-map (kbd "C-M-h") nil)
+     (define-key coffee-mode-map (kbd "C-M-g") #'restart-coffee)))
 
 ;;; js
 (eval-after-load 'js2-mode

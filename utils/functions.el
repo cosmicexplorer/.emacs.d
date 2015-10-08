@@ -555,8 +555,7 @@ that point."
 ;;; http://stackoverflow.com/a/26137517/2518889
 (defmacro with-system (type &rest body)
   "Evaluate body if `system-type' equals type."
-  `(when (eq system-type ,type)
-     ,@body))
+  `(when (eq system-type ,type) ,@body))
 (put 'with-system 'lisp-indent-function 1)
 
 (defvar current-date-time-format "%a %b %d %H:%M:%S %Z %Y"
@@ -2168,5 +2167,19 @@ by another percent."
     (with-current-buffer buf
       (when (processp proc) (delete-process proc))
       (apply #'start-process (append (list name (current-buffer)) cmd)))))
+
+(defun restart-coffee ()
+  (interactive)
+  (let* ((cof-buf (get-buffer "*CoffeeREPL*"))
+         ;; default to current window, when coffee repl not yet started
+         (cof-window (get-buffer-window cof-buf)))
+    (when cof-buf
+      (set-process-query-on-exit-flag (get-buffer-process cof-buf) nil)
+      (kill-buffer cof-buf))
+    (let* ((new-repl-buf (coffee-repl))
+           (new-repl-win (get-buffer-window new-repl-buf)))
+      (with-selected-window new-repl-win (previous-buffer))
+      (window--display-buffer new-repl-buf cof-window 'reuse)
+      (select-window cof-window))))
 
 (provide 'functions)
