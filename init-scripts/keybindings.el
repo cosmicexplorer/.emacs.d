@@ -487,3 +487,5 @@
 
 (eval-after-load 'org-plot
   '(progn (define-key org-mode-map (kbd "C-M-g") #'org-plot/gnuplot)))
+
+(global-set-key (kbd "M-i") #'imenu)

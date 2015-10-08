@@ -2170,7 +2170,8 @@ by another percent."
 
 (defun restart-coffee ()
   (interactive)
-  (let* ((cof-buf (get-buffer "*CoffeeREPL*"))
+  (let* ((cur-wind (get-buffer-window))
+         (cof-buf (get-buffer "*CoffeeREPL*"))
          ;; default to current window, when coffee repl not yet started
          (cof-window (get-buffer-window cof-buf)))
     (when cof-buf
@@ -2180,6 +2181,6 @@ by another percent."
            (new-repl-win (get-buffer-window new-repl-buf)))
       (with-selected-window new-repl-win (previous-buffer))
       (window--display-buffer new-repl-buf cof-window 'reuse)
-      (select-window cof-window))))
+      (select-window cur-wind))))
 
 (provide 'functions)
