@@ -782,7 +782,7 @@ scope of the command's precision.")
     ;; (the actual buffer can be found from the process)
     arg-proc))
 
-
+
 ;;; save buffers to disk and get them back
 (defun reread-visited-files-from-disk ()
   (with-current-buffer (find-file-noselect saved-files)
@@ -1191,6 +1191,15 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (toggle-read-only))
 
 ;;; basic utilities
+(defun remove-trailing-whitespace ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "[[:space:]]+$" nil t)
+      (unless (char-equal (char-before) ?\C-j)
+        (let ((pt (point)))
+          (re-search-backward "[^[:space:]]")
+          (delete-region (1+ (point)) pt))))))
 (defun nuke-whitespace-except-this-line ()
   (interactive)
   (let* ((orig-pt (point))
@@ -1211,7 +1220,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                           (return (if (eolp) res nil)))))
          (buf-str (and right-pt (buffer-substring left-pt right-pt)))
          (offset (and right-pt (- right-pt orig-pt))))
-    (delete-trailing-whitespace)
+    (remove-trailing-whitespace)
     (when right-pt
       (insert buf-str)
       (backward-char offset))))

@@ -186,7 +186,10 @@
 ;;; CPerl-mode
 (add-hook 'cperl-mode-hook
           (lambda ()
-            (define-key cperl-mode-map (kbd "C-c C-k") nil)))
+            (define-key cperl-mode-map (kbd "C-c C-k") nil)
+            (define-key cperl-mode-map (kbd "C-h f") #'cperl-perldoc)
+            (define-key cperl-mode-map (kbd "C-c C-w") nil)
+            (define-key cperl-mode-map (kbd "C-c C-v") nil)))
 
 ;;; lisp
 ;;; so it's all emacsy
@@ -217,6 +220,8 @@
 ;;; org-mode
 (eval-after-load 'org
   '(progn
+     (define-key org-mode-map (kbd "C-c C-v") nil)
+     (define-key org-mode-map (kbd "C-c C-w") nil)
      (define-key org-mode-map (kbd "<tab>") #'smart-tab)
      (define-key org-mode-map (kbd "C-c a") #'org-agenda)
      (define-key org-mode-map (kbd "C-c c") #'org-capture)
