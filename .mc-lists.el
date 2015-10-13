@@ -30,6 +30,7 @@
         org-force-self-insert
         org-forward-paragraph
         org-self-insert-command
+        paredit-backslash
         paredit-backspace-delete-highlight
         paredit-backward
         paredit-forward
