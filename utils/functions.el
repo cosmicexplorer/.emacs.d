@@ -1197,32 +1197,20 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (goto-char (point-min))
     (while (re-search-forward "\s+$" nil t)
       (let ((pt (point)))
-        (re-search-backward "\s+$")
-        (delete-region (point) pt)))))
+        (re-search-backward "[^\s]")
+        (delete-region (1+ (point)) pt)))))
+(defun in-whitespace-region-p () (looking-back "\s"))
 (defun nuke-whitespace-except-this-line ()
   (interactive)
-  (let* ((orig-pt (point))
-         (left-pt
-          (loop while (and (char-before) (whitespacep (char-before))
-                           (not (bolp)))
-                do (backward-char)
-                finally (let ((res (point)))
-                          (goto-char orig-pt)
-                          (return res))))
-         (right-pt
-          (loop while (and (not (eolp)) (char-after) (whitespacep (char-after)))
-                do (forward-char)
-                ;; if we're not at the end of a line, we do want whitespace
-                ;; eradicated
-                finally (let ((res (point)))
-                          (goto-char orig-pt)
-                          (return (if (eolp) res nil)))))
-         (buf-str (and right-pt (buffer-substring left-pt right-pt)))
-         (offset (and right-pt (- right-pt orig-pt))))
-    (remove-trailing-whitespace)
-    (when right-pt
-      (insert buf-str)
-      (backward-char offset))))
+  (if (not (in-whitespace-region-p)) (remove-trailing-whitespace)
+    (let* ((pt (point))
+           (str (buffer-substring
+                 (let ((res (re-search-backward "[^\s]" nil t)))
+                   (if res (progn (forward-char) (point))
+                     (progn (goto-char pt) (point-min))))
+                 pt)))
+      (remove-trailing-whitespace)
+      (insert str))))
 
 ;;; read-only text
 
