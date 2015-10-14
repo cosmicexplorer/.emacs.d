@@ -252,7 +252,17 @@
 
 (eval-after-load 'org-mode '(require 'org-plot))
 
+(defcustom sml-guess-inline-pipe-column 50
+  "Default column to guess inline pipe-cases for `fix-sml-smart-pipe'.")
 (defun fix-sml-smart-pipe ()
   (interactive)
   (sml-electric-pipe)
-  (let ((pt (point))) (beginning-of-line) (insert " ") (goto-char (1+ pt))))
+  (let ((pt (point))) (beginning-of-line) (insert " ") (goto-char (1+ pt)))
+  (let ((pt (point)))
+    (beginning-of-line)
+    (backward-char)
+    (while (looking-back "\s") (delete-backward-char 1))
+    (if (not (< (current-column) sml-guess-inline-pipe-column)) (goto-char pt)
+      (destroy-all-whitespace-nearby)
+      (insert " ")
+      (forward-char 2))))
