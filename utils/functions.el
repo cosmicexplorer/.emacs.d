@@ -1201,7 +1201,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
         (delete-region (1+ (point)) pt)))))
 (defun in-whitespace-region-p ()
   (and (looking-back "\s")
-       (looking-at "\s+$")))
+       (looking-at "\s*$")))
 (defun nuke-whitespace-except-this-line ()
   (interactive)
   (if (not (in-whitespace-region-p)) (remove-trailing-whitespace)
