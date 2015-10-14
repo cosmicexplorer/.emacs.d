@@ -251,3 +251,8 @@
                (lambda () (setq comint-process-echoes nil)))))
 
 (eval-after-load 'org-mode '(require 'org-plot))
+
+(defun fix-sml-smart-pipe ()
+  (interactive)
+  (sml-electric-pipe)
+  (let ((pt (point))) (beginning-of-line) (insert " ") (goto-char (1+ pt))))

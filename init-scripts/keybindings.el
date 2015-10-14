@@ -493,4 +493,7 @@
 (eval-after-load 'org-plot
   '(progn (define-key org-mode-map (kbd "C-M-g") #'org-plot/gnuplot)))
 
+(eval-after-load 'sml-mode
+  '(define-key sml-mode-map (kbd "|") #'fix-sml-smart-pipe))
+
 (global-set-key (kbd "M-i") #'imenu)
