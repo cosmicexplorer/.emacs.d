@@ -2200,6 +2200,8 @@ by another percent."
       (destroy-all-whitespace-nearby)
       (insert " ")
       (forward-char 2)))
-  (indent-for-tab-command))
+  (insert "a")
+  (indent-for-tab-command)
+  (delete-backward-char 1))
 
 (provide 'functions)
