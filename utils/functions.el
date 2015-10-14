@@ -1759,9 +1759,11 @@ that."
 
 (defun destroy-all-whitespace-nearby ()
   (interactive)
-  (loop while (string-match-p "[[:space:]\n]" (string (char-after)))
+  (loop while (let ((c (char-after)))
+                (when c (string-match-p "[[:space:]\n]" (string c))))
         do (delete-char 1))
-  (loop while (string-match-p "[[:space:]\n]" (string (char-before)))
+  (loop while (let ((c (char-before)))
+                (when c (string-match-p "[[:space:]\n]" (string c))))
         do (delete-backward-char 1)))
 
 (defun html-barf-tag-forward ()
