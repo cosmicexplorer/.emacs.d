@@ -1074,7 +1074,7 @@ nor 'right is given as an argument, assumes right."
 current line if no region is active. NUM-STARS-ARG is given by prefix argument,
 and determines the number of asterisks ('*') to insert before the initial
 delimiter and after the closing comment delimiter. If a blank argument is given,
-it formats the region using 'javadoc' syntax, with two stars on the initial line
+it formats the region using javadoc syntax, with two stars on the initial line
 and a single star for each line in between. This \"pushes\" the region affected
 to the beginning of the line containing the `region-beginning', and the end of
 the line containing `region-end'."
@@ -1086,27 +1086,18 @@ the line containing `region-end'."
                          ((consp num-stars-arg) nil)
                          ((null num-stars-arg) 1)
                          (t (throw 'unrecognized-prefix-arg num-stars-arg))))
-        ;; the definitions of beg and end could have been done in one line, but
-        ;; i thought it was fun to make them super "generic"
-        (beg
-         (apply
-          (if (use-region-p)
-              (lambda (fun &rest args)
-                (save-excursion
-                  (goto-char reg-beg)
-                  (apply fun args)))
-            #'funcall)
-          (list #'frontier-of-text-for-line 'left)))
-        (end (apply
-              (if (use-region-p)
-                  (lambda (fun &rest args)
-                    (goto-char
-                     (if (save-excursion (goto-char (region-end)) (bolp))
-                         (1- reg-end)
-                       reg-end))
-                    (apply fun args))
-                #'funcall)
-              (list #'frontier-of-text-for-line 'right)))
+        (beg (if (not (use-region-p)) (frontier-of-text-for-line 'left)
+               (save-excursion
+                 (goto-char reg-beg) (frontier-of-text-for-line 'left))))
+        (end (if (not (use-region-p)) (frontier-of-text-for-line 'right)
+               (goto-char reg-end)
+               (if (>= (point) (frontier-of-text-for-line 'right)) reg-end
+                 (forward-line -1)
+                 (goto-char (frontier-of-text-for-line 'right))
+                 (if (> (point) reg-beg) (point)
+                   (goto-char reg-beg)
+                   (goto-char (frontier-of-text-for-line 'right))
+                   (point)))))
         (begin-insertions 0)
         (end-insertions 0)
         (star-insertions 0)
@@ -1237,19 +1228,20 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 (defun actual-setup-submodules (&optional cb)
   (unless dont-ask-about-git
-    (if (not (executable-find "git"))
-        (send-message-to-scratch
-         "git not installed! some features will be unavailable.")
-      (let ((git-submodule-buf-name "*git-submodule-errors*")
-            (prev-wd default-directory))
-        (cd init-home-folder-dir)
-        (unwind-protect
-            (let ((submodule-out-buf
-                   (get-buffer-create git-submodule-buf-name)))
-              (unless (run-git-updates submodule-out-buf)
-                (throw 'submodule-failure "init failed")))
-          (cd prev-wd))
-        (kill-buffer git-submodule-buf-name))))
+    (with-internet-connection
+     (if (not (executable-find "git"))
+         (send-message-to-scratch
+          "git not installed! some features will be unavailable.")
+       (let ((git-submodule-buf-name "*git-submodule-errors*")
+             (prev-wd default-directory))
+         (cd init-home-folder-dir)
+         (unwind-protect
+             (let ((submodule-out-buf
+                    (get-buffer-create git-submodule-buf-name)))
+               (unless (run-git-updates submodule-out-buf)
+                 (throw 'submodule-failure "init failed")))
+           (cd prev-wd))
+         (kill-buffer git-submodule-buf-name)))))
   (when cb (funcall cb)))
 
 (defvar submodules-to-make nil)
