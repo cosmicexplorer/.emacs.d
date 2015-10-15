@@ -194,15 +194,13 @@ Check out your .emacs."))
 
 ;;; save visited files to buffer
 (when save-visited-files
-  (add-hook 'after-load-init-hook #'reread-visited-files-from-disk)
+  (reread-visited-files-from-disk)
   (add-hook 'kill-emacs-hook #'save-visiting-files-to-buffer))
 
 ;;; if everything loaded correctly, clear that last message
 (message "")
 (setq init-loaded-fully t)
 (put 'upcase-region 'disabled nil)
-
-(reread-visited-files-from-disk)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -323,7 +321,7 @@ Check out your .emacs."))
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (gnuplot-mode gnuplot sml-mode skewer-mode magit org csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode2 company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
+    (sage-shell-mode gnuplot-mode gnuplot sml-mode skewer-mode magit org csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode2 company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
  '(rainbow-ansi-colors t)
  '(rainbow-html-colors t)
  '(rainbow-latex-colors t)

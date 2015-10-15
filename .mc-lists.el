@@ -10,6 +10,7 @@
         c-electric-colon
         c-electric-semi&comma
         c-electric-slash
+        c-electric-star
         camel-case-left-word
         camel-case-right-word
         coffee-dedent-line-backspace
