@@ -1184,12 +1184,17 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 ;;; basic utilities
 (defun remove-trailing-whitespace ()
   (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (while (re-search-forward "\s+$" nil t)
-      (let ((pt (point)))
-        (re-search-backward "[^\s]")
-        (delete-region (1+ (point)) pt)))))
+  (let ((eob (looking-at "[[:space:]\n]*\\'")))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "\s+$" nil t)
+        (let ((pt (point)))
+          (re-search-backward "[^\s]")
+          (delete-region (1+ (point)) pt)))
+      (goto-char (point-max))
+      (while (looking-back "[[:space:]\n]") (delete-backward-char 1))
+      (insert "\n"))
+    (if eob (goto-char (point-max)))))
 (defun in-whitespace-region-p ()
   (and (looking-back "\s")
        (looking-at "\s*$")))
