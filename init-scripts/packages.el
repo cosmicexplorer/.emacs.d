@@ -69,6 +69,7 @@
                       php-mode
                       pkg-info
                       queue
+                      racket-mode
                       rainbow-delimiters
                       rainbow-mode
                       s

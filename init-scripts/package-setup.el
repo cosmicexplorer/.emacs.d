@@ -255,4 +255,3 @@
                (lambda () (setq comint-process-echoes nil)))))
 
 (eval-after-load 'org-mode '(require 'org-plot))
-

@@ -16,6 +16,7 @@
         coffee-dedent-line-backspace
         cperl-electric-terminator
         delete-whole-line
+        dired-next-line
         electric-pair-delete-pair
         end-of-buffer
         end-of-visual-line

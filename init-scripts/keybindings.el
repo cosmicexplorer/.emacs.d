@@ -427,14 +427,20 @@
 ;;; clojure
 (defun mc/mark-next-not-cider ()
   (interactive)
-  (if (eq major-mode 'cider-repl-mode)
-      (call-interactively #'cider-repl-next-input)
-    (call-interactively #'mc/mark-next-like-this)))
+  (cond ((eq major-mode 'cider-repl-mode)
+         (call-interactively #'cider-repl-next-input))
+        ((eq major-mode 'racket-repl-mode)
+         (call-interactively #'comint-next-input))
+        (t
+         (call-interactively #'mc/mark-next-like-this))))
 (defun mc/mark-prev-not-cider ()
   (interactive)
-  (if (eq major-mode 'cider-repl-mode)
-      (call-interactively #'cider-repl-previous-input)
-    (call-interactively #'mc/mark-previous-like-this)))
+  (cond ((eq major-mode 'cider-repl-mode)
+         (call-interactively #'cider-repl-previous-input))
+        ((eq major-mode 'racket-repl-mode)
+         (call-interactively #'comint-previous-input))
+        (t
+         (call-interactively #'mc/mark-previous-like-this))))
 (eval-after-load 'cider-mode
   '(progn
      (define-key cider-mode-map (kbd "C-c C-w")
@@ -469,7 +475,8 @@
 (eval-after-load 'latex-mode
   '(progn
      (define-key LaTeX-mode-map (kbd "C-c C-w")
-       #'destroy-all-whitespace-nearby)))
+       #'destroy-all-whitespace-nearby)
+     (define-key LaTeX-mode-map (kbd "C-c C-v") nil)))
 
 (global-set-key (kbd "C-M-g") #'rerun-command)
 (eval-after-load 'sh-mode
