@@ -18,6 +18,10 @@
               (define-key eshell-mode-map
                 [remap eshell-pcomplete]
                 'helm-esh-pcomplete)))
+(setq helm-c-source-swoop-match-functions
+      (remove 'helm-fuzzy-match helm-c-source-swoop-match-functions))
+(setq helm-c-source-swoop-search-functions
+      (remove 'helm-fuzzy-match helm-c-source-swoop-search-functions))
 
 ;;; undo-tree
 (global-undo-tree-mode)                 ; put it EVERYWHERE
