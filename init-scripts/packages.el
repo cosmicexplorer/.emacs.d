@@ -50,6 +50,7 @@
                       helm
                       helm-gtags
                       helm-swoop
+                      highlight-parentheses
                       js2-mode
                       less-css-mode
                       linum

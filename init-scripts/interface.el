@@ -593,3 +593,5 @@ Check out your .emacs.\n")))))
    (add-to-list 'load-path (concat init-home-folder-dir "org-mode/lisp/"))))
 
 (defadvice eww-follow-link (after revis activate) (refresh-visual-line-mode))
+
+(global-highlight-parentheses-mode)
