@@ -1184,7 +1184,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 ;;; basic utilities
 (defun remove-trailing-whitespace ()
   (interactive)
-  (let ((eob (and (looking-at-p "[[:space:]\n]*\\'") (= (current-column 0)))))
+  (let ((eob (and (looking-at-p "[[:space:]\n]*\\'") (= (current-column) 0))))
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward "\s+$" nil t)

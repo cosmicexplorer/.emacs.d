@@ -45,6 +45,7 @@
 
 (setq mc/cmds-to-run-once
       '(
+        Custom-save
         describe-variable
         eval-buffer-and-message
         eval-expression
