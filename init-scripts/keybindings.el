@@ -220,6 +220,8 @@
 ;;; org-mode
 (eval-after-load 'org
   '(progn
+     (define-key org-mode-map (kbd "<C-up>") #'org-previous-visible-heading)
+     (define-key org-mode-map (kbd "<C-down>") #'org-next-visible-heading)
      (define-key org-mode-map (kbd "C-c C-v") nil)
      (define-key org-mode-map (kbd "C-c C-w") nil)
      (define-key org-mode-map (kbd "<tab>") #'smart-tab)
@@ -313,6 +315,7 @@
 (global-set-key (kbd "C-c M-e") #'message-erc-modded-chans)
 
 ;;; html stuff
+(define-key html-mode-map (kbd "C-c C-v") nil)
 (define-key html-mode-map (kbd "M-o") #'open-in-browser)
 (define-key html-mode-map (kbd ">") #'html-autoclose-tag)
 (define-key html-mode-map (kbd "M-s") #'html-split-tag)
