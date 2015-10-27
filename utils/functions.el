@@ -832,6 +832,13 @@ scope of the command's precision.")
                (forward-line)))
     (kill-buffer)))
 
+(defun compose-helper (arg quoted-funs)
+  (if (null quoted-funs) arg
+    (compose-helper (list #'funcall (car quoted-funs) arg) (cdr quoted-funs))))
+
+(defmacro compose (&rest args)
+  `(lambda (&rest args) ,(apply #'compose-helper (list 'arg args))))
+
 (defvar init-loaded-fully nil
   "Set to t after init loads fully.")
 (defun save-visiting-files-to-buffer (&optional is-called-interactively)
@@ -844,7 +851,9 @@ scope of the command's precision.")
     ;; sigterm because this function fails on quit is annoying.
     (with-current-buffer (find-file saved-files)
       (erase-buffer)
-      (loop for buf in (buffer-list)
+      (loop for buf in
+            (sort (buffer-list)
+                  (lambda (a b) (string-lessp (buffer-name a) (buffer-name b))))
             do (let ((bufname (and (buffer-file-name buf)
                                    (file-truename (buffer-file-name buf))))
                      (dired-dir (with-current-buffer buf
