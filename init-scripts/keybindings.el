@@ -218,10 +218,18 @@
 (global-set-key (kbd "M-#") 'replace-regexp)
 
 ;;; org-mode
+(defun org-replace-forward-paragraph ()
+  (interactive "^")
+  (call-interactively #'forward-paragraph))
+(defun org-replace-backward-paragraph ()
+  (interactive "^")
+  (call-interactively #'backward-paragraph))
 (eval-after-load 'org
   '(progn
-     (define-key org-mode-map (kbd "<C-up>") #'org-previous-visible-heading)
-     (define-key org-mode-map (kbd "<C-down>") #'org-next-visible-heading)
+     (define-key org-mode-map (kbd "<C-up>") #'org-replace-backward-paragraph)
+     (define-key org-mode-map (kbd "<C-down>") #'org-replace-forward-paragraph)
+     (define-key org-mode-map (kbd "<C-S-up>") nil)
+     (define-key org-mode-map (kbd "<C-S-down>") nil)
      (define-key org-mode-map (kbd "C-c C-v") nil)
      (define-key org-mode-map (kbd "C-c C-w") nil)
      (define-key org-mode-map (kbd "<tab>") #'smart-tab)
@@ -506,5 +514,9 @@
 
 (eval-after-load 'sml-mode
   '(define-key sml-mode-map (kbd "|") #'fix-sml-smart-pipe))
+
+(eval-after-load 'multiple-cursors
+  '(progn
+     (define-key mc/keymap (kbd "<return>") nil)))
 
 (global-set-key (kbd "M-i") #'imenu)

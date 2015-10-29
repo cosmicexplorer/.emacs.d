@@ -31,7 +31,9 @@
         markdown-exdent-or-delete
         org-force-self-insert
         org-forward-paragraph
+        org-return
         org-self-insert-command
+        org-shiftcontrolleft
         paredit-backslash
         paredit-backspace-delete-highlight
         paredit-backward
@@ -46,6 +48,7 @@
 (setq mc/cmds-to-run-once
       '(
         Custom-save
+        describe-key
         describe-variable
         eval-buffer-and-message
         eval-expression
