@@ -34,6 +34,7 @@
         org-return
         org-self-insert-command
         org-shiftcontrolleft
+        org-yank
         paredit-backslash
         paredit-backspace-delete-highlight
         paredit-backward
@@ -57,6 +58,7 @@
         isearch-delete-char
         mc/mark-next-not-cider
         mc/mark-prev-not-cider
+        mouse-set-region
         smart-compile
         wdired-finish-edit
         ))

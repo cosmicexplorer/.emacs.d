@@ -220,10 +220,14 @@
 ;;; org-mode
 (defun org-replace-forward-paragraph ()
   (interactive "^")
-  (call-interactively #'forward-paragraph))
+  (unless (eobp)
+    (if (re-search-forward "[^\n]\n\n" nil t) (backward-char)
+      (end-of-buffer))))
 (defun org-replace-backward-paragraph ()
   (interactive "^")
-  (call-interactively #'backward-paragraph))
+  (unless (bobp)
+    (if (re-search-backward "\n\n[^\n]" nil t) (forward-char)
+      (beginning-of-buffer))))
 (eval-after-load 'org
   '(progn
      (define-key org-mode-map (kbd "<C-up>") #'org-replace-backward-paragraph)
@@ -232,7 +236,7 @@
      (define-key org-mode-map (kbd "<C-S-down>") nil)
      (define-key org-mode-map (kbd "C-c C-v") nil)
      (define-key org-mode-map (kbd "C-c C-w") nil)
-     (define-key org-mode-map (kbd "<tab>") #'smart-tab)
+     (define-key org-mode-map (kbd "<tab>") nil)
      (define-key org-mode-map (kbd "C-c a") #'org-agenda)
      (define-key org-mode-map (kbd "C-c c") #'org-capture)
      (define-key org-mode-map (kbd "C-k") #'kill-selected-region-default)
@@ -484,10 +488,9 @@
   '(progn
      (define-key python-mode-map (kbd "C-c C-v") #'delete-whole-line)))
 
-(eval-after-load 'latex-mode
+(eval-after-load 'tex-mode
   '(progn
-     (define-key LaTeX-mode-map (kbd "C-c C-w")
-       #'destroy-all-whitespace-nearby)
+     (define-key LaTeX-mode-map (kbd "C-c C-w") nil)
      (define-key LaTeX-mode-map (kbd "C-c C-v") nil)))
 
 (global-set-key (kbd "C-M-g") #'rerun-command)
