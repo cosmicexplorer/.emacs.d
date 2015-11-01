@@ -116,6 +116,8 @@ also."
   (interactive)
   (set-face-attribute 'default nil :height 100))
 
+(defalias 'small-text 'little-text)
+
 (defun tiny-text ()
   (interactive)
   (set-face-attribute 'default nil :height 50))

@@ -519,7 +519,12 @@
   '(define-key sml-mode-map (kbd "|") #'fix-sml-smart-pipe))
 
 (eval-after-load 'multiple-cursors
-  '(progn
-     (define-key mc/keymap (kbd "<return>") nil)))
+  '(progn (define-key mc/keymap (kbd "<return>") nil)))
 
 (global-set-key (kbd "M-i") #'imenu)
+
+(eval-after-load 'tuareg
+  '(progn (define-key tuareg-mode-map (kbd "C-c C-c") #'tuareg-eval-buffer)))
+
+(eval-after-load 'inf-ruby
+  '(progn (define-key ruby-mode-map (kbd "C-c C-c") #'ruby-send-buffer)))

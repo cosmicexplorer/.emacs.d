@@ -33,3 +33,4 @@ server/
 url/
 /quicklisp.lisp
 ensime/
+/abbrev_defs

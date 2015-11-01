@@ -484,3 +484,10 @@ Lisp code." t)
 
 ;;; lua stuff
 (add-to-list 'auto-mode-alist '("\\.nse$" . lua-mode))
+
+;;; ruby stuff
+(eval-after-load 'inf-ruby
+  '(progn
+     (defun ruby-send-buffer ()
+       (interactive)
+       (ruby-send-region-and-go (point-min) (point-max)))))
