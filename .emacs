@@ -88,8 +88,7 @@ init-scripts/interface.el.")
 (defmacro with-internet-connection (&rest body)
   "Perform BODY only if we can grab a url in a short period of time."
   `(progn
-     (unless (featurep 'url-queue)
-       (require 'url-queue))
+     (unless (featurep 'url-queue) (require 'url-queue))
      ;; url-queue-retrieve used because of built-in timeout
      (url-queue-retrieve
       ;; arbitrary url, chosen because github's uptime is ridiculous (remember

@@ -28,21 +28,14 @@
           (lambda () (setq comment-start "// " comment-end "")))
 
 ;;; highlight cursor and auto-fill when over 80 chars in certain modes
-(defvar no-auto-fill-modes '(litcoffee-mode))
+(defvar no-auto-fill-modes
+  '(litcoffee-mode tex-mode markdown-mode elisp-byte-code-mode))
 (defun selective-turn-on-auto-fill ()
   (unless (member major-mode no-auto-fill-modes)
     (highlight-80+-mode)
     (auto-fill-mode)))
 (add-hook 'prog-mode-hook #'selective-turn-on-auto-fill)
 (defvar coffee-string-interpolation-regexp "#{[^}]*}")
-
-;;; ...but not others
-(add-hook 'LaTeX-mode-hook (lambda ()
-                             (auto-fill-mode -1)
-                             (highlight-80+-mode -1)))
-(add-hook 'markdown-mode-hook (lambda ()
-                                (auto-fill-mode -1)
-                                (highlight-80+-mode -1)))
 
 ;;; perl
 (require 'cperl-mode)
