@@ -318,19 +318,18 @@
 (add-to-list 'auto-mode-alist '("\\`\\.zshrc\\'" . zsh-mode))
 
 ;;; lisp and related
+(defmacro add-fun-to-hooks (fun &rest hooks)
+  `(progn ,@(mapcar (lambda (hook) `(add-hook (quote ,hook) ,fun)) hooks)))
+(put 'add-fun-to-hooks 'lisp-indent-function 1)
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of
 Lisp code." t)
-(add-hook 'emacs-lisp-mode-hook                  #'enable-paredit-mode)
-(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-(add-hook 'ielm-mode-hook                        #'enable-paredit-mode)
-(add-hook 'lisp-mode-hook                        #'enable-paredit-mode)
-(add-hook 'lisp-interaction-mode-hook            #'enable-paredit-mode)
-(add-hook 'scheme-mode-hook                      #'enable-paredit-mode)
-(add-hook 'racket-mode-hook                      #'enable-paredit-mode)
-(add-hook 'racket-repl-mode-hook                 #'enable-paredit-mode)
-;;; just turn on paredit for scratch buffer
-(add-hook 'lisp-interaction-mode-hook            #'enable-paredit-mode)
-(add-hook 'clojure-mode-hook                     #'enable-paredit-mode)
+;;; running these add-hooks all at once in a mapcan leads to slime keybindings
+;;; where they shouldn't be, and I don't know why. it may have something to do
+;;; with dynamic scope; anyway, this macro seems to work
+(add-fun-to-hooks #'enable-paredit-mode
+  emacs-lisp-mode-hook eval-expression-minibuffer-setup-hook ielm-mode-hook
+  lisp-mode-hook lisp-interaction-mode-hook scheme-mode-hook racket-mode-hook
+  racket-repl-mode-hook clojure-mode-hook elisp-byte-code-mode-hook)
 
 ;;; start scratch buffer in paredit mode
 (with-current-buffer (get-buffer "*scratch*")
