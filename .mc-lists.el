@@ -21,6 +21,7 @@
         end-of-buffer
         end-of-visual-line
         helm-buffers-list
+        html-newline-indent
         ido-find-file
         isearch-abort
         isearch-delete-char

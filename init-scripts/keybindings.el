@@ -490,15 +490,15 @@
 
 (eval-after-load 'tex-mode
   '(progn
-     (define-key LaTeX-mode-map (kbd "C-c C-w") nil)
-     (define-key LaTeX-mode-map (kbd "C-c C-v") nil)))
+     (define-key tex-mode-map (kbd "C-c C-w") nil)
+     (define-key tex-mode-map (kbd "C-c C-v") nil)))
 
 (global-set-key (kbd "C-M-g") #'rerun-command)
 (eval-after-load 'sh-mode
   '(define-key sh-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby))
 
-(eval-after-load 'ein-notebook
-  '(define-key ein:notebook-mode-map (kbd ".") #'self-insert-command))
+;; (eval-after-load 'ein-notebook
+;;   '(define-key ein:notebook-mode-map (kbd ".") #'self-insert-command))
 
 ;;; this is annoying
 (global-set-key (kbd "C-x C-x") nil)

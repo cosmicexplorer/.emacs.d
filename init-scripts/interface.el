@@ -590,7 +590,10 @@ Check out your .emacs.\n")))))
 (make-submodule
  "org-mode" "make"
  (lambda ()
-   (add-to-list 'load-path (concat init-home-folder-dir "org-mode/lisp/"))))
+   (add-to-list 'load-path (concat init-home-folder-dir "org-mode/lisp/"))
+   (autoload #'org-element-update-syntax "org-element.el")
+   (autoload #'org-define-error "org-compat.el")
+   (require 'org)))
 
 (defadvice eww-follow-link (after revis activate) (refresh-visual-line-mode))
 

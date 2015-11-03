@@ -1239,6 +1239,10 @@ way I prefer, and regards `comment-padding', unlike the standard version."
        (zerop
         (call-process
          "git" nil submodule-out-buf nil
+         "submodule" "foreach" "git" "checkout" "master"))
+       (zerop
+        (call-process
+         "git" nil submodule-out-buf nil
          "submodule" "foreach" "git" "pull" "origin"
          "master"))))
 

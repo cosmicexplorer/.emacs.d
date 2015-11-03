@@ -491,3 +491,7 @@ Lisp code." t)
      (defun ruby-send-buffer ()
        (interactive)
        (ruby-send-region-and-go (point-min) (point-max)))))
+
+;;; ocaml
+(eval-after-load 'tuareg
+  '(add-to-list 'auto-mode-alist '("\\.ocamlinit$" . tuareg-mode)))
