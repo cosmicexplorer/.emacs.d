@@ -530,3 +530,5 @@
 
 (eval-after-load 'inf-ruby
   '(progn (define-key ruby-mode-map (kbd "C-c C-c") #'ruby-send-buffer)))
+
+(global-set-key (kbd "C-c a") #'cycle-shell-buffers)

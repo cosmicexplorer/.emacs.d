@@ -2218,4 +2218,27 @@ by another percent."
   (indent-for-tab-command)
   (delete-backward-char 1))
 
+(defvar async-shell-buffers nil)
+(defvar async-shell-buffers-pointer nil)
+
+(defun display-buf-no-win-save-shell-command-buf (buf alist)
+  (setq async-shell-buffers-pointer
+        (setq async-shell-buffers
+              (remove-if-not #'buffer-live-p (cons buf async-shell-buffers))))
+  (display-buffer-no-window buf alist))
+
+(defun cycle-shell-buffers (arg)
+  (interactive "P")
+  (setq async-shell-buffers
+        (remove-if-not #'buffer-live-p async-shell-buffers))
+  (when (null async-shell-buffers-pointer)
+    (setq async-shell-buffers-pointer async-shell-buffers))
+  (if (null async-shell-buffers) (message "%s" "No shell buffers found!")
+    (let* ((ptr async-shell-buffers-pointer)
+           (buf (car ptr)))
+      (if (not (buffer-live-p buf))
+          (cycle-shell-buffers arg)
+        (setq async-shell-buffers-pointer (cdr async-shell-buffers-pointer))
+        (if arg (select-window (display-buffer buf)) (switch-to-buffer buf))))))
+
 (provide 'functions)
