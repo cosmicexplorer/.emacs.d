@@ -3,8 +3,7 @@
 ;;; .....let's begin
 (package-initialize)
 
-(defgroup my-customizations nil
-  "all `defcustom' forms in my own init scripts")
+(defgroup my-customizations nil "all `defcustom' forms in my own init scripts")
 
 ;;; add wherever emacs was invoked from to path
 ;;; done at top so we know we're not changing any directories
@@ -33,7 +32,7 @@
 ;;; which is not really great for sharing on github. this "custom-vars.el" file
 ;;; is gitignored so that it may vary easily. meaningful defaults are provided
 ;;; below with each variable. it should be noted that this file is especially
-;;; useful to store variables such as org-agenda-files.
+;;; useful to store variables such as `org-agenda-files'.
 (defvar warning-words-file nil
   "Path to file defining words to highlight specially. An example file would
 contain:

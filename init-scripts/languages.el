@@ -324,8 +324,8 @@
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of
 Lisp code." t)
 ;;; running these add-hooks all at once in a mapcan leads to slime keybindings
-;;; where they shouldn't be, and I don't know why. it may have something to do
-;;; with dynamic scope; anyway, this macro seems to work
+;;; in modes where they shouldn't be, and I don't know why. it may have
+;;; something to do with dynamic scope; anyway, this macro seems to work
 (add-fun-to-hooks #'enable-paredit-mode
   emacs-lisp-mode-hook eval-expression-minibuffer-setup-hook ielm-mode-hook
   lisp-mode-hook lisp-interaction-mode-hook scheme-mode-hook racket-mode-hook
@@ -414,10 +414,14 @@ Lisp code." t)
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-;;; TODO: figure out why markdown-mode.el chooses to cripple gfm-mode
-;; (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
-;; (add-to-list 'auto-mode-alist '("readme\\.md\\'" . gfm-mode))
-;; (add-to-list 'auto-mode-alist '("Readme\\.md\\'" . gfm-mode))
+(add-hook
+ 'markdown-mode-hook
+ (lambda ()
+   (when (and (file-exists-p ".git")
+              (let ((case-fold-search t))
+                (string-match-p "readme\\.md\\'" (buffer-file-name)))
+              (not (eq major-mode 'gfm-mode)))
+     (gfm-mode))))
 
 ;;; coffeescript
 (eval-after-load "coffee-mode"
