@@ -371,6 +371,8 @@
        '(define-key org-mode-map (kbd "C-c c") #'magit-show-commit))
      (define-key magit-mode-map (kbd "<tab>") #'magit-tab-dwim)
      (define-key magit-mode-map (kbd "<backtab>") #'magit-section-up)))
+(eval-after-load 'magit-blame
+  '(progn (define-key magit-blame-mode-map (kbd "c") #'magit-show-commit)))
 
 ;;; LOL MAIL
 (global-set-key (kbd "C-x m") nil)
