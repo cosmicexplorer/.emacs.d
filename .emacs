@@ -1,4 +1,4 @@
-;;; -*lexical-binding: t -*-
+;;; -* lexical-binding: t -*-
 
 ;;; .....let's begin
 (package-initialize)

@@ -240,6 +240,7 @@
      (define-key org-mode-map (kbd "C-c a") #'org-agenda)
      (define-key org-mode-map (kbd "C-c c") #'org-capture)
      (define-key org-mode-map (kbd "C-k") #'kill-selected-region-default)
+     (define-key org-mode-map (kbd "C-c a") nil)
      (add-to-list
       'org-mode-hook
       (lambda () (define-key org-mode-map (kbd "C-c C-k") #'smart-compile)))
@@ -392,6 +393,8 @@
       'haskell-mode-hook
       (lambda ()
         (define-key haskell-mode-map (kbd "C-c C-k") #'smart-compile)))))
+
+(define-key compilation-mode-map (kbd "G") #'compile)
 
 (eval-after-load 'haskell-interactive-mode
   '(progn

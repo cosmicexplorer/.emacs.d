@@ -2231,7 +2231,7 @@ by another percent."
   (interactive "P")
   (setq async-shell-buffers
         (remove-if-not #'buffer-live-p async-shell-buffers))
-  (when (null async-shell-buffers-pointer)
+  (unless (buffer-live-p (car async-shell-buffers-pointer))
     (setq async-shell-buffers-pointer async-shell-buffers))
   (if (null async-shell-buffers) (message "%s" "No shell buffers found!")
     (let* ((ptr async-shell-buffers-pointer)
