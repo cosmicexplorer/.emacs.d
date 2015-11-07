@@ -134,13 +134,13 @@ also."
 ;;; https://stackoverflow.com/questions/27798296/check-if-a (continued)
 ;;; -character-not-string-is-lowercase-uppercase-alphanumeric
 (defun wordp (c)
-  (= ?w (char-syntax c)))
+  (and c (= ?w (char-syntax c))))
 (defun lowercasep (c)
-  (and (wordp c) (= c (downcase c))))
+  (and c (wordp c) (= c (downcase c))))
 (defun uppercasep (c)
-  (and (wordp c) (= c (upcase c))))
+  (and c (wordp c) (= c (upcase c))))
 (defun whitespacep (c)
-  (= 32 (char-syntax c)))
+  (and c (= 32 (char-syntax c))))
 (defun string-capitalized-p (str)
   (let ((case-fold-search nil))
     (string-match-p "\\`[A-Z]*\\'" str)))
@@ -2240,5 +2240,19 @@ by another percent."
           (cycle-shell-buffers arg)
         (setq async-shell-buffers-pointer (cdr async-shell-buffers-pointer))
         (if arg (select-window (display-buffer buf)) (switch-to-buffer buf))))))
+
+(defadvice mc/mark-next-like-this (around no-error activate)
+  (condition-case err
+      ad-do-it
+    (error
+     (ding)
+     (message "%s" (error-message-string err)))))
+
+(defadvice mc/mark-previous-like-this (around no-error activate)
+  (condition-case err
+      ad-do-it
+    (error
+     (ding)
+     (message "%s" (error-message-string err)))))
 
 (provide 'functions)
