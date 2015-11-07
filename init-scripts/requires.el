@@ -45,6 +45,7 @@
 (require 'web-beautify)
 (require 'js2-mode)
 (require 'highlight-parentheses)
+(when (featurep 'minimap) (unload-feature 'minimap))
 
 ;;; my stuff
 (require 'utilities)
