@@ -60,6 +60,7 @@
         mc/mark-next-not-cider
         mc/mark-prev-not-cider
         mouse-set-region
+        rerun-command
         smart-compile
         wdired-finish-edit
         ))

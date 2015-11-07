@@ -530,7 +530,7 @@ Check out your .emacs.\n")))))
 (defadvice switch-to-buffer
     (after update-erc-status-on-switch-to-erc-buf activate)
   (message-erc-modded-chans-when-erc-mode))
-(defadvice windmove-do-window-select
+ (defadvice windmove-do-window-select
     (after update-erc-status-on-windmove activate)
   (message-erc-modded-chans-when-erc-mode))
 ;;; don't open up windows randomly!!!!
