@@ -339,6 +339,7 @@ lowercase, and Initial Caps versions."
              :initial-value ""))))
 
 (defun eww-get-buffer-name (&optional my-mode)
+  (setq prev-special-buffer (cons "*eww*" (current-buffer)))
   (format "%s: %s (%s)"
           "eww" (plist-get eww-data :title)
           (cdr (memq 'href (car (second (plist-get eww-data :dom)))))))
@@ -354,6 +355,8 @@ mode-name &optional advice-type advice-forms))."
      ,@(mapcar
         (lambda (arg)
           `(progn
+             (when ,(sixth arg)
+               (add-to-list 'special-buffer-names ,(sixth arg)))
              ,@(unless (null (first arg))
                  (mapcar
                   (lambda (el)
@@ -396,8 +399,7 @@ mode-name &optional advice-type advice-forms))."
            (generate-new-buffer-name (rename-shell-buffer) (buffer-name)))))
  (info Info-goto-node #'help-info-get-buffer-name Info-mode)
  (help-mode nil #'help-info-get-buffer-name help-mode)
- (nil cider-doc-lookup #'cider-doc-get-buffer-name cider-docview-mode)
- (eww (eww-follow-link eww-back-url) #'eww-get-buffer-name eww-mode))
+ (nil cider-doc-lookup #'cider-doc-get-buffer-name cider-docview-mode))
 
 (add-hook 'help-mode-hook (lambda () (help-info-get-buffer-name 'help-mode)))
 
