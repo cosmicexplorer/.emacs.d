@@ -1123,7 +1123,9 @@ the line containing `region-end'."
     (let ((insert-begin-str
            (concat comment-start
                    (make-string (1- (or num-stars 2)) (str2char "*"))
-                   (if num-stars comment-padding "\n"))))
+                   (if num-stars
+                       (if (looking-at-p "[[:space:]]*\n") "" comment-padding)
+                     "\n"))))
       (insert insert-begin-str)
       (setq begin-insertions (length insert-begin-str)))
     (goto-char (+ end begin-insertions))
