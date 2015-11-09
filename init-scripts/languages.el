@@ -423,6 +423,17 @@ Lisp code." t)
               (not (eq major-mode 'gfm-mode)))
      (gfm-mode))))
 
+(add-hook 'markdown-mode-hook
+          (lambda ()
+            (setq markdown-command
+                  (if (eq major-mode 'gfm-mode)
+                      "pandoc -f markdown_github -t html -"
+                    "pandoc -f markdown -t html -"))))
+(add-hook 'gfm-mode-hook
+          (lambda ()
+            (setq markdown-command "pandoc -f markdown_github -t html -")))
+
+
 ;;; coffeescript
 (eval-after-load "coffee-mode"
   '(progn
