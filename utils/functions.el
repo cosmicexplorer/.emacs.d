@@ -1075,8 +1075,9 @@ nor 'right is given as an argument, assumes right."
                            (and (not (eq left-or-right 'left))
                                 (eolp)))
                    (setq was-final-char t))
-                 (if (eq left-or-right 'left) (or (bobp) (backward-char))
-                   (forward-char)))
+                 (if (eq left-or-right 'left)
+                     (unless (bobp) (backward-char))
+                   (unless (eobp) (forward-char))))
             finally
             (return final-text-char)))))
 
