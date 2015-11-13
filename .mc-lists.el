@@ -8,6 +8,7 @@
         beg-of-line-text
         beginning-of-visual-line
         c-electric-colon
+        c-electric-paren
         c-electric-semi&comma
         c-electric-slash
         c-electric-star
@@ -50,6 +51,7 @@
 (setq mc/cmds-to-run-once
       '(
         Custom-save
+        clang-format-buffer
         describe-key
         describe-variable
         eval-buffer-and-message

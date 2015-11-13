@@ -495,8 +495,8 @@
 
 (eval-after-load 'tex-mode
   '(progn
-     (define-key tex-mode-map (kbd "C-c C-w") nil)
-     (define-key tex-mode-map (kbd "C-c C-v") nil)))
+     (define-key LaTeX-mode-map (kbd "C-c C-w") nil)
+     (define-key LaTeX-mode-map (kbd "C-c C-v") nil)))
 
 (global-set-key (kbd "C-M-g") #'rerun-command)
 (eval-after-load 'sh-mode
