@@ -1449,8 +1449,9 @@ way I prefer, and regards `comment-padding', unlike the standard version."
      with dired-dir = (expand-file-name dired-directory)
      with dir-reg = (concat "\\`" (regexp-quote dired-dir))
      for buf in (buffer-list)
-     do (let ((place (or (buffer-file-name buf)
-                         (with-current-buffer buf default-directory))))
+     do (let ((place (expand-file-name
+                      (or (buffer-file-name buf)
+                          (with-current-buffer buf default-directory)))))
           (when (string-match-p dir-reg place) (kill-buffer buf))))
     (kill-buffer)))
 

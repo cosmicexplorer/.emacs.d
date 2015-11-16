@@ -4,8 +4,10 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        LaTeX-insert-left-brace
         TeX-insert-backslash
         beg-of-line-text
+        beginning-of-buffer
         beginning-of-visual-line
         c-electric-colon
         c-electric-paren
