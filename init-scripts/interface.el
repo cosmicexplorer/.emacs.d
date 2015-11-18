@@ -600,3 +600,6 @@ Check out your .emacs.\n")))))
 (defadvice eww-follow-link (after revis activate) (refresh-visual-line-mode))
 
 (global-highlight-parentheses-mode)
+
+(defadvice browse-url-chromium (around no-error activate)
+  (ignore-errors ad-do-it))
