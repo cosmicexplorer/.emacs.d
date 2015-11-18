@@ -30,15 +30,19 @@
 (add-hook 'before-save-hook 'nuke-whitespace-except-this-line)
 
 ;;; only show whitespace sometimes
-(add-hook 'after-change-major-mode-hook
-          '(lambda ()
-             (if (or (eq major-mode 'w3m-mode)
-                         (eq major-mode 'eww-mode)
-                         (eq major-mode 'eshell-mode)
-                         (eq major-mode 'ibuffer-mode)
-                         (eq major-mode 'undo-tree-visualizer-mode))
-                 (setq show-trailing-whitespace nil)
-               (setq show-trailing-whitespace t))))
+(defvar no-show-whitespace-modes
+  '(w3m-mode
+    eww-mode eshell-mode ibuffer-mode undo-tree-visualizer-mode
+    magit-mode magit-status-mode magit-log-mode))
+(defun set-correct-trailing-whitespace ()
+  (setq show-trailing-whitespace
+        (not (apply #'derived-mode-p no-show-whitespace-modes))))
+(add-hook
+ 'buffer-list-update-hook
+ (lambda ()
+   (loop for buf in (buffer-list)
+         do (with-current-buffer buf (set-correct-trailing-whitespace)))))
+(add-hook 'after-change-major-mode-hook #'set-correct-trailing-whitespace)
 
 ;; do backups well and put them into a separate folder
 (setq backup-directory-alist
