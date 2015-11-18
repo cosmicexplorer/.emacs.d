@@ -2259,4 +2259,14 @@ by another percent."
      (ding)
      (message "%s" (error-message-string err)))))
 
+(defun clear-beginning-whitespace ()
+  (interactive)
+  (save-excursion
+    (beginning-of-line)
+    (unless (looking-at-p "$")
+      (let ((pt (point)))
+        (re-search-forward "[^[:space:]]" nil t)
+        (backward-char)
+        (delete-region pt (point))))))
+
 (provide 'functions)

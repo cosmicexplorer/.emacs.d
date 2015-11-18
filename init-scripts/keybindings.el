@@ -39,6 +39,8 @@
 (global-set-key (kbd "<C-kp-end>")
                 (lookup-key (current-global-map) (kbd "<C-end>") t))
 
+(global-set-key (kbd "C-c W") #'clear-beginning-whitespace)
+
 ;;; helm
 ;;; the below can also be applied over multiple lines with:
 ;;; C-u [number] M-x helm-swoop RET
@@ -391,10 +393,9 @@
      (define-key haskell-mode-map (kbd "<return>")
        #'haskell-newline-actual-indent)
      (define-key haskell-mode-map (kbd "C-c C-v") nil)
-     (add-hook
-      'haskell-mode-hook
-      (lambda ()
-        (define-key haskell-mode-map (kbd "C-c C-k") #'smart-compile)))))
+     (define-key interactive-haskell-mode-map (kbd "M-p") nil)
+     (define-key interactive-haskell-mode-map (kbd "M-n") nil)
+     (define-key interactive-haskell-mode-map (kbd "C-c C-k") #'smart-compile)))
 
 (define-key compilation-mode-map (kbd "G") #'compile)
 
