@@ -75,7 +75,6 @@
 
 
 ;;; org-mode
-(setq-default org-startup-folded "showeverything")
 (add-hook 'org-mode-hook
           (lambda ()
             (highlight-80+-mode -1)

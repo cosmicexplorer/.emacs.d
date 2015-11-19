@@ -392,17 +392,17 @@
   '(progn
      (define-key haskell-mode-map (kbd "<return>")
        #'haskell-newline-actual-indent)
-     (define-key haskell-mode-map (kbd "C-c C-v") nil)
-     (define-key interactive-haskell-mode-map (kbd "M-p") nil)
-     (define-key interactive-haskell-mode-map (kbd "M-n") nil)
-     (define-key interactive-haskell-mode-map (kbd "C-c C-k") #'smart-compile)))
+     (define-key haskell-mode-map (kbd "C-c C-v") nil)))
 
 (define-key compilation-mode-map (kbd "G") #'compile)
 
 (eval-after-load 'haskell-interactive-mode
   '(progn
      (define-key haskell-interactive-mode-map (kbd "C-c <tab>")
-       #'haskell-process-do-info)))
+       #'haskell-process-do-info)
+     (define-key haskell-interactive-mode-map (kbd "M-p") nil)
+     (define-key haskell-interactive-mode-map (kbd "M-n") nil)
+     (define-key haskell-interactive-mode-map (kbd "C-c C-k") #'smart-compile)))
 
 ;;; paredit
 (define-key paredit-mode-map (kbd "M-t") 'transpose-sexps)

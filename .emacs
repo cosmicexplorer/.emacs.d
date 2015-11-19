@@ -325,6 +325,7 @@ Check out your .emacs."))
  '(org-enforce-todo-dependencies t)
  '(org-from-is-user-regexp nil)
  '(org-src-fontify-natively t)
+ '(org-startup-folded t)
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
