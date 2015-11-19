@@ -182,6 +182,9 @@
            (name . "Doc")
            (mode . Man-mode)))
          ("yaml" (filename . "\\.yaml\\'"))
+         ("MATLAB" (mode . matlab-mode))
+         ("Octave" (mode . octave-mode))
+         ("OCaml" (mode . tuareg-mode))
          ("default" (name . "")))))
 
 ;;; more ibuffer stuff
