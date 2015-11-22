@@ -502,3 +502,6 @@ Lisp code." t)
 ;;; ocaml
 (eval-after-load 'tuareg
   '(add-to-list 'auto-mode-alist '("\\.ocamlinit$" . tuareg-mode)))
+
+;;; prolog
+(add-to-list 'auto-mode-alist '("\\.pro$" . prolog-mode))
