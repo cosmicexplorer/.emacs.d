@@ -180,28 +180,21 @@
     "broken")
   "Used if no warning_words file exists.")
 
-(defun make-string-init-caps (str)
-  "Takes string with arbitrary capitalization and forces it to Initial Caps
-case."
-  (let ((downstr (downcase str)))
-    (loop for i from 0 upto (1- (length downstr))
-          do (if (/= i 0)
-                 (when (and (not (wordp (aref downstr (1- i))))
-                            (wordp (aref downstr i)))
-                   (setf (aref downstr i)
-                         (upcase (aref downstr i))))
-               (setf (aref downstr i)
-                     (upcase (aref downstr i)))))
-    downstr))
+(defun only-upcase-first-char (str)
+  (let* ((res (downcase str))
+         (init (aref res 0)))
+    (setf (aref res 0) (upcase init))
+    res))
 
 (defun read-words-from-list-with-caps (list)
   "Read words from list, transformed into ALLCAPS, lowercase, and Init Caps."
-  (let ((final-word-list nil))
+  (let (final-word-list)
     (loop for line in list
           do (unless (string= "" line)
                (add-to-list 'final-word-list (downcase line))
                (add-to-list 'final-word-list (upcase line))
-               (add-to-list 'final-word-list (make-string-init-caps line))))
+               (add-to-list 'final-word-list (upcase-initials line))
+               (add-to-list 'final-word-list (only-upcase-first-char line))))
     final-word-list))
 
 (defun read-words-from-file-as-list-with-caps (filename)
