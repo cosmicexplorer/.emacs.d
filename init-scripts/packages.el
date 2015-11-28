@@ -67,6 +67,7 @@
                       org
                       package-build
                       paredit
+                      perl6-mode
                       php-mode
                       pkg-info
                       queue
