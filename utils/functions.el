@@ -2269,4 +2269,26 @@ by another percent."
         (backward-char)
         (delete-region pt (point))))))
 
+(defcustom latex-engine "pdflatex"
+  "LaTeX engine to use for `latex-compile'.")
+(defvar latex-compile-output-buffer "*TeX-Compile-Output*")
+(defun latex-compile ()
+  (interactive)
+  (unless (zerop (call-process latex-engine nil latex-compile-output-buffer t
+                               (buffer-file-name)))
+    (switch-to-latex-compile-output t)))
+
+(defvar bibtex-command "bibtex")
+(defun bibtex-compile ()
+  (interactive)
+  (unless (zerop (call-process "bibtex" nil latex-compile-output-buffer t
+                               (file-name-base)))
+    (switch-to-latex-compile-output t)))
+
+(defun switch-to-latex-compile-output (arg)
+  (interactive "P")
+  (let ((buf (get-buffer latex-compile-output-buffer)))
+    (if arg (display-buffer buf)
+      (display-buffer-same-window buf nil))))
+
 (provide 'functions)
