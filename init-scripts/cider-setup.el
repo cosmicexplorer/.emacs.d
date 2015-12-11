@@ -16,7 +16,7 @@
            (with-temp-buffer
              (insert-file-contents lein-profiles-file)
              (goto-char (point-min))
-             (re-search-forward "cider/cider-nrepl\s+\"\\(.*\\)\"" nil t)
+             (re-search-forward "cider/cider-nrepl[[:space:]]+\"\\(.*\\)\"" nil t)
              (replace-match cider-version nil t nil 1)
              (write-region nil nil lein-profiles-file))
            (setup-cider-stuff))

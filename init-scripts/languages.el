@@ -119,7 +119,7 @@
   (let ((real-str (perl-repl-get-real-str)))
     (when (string-match-p (regexp-quote perl-repl-prompt) real-str)
       (goto-char (- (point) (length real-str)))
-      (while (string-match-p "[\s\r\n]" (char-to-string (char-after)))
+      (while (string-match-p "[[:space:]\r\n]" (char-to-string (char-after)))
         (delete-char 1))
       (goto-char (point-max)))))
 
@@ -233,7 +233,7 @@
       (newline-and-indent)
       (forward-char))
      ((string-match-p
-       (concat (regexp-opt annoying-identifiers) "\s*$")
+       (concat (regexp-opt annoying-identifiers) "[[:space:]]*$")
        (buffer-substring-no-properties
         (line-beginning-position) (point)))
       (let ((pt (point))
@@ -245,7 +245,7 @@
         (delete-char 1)
         (goto-char (1- next-pt))))
      ((and (string-match-p
-            "(\s*$" (buffer-substring-no-properties
+            "([[:space:]]*$" (buffer-substring-no-properties
                      (line-beginning-position) (point)))
            (char-equal (char-after) (str2char ")")))
       (newline) (indent-for-tab-command))
@@ -258,7 +258,7 @@
            (string-match-p
             (concat (regexp-opt
                      (c-lang-const c-block-stmt-2-kwds csharp) 'words)
-                    "\s*$")
+                    "[[:space:]]*$")
             (buffer-substring-no-properties
              (line-beginning-position) (point))))
     (insert " "))

@@ -409,7 +409,7 @@ prompt according to `unix-find-begin-prompt'."
               (make-variable-buffer-local 'compilation-error-regexp-alist)
               (setq compilation-error-regexp-alist
                     '(("\\([^:\n]+\\):\\(0\\):\\(0\\)" 1 2 3 1)
-                      ("\\(Find results\\):\s*\\([^\n]*\\)" nil 2 nil nil nil
+                      ("\\(Find results\\):[[:space:]]*\\([^\n]*\\)" nil 2 nil nil nil
                        (1 font-lock-function-name-face)
                        (2 font-lock-variable-name-face)))))
             (unix-find-do-find buf find-command find-cmd-parsed)))

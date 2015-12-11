@@ -604,7 +604,7 @@ scope of the command's precision.")
   (>
    (/
     (cl-count-if
-     (lambda (s) (string-match-p "[\s\r\n]" (char-to-string s)))
+     (lambda (s) (string-match-p "[[:space:]\r\n]" (char-to-string s)))
      str)
     (float (length str)))
    0.8))
@@ -643,7 +643,7 @@ scope of the command's precision.")
       (let ((treated-str
              (trim-whitespace
               (replace-regexp-in-string
-               "%[\s\r\n]*\\'"
+               "%[[:space:]\r\n]*\\'"
                ""
                (replace-regexp-in-string
                 (concat
@@ -657,7 +657,7 @@ scope of the command's precision.")
                   (trim-whitespace prev-shell-input))
                  ""
                  (ansi-color-filter-apply str-to-send))))))
-            (whitespace-regex "\\`[\s\r\n]*\\'")
+            (whitespace-regex "\\`[[:space:]\r\n]*\\'")
             (header-str (if was-last-output ""
                           (concat "--out--: " default-directory ": "
                                   (format-time-string current-date-time-format
@@ -1160,7 +1160,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (goto-char (frontier-of-text-for-line 'right))
   (insert (if (or
                (bolp)
-               (string-match-p "^\s*$" (buffer-substring-no-properties
+               (string-match-p "^[[:space:]]*$" (buffer-substring-no-properties
                                         (line-beginning-position)
                                         (line-end-position))))
               "" comment-padding)
@@ -1217,7 +1217,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (if (not (in-whitespace-region-p)) (remove-trailing-whitespace)
     (let* ((pt (point))
            (str (buffer-substring
-                 (let ((res (re-search-backward "[^\s]" nil t)))
+                 (let ((res (re-search-backward "[^[:space:]]" nil t)))
                    (if res (progn (forward-char) (point))
                      (progn (goto-char pt) (point-min))))
                  pt)))
@@ -1424,7 +1424,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
      (interactive)
      (loop for buf in (buffer-list)
            do (with-current-buffer buf
-                (when (string-match-p "^\\*[hH]elm[\s\\-]" (buffer-name))
+                (when (string-match-p "^\\*[hH]elm[[:space:]\\-]" (buffer-name))
                   (kill-buffer))))))
 (eval-after-load 'magit
   '(defun cleanup-magit-buffers ()
@@ -2201,7 +2201,7 @@ by another percent."
 
 (defun fix-sml-smart-pipe (arg)
   (interactive "P")
-  (while (looking-back "\s") (delete-backward-char 1))
+  (while (looking-back "[[:space:]]") (delete-backward-char 1))
   (sml-electric-pipe)
   (let ((pt (point)))
     (beginning-of-line)
@@ -2213,7 +2213,7 @@ by another percent."
   (let ((pt (point)))
     (beginning-of-line)
     (backward-char)
-    (while (looking-back "\s") (delete-backward-char 1))
+    (while (looking-back "[[:space:]]") (delete-backward-char 1))
     (if (not arg) (goto-char pt)
       (destroy-all-whitespace-nearby)
       (insert " ")

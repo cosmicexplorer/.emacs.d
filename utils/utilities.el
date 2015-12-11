@@ -87,7 +87,7 @@ A representative example might be:
   (loop while (< (point) end)
         with num-cut = 0
         do (if (and (whitespacep (char-after))
-                    (string-match-p "^\s*$" (line-before-you)))
+                    (string-match-p "^[[:space:]]*$" (line-before-you)))
                (progn
                  (delete-char 1)
                  (incf num-cut))
@@ -186,7 +186,7 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
 
 (defun trim-whitespace (str)
   (replace-regexp-in-string
-   "[\s\r\n]+\\'" ""
-   (replace-regexp-in-string "\\`[\s\r\n]+" "" str)))
+   "[[:space:]\r\n]+\\'" ""
+   (replace-regexp-in-string "\\`[[:space:]\r\n]+" "" str)))
 
 (provide 'utilities)
