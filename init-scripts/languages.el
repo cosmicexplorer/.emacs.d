@@ -505,3 +505,6 @@ Lisp code." t)
 
 ;;; prolog
 (add-to-list 'auto-mode-alist '("\\.pro$" . prolog-mode))
+
+;;; bison
+(add-to-list 'auto-mode-alist '("\\.jison$" . bison-mode))

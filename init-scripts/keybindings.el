@@ -541,4 +541,11 @@
 (eval-after-load 'inf-ruby
   '(progn (define-key ruby-mode-map (kbd "C-c C-c") #'ruby-send-buffer)))
 
+(eval-after-load 'bison-mode
+  '(progn
+     (define-key bison-mode-map (kbd "RET") #'newline-and-indent)))
+
+(eval-after-load 'prolog
+  '(progn (define-key prolog-mode-map (kbd "C-c C-v") nil)))
+
 (global-set-key (kbd "C-c a") #'cycle-shell-buffers)
