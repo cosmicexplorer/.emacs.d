@@ -361,6 +361,7 @@ Lisp code." t)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.gyp\\'" . js-mode))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . js-mode))
+(add-to-list 'auto-mode-alist '("\\.babelrc" . js-mode))
 (add-to-list 'auto-mode-alist '("\\.cshtml\\'" . html-mode))
 
 ;;; config files
