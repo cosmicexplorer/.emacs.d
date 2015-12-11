@@ -200,6 +200,8 @@ Check out your .emacs."))
 (setq init-loaded-fully t)
 (put 'upcase-region 'disabled nil)
 
+(setq prolog-program-name (if (executable-find "swipl") "swipl" "prolog"))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -237,7 +239,8 @@ Check out your .emacs."))
      ("\\.zsh\\'" "zsh")
      ("\\.sh\\'" "sh")
      ("\\.py\\'" "python" "python2" "python3")
-     ("\\..+x\\'" "libreoffice"))))
+     ("\\..+x\\'" "libreoffice")
+     ("\\.html\\'" "chromium" "firefox"))))
  '(dired-no-confirm t)
  '(dired-recursive-copies (quote always))
  '(dired-recursive-deletes (quote always))
