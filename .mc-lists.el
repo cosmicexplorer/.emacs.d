@@ -9,6 +9,7 @@
         beg-of-line-text
         beginning-of-buffer
         beginning-of-visual-line
+        bison-electric-pipe
         c-electric-colon
         c-electric-paren
         c-electric-semi&comma
@@ -42,8 +43,10 @@
         paredit-backslash
         paredit-backspace-delete-highlight
         paredit-backward
+        paredit-close-square
         paredit-forward
         paredit-forward-delete
+        racket--paredit-open-square
         sgml-slash
         smart-tab
         toggle-letter-case
