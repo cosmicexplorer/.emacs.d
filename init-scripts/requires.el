@@ -46,6 +46,7 @@
 (require 'js2-mode)
 (require 'highlight-parentheses)
 (when (featurep 'minimap) (unload-feature 'minimap))
+(require 'wgrep)
 
 ;;; my stuff
 (require 'utilities)

@@ -9,6 +9,7 @@
         beg-of-line-text
         beginning-of-buffer
         beginning-of-visual-line
+        bison-electric-open-brace
         bison-electric-pipe
         c-electric-colon
         c-electric-paren

@@ -17,6 +17,7 @@
 
 (defvar my-packages '(
                       2048-game
+                      ag
                       async
                       auctex
                       auto-complete
@@ -49,6 +50,7 @@
                       go-mode
                       haskell-mode
                       helm
+                      helm-ag
                       helm-gtags
                       helm-swoop
                       highlight-parentheses
@@ -86,6 +88,9 @@
                       speech-tagger
                       undo-tree
                       w3m
+                      wgrep
+                      wgrep-ag
+                      wgrep-helm
                       web-beautify
                       xterm-color
                       ))
