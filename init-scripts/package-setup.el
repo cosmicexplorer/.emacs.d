@@ -69,6 +69,10 @@
         (call-interactively #'magit-section-toggle)
       (push-mark)
       (magit-section-goto (magit-get-section sec-diff)))))
+;;; fix magit's inane new choice of push keybinding
+(eval-after-load 'magit-remote
+  (magit-define-popup-action 'magit-push-popup ?P "just fuckin push it lol"
+    'magit-push-current-to-upstream ?u))
 
 ;;; parenthesis matching and more
 ;;; turn pair parens on
