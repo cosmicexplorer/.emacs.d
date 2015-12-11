@@ -21,6 +21,7 @@
                       auctex
                       auto-complete
                       better-defaults
+                      bison-mode
                       cider
                       cloc
                       clojure-mode
@@ -66,6 +67,7 @@
                       omnisharp
                       org
                       package-build
+                      pacmacs
                       paredit
                       perl6-mode
                       php-mode
