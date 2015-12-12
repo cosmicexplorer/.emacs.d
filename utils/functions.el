@@ -2291,4 +2291,10 @@ by another percent."
     (if arg (display-buffer buf)
       (display-buffer-same-window buf nil))))
 
+(defvar ediff-prev-window-config nil)
+(defadvice ediff (before save-window-config activate)
+  (setq ediff-prev-window-config (current-window-configuration)))
+(defadvice ediff-quit (after restore-window-config activate)
+  (set-window-configuration ediff-prev-window-config))
+
 (provide 'functions)
