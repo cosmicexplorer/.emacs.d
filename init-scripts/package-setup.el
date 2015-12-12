@@ -72,7 +72,9 @@
 ;;; fix magit's inane new choice of push keybinding
 (eval-after-load 'magit-remote
   (magit-define-popup-action 'magit-push-popup ?P "just fuckin push it lol"
-    'magit-push-current-to-upstream ?u))
+    'magit-push-current-to-upstream ?u)
+  (magit-define-popup-action 'magit-pull-popup ?F "just fucking pull it lol"
+    'magit-pull-from-upstream ?u))
 
 ;;; parenthesis matching and more
 ;;; turn pair parens on
