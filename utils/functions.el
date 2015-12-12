@@ -827,10 +827,11 @@ scope of the command's precision.")
                                        (concat "i don't recognize "
                                                active-filetype "!"))))
                        (message "")))
-                 (with-current-buffer "*scratch*"
-                   (insert (concat "couldn't parse this line of "
-                                   saved-files ": \"" cur-line "\""))
-                   (newline)))
+                 (unless (string= cur-line "")
+                   (with-current-buffer "*scratch*"
+                     (insert (concat "couldn't parse this line of "
+                                     saved-files ": \"" cur-line "\""))
+                     (newline))))
                (forward-line)))
     (kill-buffer)))
 
