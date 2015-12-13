@@ -1197,12 +1197,13 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (toggle-read-only))
 
 ;;; basic utilities
+(defvar trailing-whitespace-regexp "\\([\t \u00A0]+\\)$")
 (defun remove-trailing-whitespace ()
   (interactive)
   (let ((eob (and (looking-at-p "[[:space:]\n]*\\'") (= (current-column) 0))))
     (save-excursion
       (goto-char (point-min))
-      (while (re-search-forward "[[:space:]]+$" nil t)
+      (while (re-search-forward trailing-whitespace-regexp nil t)
         (let ((pt (point)))
           (re-search-backward "[^[:space:]]")
           (delete-region (1+ (point)) pt)))
@@ -1212,7 +1213,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (if eob (goto-char (point-max)))))
 (defun in-whitespace-region-p ()
   (and (looking-back "[[:space:]]")
-       (looking-at "[[:space:]]*$")))
+       (looking-at trailing-whitespace-regexp)))
 (defun nuke-whitespace-except-this-line ()
   (interactive)
   (if (not (in-whitespace-region-p)) (remove-trailing-whitespace)
@@ -2295,7 +2296,17 @@ by another percent."
 (defvar ediff-prev-window-config nil)
 (defadvice ediff (before save-window-config activate)
   (setq ediff-prev-window-config (current-window-configuration)))
+(defadvice ediff-buffers (before save-window-config activate)
+  (setq ediff-prev-window-config (current-window-configuration)))
 (defadvice ediff-quit (after restore-window-config activate)
   (set-window-configuration ediff-prev-window-config))
+(defun ediff-these-buffers ()
+  "Hack to just ediff what I want."
+  (interactive)
+  (let ((winlist (window-list)))
+    (destructuring-bind (first-win second-win) winlist
+      (if (eq second-win (window-in-direction 'right first-win))
+          (ediff-buffers (window-buffer first-win) (window-buffer second-win))
+        (ediff-buffers (window-buffer second-win) (window-buffer first-win))))))
 
 (provide 'functions)
