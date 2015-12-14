@@ -74,7 +74,7 @@
   '(progn
      (magit-define-popup-action 'magit-push-popup ?P "just fuckin push it lol"
        'magit-push-current-to-upstream ?u)
-     (magit-define-popup-action 'magit-pull-popup ?F "just fucking pull it lol"
+     (magit-define-popup-action 'magit-pull-popup ?F "just fuckin pull it lol"
        'magit-pull-from-upstream ?u)))
 
 ;;; parenthesis matching and more
