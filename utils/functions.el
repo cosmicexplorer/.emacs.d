@@ -2316,4 +2316,14 @@ by another percent."
         ((region-active-p) (call-interactively #'kill-region))
         (t (call-interactively #'kill-visual-line))))
 
+(defun TeX-quote-region ()
+  (interactive)
+  (if (not (region-active-p)) (call-interactively #'TeX-insert-quote)
+    (let ((reg-beg (region-beginning))
+          (reg-end (region-end)))
+      (goto-char reg-beg)
+      (insert TeX-open-quote)
+      (goto-char (+ reg-end (length TeX-open-quote)))
+      (insert TeX-close-quote))))
+
 (provide 'functions)
