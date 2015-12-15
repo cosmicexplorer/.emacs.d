@@ -499,6 +499,8 @@
 (eval-after-load 'tex-mode
   '(progn
      (define-key tex-mode-map (kbd "C-c C-w") nil)
+     (define-key LaTeX-mode-map (kbd "C-c C-w") nil)
+     (define-key LaTeX-mode-map (kbd "C-c C-v") nil)
      (define-key tex-mode-map (kbd "C-c C-v") nil)
      (define-key tex-mode-map (kbd "C-c e") #'latex-compile)
      (define-key tex-mode-map (kbd "C-c C-b") #'bibtex-compile)

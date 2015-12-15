@@ -6,6 +6,7 @@
       '(
         LaTeX-insert-left-brace
         TeX-insert-backslash
+        TeX-insert-dollar
         beg-of-line-text
         beginning-of-buffer
         beginning-of-visual-line
@@ -33,6 +34,7 @@
         isearch-forward-regexp
         isearch-printing-char
         isearch-repeat-backward
+        js-newline-indent-for-real
         kill-selected-region-default
         markdown-exdent-or-delete
         org-force-self-insert
