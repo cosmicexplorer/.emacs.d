@@ -2310,4 +2310,10 @@ by another percent."
           (ediff-buffers (window-buffer first-win) (window-buffer second-win))
         (ediff-buffers (window-buffer second-win) (window-buffer first-win))))))
 
+(defun kill-line-or-region (pfx)
+  (interactive "P")
+  (cond (pfx (kill-line))
+        ((region-active-p) (call-interactively #'kill-region))
+        (t (call-interactively #'kill-visual-line))))
+
 (provide 'functions)
