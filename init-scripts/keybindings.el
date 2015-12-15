@@ -242,7 +242,7 @@
      (define-key org-mode-map (kbd "<tab>") nil)
      (define-key org-mode-map (kbd "C-c a") #'org-agenda)
      (define-key org-mode-map (kbd "C-c c") #'org-capture)
-     (define-key org-mode-map (kbd "C-k") #'kill-selected-region-default)
+     (define-key org-mode-map (kbd "C-k") #'kill-visual-line)
      (define-key org-mode-map (kbd "C-c a") nil)
      (add-to-list
       'org-mode-hook
@@ -501,6 +501,7 @@
      (define-key tex-mode-map (kbd "C-c C-w") nil)
      (define-key LaTeX-mode-map (kbd "C-c C-w") nil)
      (define-key LaTeX-mode-map (kbd "C-c C-v") nil)
+     (define-key LaTeX-mode-map (kbd "C-k") #'kill-visual-line)
      (define-key tex-mode-map (kbd "C-c C-v") nil)
      (define-key tex-mode-map (kbd "C-c e") #'latex-compile)
      (define-key tex-mode-map (kbd "C-c C-b") #'bibtex-compile)
