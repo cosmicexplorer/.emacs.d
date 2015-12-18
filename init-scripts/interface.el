@@ -31,7 +31,7 @@
 
 ;;; only show whitespace sometimes
 (defvar no-show-whitespace-modes
-  '(w3m-mode
+  '(w3m-mode special-mode
     eww-mode eshell-mode ibuffer-mode undo-tree-visualizer-mode
     magit-mode magit-status-mode magit-log-mode))
 (defun set-correct-trailing-whitespace ()
