@@ -27,6 +27,9 @@
 (add-hook 'css-mode-hook
           (lambda () (setq comment-start "// " comment-end "")))
 
+;;; assembly before S
+(push '("\\.[sS]\\'" . asm-mode) auto-mode-alist)
+
 ;;; highlight cursor and auto-fill when over 80 chars in certain modes
 (defvar no-auto-fill-modes
   '(litcoffee-mode tex-mode markdown-mode elisp-byte-code-mode))
