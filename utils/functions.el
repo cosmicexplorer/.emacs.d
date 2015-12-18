@@ -2328,4 +2328,11 @@ by another percent."
       (goto-char (+ reg-end (length TeX-open-quote)))
       (insert TeX-close-quote))))
 
+(defun cleanup-ag-buffers ()
+  (interactive)
+  (loop for buf in (buffer-list)
+        do (with-current-buffer buf
+             (when (eq major-mode 'ag-mode)
+               (kill-buffer)))))
+
 (provide 'functions)

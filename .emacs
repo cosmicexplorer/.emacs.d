@@ -209,6 +209,7 @@ Check out your .emacs."))
  ;; If there is more than one, they won't work right.
  '(TeX-engine (quote luatex))
  '(TeX-newline-function (quote reindent-then-newline-and-indent))
+ '(ag-highlight-search t)
  '(asm-comment-char 35)
  '(async-shell-command-buffer (quote new-buffer))
  '(auto-revert-verbose nil)
