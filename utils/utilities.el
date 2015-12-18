@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
+(eval-when-compile '(require 'cl))
+
 ;;; fun stuff that i might release on melpa if anyone cares
 
 ;;; setf stuff that *should* work already lol

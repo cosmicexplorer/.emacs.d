@@ -1,5 +1,6 @@
 ;;; -*- lexical-binding: t -*-
 
+(eval-when-compile '(require 'cl))
 (require 'utilities)
 
 ;;; implementation of unix find in pure elisp

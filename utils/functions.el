@@ -3,6 +3,7 @@
 ;;; some of these are mine, some are heavily adapted from emacswiki, some are
 ;;; copy/paste from emacswiki
 
+(eval-when-compile '(require cl))
 (require 'utilities)
 
 (defun send-message-to-scratch (&rest msg-args)

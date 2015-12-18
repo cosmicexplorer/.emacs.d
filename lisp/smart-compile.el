@@ -40,7 +40,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile '(require 'cl))
 (require 'unix-find)
 (require 'functions)
 (require 'utilities)
@@ -190,7 +190,6 @@ evaluate FUNCTION instead of running a compilation command.
   "The option string that replaces %o.  The default is empty."
   :type 'string
   :group 'smart-compile)
-
 
 ;;;###autoload
 (defun smart-compile (&optional arg)
