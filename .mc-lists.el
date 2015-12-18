@@ -20,6 +20,7 @@
         camel-case-left-word
         camel-case-right-word
         coffee-dedent-line-backspace
+        compile-goto-error
         cperl-electric-terminator
         delete-whole-line
         dired-next-line
@@ -37,6 +38,7 @@
         js-newline-indent-for-real
         kill-selected-region-default
         markdown-exdent-or-delete
+        newline-and-indent-fix-cc-mode
         org-force-self-insert
         org-forward-paragraph
         org-return
@@ -54,6 +56,7 @@
         smart-tab
         toggle-letter-case
         transpose-words
+        wgrep-finish-edit
         ))
 
 (setq mc/cmds-to-run-once
