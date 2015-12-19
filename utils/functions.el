@@ -2335,4 +2335,16 @@ by another percent."
              (when (eq major-mode 'ag-mode)
                (kill-buffer)))))
 
+(defun latex-insert-math ()
+  (interactive)
+  (if (use-region-p)
+      (let ((reg-beg (region-beginning))
+            (reg-end (region-end)))
+        (goto-char reg-beg)
+        (insert "$")
+        (goto-char (1+ reg-end))
+        (insert "$"))
+    (insert "$$")
+    (backward-char)))
+
 (provide 'functions)

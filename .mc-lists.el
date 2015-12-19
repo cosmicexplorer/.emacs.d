@@ -4,9 +4,12 @@
 
 (setq mc/cmds-to-run-for-all
       '(
+        LaTeX-babel-insert-hyphen
         LaTeX-insert-left-brace
         TeX-insert-backslash
         TeX-insert-dollar
+        TeX-insert-sub-or-superscript
+        TeX-newline
         beg-of-line-text
         beginning-of-buffer
         beginning-of-visual-line
