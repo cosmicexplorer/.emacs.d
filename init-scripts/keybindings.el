@@ -507,6 +507,7 @@
      (define-key tex-mode-map (kbd "C-c e") #'latex-compile)
      (define-key tex-mode-map (kbd "C-c C-b") #'bibtex-compile)
      (define-key LaTeX-mode-map (kbd "C-c m") #'latex-insert-math)
+     (define-key LaTeX-mode-map (kbd "$") #'latex-insert-math)
      (define-key latex-mode-map (kbd "C-c C-s")
        #'switch-to-latex-compile-output)))
 

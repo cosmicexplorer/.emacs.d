@@ -2335,6 +2335,18 @@ by another percent."
              (when (eq major-mode 'ag-mode)
                (kill-buffer)))))
 
+(defun latex-inside-math ()
+  (let ((face (plist-get (text-properties-at (point) (current-buffer)) 'face)))
+    (eq face 'font-latex-math-face)))
+
+(defun latex-skip-to-end-of-math ()
+  (condition-case nil
+      (let (res)
+        (while (and (latex-inside-math) (not (eobp)))
+          (setq res (re-search-forward "\\(\\\\\\)*\\$")))
+        res)
+    (error nil)))
+
 (defun latex-insert-math ()
   (interactive)
   (if (use-region-p)
@@ -2344,7 +2356,10 @@ by another percent."
         (insert "$")
         (goto-char (1+ reg-end))
         (insert "$"))
-    (insert "$$")
-    (backward-char)))
+    (if (latex-inside-math)
+        (unless (latex-skip-to-end-of-math)
+          (insert "$"))
+      (insert "$$")
+      (backward-char))))
 
 (provide 'functions)
