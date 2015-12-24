@@ -2381,7 +2381,48 @@ by another percent."
           (is-in-git-repo (expand-file-name (concat cur-dir "/..")))))))
 
 (defun git-repo-is-github (&optional dir)
+  (unless (executable-find "git") (error "no git executable found"))
   (and (is-in-git-repo dir)
        (zerop (shell-command "git remote -v | grep github.com"))))
+
+(defun negativep (num) (< num 0))
+
+(defun prefix-lines-or-region-get-start-num-lines (pfx)
+  (cond ((numberp pfx) (list (line-beginning-position) (abs pfx)
+                             (if (negativep pfx) 'backward 'forward)))
+        ((use-region-p)
+         (let ((reg-beg (region-beginning))
+               (reg-end (region-end)))
+           (save-excursion
+             (list
+              (progn
+                (goto-char reg-beg)
+                (line-beginning-position))
+              (progn
+                (goto-char reg-end)
+                (let ((pt (point)))
+                  (beg-of-line-text)
+                  (let ((res (count-lines reg-beg reg-end)))
+                    (if (< (point) pt) (1+ res) res))))
+              'forward))))
+        (t (error "no numeric prefix or region!"))))
+
+(defun do-keys-for-line (pfx)
+  (interactive "P")
+  (do-for-line pfx (key-binding
+                    (read-key-sequence "key sequence for command:"))))
+
+(defun do-for-line (pfx cmd)
+  (interactive (list current-prefix-arg (intern (read-extended-command))))
+  (destructuring-bind (start num-lines direction)
+      (prefix-lines-or-region-get-start-num-lines pfx)
+    (let ((movement (cond ((eq direction 'forward) 1)
+                          ((eq direction 'backward) -1)
+                          (t (error "invalid direction")))))
+      (goto-char start)
+      (loop for i from 1 to num-lines
+            do (progn
+                 (call-interactively cmd)
+                 (forward-line movement))))))
 
 (provide 'functions)

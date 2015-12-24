@@ -559,3 +559,6 @@
   '(progn (define-key prolog-mode-map (kbd "C-c C-v") nil)))
 
 (global-set-key (kbd "C-c a") #'cycle-shell-buffers)
+
+(global-set-key (kbd "C-c k") #'do-keys-for-line)
+(global-set-key (kbd "C-c f") #'do-for-line)

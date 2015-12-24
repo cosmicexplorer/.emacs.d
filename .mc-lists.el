@@ -40,6 +40,7 @@
         isearch-repeat-backward
         js-newline-indent-for-real
         kill-selected-region-default
+        markdown-demote
         markdown-exdent-or-delete
         newline-and-indent-fix-cc-mode
         org-force-self-insert
