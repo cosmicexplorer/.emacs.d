@@ -130,7 +130,7 @@ Check out your .emacs."))
 
 ;;; added up here cause a lot of packages depend on it being defined without
 ;;; defining it themselves
-(require 'cl)
+(eval-when-compile (require 'cl))
 (require 'json)
 
 ;; starts emacs in server form so i can use emacsclient to add files

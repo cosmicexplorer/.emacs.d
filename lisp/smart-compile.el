@@ -40,7 +40,7 @@
 
 ;;; Code:
 
-(eval-when-compile '(require 'cl))
+(eval-when-compile (require 'cl))
 (require 'unix-find)
 (require 'functions)
 (require 'utilities)

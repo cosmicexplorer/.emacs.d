@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t -*-
 
-(eval-when-compile '(require 'cl))
+(eval-when-compile (require 'cl))
 
 ;;; fun stuff that i might release on melpa if anyone cares
 
