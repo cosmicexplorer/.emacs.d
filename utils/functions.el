@@ -2362,4 +2362,15 @@ by another percent."
       (insert "$$")
       (backward-char))))
 
+(defvar markdown-literal-char "`")
+(defun markdown-literal-region-too ()
+  (interactive)
+  (if (not (use-region-p)) (insert markdown-literal-char)
+    (let ((reg-beg (region-beginning))
+          (reg-end (region-end)))
+      (goto-char reg-beg)
+      (insert markdown-literal-char)
+      (goto-char (+ reg-end (length markdown-literal-char)))
+      (insert markdown-literal-char))))
+
 (provide 'functions)
