@@ -2373,4 +2373,15 @@ by another percent."
       (goto-char (+ reg-end (length markdown-literal-char)))
       (insert markdown-literal-char))))
 
+(defun is-in-git-repo (&optional dir)
+  (let ((cur-dir (or dir default-directory)))
+    (if (string= (expand-file-name cur-dir) (expand-file-name "/"))
+        (file-exists-p (expand-file-name (concat cur-dir "/.git")))
+      (or (file-exists-p (expand-file-name (concat cur-dir "/.git")))
+          (is-in-git-repo (expand-file-name (concat cur-dir "/..")))))))
+
+(defun git-repo-is-github (&optional dir)
+  (and (is-in-git-repo dir)
+       (zerop (shell-command "git remote -v | grep github.com"))))
+
 (provide 'functions)

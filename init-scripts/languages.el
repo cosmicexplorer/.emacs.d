@@ -421,9 +421,7 @@ Lisp code." t)
 (add-hook
  'markdown-mode-hook
  (lambda ()
-   (when (and (file-exists-p ".git")
-              (let ((case-fold-search t))
-                (string-match-p "readme\\.md\\'" (buffer-file-name)))
+   (when (and (git-repo-is-github)
               (not (eq major-mode 'gfm-mode)))
      (gfm-mode))))
 
