@@ -3,7 +3,7 @@
 ;;; some of these are mine, some are heavily adapted from emacswiki, some are
 ;;; copy/paste from emacswiki
 
-(eval-when-compile '(require cl))
+(eval-when-compile (require cl))
 (require 'utilities)
 
 (defun send-message-to-scratch (&rest msg-args)
@@ -21,7 +21,7 @@
            (if load-file-name
                (file-name-directory (file-truename load-file-name))
              default-directory))
-   "/" filename))
+          "/" filename))
 
 ;;; helper function often used in keybinding mappings
 (defun add-keybinding-to-mode-maps (keys-pressed func-to-call-quoted
@@ -124,8 +124,7 @@ also."
   (set-face-attribute 'default nil :height 50))
 
 ;; Switching to ibuffer puts the cursor on the most recent buffer
-(defadvice ibuffer (around ibuffer-point-to-most-recent) ()
-  "Open ibuffer with cursor pointed to most recent buffer name"
+(defadvice ibuffer (around ibuffer-point-to-most-recent)
   (let ((recent-buffer-name (buffer-name)))
     ad-do-it
     (ibuffer-jump-to-buffer recent-buffer-name)))
@@ -174,7 +173,7 @@ Toggles between: lowercase->ALL CAPS->Initial Caps->(cycle)."
         (let ((before-first-char (char-before beg))
               (first-char (char-after beg)))
           (when (and (not (wordp before-first-char))
-                   (lowercasep first-char))
+                     (lowercasep first-char))
             (goto-char beg)
             (delete-char 1)
             (insert-char (upcase first-char) 1 t)))
@@ -323,8 +322,8 @@ annoying. This fixes that."
         (loop for letter-index from -1 downto (- fin-point cur-point)
               while (= cap-letter-index (- fin-point cur-point))
               do (if (and (char-after (+ cur-point letter-index))
-                      (char-is-capitalized-p
-                       (char-after (+ cur-point letter-index))))
+                          (char-is-capitalized-p
+                           (char-after (+ cur-point letter-index))))
                      (setq cap-letter-index letter-index)))
         (goto-char (+ cur-point cap-letter-index))))))
 
@@ -345,9 +344,9 @@ instead of just the final line."
   (interactive "P")
   (paredit-comment-dwim arg)
   (unless (or (string-match-p "^[[:space:]]*;"
-                            (buffer-substring-no-properties
-                             (line-beginning-position)
-                             (line-end-position)))
+                              (buffer-substring-no-properties
+                               (line-beginning-position)
+                               (line-end-position)))
               (string-match-p "[[:space:]]" (make-string 1 (char-before))))
     (insert " ")))
 
@@ -477,16 +476,16 @@ parentheses. CURRENTLY BROKEN"
                     (if (eq system-type 'windows-nt)
                         (concat "move " "\"" (convert-standard-filename
                                               compiled-file) "\" "
-                                (getenv "temp"))
+                                              (getenv "temp"))
                       (concat "mv " "\"" compiled-file "\"" " /tmp/")))))
         (message msg))))
   (kill-this-buffer))
 
 (defun string/starts-with (s begins)
-      "Return non-nil if string S starts with BEGINS."
-      (cond ((>= (length s) (length begins))
-             (string-equal (substring s 0 (length begins)) begins))
-            (t nil)))
+  "Return non-nil if string S starts with BEGINS."
+  (cond ((>= (length s) (length begins))
+         (string-equal (substring s 0 (length begins)) begins))
+        (t nil)))
 
 (defun is-buffer-beautifiable (buf-name)
   "Determines whether file is in directory specified in ~/.emacs.d/no-beautify,
@@ -1147,10 +1146,10 @@ the line containing `region-end'."
              (concat "*" comment-padding)
              (if (save-excursion (goto-char beg) (bolp)) (1+ beg) beg)
              (- (+ end begin-insertions) trim-deletions))))
-     (let ((real-beg beg)
-           (real-end
-            (- (+ end begin-insertions star-insertions end-insertions)
-               trim-deletions)))
+    (let ((real-beg beg)
+          (real-end
+           (- (+ end begin-insertions star-insertions end-insertions)
+              trim-deletions)))
       (c-indent-region real-beg real-end t))
     ;; c-indent-region is loud and annoying
     (message "")))
@@ -1163,8 +1162,8 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (insert (if (or
                (bolp)
                (string-match-p "^[[:space:]]*$" (buffer-substring-no-properties
-                                        (line-beginning-position)
-                                        (line-end-position))))
+                                                 (line-beginning-position)
+                                                 (line-end-position))))
               "" comment-padding)
           comment-start comment-padding)
   (unless (string-equal comment-end "")
@@ -1278,28 +1277,28 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                (list folder-name make-cmd onfinish make-args)))
 (defun actual-make-submodule (submodule-args)
   (destructuring-bind (folder-name make-cmd cb make-args) submodule-args
-      (unless (member folder-name submodule-makes-to-ignore)
-        (if (not (executable-find make-cmd))
-            (with-current-buffer "*scratch*"
-              (insert "couldn't find " make-cmd " to build " folder-name "!"))
-          (let ((make-output-buf (get-buffer-create
-                                  (concat "*" folder-name "-make-errors*")))
-                (prev-wd default-directory))
-            (cd (concat init-home-folder-dir folder-name))
-            (set-process-sentinel
-             (apply #'start-process
-                    (append
-                     (list (concat "make-" folder-name)
-                           (buffer-name make-output-buf) make-cmd)
-                     make-args))
-             (lambda (proc ev)
-               (if (and (stringp ev) (string= ev "finished\n"))
-                   (kill-buffer (process-buffer proc))
-                 (when (process-live-p proc) (kill-process proc))
-                 (switch-to-buffer (process-buffer proc))
-                 (throw 'submodule-make-failure ev))))
-            (cd prev-wd)
-            (if cb (funcall cb)))))))
+    (unless (member folder-name submodule-makes-to-ignore)
+      (if (not (executable-find make-cmd))
+          (with-current-buffer "*scratch*"
+            (insert "couldn't find " make-cmd " to build " folder-name "!"))
+        (let ((make-output-buf (get-buffer-create
+                                (concat "*" folder-name "-make-errors*")))
+              (prev-wd default-directory))
+          (cd (concat init-home-folder-dir folder-name))
+          (set-process-sentinel
+           (apply #'start-process
+                  (append
+                   (list (concat "make-" folder-name)
+                         (buffer-name make-output-buf) make-cmd)
+                   make-args))
+           (lambda (proc ev)
+             (if (and (stringp ev) (string= ev "finished\n"))
+                 (kill-buffer (process-buffer proc))
+               (when (process-live-p proc) (kill-process proc))
+               (switch-to-buffer (process-buffer proc))
+               (throw 'submodule-make-failure ev))))
+          (cd prev-wd)
+          (if cb (funcall cb)))))))
 (defun actual-make-all-submodules (&optional cb)
   (mapcar #'actual-make-submodule submodules-to-make)
   (if cb (funcall cb)))
@@ -1399,18 +1398,18 @@ way I prefer, and regards `comment-padding', unlike the standard version."
       (if (not (mark)) (push-mark))
       (exchange-point-and-mark) ;Use the mark to represent the cursor location
       (dolist (char (append string nil))
-    (cond ((char-equal char ?\r)
-           (move-beginning-of-line 1))
-          ((char-equal char ?\n)
-           (move-end-of-line 1) (newline))
-          (t
-           (if (/= (point) (point-max)) ;Overwrite character
-           (delete-char 1))
-           (insert char))))
+        (cond ((char-equal char ?\r)
+               (move-beginning-of-line 1))
+              ((char-equal char ?\n)
+               (move-end-of-line 1) (newline))
+              (t
+               (if (/= (point) (point-max)) ;Overwrite character
+                   (delete-char 1))
+               (insert char))))
       (exchange-point-and-mark))
     (if window
-      (with-selected-window window
-        (goto-char (point-max))))))
+        (with-selected-window window
+          (goto-char (point-max))))))
 
 ;;; mark stuff
 ;;; http://stackoverflow.com/a/14539202/2518889
@@ -1488,7 +1487,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
       (sgml-close-tag)
     (let ((context (car (save-excursion (sgml-get-context)))))
       (if (assoc (save-excursion (backward-char) (aref context 4))
-                   html-autoclosable-tags)
+                 html-autoclosable-tags)
           (progn
             (goto-char (aref context 3))
             (delete-backward-char 1)
@@ -1992,9 +1991,9 @@ by another percent."
 (defun dired-lisp-get-args ()
   (let* ((files (dired-get-marked-files))
          (def (dired-get-default-cmd files)))
-     (list files def
-           (read-from-minibuffer
-            (concat "lisp to run: " (if def (concat "[" def "]") ""))))))
+    (list files def
+          (read-from-minibuffer
+           (concat "lisp to run: " (if def (concat "[" def "]") ""))))))
 
 (defun dired-run-lisp (files default func-and-args)
   (interactive (dired-lisp-get-args))
@@ -2426,6 +2425,7 @@ by another percent."
                  (forward-line movement))))))
 
 (defvar-local ag-args nil)
+
 (defun re-ag ()
   (interactive)
   (if (not ag-args) (message "%s" "no previous ag found!")
@@ -2439,6 +2439,7 @@ by another percent."
           (quit-windows-on res-buf)
           (with-selected-window cur-win
             (display-buffer-same-window res-buf nil)))))))
+
 (defun re-ag-reset-args-and-recompile ()
   (interactive)
   (let ((args ag-args))
