@@ -261,3 +261,8 @@
                (lambda () (setq comint-process-echoes nil)))))
 
 (eval-after-load 'org-mode '(require 'org-plot))
+
+(eval-after-load 'ag
+  '(defadvice ag/search (after remember-stuff activate)
+     (with-current-buffer ad-return-value
+       (setq ag-args (ad-get-args 0)))))

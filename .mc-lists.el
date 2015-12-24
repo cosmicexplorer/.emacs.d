@@ -42,6 +42,7 @@
         kill-selected-region-default
         markdown-demote
         markdown-exdent-or-delete
+        markdown-promote
         newline-and-indent-fix-cc-mode
         org-force-self-insert
         org-forward-paragraph

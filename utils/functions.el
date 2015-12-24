@@ -2425,4 +2425,24 @@ by another percent."
                  (call-interactively cmd)
                  (forward-line movement))))))
 
+(defvar-local ag-args nil)
+(defun re-ag ()
+  (interactive)
+  (if (not ag-args) (message "%s" "no previous ag found!")
+    (destructuring-bind (str dir &rest kwargs) ag-args
+      (let ((new-str (read-from-minibuffer "Search string " str))
+            (new-dir (read-directory-name "Directory: " dir)))
+        (kill-buffer)
+        (let* ((cur-win (selected-window))
+               (res-buf
+                (apply #'ag/search (append (list new-str new-dir) kwargs))))
+          (quit-windows-on res-buf)
+          (with-selected-window cur-win
+            (display-buffer-same-window res-buf nil)))))))
+(defun re-ag-reset-args-and-recompile ()
+  (interactive)
+  (let ((args ag-args))
+    (recompile)
+    (setq ag-args args)))
+
 (provide 'functions)
