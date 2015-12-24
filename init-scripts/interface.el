@@ -243,10 +243,10 @@ lowercase, and Initial Caps versions."
   "Highlight words of warning."
   :lighter " !!"
   (progn
-    (if warning-highlights-mode
-        (warning-highlights-turn-on)
-      (warning-highlights-turn-off))
-    (font-lock-mode 1)))
+    (if (not warning-highlights-mode)
+        (warning-highlights-turn-off)
+      (warning-highlights-turn-on)
+      (font-lock-mode 1))))
 ;;; add it to programming modes!
 (add-hook 'prog-mode-hook #'warning-highlights-mode)
 
