@@ -599,3 +599,11 @@ Check out your .emacs.\n")))))
 
 (defadvice browse-url-chromium (around no-error activate)
   (ignore-errors ad-do-it))
+
+(defadvice man (around no-switch-buf activate)
+  (let* ((win (selected-window))
+         (buf ad-do-it))
+    (unless current-prefix-arg
+      (quit-windows-on buf)
+      (with-selected-window win
+        (display-buffer-same-window buf nil)))))
