@@ -563,7 +563,14 @@
 (global-set-key (kbd "C-c k") #'do-keys-for-line)
 (global-set-key (kbd "C-c f") #'do-for-line)
 
+(eval-after-load 'cc-mode
+  '(progn
+     (define-key c-mode-base-map (kbd "C-c C-a") #'my-ag)
+     (define-key c-mode-base-map (kbd "C-c C-r") #'my-ag-regexp)))
+
 (eval-after-load 'ag
   '(progn
      (define-key ag-mode-map (kbd "g") #'re-ag-reset-args-and-recompile)
-     (define-key ag-mode-map (kbd "G") #'re-ag)))
+     (define-key ag-mode-map (kbd "G") #'re-ag)
+     (global-set-key (kbd "C-c C-a") #'my-ag)
+     (global-set-key (kbd "C-x C-r") #'my-ag-regexp)))

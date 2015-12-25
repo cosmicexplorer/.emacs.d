@@ -263,6 +263,14 @@
 (eval-after-load 'org-mode '(require 'org-plot))
 
 (eval-after-load 'ag
-  '(defadvice ag/search (after remember-stuff activate)
-     (with-current-buffer ad-return-value
-       (setq ag-args (ad-get-args 0)))))
+  '(progn
+     (defadvice ag/search (after remember-stuff activate)
+       (with-current-buffer ad-return-value
+         (setq ag-args (ad-get-args 0))))
+     (defadvice ag/search (around same-window activate)
+       (let ((cur-win (selected-window)))
+         ad-do-it
+         (let ((res-buf ad-return-value))
+           (quit-windows-on res-buf)
+           (with-selected-window cur-win
+             (display-buffer-same-window res-buf nil)))))))

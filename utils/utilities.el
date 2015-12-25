@@ -202,4 +202,15 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
                (setq even (not even)))
           finally (return (reverse out)))))
 
+(defmacro other-window-prefix-wrapper (fun name)
+  (let ((pfx (gensym))
+        (res-buf (gensym)))
+    `(defun ,name (,pfx)
+       (interactive "P")
+       (let* ((current-prefix-arg nil)
+              (,res-buf (call-interactively ,fun)))
+         (quit-windows-on ,res-buf)
+         (if (not ,pfx) (display-buffer-same-window ,res-buf nil)
+           (display-buffer ,res-buf))))))
+
 (provide 'utilities)

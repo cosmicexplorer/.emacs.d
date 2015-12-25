@@ -2458,4 +2458,7 @@ by another percent."
     (recompile)
     (setq ag-args args)))
 
+(other-window-prefix-wrapper #'ag my-ag)
+(other-window-prefix-wrapper #'ag-regexp my-ag-regexp)
+
 (provide 'functions)
