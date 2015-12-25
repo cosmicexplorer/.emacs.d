@@ -574,3 +574,5 @@
      (define-key ag-mode-map (kbd "G") #'re-ag)
      (global-set-key (kbd "C-c C-a") #'my-ag)
      (global-set-key (kbd "C-c C-r") #'my-ag-regexp)))
+
+(define-key sh-mode-map (kbd "C-c C-w") nil)
