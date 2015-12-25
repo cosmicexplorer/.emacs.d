@@ -2426,16 +2426,28 @@ by another percent."
 
 (defvar-local ag-args nil)
 
-(defun re-ag ()
-  (interactive)
+(defun re-ag-flip-regexp (kwargs)
+  (if (plist-get kwargs :regexp) (remove-from-plist kwargs :regexp)
+    (append '(:regexp t) kwargs)))
+
+(defun re-ag (pfx)
+  (interactive "P")
   (if (not ag-args) (message "%s" "no previous ag found!")
     (destructuring-bind (str dir &rest kwargs) ag-args
-      (let ((new-str (read-from-minibuffer "Search string " str))
-            (new-dir (read-directory-name "Directory: " dir)))
+      (let* ((regexp-in-kwargs (plist-get kwargs :regexp))
+             (now-is-regexp (or (and regexp-in-kwargs (not pfx))
+                                (and (not regexp-in-kwargs) pfx)))
+             (search-prompt
+              (if now-is-regexp "Search regexp: " "Search string: "))
+             (new-str (read-from-minibuffer search-prompt str))
+             (new-dir (read-directory-name "Directory: " dir))
+             (out-list
+              (append (list new-str new-dir)
+                      (if pfx (re-ag-flip-regexp kwargs) kwargs)))
+             (cur-win (selected-window)))
         (kill-buffer)
-        (let* ((cur-win (selected-window))
-               (res-buf
-                (apply #'ag/search (append (list new-str new-dir) kwargs))))
+        (let* ((current-prefix-arg nil)
+               (res-buf (apply #'ag/search out-list)))
           (quit-windows-on res-buf)
           (with-selected-window cur-win
             (display-buffer-same-window res-buf nil)))))))

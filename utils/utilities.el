@@ -191,4 +191,15 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
    "[[:space:]\r\n]+\\'" ""
    (replace-regexp-in-string "\\`[[:space:]\r\n]+" "" str)))
 
+(defun remove-from-plist (plist key &optional cmp)
+  (let ((fun (or cmp #'eq)))
+    (loop for el in plist
+          with prev-was-el = nil and out = nil and even = t
+          do (progn
+               (cond (prev-was-el (setq prev-was-el nil))
+                     ((and even (funcall fun el key)) (setq prev-was-el t))
+                     (t (push el out)))
+               (setq even (not even)))
+          finally (return (reverse out)))))
+
 (provide 'utilities)
