@@ -211,6 +211,6 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
               (,res-buf (call-interactively ,fun)))
          (quit-windows-on ,res-buf)
          (if (not ,pfx) (display-buffer-same-window ,res-buf nil)
-           (display-buffer ,res-buf))))))
+           (select-window (display-buffer ,res-buf)))))))
 
 (provide 'utilities)
