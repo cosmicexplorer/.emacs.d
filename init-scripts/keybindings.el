@@ -516,8 +516,8 @@
          #'switch-to-latex-compile-output))))
 
 (global-set-key (kbd "C-M-g") #'rerun-command)
-(eval-after-load 'sh-mode
-  '(define-key sh-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby))
+(eval-after-load 'sh-script
+  '(define-key sh-mode-map (kbd "C-c C-w") nil))
 
 ;; (eval-after-load 'ein-notebook
 ;;   '(define-key ein:notebook-mode-map (kbd ".") #'self-insert-command))
@@ -574,5 +574,3 @@
      (define-key ag-mode-map (kbd "G") #'re-ag)
      (global-set-key (kbd "C-c C-a") #'my-ag)
      (global-set-key (kbd "C-c C-r") #'my-ag-regexp)))
-
-(define-key sh-mode-map (kbd "C-c C-w") nil)
