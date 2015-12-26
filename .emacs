@@ -122,10 +122,6 @@ Check out your .emacs."))
       (write-region nil nil custom-var-file)))
   (load-file custom-var-file))
 
-;;; get rid of annoying erc stuff everywhere
-(switch-to-buffer "*scratch*")
-(delete-other-windows)
-
 (unless (file-exists-p init-home-folder-dir)
   (throw 'no-home-holder "no emacs home directory found (check your .emacs)!"))
 
@@ -202,6 +198,11 @@ Check out your .emacs."))
 (put 'upcase-region 'disabled nil)
 
 (setq prolog-program-name (if (executable-find "swipl") "swipl" "prolog"))
+
+(switch-to-buffer "*scratch*")
+(delete-other-windows)
+
+(garbage-collect)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
