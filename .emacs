@@ -102,6 +102,7 @@ init-scripts/interface.el.")
 (defvar after-load-init-hook nil
   "Hook to run whatever after loading packages n functions n whatever.")
 (defvar use-omnisharp t "C#!!!!!!!")
+(defvar use-https t)
 
 ;;; load custom values for these variables (this file is .gitignored)
 (let ((custom-var-file

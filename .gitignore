@@ -31,6 +31,7 @@ quicklisp/
 node_modules/
 server/
 url/
-/quicklisp.lisp
+quicklisp.lisp
 ensime/
-/abbrev_defs
+abbrev_defs
+network-security.data

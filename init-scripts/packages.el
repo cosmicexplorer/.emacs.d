@@ -3,14 +3,59 @@
 (require 'package)
 
 ;;; add package lists
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-(when (< emacs-major-version 24)
-  ;; For important compatibility libraries like cl-lib
-  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
 
-;;; not really sure what this bit does but nothing works without it
+(if use-https
+    ;; https://glyph.twistedmatrix.com/2015/11/editor-malware.html
+    (progn
+      (eval-after-load 'tls '(setq tls-checktrust t))
+      (setq package-archives nil)
+      (add-to-list 'package-archives
+                   '("melpa" . "https://melpa.org/packages/") t)
+      (add-to-list 'package-archives
+                   '("gnu" . "https://elpa.gnu.org/packages/") t)
+      (if (not
+           (or (zerop (shell-command "python -m pip show certifi"))
+               (zerop (shell-command "python -m pip install --user certifi"))))
+          (error "pip not installed, or some other error")
+        (if (not (executable-find "gnutls-cli"))
+            (error "gnutls-cli not installed!")
+          (let ((trustfile
+                 (replace-regexp-in-string
+                  "\\\\" "/"
+                  (replace-regexp-in-string
+                   "\n" ""
+                   (shell-command-to-string "python -m certifi")))))
+            (setq tls-program
+                  (list
+                   (format
+                    "gnutls-cli%s --x509cafile %s -p %%p %%h"
+                    (if (memq system-type '(ms-dos windows-nt)) ".exe" "")
+                    trustfile)))
+            (eval-after-load 'gnutls
+              `(progn
+                 (setq gnutls-verify-error t)
+                 (setq gnutls-trustfiles (list ,trustfile)))))
+          ;; check to verify host checking is done correctly
+          (let ((bad-hosts
+                 (loop for bad
+                       in `("https://wrong.host.badssl.com/"
+                            "https://self-signed.badssl.com/")
+                       if (condition-case e
+                              (url-retrieve
+                               bad (lambda (retrieved) t))
+                            (error nil))
+                       collect bad)))
+            (if bad-hosts
+                (error (format "tls misconfigured; retrieved %s ok"
+                               bad-hosts))
+              (url-retrieve "https://badssl.com"
+                            (lambda (retrieved) t)))))))
+  (add-to-list 'package-archives
+               '("melpa" . "http://melpa.milkbox.net/packages/") t)
+  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+  (add-to-list 'package-archives
+               '("gnu" . "http://elpa.gnu.org/packages/") t))
+
 (when (not package-archive-contents)
   (package-refresh-contents))
 (package-initialize)
