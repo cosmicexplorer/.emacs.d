@@ -48,6 +48,7 @@
 (when (featurep 'minimap) (unload-feature 'minimap))
 (require 'wgrep)
 (require 'sourcemap)
+(require 'helm-ag)
 
 ;;; my stuff
 (require 'utilities)
