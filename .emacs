@@ -217,7 +217,9 @@ Check out your .emacs."))
  '(auto-revert-verbose nil)
  '(browse-url-browser-function (quote browse-url-chromium))
  '(cloc-use-3rd-gen nil)
- '(coffee-args-compile (quote ("-c" "-b" "--no-header")))
+ '(coffee-args-compile (quote ("-c" "-b" "--no-header" "-m")))
+ '(coffee-indent-like-python-mode t)
+ '(coffee-switch-to-compile-buffer t)
  '(coffee-tab-width 2)
  '(company-dabbrev-code-modes
    (quote
@@ -337,7 +339,7 @@ Check out your .emacs."))
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (helm-ag wgrep wgrep-ag wgrep-helm ag pacmacs bison-mode slime slime-company perl6-mode enh-ruby-mode robe tuareg solarized-theme color-theme-solarized highlight-parentheses racket-mode sage-shell-mode gnuplot-mode gnuplot sml-mode skewer-mode magit org csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode2 company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
+    (sourcemap helm-ag wgrep wgrep-ag wgrep-helm ag pacmacs bison-mode slime slime-company perl6-mode enh-ruby-mode robe tuareg solarized-theme color-theme-solarized highlight-parentheses racket-mode sage-shell-mode gnuplot-mode gnuplot sml-mode skewer-mode magit org csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode2 company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
  '(perl6-indent-offset 2)
  '(rainbow-ansi-colors t)
  '(rainbow-html-colors t)

@@ -130,6 +130,7 @@
                       slime-company
                       smartrep
                       sml-mode
+                      sourcemap
                       speech-tagger
                       undo-tree
                       w3m

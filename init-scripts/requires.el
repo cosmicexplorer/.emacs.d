@@ -47,6 +47,7 @@
 (require 'highlight-parentheses)
 (when (featurep 'minimap) (unload-feature 'minimap))
 (require 'wgrep)
+(require 'sourcemap)
 
 ;;; my stuff
 (require 'utilities)

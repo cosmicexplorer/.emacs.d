@@ -233,6 +233,27 @@
     `(progn
        (setq coffee-command (concat ,npm-bin-dir "/coffee"))
        (setq js2coffee-command (concat ,npm-bin-dir "/js2coffee")))))
+(eval-after-load 'sourcemap
+  '(progn
+     (defun coffee-goto-sourcemap-and-delete (props)
+       (sourcemap-goto-corresponding-point props)
+       (delete-file (plist-get props :sourcemap)))
+     (eval-after-load 'coffee-mode
+       '(add-hook 'coffee-after-compile-hook
+                  #'coffee-goto-sourcemap-and-delete))))
+(eval-after-load 'coffee-mode
+  '(defadvice coffee-indent-shift-left (around shift-negative activate)
+     (let ((start (ad-get-arg 0))
+           (end (ad-get-arg 1))
+           (count (ad-get-arg 2)))
+       (cond
+        ((listp count)
+         (setq ad-return-value
+               (coffee-indent-shift-right start end 1)))
+        ((and count (negativep count))
+              (setq ad-return-value
+                    (coffee-indent-shift-right start end (- count))))
+        (t ad-do-it)))))
 
 ;;; company
 (add-hook 'after-load-init-hook #'global-company-mode)
