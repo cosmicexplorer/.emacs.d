@@ -558,7 +558,9 @@
 (eval-after-load 'prolog
   '(progn (define-key prolog-mode-map (kbd "C-c C-v") nil)))
 
-(global-set-key (kbd "C-c a") #'cycle-shell-buffers)
+(global-set-key (kbd "C-w") nil)
+(global-set-key (kbd "C-w c") #'cycle-shell-buffers)
+(global-set-key (kbd "C-w C-c") #'cycle-shell-buffers)
 
 (global-set-key (kbd "C-c k") #'do-keys-for-line)
 (global-set-key (kbd "C-c f") #'do-for-line)
@@ -571,6 +573,9 @@
 (eval-after-load 'ag
   '(progn
      (define-key ag-mode-map (kbd "g") #'re-ag-reset-args-and-recompile)
-     (define-key ag-mode-map (kbd "G") #'re-ag)
-     (global-set-key (kbd "C-c C-a") #'my-ag)
-     (global-set-key (kbd "C-c C-r") #'my-ag-regexp)))
+     (define-key ag-mode-map (kbd "G") #'re-ag)))
+
+(eval-after-load 'helm-ag
+  '(progn
+     (global-set-key (kbd "C-c a") #'helm-ag)
+     (global-set-key (kbd "C-c C-a") #'helm-ag)))
