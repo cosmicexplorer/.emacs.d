@@ -303,3 +303,8 @@
            (quit-windows-on res-buf)
            (with-selected-window cur-win
              (display-buffer-same-window res-buf nil)))))))
+
+(defadvice helm (around mark-stuff activate)
+  (push-mark)
+  ad-do-it
+  (unless (= helm-exit-status 0) (pop-mark)))

@@ -579,3 +579,5 @@
   '(progn
      (global-set-key (kbd "C-c a") #'helm-ag)
      (global-set-key (kbd "C-c C-a") #'helm-ag)))
+
+(global-set-key (kbd "M-y") #'helm-show-kill-ring)
