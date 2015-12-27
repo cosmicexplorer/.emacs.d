@@ -423,7 +423,8 @@ Lisp code." t)
  (lambda ()
    (when (and (git-repo-is-github)
               (not (eq major-mode 'gfm-mode)))
-     (gfm-mode))))
+     (gfm-mode))
+   (message "")))
 
 (add-hook 'markdown-mode-hook
           (lambda ()
