@@ -1208,7 +1208,10 @@ way I prefer, and regards `comment-padding', unlike the standard version."
           (re-search-backward "[^[:space:]]")
           (delete-region (1+ (point)) pt)))
       (goto-char (point-max))
+      ;; so having active region doesn't delete the entire buffer
+      (push-mark)
       (while (looking-back "[[:space:]\n]") (delete-backward-char 1))
+      (pop-mark)
       (insert "\n"))
     (if eob (goto-char (point-max)))))
 (defvar previous-whitespace-regexp "[\t \u00A0]+")
