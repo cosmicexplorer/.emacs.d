@@ -589,3 +589,19 @@
 
 (global-set-key (kbd "M-y") #'helm-show-kill-ring)
 (global-set-key (kbd "M-x") #'helm-M-x)
+
+
+(eval-after-load 'helm-ag
+  '(progn
+     (defun helm-cycle-down ()
+       (interactive)
+       (let ((helm-move-to-line-cycle-in-source t))
+         (helm-move-selection-common :where 'line :direction 'next)))
+     (defun helm-cycle-up ()
+       (interactive)
+       (let ((helm-move-to-line-cycle-in-source t))
+         (helm-move-selection-common :where 'line :direction 'previous)))
+     (define-key helm-map (kbd "<down>") #'helm-cycle-down)
+     (define-key helm-map (kbd "C-n") #'helm-cycle-down)
+     (define-key helm-map (kbd "<up>") #'helm-cycle-up)
+     (define-key helm-map (kbd "C-p") #'helm-cycle-up)))
