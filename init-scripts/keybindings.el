@@ -515,7 +515,6 @@
        (define-key LaTeX-mode-map (kbd "C-c C-s")
          #'switch-to-latex-compile-output))))
 
-(global-set-key (kbd "C-M-g") #'rerun-command)
 (eval-after-load 'sh-script
   '(define-key sh-mode-map (kbd "C-c C-w") nil))
 
@@ -575,9 +574,13 @@
      (define-key ag-mode-map (kbd "g") #'re-ag-reset-args-and-recompile)
      (define-key ag-mode-map (kbd "G") #'re-ag)))
 
+(defun my-helm-ag ()
+  (interactive)
+  (helm-do-ag default-directory))
 (eval-after-load 'helm-ag
   '(progn
-     (global-set-key (kbd "C-c a") #'helm-ag)
-     (global-set-key (kbd "C-c C-a") #'helm-ag)))
+     (global-set-key (kbd "C-c a") #'my-helm-ag)
+     (global-set-key (kbd "C-c C-a") #'my-helm-ag)))
 
 (global-set-key (kbd "M-y") #'helm-show-kill-ring)
+(global-set-key (kbd "M-x") #'helm-M-x)

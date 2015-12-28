@@ -304,7 +304,11 @@
            (with-selected-window cur-win
              (display-buffer-same-window res-buf nil)))))))
 
-(defadvice helm (around mark-stuff activate)
-  (push-mark)
-  ad-do-it
-  (unless (= helm-exit-status 0) (pop-mark)))
+;;; have to do it this way because setting mark in an 'around advice screws
+;;; around with `thing-at-point'
+(defadvice helm-swoop (around mark-stuff activate)
+  (let ((mk (make-marker)))
+    (set-marker mk (point))
+    (unwind-protect ad-do-it
+      (when (= helm-exit-status 0)
+        (push-mark mk)))))

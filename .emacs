@@ -286,6 +286,9 @@ Check out your .emacs."))
  '(haskell-check-command "hlint")
  '(haskell-process-type (quote cabal-repl))
  '(haskell-tags-on-save t)
+ '(helm-ag--preview-highlight-matches (quote any))
+ '(helm-ag--preview-max-matches 500)
+ '(helm-ag-insert-at-point (quote symbol))
  '(helm-ff-fuzzy-matching nil)
  '(hippie-expand-try-functions-list
    (quote
