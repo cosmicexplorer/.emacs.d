@@ -44,11 +44,16 @@
 ;;; helm
 ;;; the below can also be applied over multiple lines with:
 ;;; C-u [number] M-x helm-swoop RET
-(global-set-key (kbd "C-x o") 'helm-swoop)
+(defun my-helm-swoop ()
+  (interactive)
+  (helm-swoop :$query (thing-at-point 'symbol)))
+(global-set-key (kbd "C-x o") #'my-helm-swoop)
 ;;; find regexp in ALL open buffers
-(global-set-key (kbd "C-x f") 'helm-multi-swoop-all)
-;;; find regexp in SOME open buffers
-(global-set-key (kbd "C-x j") 'helm-multi-swoop)
+(defun my-multi-swoop-all (pfx)
+  (interactive "P")
+  (if pfx (helm-multi-swoop-all (thing-at-point 'symbol))
+    (helm-multi-swoop-all)))
+(global-set-key (kbd "C-x f") 'my-multi-swoop-all)
 ;;; find buffer by name
 (global-set-key (kbd "C-x b") 'helm-buffers-list)
 

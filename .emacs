@@ -289,7 +289,9 @@ Check out your .emacs."))
  '(helm-ag--preview-highlight-matches (quote any))
  '(helm-ag--preview-max-matches 500)
  '(helm-ag-insert-at-point (quote symbol))
+ '(helm-ag-use-emacs-lisp-regexp t)
  '(helm-ff-fuzzy-matching nil)
+ '(helm-swoop-pre-input-function (lambda nil (thing-at-point (quote symbol))))
  '(hippie-expand-try-functions-list
    (quote
     (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)))

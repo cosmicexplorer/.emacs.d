@@ -18,3 +18,8 @@
 	url = ./org-mode
         ignore = dirty
         branch = master
+[submodule "emacs-helm-ag"]
+	path = emacs-helm-ag
+	url = git@github.com:cosmicexplorer/emacs-helm-ag.git
+        ignore = dirty
+        branch = play

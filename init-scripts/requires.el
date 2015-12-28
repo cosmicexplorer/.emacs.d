@@ -7,6 +7,7 @@
 ;;; add packages that don't exist on melpa; typically from emacswiki, but some
 ;;; are from more dubious sources
 (add-to-list 'load-path (concat init-home-folder-dir "lisp"))
+(load-file (concat init-home-folder-dir "emacs-helm-ag/helm-ag.el"))
 
 ;;; ESS is done in `./package-setup.el'
 
@@ -48,7 +49,6 @@
 (when (featurep 'minimap) (unload-feature 'minimap))
 (require 'wgrep)
 (require 'sourcemap)
-(require 'helm-ag)
 
 ;;; my stuff
 (require 'utilities)
