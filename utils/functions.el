@@ -972,6 +972,13 @@ prompt the user for a coding system."
   (call-interactively #'mouse-set-point)
   (call-interactively #'w3m-goto-url-new-tab))
 
+(defun w3m-goto-url-mouse ()
+  (interactive)
+  (call-interactively #'mouse-set-point)
+  (let ((active (w3m-active-region-or-url-at-point)))
+    (when active
+      (w3m-goto-url active))))
+
 (defun w3m-forget () (interactive))
 
 (defvar w3m-urls nil)

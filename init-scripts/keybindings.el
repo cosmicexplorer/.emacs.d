@@ -124,6 +124,7 @@
   (define-key w3m-mode-map (kbd "<C-mouse-1>") 'w3m-forget)
   (define-key w3m-mode-map (kbd "<C-drag-mouse-1>") 'w3m-forget)
   (define-key w3m-mode-map (kbd "<C-down-mouse-1>") 'w3m-goto-url-new-tab-mouse)
+  (define-key w3m-mode-map (kbd "<down-mouse-1>") 'w3m-goto-url-mouse)
   (define-key w3m-mode-map (kbd "v") 'w3m-view-source))
 
 ;; make C-z undo instead of FUCKING UP MY ENTIRE LIFE by suspending
