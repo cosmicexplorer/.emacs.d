@@ -117,9 +117,13 @@
   (define-key w3m-mode-map (kbd "C-l C-<tab>") 'w3m-tab-move-right)
   (define-key w3m-mode-map (kbd "<C-iso-lefttab>") 'w3m-tab-previous-buffer)
   (define-key w3m-mode-map (kbd "C-l <C-iso-lefttab>") 'w3m-tab-move-left)
-  (define-key w3m-mode-map (kbd "C-w") 'w3m-delete-buffer)
+  (define-key w3m-mode-map (kbd "C-w") 'w3m-delete-buf-remember)
   (define-key w3m-mode-map (kbd "C-t") 'w3m-create-empty-session)
-  (define-key w3m-mode-map (kbd "C-S-t") 'w3m-goto-url-new-session)
+  (define-key w3m-mode-map (kbd "C-S-t") 'w3m-restore-buffer)
+  (define-key w3m-mode-map (kbd "<C-return>") 'w3m-goto-url-new-tab)
+  (define-key w3m-mode-map (kbd "<C-mouse-1>") 'w3m-forget)
+  (define-key w3m-mode-map (kbd "<C-drag-mouse-1>") 'w3m-forget)
+  (define-key w3m-mode-map (kbd "<C-down-mouse-1>") 'w3m-goto-url-new-tab-mouse)
   (define-key w3m-mode-map (kbd "v") 'w3m-view-source))
 
 ;; make C-z undo instead of FUCKING UP MY ENTIRE LIFE by suspending

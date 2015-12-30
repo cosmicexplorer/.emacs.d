@@ -962,6 +962,33 @@ prompt the user for a coding system."
                  (match-string 0 str))))
      t)))
 
+(defun w3m-goto-url-new-tab ()
+  (interactive)
+  (let ((active (w3m-active-region-or-url-at-point)))
+    (when active (w3m-goto-url-new-session active))))
+
+(defun w3m-goto-url-new-tab-mouse ()
+  (interactive)
+  (call-interactively #'mouse-set-point)
+  (call-interactively #'w3m-goto-url-new-tab))
+
+(defun w3m-forget () (interactive))
+
+(defvar w3m-urls nil)
+(defvar w3m-cur-url-ptr nil)
+(defun w3m-delete-buf-remember ()
+  (interactive)
+  (push w3m-current-url w3m-urls)
+  (setq w3m-cur-url-ptr w3m-urls)
+  (call-interactively #'w3m-delete-buffer))
+
+(defun w3m-restore-buffer ()
+  (interactive)
+  (if w3m-cur-url-ptr
+      (w3m-goto-url-new-session (car w3m-cur-url-ptr))
+    (message "%s" "No old urls to restore!"))
+  (setq w3m-cur-url-ptr (cdr w3m-cur-url-ptr)))
+
 ;;; org-mode stuff
 (defadvice org-kill-line (around org-kill-region-advice)
   (if (use-region-p)
