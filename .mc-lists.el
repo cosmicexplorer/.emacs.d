@@ -56,6 +56,7 @@
         paredit-close-square
         paredit-forward
         paredit-forward-delete
+        paredit-open-round
         racket--paredit-open-square
         sgml-slash
         smart-tab
