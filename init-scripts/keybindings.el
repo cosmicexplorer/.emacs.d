@@ -284,7 +284,8 @@
   '(progn
      (define-key markdown-mode-map (kbd "M-n") #'mc/mark-next-like-this)
      (define-key markdown-mode-map (kbd "M-p") #'mc/mark-previous-like-this)
-     (define-key markdown-mode-map (kbd "`") #'markdown-literal-region-too)))
+     (define-key markdown-mode-map (kbd "`") #'markdown-literal-region-too)
+     (define-key markdown-mode-map (kbd "C-k") #'kill-line-or-region)))
 
 (eval-after-load 'grep
   '(define-key grep-mode-map (kbd "G") #'refind-or-grep))
