@@ -200,6 +200,9 @@
          ("MATLAB" (mode . matlab-mode))
          ("Octave" (mode . octave-mode))
          ("OCaml" (mode . tuareg-mode))
+         ("lexer" (name . "\\.l\\'"))
+         ("grammar" (or (name . "\\.y\\'")
+                        (name . "\\.jison\\'")))
          ("default" (name . "")))))
 
 ;;; more ibuffer stuff
