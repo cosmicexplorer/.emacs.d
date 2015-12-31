@@ -2324,7 +2324,7 @@ by another percent."
 
 (defun kill-line-or-region (pfx)
   (interactive "P")
-  (cond (pfx (kill-line))
+  (cond (pfx (kill-line (if (listp pfx) nil pfx)))
         ((region-active-p) (call-interactively #'kill-region))
         (t (call-interactively #'kill-visual-line))))
 
