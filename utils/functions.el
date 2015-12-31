@@ -2472,4 +2472,9 @@ by another percent."
 (other-window-prefix-wrapper #'ag my-ag)
 (other-window-prefix-wrapper #'ag-regexp my-ag-regexp)
 
+(defun git-gutter:diff-and-switch ()
+  (interactive)
+  (select-window
+   (get-buffer-window (call-interactively #'git-gutter:popup-hunk))))
+
 (provide 'functions)
