@@ -276,6 +276,9 @@ Check out your .emacs."))
  '(erc-track-minor-mode t)
  '(erc-track-mode t)
  '(fill-column 80)
+ '(git-gutter:update-hooks
+   (quote
+    (after-save-hook after-revert-hook find-file-hook after-change-major-mode-hook text-scale-mode-hook magit-revert-buffer-hook magit-status-refresh-hook)))
  '(git-gutter:update-interval 1)
  '(git-gutter:window-width 0)
  '(global-rainbow-delimiters-mode t)
@@ -299,6 +302,7 @@ Check out your .emacs."))
  '(hl-paren-background-colors (quote ("light goldenrod")))
  '(hl-paren-colors (quote ("chocolate" "magenta" "tomato" "yellow")))
  '(initial-buffer-choice t)
+ '(js2-global-externs (quote ("process" "setTimeout" "require")))
  '(kill-buffer-trash-alist
    (quote
     ((markdown-mode lambda

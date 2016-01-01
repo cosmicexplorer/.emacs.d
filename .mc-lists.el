@@ -54,6 +54,7 @@
         paredit-backspace-delete-highlight
         paredit-backward
         paredit-close-square
+        paredit-doublequote
         paredit-forward
         paredit-forward-delete
         paredit-open-round
