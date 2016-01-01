@@ -31,6 +31,7 @@
         end-of-buffer
         end-of-visual-line
         helm-buffers-list
+        helm-show-kill-ring
         html-newline-indent
         ido-find-file
         isearch-abort
@@ -53,11 +54,13 @@
         paredit-backslash
         paredit-backspace-delete-highlight
         paredit-backward
+        paredit-close-round
         paredit-close-square
         paredit-doublequote
         paredit-forward
         paredit-forward-delete
         paredit-open-round
+        paredit-open-square
         racket--paredit-open-square
         sgml-slash
         smart-tab
