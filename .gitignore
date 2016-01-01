@@ -35,3 +35,4 @@ quicklisp.lisp
 ensime/
 abbrev_defs
 network-security.data
+.cask
