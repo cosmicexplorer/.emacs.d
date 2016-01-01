@@ -19,13 +19,6 @@
                 [remap eshell-pcomplete]
                 'helm-esh-pcomplete)))
 
-;;; use ido for file name completion
-(if (and (fboundp 'remove-function) (fboundp 'add-function))
-    (progn
-      (remove-function read-file-name-function #'helm--generic-read-file-name)
-      (add-function :override read-file-name-function #'ido-read-file-name))
-  (setq read-file-name-function 'ido-read-file-name))
-
 ;;; undo-tree
 (global-undo-tree-mode)                 ; put it EVERYWHERE
 ;;; persist across file saves

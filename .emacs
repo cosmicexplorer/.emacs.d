@@ -294,7 +294,23 @@ Check out your .emacs."))
  '(helm-ag-insert-at-point (quote symbol))
  '(helm-ag-use-agignore t)
  '(helm-ag-use-emacs-lisp-regexp nil)
+ '(helm-completing-read-handlers-alist
+   (quote
+    ((describe-function . helm-completing-read-symbols)
+     (describe-variable . helm-completing-read-symbols)
+     (describe-symbol . helm-completing-read-symbols)
+     (debug-on-entry . helm-completing-read-symbols)
+     (find-function . helm-completing-read-symbols)
+     (disassemble . helm-completing-read-symbols)
+     (trace-function . helm-completing-read-symbols)
+     (trace-function-foreground . helm-completing-read-symbols)
+     (trace-function-background . helm-completing-read-symbols)
+     (find-tag . helm-completing-read-with-cands-in-buffer)
+     (ffap-alternate-file)
+     (tmm-menubar)
+     (dired-do-rename . ido))))
  '(helm-ff-fuzzy-matching nil)
+ '(helm-move-to-line-cycle-in-source t)
  '(helm-swoop-pre-input-function (lambda nil (thing-at-point (quote symbol))))
  '(hippie-expand-try-functions-list
    (quote
