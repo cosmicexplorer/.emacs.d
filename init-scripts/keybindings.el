@@ -594,8 +594,6 @@
      (global-set-key (kbd "C-c C-a") #'my-helm-ag)))
 
 (global-set-key (kbd "M-y") #'helm-show-kill-ring)
-(global-set-key (kbd "M-x") #'helm-M-x)
-
 
 (eval-after-load 'helm-ag
   '(progn
@@ -611,3 +609,6 @@
      (define-key helm-map (kbd "C-n") #'helm-cycle-down)
      (define-key helm-map (kbd "<up>") #'helm-cycle-up)
      (define-key helm-map (kbd "C-p") #'helm-cycle-up)))
+
+(define-key helm-map (kbd "C-z") #'undo-tree-undo)
+(global-set-key (kbd "C-w b") #'push-buffer-to-kill-ring)

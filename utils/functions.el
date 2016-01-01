@@ -2476,4 +2476,8 @@ by another percent."
   (select-window
    (get-buffer-window (call-interactively #'git-gutter:popup-hunk))))
 
+(defun push-buffer-to-kill-ring ()
+  (interactive)
+  (kill-ring-save (point-min) (point-max)))
+
 (provide 'functions)
