@@ -2483,11 +2483,11 @@ by another percent."
 (defun remove-diff-errata (str)
   "Removes leading -/+/=, and removes conflict markers."
   (loop
-   for reg-pair in '(("^>\\{7,\\}[^\n]*\n" . "")
-                     ("^<\\{7,\\}[^\n]*\n" . "")
-                     ("^|\\{7,\\}[^\n]*\n" . "")
-                     ("^=\\{7,\\}[^\n]*\n" . "")
-                     ("^@@[^\n]*\n" . "")
+   for reg-pair in '(("^\\(?:\\+\\+\\)?>\\{7,\\}[^\n]*\\(?:\n\\|\\'\\)" . "")
+                     ("^\\(?:\\+\\+\\)?<\\{7,\\}[^\n]*\\(?:\n\\|\\'\\)" . "")
+                     ("^\\(?:\\+\\+\\)?|\\{7,\\}[^\n]*\\(?:\n\\|\\'\\)" . "")
+                     ("^\\(?:\\+\\+\\)?=\\{7,\\}[^\n]*\\(?:\n\\|\\'\\)" . "")
+                     ("^@@[^\n]*\\(?:\n\\|\\'\\)" . "")
                      ("^[-+]" . " "))
    do (setq str (replace-regexp-in-string (car reg-pair) (cdr reg-pair) str))
    finally (return str)))
