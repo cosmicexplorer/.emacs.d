@@ -612,3 +612,8 @@
 
 (define-key helm-map (kbd "C-z") #'undo-tree-undo)
 (global-set-key (kbd "C-w b") #'push-buffer-to-kill-ring)
+
+(define-key diff-mode-map (kbd "M-w") #'diff-mode-copy)
+(define-key diff-mode-map (kbd "C-k") #'diff-mode-copy)
+(define-key magit-mode-map (kbd "M-w") #'diff-mode-copy)
+(define-key magit-mode-map (kbd "C-k") #'diff-mode-copy)

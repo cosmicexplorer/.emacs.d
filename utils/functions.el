@@ -2480,4 +2480,29 @@ by another percent."
   (interactive)
   (kill-ring-save (point-min) (point-max)))
 
+(defun remove-diff-errata (str)
+  "Removes leading -/+/=, and removes conflict markers."
+  (loop
+   for reg-pair in '(("^>\\{7,\\}[^\n]*\n" . "")
+                     ("^<\\{7,\\}[^\n]*\n" . "")
+                     ("^|\\{7,\\}[^\n]*\n" . "")
+                     ("^=\\{7,\\}[^\n]*\n" . "")
+                     ("^@@[^\n]*\n" . "")
+                     ("^[-+]" . " "))
+   do (setq str (replace-regexp-in-string (car reg-pair) (cdr reg-pair) str))
+   finally (return str)))
+
+(defun diff-mode-copy ()
+  (interactive)
+  (let* ((text
+          (if (use-region-p)
+              (buffer-substring-no-properties (region-beginning) (region-end))
+            (buffer-substring-no-properties (point-min) (point-max))))
+         (cleaned-text (remove-diff-errata text))
+         (space-cleaned-text (replace-regexp-in-string "^ " "" cleaned-text)))
+    (kill-new space-cleaned-text)
+    (if (derived-mode-p 'magit-mode)
+        (set-mark (point))
+      (setq deactivate-mark t))))
+
 (provide 'functions)
