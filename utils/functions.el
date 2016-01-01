@@ -1482,19 +1482,18 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                 (when (eq major-mode 'dired-mode)
                   (kill-buffer))))))
 
-(defun dired-kill-buf-and-all-visiting ()
-  (interactive)
-  (if (not (eq major-mode 'dired-mode))
-      (throw 'not-dired-buf "this isn't a dired buffer!")
-    (loop
-     with dired-dir = (expand-file-name dired-directory)
-     with dir-reg = (concat "\\`" (regexp-quote dired-dir))
-     for buf in (buffer-list)
-     do (let ((place (expand-file-name
-                      (or (buffer-file-name buf)
-                          (with-current-buffer buf default-directory)))))
-          (when (string-match-p dir-reg place) (kill-buffer buf))))
-    (kill-buffer)))
+(defun kill-buf-and-all-visiting (pfx)
+  (interactive "P")
+  (loop
+   with dir = (if pfx (ido-read-directory-name "directory to kill: ")
+                default-directory)
+   with dir-reg = (concat "\\`" (regexp-quote (expand-file-name dir)))
+   for buf in (buffer-list)
+   do (let ((place (expand-file-name
+                    (or (let ((name (buffer-file-name buf)))
+                          (when name (file-name-directory name)))
+                        (with-current-buffer buf default-directory)))))
+        (when (string-match-p dir-reg place) (kill-buffer buf)))))
 
 (defun dired-kill-marked-files ()
   (interactive)
