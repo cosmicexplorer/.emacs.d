@@ -49,6 +49,7 @@
 (when (featurep 'minimap) (unload-feature 'minimap))
 (require 'wgrep)
 (require 'sourcemap)
+(require 'eww)
 
 ;;; my stuff
 (require 'utilities)
