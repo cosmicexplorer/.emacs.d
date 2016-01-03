@@ -324,7 +324,8 @@ Check out your .emacs."))
  '(hl-paren-background-colors (quote ("light goldenrod")))
  '(hl-paren-colors (quote ("chocolate" "magenta" "tomato" "yellow")))
  '(initial-buffer-choice t)
- '(js2-global-externs (quote ("process" "setTimeout" "require")))
+ '(js2-global-externs (quote ("history")))
+ '(js2-include-node-externs t)
  '(kill-buffer-trash-alist
    (quote
     ((markdown-mode lambda
