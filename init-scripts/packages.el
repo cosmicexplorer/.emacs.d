@@ -92,6 +92,7 @@
                       wgrep-helm
                       web-beautify
                       xterm-color
+                      yaml-mode
                       ))
 
 ;;; do the install (slow upon startup, but only for the first time)
