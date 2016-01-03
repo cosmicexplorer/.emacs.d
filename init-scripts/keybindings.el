@@ -1,3 +1,5 @@
+;; -*- lexical-binding: t -*-
+
 ;;; keybindings are cool and fun
 ;;; i think there are like 200 of these in here
 
@@ -296,14 +298,61 @@
   #'describe-function-or-variable-at-point)
 ;;; TODO: write this
 ;; (global-set-key (kbd "C-h C-d") #'find-function-or-variable)
-(global-set-key (kbd "C-M-h C-d")
-  #'find-function-or-variable-at-point)
-(global-set-key (kbd "C-M-h f") #'describe-function-at-point)
-(global-set-key (kbd "C-M-h v") #'describe-variable-at-point)
-(global-set-key (kbd "C-h C-f") #'find-function)
-(global-set-key (kbd "C-M-h C-f") #'find-function-at-point)
-(global-set-key (kbd "C-h C-v") #'find-variable)
-(global-set-key (kbd "C-M-h C-v") #'find-variable-at-point)
+(defun current-help-window-or-pfx (cmd)
+  (lambda (pfx)
+    (interactive "P")
+    (let (failure)
+      (save-window-excursion
+        (setq failure
+              (let ((res (call-interactively cmd)))
+                (and (stringp res)
+                     (string-match-p "\\`[^\n]* is undefined\\'" res)))))
+      (unless failure
+        (if pfx (display-buffer-other-window last-help-mode-buffer)
+          (display-buffer-same-window last-help-mode-buffer nil))))))
+(defun find-function-switch-pfx (cmd &optional nomark)
+  (lambda (pfx)
+    (interactive "P")
+    (let (failure final-buf (orig-buf (current-buffer))
+                  win-pt win-st)
+      (save-window-excursion
+        (call-interactively cmd)
+        (setq final-buf (current-buffer)
+              failure (eq orig-buf final-buf)
+              win-pt (window-point)
+              win-st (window-start)))
+      (unless failure
+        (unless nomark
+          (let ((mk (make-marker)))
+            (set-marker mk (point))
+            (push mk global-mark-ring)))
+        (if pfx (display-buffer-other-window final-buf)
+          (display-buffer-same-window final-buf nil))
+        (set-window-point (selected-window) win-pt)
+        (set-window-start (selected-window) win-st)))))
+(global-set-key (kbd "C-h f") (current-help-window-or-pfx #'describe-function))
+(global-set-key (kbd "C-h v") (current-help-window-or-pfx #'describe-variable))
+(global-set-key (kbd "C-h k") (current-help-window-or-pfx #'describe-key))
+(global-set-key (kbd "C-h d")
+                (current-help-window-or-pfx #'describe-function-or-variable))
+(global-set-key
+ (kbd "C-M-h d")
+ (current-help-window-or-pfx #'describe-function-or-variable-at-point))
+(global-set-key (kbd "C-h C-d")
+                (find-function-switch-pfx #'find-function-or-variable))
+(global-set-key
+ (kbd "C-M-h C-d")
+ (find-function-switch-pfx #'find-function-or-variable-at-point))
+(global-set-key (kbd "C-M-h f")
+                (current-help-window-or-pfx #'describe-function-at-point))
+(global-set-key (kbd "C-M-h v")
+                (current-help-window-or-pfx #'describe-variable-at-point))
+(global-set-key (kbd "C-h C-f") (find-function-switch-pfx #'find-function))
+(global-set-key (kbd "C-M-h C-f")
+                (find-function-switch-pfx #'find-function-at-point))
+(global-set-key (kbd "C-h C-v") (find-function-switch-pfx #'find-variable))
+(global-set-key (kbd "C-M-h C-v")
+                (find-function-switch-pfx #'find-variable-at-point))
 
 ;;; now for c
 (eval-after-load 'cc-mode
@@ -330,7 +379,9 @@
      (define-key c-mode-map (kbd "RET") #'newline-and-indent-fix-cc-mode)))
 
 ;;; in the same vein
-(global-set-key (kbd "C-x C-h") #'pop-to-mark-command)
+;; (global-set-key (kbd "C-x C-h") #'pop-to-mark-command)
+(global-set-key (kbd "C-x C-h")
+                (find-function-switch-pfx #'pop-buf-or-global-mark t))
 (global-set-key (kbd "C-x M-h") #'unpop-to-mark-command)
 (global-set-key (kbd "C-x C-p") #'previous-buffer)
 (global-set-key (kbd "C-x M-p") #'next-buffer)

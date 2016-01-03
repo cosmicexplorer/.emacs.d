@@ -351,6 +351,9 @@ mode-name &optional advice-type advice-forms))."
      ,@(mapcar
         (lambda (arg)
           `(progn
+             (defvar ,(intern
+                       (concat "last-" (symbol-name (first arg)) "-buffer"))
+               nil)
              (when ,(sixth arg)
                (add-to-list 'special-buffer-names ,(sixth arg)))
              ,@(unless (null (first arg))
@@ -362,7 +365,12 @@ mode-name &optional advice-type advice-forms))."
                              `((rename-buffer
                                 (generate-new-buffer-name
                                  (funcall ,(third arg) (quote ,(fourth arg)))
-                                 (buffer-name)))))))
+                                 (buffer-name)))
+                               (set
+                                (intern
+                                 (concat "last-" ,(symbol-name el)
+                                          "-buffer"))
+                                (current-buffer))))))
                   (if (listp (first arg)) (first arg) (list (first arg)))))
              ,@(unless (null (second arg))
                  (mapcar
@@ -373,7 +381,12 @@ mode-name &optional advice-type advice-forms))."
                              `((rename-buffer
                                 (generate-new-buffer-name
                                  (funcall ,(third arg) (quote ,(fourth arg)))
-                                 (buffer-name)))))))
+                                 (buffer-name)))
+                               (set
+                                (intern
+                                 (concat "last-" ,(symbol-name el)
+                                         "-buffer"))
+                                (current-buffer))))))
                   (if (listp (second arg)) (second arg) (list (second arg)))))
              (defun ,(intern (concat "cleanup-"
                                      (replace-regexp-in-string

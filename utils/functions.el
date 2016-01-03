@@ -1419,6 +1419,35 @@ way I prefer, and regards `comment-padding', unlike the standard version."
       (let ((fun-symb (function-called-at-point)))
         (when fun-symb (describe-function fun-symb))))))
 
+(defun function-or-symbol (sym) (or (fboundp sym) (boundp sym)))
+(defun describe-function-or-variable ()
+  (interactive)
+  (let* ((symb (variable-at-point))
+         (fun-symb (function-called-at-point))
+         (real-symb (if (zerop symb) fun-symb symb))
+         (val (completing-read
+               (concat "describe function or variable: "
+                       (when real-symb
+                         (format "(default %s) " (symbol-name real-symb))))
+               obarray #'function-or-symbol t nil nil
+               (when real-symb (symbol-name real-symb)))))
+    (if (fboundp (intern val)) (describe-function (intern val))
+      (describe-variable (intern val)))))
+
+(defun find-function-or-variable ()
+  (interactive)
+  (let* ((symb (variable-at-point))
+         (fun-symb (function-called-at-point))
+         (real-symb (if (zerop symb) fun-symb symb))
+         (val (completing-read
+               (concat "find function or variable: "
+                       (when real-symb
+                         (format "(default %s) " (symbol-name real-symb))))
+               obarray #'function-or-symbol t nil nil
+               (when real-symb (symbol-name real-symb)))))
+    (if (fboundp (intern val)) (find-function (intern val))
+      (find-variable (intern val)))))
+
 (defun find-function-or-variable-at-point ()
   (interactive)
   (let ((symb (variable-at-point)))
@@ -2504,5 +2533,14 @@ by another percent."
     (if (derived-mode-p 'magit-mode)
         (set-mark (point))
       (setq deactivate-mark t))))
+
+(defun display-buffer-other-window (buf)
+  (let ((cur-buf (current-buffer)))
+    (switch-to-buffer-other-window buf)
+    (set-buffer cur-buf)))
+
+(defun pop-buf-or-global-mark (pfx)
+  (interactive "P")
+  (unless (pop-mark) (pop-global-mark)))
 
 (provide 'functions)
