@@ -150,67 +150,23 @@ also."
   "Toggle the letter case of current word or text selection.
 Toggles between: lowercase->ALL CAPS->Initial Caps->(cycle)."
   (interactive)
-  (let ((orig-pt (point)))
-    (let* ((beg (region-beginning))
-           (end (region-end))
-           (reg (buffer-substring-no-properties beg end))
-           (case-fold-search nil))
-      (cond
-       ((not (string-match-p "[a-z]" reg))
-        ;; if no lowercase (all uppercase)
-        ;; -> lowercase
-        (loop
-         for pt from 0 upto (1- (- end beg))
-         with next-char = 0
-         do (progn
-              (setq next-char (aref reg pt))
-              (when (uppercasep next-char)
-                (goto-char (+ beg pt))
-                (delete-char 1)
-                (insert-char (downcase next-char) 1 t)))))
-       ((not (string-match-p "[A-Z]" reg))
-        ;; if no uppercase (all lowercase)
-        ;; -> Initial Caps
-        (let ((before-first-char (char-before beg))
-              (first-char (char-after beg)))
-          (when (and (not (wordp before-first-char))
-                     (lowercasep first-char))
-            (goto-char beg)
-            (delete-char 1)
-            (insert-char (upcase first-char) 1 t)))
-        (loop
-         for pt from 1 upto (1- (- end beg))
-         with next-char = 0 and prev-char = 0
-         do (progn
-              (setq next-char (aref reg pt)
-                    prev-char (aref reg (1- pt)))
-              (cond ((and (not (wordp prev-char))
-                          (lowercasep next-char))
-                     (goto-char (+ beg pt))
-                     (delete-char 1)
-                     (insert-char (downcase next-char)))
-                    ((and (wordp prev-char)
-                          (uppercasep next-char))
-                     (goto-char (+ beg pt))
-                     (delete-char 1)
-                     (insert-char (downcase next-char) 1 t))))))
-       (t
-        ;; if mixture of upper/lowercase, "assume" Init Caps
-        ;; -> ALL CAPS
-        (loop
-         ;; not sure why the 1- is required
-         ;; i think it's some silly intricacy of emacs region selection
-         for pt from 0 upto (1- (- end beg))
-         with next-char = 0
-         do (progn
-              (setq next-char (aref reg pt))
-              (when (lowercasep next-char)
-                (goto-char (+ beg pt))
-                ;; delete, then insert; net zero change
-                (delete-char 1)
-                (insert-char (upcase next-char) 1 t))))))
-      (goto-char orig-pt)
-      (set-mark end))))
+  (let* ((beg (region-beginning))
+         (end (region-end))
+         (reg (buffer-substring-no-properties beg end))
+         (case-fold-search nil))
+    (cond
+     ((not (string-match-p "[a-z]" reg))
+      ;; if no lowercase (all uppercase)
+      ;; -> lowercase
+      (downcase-region beg end))
+     ((not (string-match-p "[A-Z]" reg))
+      ;; if no uppercase (all lowercase)
+      ;; -> Initial Caps
+      (upcase-initials-region beg end))
+     (t
+      ;; if mixture of upper/lowercase, "assume" Init Caps
+      ;; -> ALL CAPS
+      (upcase-region beg end)))))
 
 (defadvice toggle-letter-case (after deactivate-mark-nil activate)
   (when (called-interactively-p 'any)
