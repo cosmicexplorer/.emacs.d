@@ -83,21 +83,63 @@
   (-let [(remote . target) (magit-split-branch-name remote-branch)]
     (magit-run-git-async-no-revert "push" "-v" remote "--delete" target)))
 
-(eval-after-load 'magit-remote
-  '(progn
-     (magit-define-popup-action 'magit-push-popup ?u "I PUSH WHERE I WANT"
-       #'magit-reset-push-destination ?p)
-     (magit-define-popup-action 'magit-push-popup ?P "just fuckin push it lol"
-       #'magit-push-current-to-upstream ?u)
-     (magit-define-popup-action 'magit-pull-popup ?F "just fuckin pull it lol"
-       #'magit-pull-from-upstream ?u)
-     (let ((actions (plist-get magit-push-popup :actions))
-           (added-string "DESTRUCTION"))
-       (unless (find added-string actions :test #'equal)
-         (plist-put magit-push-popup :actions
-                    (append actions (list added-string)))))
-     (magit-define-popup-action 'magit-push-popup ?d "DESTROY IT"
-       #'magit-delete-remote-branch)))
+(defun magit-add-action-to-popup (action popup &optional test after)
+  (let ((actions (plist-get popup :actions))
+        (real-test (or test #'equal)))
+    (unless (find action actions :test real-test)
+      (plist-put
+       popup :actions
+       (cond ((null after) (append actions (list action)))
+             ((eq after t) (cons action actions))
+             (t (loop with found = nil
+                      for el in actions
+                      with results = nil
+                      do (progn
+                           (push el results)
+                           (when (funcall real-test after
+                                          (if (listp el) (car el) el))
+                             (push action results)
+                             (setq found t)))
+                      finally (return
+                               (if found (reverse results)
+                                 (error "No match found for %S" after))))))))))
+
+(with-eval-after-load 'magit-remote
+  (magit-define-popup-action 'magit-push-popup ?u "I PUSH WHERE I WANT"
+    #'magit-reset-push-destination ?p)
+  (magit-define-popup-action 'magit-push-popup ?P "just fuckin push it lol"
+    #'magit-push-current-to-upstream ?u)
+  (magit-define-popup-action 'magit-pull-popup ?F "just fuckin pull it lol"
+    #'magit-pull-from-upstream ?u)
+  (magit-add-action-to-popup "DESTRUCTION" magit-push-popup)
+  (magit-define-popup-action 'magit-push-popup ?d "DESTROY IT"
+    #'magit-delete-remote-branch))
+
+(defun my-magit-reset-hard (commit)
+  (interactive (list (my-magit-read-branch-or-commit "Reset head to")))
+  (magit-reset-head commit))
+
+(defun my-magit-reset-soft (commit)
+  (interactive (list (my-magit-read-branch-or-commit "Soft reset to")))
+  (magit-reset-soft commit))
+
+(defun my-magit-reset-hard (commit)
+  (interactive (list (my-magit-read-branch-or-commit "Hard reset to")))
+  (magit-reset-hard commit))
+
+(magit-define-popup magit-reset-popup
+  "Popup console for reset commands."
+  'magit-commands
+  :man-page "git-reset"
+  :actions '((?R "Hard Reset" my-magit-reset-hard)
+             (?S "Soft Reset" my-magit-reset-soft)
+             (?M "Mixed Reset" my-magit-reset-head)))
+
+(magit-add-action-to-popup
+ '(?R "Reset" magit-reset-popup) magit-dispatch-popup
+ nil ?!)
+
+(define-key magit-status-mode-map (kbd "R") #'magit-reset-popup)
 
 ;;; parenthesis matching and more
 ;;; turn pair parens on

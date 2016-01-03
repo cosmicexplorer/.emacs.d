@@ -2544,4 +2544,28 @@ by another percent."
   (interactive "P")
   (unless (pop-mark) (pop-global-mark)))
 
+(defun my-magit-get-commits-in-current-branch (num)
+  (magit-git-lines "log" "--format=%H" "-n"
+                   (shell-quote-argument (number-to-string num))))
+
+(defun my-magit-get-head-back (num)
+  (cons "HEAD"
+        (loop for n from 1 upto (1- num)
+              collect (concat "HEAD~" (number-to-string n)))))
+
+(defcustom my-magit-num-commits-back-to-search 50
+  "Number of commits to search for `my-magit-read-branch-or-commit'."
+  :group 'magit
+  :type 'integer)
+
+(defun my-magit-read-branch-or-commit (prompt)
+  (or (magit-completing-read
+       prompt (append (magit-list-refnames)
+                      (my-magit-get-head-back
+                       my-magit-num-commits-back-to-search)
+                      (my-magit-get-commits-in-current-branch
+                       (1+ my-magit-num-commits-back-to-search)))
+       nil nil nil 'magit-revision-history)
+      (user-error "Nothing selected")))
+
 (provide 'functions)
