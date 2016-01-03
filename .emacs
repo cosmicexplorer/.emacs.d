@@ -99,6 +99,13 @@ init-scripts/interface.el.")
           (unless err ,@body)))
       nil t t)))
 
+(unless (fboundp 'with-eval-after-load)
+  (defmacro with-eval-after-load (file &rest body)
+    "Execute BODY after FILE is loaded.  FILE is normally a feature name, but it
+can also be a file name, in case that file does not provide any feature."
+    (declare (indent 1) (debug t))
+    `(eval-after-load ,file ,`'(progn ,@body))))
+
 (defvar after-load-init-hook nil
   "Hook to run whatever after loading packages n functions n whatever.")
 (defvar use-omnisharp t "C#!!!!!!!")
