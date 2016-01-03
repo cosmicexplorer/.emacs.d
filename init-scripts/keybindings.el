@@ -319,6 +319,12 @@
     (interactive "P")
     (let (failure final-buf (orig-buf (current-buffer))
                   win-pt win-st (start-pt (point)))
+      (unless nomark
+        (let ((mk (make-marker)))
+          (set-marker mk start-pt)
+          (message "PT: %S" start-pt)
+          (message "MK: %S" mk)
+          (push mk global-mark-ring)))
       (save-window-excursion
         (call-interactively cmd)
         (setq final-buf (current-buffer)
@@ -327,10 +333,6 @@
               failure (and (eq orig-buf final-buf)
                            (= start-pt win-pt))))
       (unless failure
-        (unless nomark
-          (let ((mk (make-marker)))
-            (set-marker mk (point))
-            (push mk global-mark-ring)))
         (if pfx (display-buffer-other-window final-buf)
           (display-buffer-same-window final-buf nil))
         (set-window-point (selected-window) win-pt)
@@ -384,9 +386,8 @@
      (define-key c-mode-map (kbd "RET") #'newline-and-indent-fix-cc-mode)))
 
 ;;; in the same vein
-(global-set-key (kbd "C-x h") (find-function-switch-pfx #'pop-to-mark-command))
-(global-set-key (kbd "C-x C-h")
-                (find-function-switch-pfx #'pop-buf-or-global-mark t))
+(global-set-key (kbd "C-x h") #'pop-to-mark-command)
+(global-set-key (kbd "C-x C-h") #'pop-buf-or-global-mark)
 (global-set-key (kbd "C-x M-h") #'unpop-to-mark-command)
 (global-set-key (kbd "C-x C-p") #'previous-buffer)
 (global-set-key (kbd "C-x M-p") #'next-buffer)
