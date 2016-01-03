@@ -2521,7 +2521,7 @@ by another percent."
                        my-magit-num-commits-back-to-search)
                       (my-magit-get-commits-in-current-branch
                        (1+ my-magit-num-commits-back-to-search)))
-       nil nil nil 'magit-revision-history)
+       nil nil nil 'magit-revision-history "HEAD~1")
       (user-error "Nothing selected")))
 
 (provide 'functions)
