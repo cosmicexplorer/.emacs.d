@@ -428,13 +428,14 @@ Lisp code." t)
 
 (add-hook 'markdown-mode-hook
           (lambda ()
-            (setq markdown-command
-                  (if (eq major-mode 'gfm-mode)
-                      "pandoc -f markdown_github -t html -"
-                    "pandoc -f markdown -t html -"))))
+            (set (make-local-variable 'markdown-command)
+                 (if (eq major-mode 'gfm-mode)
+                     "pandoc -f markdown_github -t html -"
+                   "pandoc -f markdown -t html -"))))
 (add-hook 'gfm-mode-hook
           (lambda ()
-            (setq markdown-command "pandoc -f markdown_github -t html -")))
+            (set (make-local-variable 'markdown-command)
+                 "pandoc -f markdown_github -t html -")))
 
 
 ;;; coffeescript
