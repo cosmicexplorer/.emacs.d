@@ -31,7 +31,11 @@
 ;;; toggle letter casing from ALLCAPS to InitialCase to all lowercase
 (global-set-key (kbd "C-x M-c") 'toggle-letter-case)
 ;;; kill buffer without prompting
-(global-set-key (kbd "C-x k") 'kill-this-buffer)
+(defun kill-this-buffer-and-all-visiting (pfx)
+  (interactive "P")
+  (let ((current-prefix-arg nil))
+    (if pfx (kill-buf-and-all-visiting nil) (kill-this-buffer))))
+(global-set-key (kbd "C-x k") #'kill-this-buffer-and-all-visiting)
 ;;; quit-window is more useful than i previously thought
 (global-set-key (kbd "C-c q") 'quit-window)
 
@@ -314,13 +318,14 @@
   (lambda (pfx)
     (interactive "P")
     (let (failure final-buf (orig-buf (current-buffer))
-                  win-pt win-st)
+                  win-pt win-st (start-pt (point)))
       (save-window-excursion
         (call-interactively cmd)
         (setq final-buf (current-buffer)
-              failure (eq orig-buf final-buf)
               win-pt (window-point)
-              win-st (window-start)))
+              win-st (window-start)
+              failure (and (eq orig-buf final-buf)
+                           (= start-pt win-pt))))
       (unless failure
         (unless nomark
           (let ((mk (make-marker)))
@@ -379,7 +384,7 @@
      (define-key c-mode-map (kbd "RET") #'newline-and-indent-fix-cc-mode)))
 
 ;;; in the same vein
-;; (global-set-key (kbd "C-x C-h") #'pop-to-mark-command)
+(global-set-key (kbd "C-x h") (find-function-switch-pfx #'pop-to-mark-command))
 (global-set-key (kbd "C-x C-h")
                 (find-function-switch-pfx #'pop-buf-or-global-mark t))
 (global-set-key (kbd "C-x M-h") #'unpop-to-mark-command)
@@ -644,7 +649,8 @@
      (global-set-key (kbd "C-c a") #'my-helm-ag)
      (global-set-key (kbd "C-c C-a") #'my-helm-ag)))
 
-(global-set-key (kbd "M-y") #'helm-show-kill-ring)
+(global-set-key (kbd "M-y") #'yank-pop)
+(global-set-key (kbd "C-M-y") #'helm-show-kill-ring)
 
 (eval-after-load 'helm-ag
   '(progn

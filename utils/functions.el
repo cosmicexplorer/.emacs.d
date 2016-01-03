@@ -82,13 +82,14 @@
     (newline-and-indent)))
 
 ;; kill current buffer and close pane
-(defun close-and-kill-this-pane ()
+(defun close-and-kill-this-pane (pfx)
   "If there are multiple windows, then close this pane and kill the buffer in it
 also."
-  (interactive)
-  (kill-this-buffer)
-  (if (not (one-window-p))
-      (delete-window)))
+  (interactive "P")
+  (let ((current-prefix-arg nil))
+    (if pfx (kill-buf-and-all-visiting nil) (kill-this-buffer))
+    (if (not (one-window-p))
+        (delete-window))))
 
 ;; open new file (i wrote this!!!)
 (defun open-new-file ()
