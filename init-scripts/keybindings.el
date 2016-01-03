@@ -322,8 +322,6 @@
       (unless nomark
         (let ((mk (make-marker)))
           (set-marker mk start-pt)
-          (message "PT: %S" start-pt)
-          (message "MK: %S" mk)
           (push mk global-mark-ring)))
       (save-window-excursion
         (call-interactively cmd)
@@ -678,3 +676,5 @@
 
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "C-M-h i") #'helm-info-elisp)
+(global-set-key (kbd "<M-home>") #'beginning-of-buffer)
+(global-set-key (kbd "<M-end>") #'end-of-buffer)

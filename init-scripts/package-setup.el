@@ -140,6 +140,7 @@
  nil ?!)
 
 (define-key magit-status-mode-map (kbd "R") #'magit-reset-popup)
+(define-key magit-branch-section-map (kbd "R") #'magit-reset-popup)
 
 ;;; parenthesis matching and more
 ;;; turn pair parens on
@@ -367,11 +368,9 @@
 ;;; around with `thing-at-point'
 (defmacro setup-marker-around-helm-command (cmd)
   `(defadvice ,cmd
-       (around ,(intern (concat "mark-stuff-" (symbol-name cmd))) activate)
+       (before ,(intern (concat "mark-stuff-" (symbol-name cmd))) activate)
      (let ((mk (make-marker)))
        (set-marker mk (point))
-       (unwind-protect ad-do-it
-         (when (= helm-exit-status 0)
-           (push-mark mk))))))
+       (push mk global-mark-ring))))
 (setup-marker-around-helm-command helm-swoop)
 (setup-marker-around-helm-command helm-multi-swoop-all)
