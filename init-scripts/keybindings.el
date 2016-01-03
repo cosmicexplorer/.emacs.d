@@ -617,3 +617,5 @@
 (define-key diff-mode-map (kbd "C-k") #'diff-mode-copy)
 (define-key magit-mode-map (kbd "M-w") #'diff-mode-copy)
 (define-key magit-mode-map (kbd "C-k") #'diff-mode-copy)
+
+(global-set-key (kbd "M-x") #'helm-M-x)
