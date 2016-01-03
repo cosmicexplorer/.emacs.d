@@ -354,6 +354,7 @@ Check out your .emacs."))
              (file-name-sans-extension f)))))
  '(linum-relative-plusp-offset 1)
  '(lua-indent-level 2)
+ '(magit-display-buffer-function (quote display-buffer))
  '(magit-no-confirm
    (quote
     (kill-process stage-all-changes unstage-all-changes)))
