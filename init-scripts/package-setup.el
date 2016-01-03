@@ -69,12 +69,20 @@
         (call-interactively #'magit-section-toggle)
       (push-mark)
       (magit-section-goto (magit-get-section sec-diff)))))
-;;; fix magit's inane new choice of push keybinding
+
+;;; fix magit's inane keybinding changes
 (defun magit-reset-push-destination (remote-branch &optional current-branch)
   (interactive (list (magit-read-remote-branch "remote branch to push to")))
   (magit-git-push
    (or current-branch (magit-get-current-branch))
    remote-branch '("-u")))
+
+(defun magit-delete-remote-branch (remote-branch)
+  (interactive (list (magit-read-remote-branch "remote branch to delete")))
+  (run-hooks 'magit-credential-hook)
+  (-let [(remote . target) (magit-split-branch-name remote-branch)]
+    (magit-run-git-async-no-revert "push" "-v" remote "--delete" target)))
+
 (eval-after-load 'magit-remote
   '(progn
      (magit-define-popup-action 'magit-push-popup ?u "I PUSH WHERE I WANT"
@@ -82,7 +90,14 @@
      (magit-define-popup-action 'magit-push-popup ?P "just fuckin push it lol"
        #'magit-push-current-to-upstream ?u)
      (magit-define-popup-action 'magit-pull-popup ?F "just fuckin pull it lol"
-       #'magit-pull-from-upstream ?u)))
+       #'magit-pull-from-upstream ?u)
+     (let ((actions (plist-get magit-push-popup :actions))
+           (added-string "DESTRUCTION"))
+       (unless (find added-string actions :test #'equal)
+         (plist-put magit-push-popup :actions
+                    (append actions (list added-string)))))
+     (magit-define-popup-action 'magit-push-popup ?d "DESTROY IT"
+       #'magit-delete-remote-branch)))
 
 ;;; parenthesis matching and more
 ;;; turn pair parens on
