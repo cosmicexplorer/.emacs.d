@@ -676,3 +676,4 @@
 (define-key magit-mode-map (kbd "C-k") #'diff-mode-copy)
 
 (global-set-key (kbd "M-x") #'helm-M-x)
+(global-set-key (kbd "C-M-h i") #'helm-info-elisp)
