@@ -70,12 +70,19 @@
       (push-mark)
       (magit-section-goto (magit-get-section sec-diff)))))
 ;;; fix magit's inane new choice of push keybinding
+(defun magit-reset-push-destination (remote-branch &optional current-branch)
+  (interactive (list (magit-read-remote-branch "remote branch to push to")))
+  (magit-git-push
+   (or current-branch (magit-get-current-branch))
+   remote-branch '("-u")))
 (eval-after-load 'magit-remote
   '(progn
+     (magit-define-popup-action 'magit-push-popup ?u "I PUSH WHERE I WANT"
+       #'magit-reset-push-destination ?p)
      (magit-define-popup-action 'magit-push-popup ?P "just fuckin push it lol"
-       'magit-push-current-to-upstream ?u)
+       #'magit-push-current-to-upstream ?u)
      (magit-define-popup-action 'magit-pull-popup ?F "just fuckin pull it lol"
-       'magit-pull-from-upstream ?u)))
+       #'magit-pull-from-upstream ?u)))
 
 ;;; parenthesis matching and more
 ;;; turn pair parens on
