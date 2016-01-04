@@ -1495,10 +1495,11 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 (defun eval-buffer-and-message (prefix-given)
   (interactive "P")
-  (let ((reg (region-active-p)))
-    (if reg (eval-region (region-beginning) (region-end)) (eval-buffer))
-    (unless prefix-given
-      (message "%s %s" "evaluated" (if reg "region" (buffer-name))))))
+  (let* ((reg (region-active-p))
+         (res (if reg (eval-region (region-beginning) (region-end)
+                                   (when prefix-given (current-buffer)))
+                (eval-buffer nil (when prefix-given (current-buffer))))))
+    (message "%s %s" "evaluated" (if reg "region" (buffer-name)))))
 
 ;;; html functions
 (require 'sgml-mode)
