@@ -338,6 +338,7 @@
 (global-set-key (kbd "C-h f") (current-help-window-or-pfx #'describe-function))
 (global-set-key (kbd "C-h v") (current-help-window-or-pfx #'describe-variable))
 (global-set-key (kbd "C-h k") (current-help-window-or-pfx #'describe-key))
+(global-set-key (kbd "C-h C-k") (current-help-window-or-pfx #'describe-key))
 (global-set-key (kbd "C-h d")
                 (current-help-window-or-pfx #'describe-function-or-variable))
 (global-set-key
@@ -674,7 +675,6 @@
 (define-key magit-mode-map (kbd "M-w") #'diff-mode-copy)
 (define-key magit-mode-map (kbd "C-k") #'diff-mode-copy)
 
-(global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "C-M-h i") #'helm-info-elisp)
 (global-set-key (kbd "<M-home>") #'beginning-of-buffer)
 (global-set-key (kbd "<M-end>") #'end-of-buffer)

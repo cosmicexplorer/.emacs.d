@@ -141,6 +141,7 @@
 
 (define-key magit-status-mode-map (kbd "R") #'magit-reset-popup)
 (define-key magit-branch-section-map (kbd "R") #'magit-reset-popup)
+(define-key magit-file-section-map (kbd "R") #'magit-reset-popup)
 
 ;;; parenthesis matching and more
 ;;; turn pair parens on

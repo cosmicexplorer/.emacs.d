@@ -2465,7 +2465,8 @@ by another percent."
 
 (defun push-buffer-to-kill-ring ()
   (interactive)
-  (kill-ring-save (point-min) (point-max)))
+  (kill-ring-save (point-min) (point-max))
+  (message "%s" "saved buffer to kill ring!"))
 
 (defun remove-diff-errata (str)
   "Removes leading -/+/=, and removes conflict markers."
@@ -2524,5 +2525,11 @@ by another percent."
                        (1+ my-magit-num-commits-back-to-search)))
        nil nil nil 'magit-revision-history "HEAD~1")
       (user-error "Nothing selected")))
+
+(defun my-display-buffer-other-window (buf)
+  (let ((cur-buf (current-buffer)))
+    (switch-to-buffer-other-window buf)
+    (set-buffer cur-buf)
+    (get-buffer-window buf)))
 
 (provide 'functions)
