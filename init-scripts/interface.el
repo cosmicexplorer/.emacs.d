@@ -483,22 +483,23 @@ Check out your .emacs.\n")))))
              (when (eq major-mode 'erc-mode)
                (kill-this-buffer)))))
 (defun create-erc-modded-chans-string (erc-modded-chans-alist)
-  (concat
-   "["
-   (substring
-    (reduce
-     (lambda (a b) (concat a " " b))
-     (remove-if
-      #'null
-      (mapcar
-       (lambda (el)
-         (let ((face (if (listp (nthcdr 2 el)) (fourth el) (nthcdr 2 el))))
-           (and (buffer-name (first el)) face
-                (propertize (buffer-name (first el)) 'face face))))
-       erc-modded-chans-alist))
-     :initial-value " ")
-    2)
-   "]"))
+  (if (null erc-modded-chans-alist) "No erc channels open."
+    (concat
+     "["
+     (substring
+      (reduce
+       (lambda (a b) (concat a " " b))
+       (remove-if
+        #'null
+        (mapcar
+         (lambda (el)
+           (let ((face (if (listp (nthcdr 2 el)) (fourth el) (nthcdr 2 el))))
+             (and (buffer-name (first el)) face
+                  (propertize (buffer-name (first el)) 'face face))))
+         erc-modded-chans-alist))
+       :initial-value " ")
+      2)
+     "]")))
 (defun message-erc-modded-chans (prefix-given)
   (interactive "P")
   (message
