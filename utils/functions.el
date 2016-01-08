@@ -2177,9 +2177,6 @@ by another percent."
       (skewer-flash-region start end)
       (skewer-eval string #'skewer-post-minibuffer))))
 
-(defmacro silence-messages (&rest body)
-  `(with-temp-message "" ,@body))
-
 (defun get-emacs-build-time ()
   (interactive)
   (let ((str (format-time-string "%Y-%m-%d@%H:%M:%S" emacs-build-time)))
