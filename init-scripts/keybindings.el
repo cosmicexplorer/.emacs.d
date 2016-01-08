@@ -299,22 +299,19 @@
 (global-set-key (kbd "C-M-h") nil)
 (global-set-key (kbd "C-h d") #'describe-function-or-variable)
 (global-set-key (kbd "C-M-h d")
-  #'describe-function-or-variable-at-point)
-;;; TODO: write this
-;; (global-set-key (kbd "C-h C-d") #'find-function-or-variable)
+                #'describe-function-or-variable-at-point)
 (defun current-help-window-or-pfx (cmd)
   (lambda (pfx)
     (interactive "P")
-    (let (failure)
-      (save-window-excursion
-        (setq failure
-              (let ((res (call-interactively cmd)))
-                (and (stringp res)
-                     (string-match-p "\\`[^\n]* is undefined\\'" res)))))
+    (let ((failure
+           (save-window-excursion
+             (let ((res (call-interactively cmd)))
+               (and (stringp res)
+                    (string-match-p "\\`[^\n]* is undefined\\'" res))))))
       (unless failure
-        (if pfx (display-buffer-other-window last-help-mode-buffer)
+        (if (not pfx) (display-buffer-other-window last-help-mode-buffer)
           (display-buffer-same-window last-help-mode-buffer nil))))))
-(defun find-function-switch-pfx (cmd &optional nomark)
+(defun find-function-switch-pfx (cmd &optional nomark invert no-prefix)
   (lambda (pfx)
     (interactive "P")
     (let (failure final-buf (orig-buf (current-buffer))
@@ -324,14 +321,17 @@
           (set-marker mk start-pt)
           (push mk global-mark-ring)))
       (save-window-excursion
-        (call-interactively cmd)
+        (let ((current-prefix-arg (not no-prefix)))
+          (call-interactively cmd))
         (setq final-buf (current-buffer)
               win-pt (window-point)
               win-st (window-start)
               failure (and (eq orig-buf final-buf)
                            (= start-pt win-pt))))
       (unless failure
-        (if pfx (display-buffer-other-window final-buf)
+        (if (or (and invert (not pfx))
+                (and pfx (not invert)))
+            (display-buffer-other-window final-buf)
           (display-buffer-same-window final-buf nil))
         (set-window-point (selected-window) win-pt)
         (set-window-start (selected-window) win-st)))))
@@ -435,12 +435,9 @@
 ;;; magit
 (eval-after-load "magit"
   '(progn
-     (global-set-key (kbd "C-c g") 'magit-status)
+     (global-set-key (kbd "C-c g")
+                     (find-function-switch-pfx #'magit-status nil t t))
      (global-set-key (kbd "C-c b") #'magit-blame)
-     (global-set-key (kbd "C-c d") #'magit-diff)
-     (global-set-key (kbd "C-c c") #'magit-show-commit)
-     (eval-after-load 'org
-       '(define-key org-mode-map (kbd "C-c c") #'magit-show-commit))
      (define-key magit-mode-map (kbd "<tab>") #'magit-tab-dwim)
      (define-key magit-mode-map (kbd "<backtab>") #'magit-section-up)))
 (eval-after-load 'magit-blame
@@ -651,6 +648,7 @@
 
 (global-set-key (kbd "M-y") #'yank-pop)
 (global-set-key (kbd "C-M-y") #'helm-show-kill-ring)
+(define-key paredit-mode-map (kbd "C-M-y") #'helm-show-kill-ring)
 
 (eval-after-load 'helm-ag
   '(progn
