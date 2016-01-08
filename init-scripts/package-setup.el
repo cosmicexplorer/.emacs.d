@@ -136,12 +136,43 @@
              (?M "Mixed Reset" my-magit-reset-head)))
 
 (magit-add-action-to-popup
- '(?R "Reset" magit-reset-popup) magit-dispatch-popup
- nil ?!)
+ '(?R "Reset" magit-reset-popup) magit-dispatch-popup nil ?!)
 
 (define-key magit-status-mode-map (kbd "R") #'magit-reset-popup)
 (define-key magit-branch-section-map (kbd "R") #'magit-reset-popup)
 (define-key magit-file-section-map (kbd "R") #'magit-reset-popup)
+
+(defconst git-gutter-fringe-hack-hooks git-gutter:update-hooks)
+(define-minor-mode git-gutter-fringe-hack-mode
+  "hack to make git gutter work"
+  :group 'git-gutter
+  :init-value nil
+  :global nil
+  :lighter git-gutter:lighter
+  (if git-gutter-fringe-hack-mode
+      (progn
+        (loop for hook in git-gutter-fringe-hack-hooks
+              do (add-hook hook #'git-gutter t t))
+        (git-gutter))
+    (loop for hook in git-gutter-fringe-hack-hooks
+          do (remove-hook hook #'git-gutter t))
+    (git-gutter:clear)))
+(defun git-gutter-fringe-hack-turn-on ()
+  (git-gutter-fringe-hack-mode +1))
+(define-global-minor-mode global-git-gutter-fringe-hack-mode
+  git-gutter-fringe-hack-mode git-gutter-fringe-hack-turn-on
+  :group 'git-gutter)
+(global-git-gutter-fringe-hack-mode)
+
+;;; make git-gutter run on magit actions
+(defadvice magit-run-git (around run-git-gutter activate)
+  (let ((prev-mod-files (magit-modified-files)))
+    ad-do-it
+    (loop
+     for file in (union prev-mod-files (magit-modified-files)
+                        :test #'equal)
+     for buf = (get-file-buffer file) when buf
+     do (with-current-buffer buf (git-gutter)))))
 
 ;;; parenthesis matching and more
 ;;; turn pair parens on
@@ -339,9 +370,6 @@
 ;;; dired async stuff
 (autoload 'dired-async-mode "dired-async.el" nil t)
 (dired-async-mode 1)
-
-;;; GIT GUTTER IS GR8
-(global-git-gutter-mode)
 
 ;;; SKEWER DIS ISH
 (eval-after-load 'skewer-mode

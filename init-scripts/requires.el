@@ -50,6 +50,7 @@
 (require 'wgrep)
 (require 'sourcemap)
 (require 'eww)
+(require 'git-gutter-fringe)
 
 ;;; my stuff
 (require 'utilities)

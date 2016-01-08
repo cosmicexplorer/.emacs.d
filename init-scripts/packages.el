@@ -43,6 +43,7 @@
                       ggtags
                       ghc
                       git-gutter
+                      git-gutter-fringe
                       gnuplot
                       gnuplot-mode
                       go-mode
