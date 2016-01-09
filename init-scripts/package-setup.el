@@ -182,7 +182,7 @@
 (show-paren-mode t)
 
 ;;; rainbow delimiters!
-(global-rainbow-delimiters-mode)
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
 (ido-mode t)
 ;;; makes searching fuzzier

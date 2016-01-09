@@ -35,7 +35,6 @@
 (require 'pp-c-l)
 (require 'qmake)
 (require 'rainbow-delimiters)
-(require 'rainbow-delimiters)
 (require 'rainbow-mode)
 (require 'revbufs)
 (require 'saveplace)
