@@ -450,8 +450,6 @@
   '(define-key litcoffee-mode-map (kbd "C-c C-v")
      #'litcoffee-toggle-code-prose))
 
-(global-set-key (kbd "C-c r") 'align-regexp)
-
 ;;; haskell
 (eval-after-load "haskell-mode"
   '(progn
@@ -549,8 +547,8 @@
 (global-set-key (kbd "C-c n") #'git-gutter:next-hunk)
 (global-set-key (kbd "C-c p") #'git-gutter:previous-hunk)
 (global-set-key (kbd "C-c s") #'git-gutter:stage-hunk)
-(global-set-key (kbd "C-c D") #'git-gutter:diff-and-switch)
-(global-set-key (kbd "C-c R") #'git-gutter:revert-hunk)
+(global-set-key (kbd "C-c d") #'git-gutter:diff-and-switch)
+(global-set-key (kbd "C-c r") #'git-gutter:revert-hunk)
 (global-set-key (kbd "<home>") #'beg-of-line-text)
 (global-set-key (kbd "<end>") #'move-end-of-line)
 
@@ -676,3 +674,4 @@
 (global-set-key (kbd "C-M-h i") #'helm-info-elisp)
 (global-set-key (kbd "<M-home>") #'beginning-of-buffer)
 (global-set-key (kbd "<M-end>") #'end-of-buffer)
+(global-set-key (kbd "C-c R") #'resurrect-buffer-from-file)

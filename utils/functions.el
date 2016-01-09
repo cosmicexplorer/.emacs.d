@@ -2529,4 +2529,19 @@ by another percent."
     (set-buffer cur-buf)
     (get-buffer-window buf)))
 
+(defun resurrect-buffer-from-file (&optional buf win)
+  (interactive)
+  (let* ((buf (or buf (current-buffer)))
+         (file (buffer-file-name buf))
+         (win (or win (selected-window)))
+         (win-pt (window-point win))
+         (win-st (window-start win)))
+    (if (and file (file-exists-p file))
+        (progn
+          (kill-buffer buf)
+          (set-window-buffer win (find-file-noselect file))
+          (set-window-point win win-pt)
+          (set-window-start win win-st))
+      (error (format "file for buffer %s doesn't exist!" (buffer-name buf))))))
+
 (provide 'functions)
