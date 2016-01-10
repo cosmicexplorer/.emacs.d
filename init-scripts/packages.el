@@ -79,6 +79,7 @@
                       rainbow-mode
                       s
                       scala-mode2
+                      shut-up
                       skewer-mode
                       slime
                       slime-company
@@ -88,10 +89,10 @@
                       speech-tagger
                       undo-tree
                       w3m
+                      web-beautify
                       wgrep
                       wgrep-ag
                       wgrep-helm
-                      web-beautify
                       xterm-color
                       yaml-mode
                       ))
