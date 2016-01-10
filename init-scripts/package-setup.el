@@ -403,3 +403,9 @@
        (push mk global-mark-ring))))
 (setup-marker-around-helm-command helm-swoop)
 (setup-marker-around-helm-command helm-multi-swoop-all)
+
+(defun turn-off-linum ()
+  (interactive)
+  (linum-mode -1))
+
+(add-hook 'eww-mode-hook #'turn-off-linum)
