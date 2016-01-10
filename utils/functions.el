@@ -1218,7 +1218,10 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (let* ((pt (point))
            (str (buffer-substring
                  (let ((res (re-search-backward "[^[:space:]]" nil t)))
-                   (if res (progn (forward-char) (point))
+                   (if res (progn
+                             (forward-char)
+                             (when (char-equal (char-after) ?\n) (forward-char))
+                             (point))
                      (progn (goto-char pt) (point-min))))
                  pt)))
       (remove-trailing-whitespace)

@@ -435,7 +435,8 @@ Lisp code." t)
 (add-hook 'gfm-mode-hook
           (lambda ()
             (set (make-local-variable 'markdown-command)
-                 "pandoc -f markdown_github -t html -")))
+                 "pandoc -f markdown_github -t html -")
+            (set (make-local-variable 'markdown-list-indent-width) 4)))
 
 
 ;;; coffeescript
