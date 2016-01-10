@@ -901,8 +901,9 @@ prompt the user for a coding system."
               ""))))
 
 (defun kill-message-buffer-id (&optional buf)
-  ;; unless is emacs-internal buffer
-  (unless (char-equal (aref (buffer-name) 0) 32)
+  ;; unless is emacs-internal buffer or markdown-live-preview buffer
+  (unless (or (char-equal (aref (buffer-name) 0) ? )
+              (string= (buffer-name) "*markdown-live-preview-output*"))
     (message "%s" (concat "killed " (get-buffer-id buf)))))
 
 ;;; allow for searchable names of w3m buffers
