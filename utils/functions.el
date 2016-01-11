@@ -248,22 +248,26 @@ annoying. This fixes that."
 
 (defun camel-case-right-word ()
   (interactive "^")                     ; highlights region if shifted
-  (let ((cur-point (point))
-        fin-point
-        cap-letter-index)
-    (right-word)
-    (setq fin-point (point)
-          cap-letter-index (- fin-point cur-point))
-    ;; check if string is all caps; if so, skip
-    (when (not (string-is-capitalized-p (buffer-substring cur-point fin-point)))
-      (progn
-        (loop for letter-index from 1 upto (- fin-point cur-point)
-              while (= cap-letter-index (- fin-point cur-point))
-              do (if (and (char-after (+ cur-point letter-index))
-                          (char-is-capitalized-p
-                           (char-after (+ cur-point letter-index))))
-                     (setq cap-letter-index letter-index)))
-        (goto-char (+ cur-point cap-letter-index))))))
+  (block out
+    (let ((start-pt (point))
+          (fin-pt (save-excursion (right-word) (point)))
+          (go-forth (not (char-is-capitalized-p (char-after (1+ (point)))))))
+      (when go-forth
+        (forward-char))
+      (when (and (not (char-is-capitalized-p (char-after)))
+                 (not go-forth))
+        (return-from out (forward-char)))
+      (loop do (forward-char)
+            while (and (< (point) fin-pt)
+                       (or (and go-forth
+                                (not (char-is-capitalized-p (char-before))))
+                           (and (not go-forth)
+                                (char-is-capitalized-p (char-before)))))
+            finally (progn
+                      (when (< (point) fin-pt) (backward-char 2))
+                      (while (and (< (point) fin-pt)
+                                  (not (char-is-capitalized-p (char-after))))
+                        (forward-char)))))))
 
 (defun camel-case-left-word ()
   (interactive "^")                     ; highlights region if shifted
