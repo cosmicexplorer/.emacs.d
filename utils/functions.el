@@ -1098,15 +1098,24 @@ the line containing `region-end'."
         (beg (if (not (use-region-p)) (frontier-of-text-for-line 'left)
                (save-excursion
                  (goto-char reg-beg) (frontier-of-text-for-line 'left))))
-        (end (if (not (use-region-p)) (frontier-of-text-for-line 'right)
-               (goto-char reg-end)
-               (if (>= (point) (frontier-of-text-for-line 'right)) reg-end
-                 (forward-line -1)
-                 (goto-char (frontier-of-text-for-line 'right))
-                 (if (> (point) reg-beg) (point)
-                   (goto-char reg-beg)
-                   (goto-char (frontier-of-text-for-line 'right))
-                   (point)))))
+        (end (let ((res
+                    (if (not (use-region-p)) (frontier-of-text-for-line 'right)
+                      (goto-char reg-end)
+                      (if (>= (point) (frontier-of-text-for-line 'right))
+                          reg-end
+                        (forward-line -1)
+                        (goto-char (frontier-of-text-for-line 'right))
+                        (if (> (point) reg-beg) (point)
+                          (goto-char reg-beg)
+                          (goto-char (frontier-of-text-for-line 'right))
+                          (point))))))
+               (if (save-excursion (goto-char res)
+                                   (looking-back "[[:space:]\n]+"))
+                   (save-excursion
+                     (goto-char res)
+                     (re-search-backward "[^[:space:]\n]" nil t)
+                     (1+ (point)))
+                 res)))
         (begin-insertions 0)
         (end-insertions 0)
         (star-insertions 0)
