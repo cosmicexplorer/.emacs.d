@@ -445,10 +445,7 @@ Lisp code." t)
      (define-key coffee-mode-map (kbd "M-;")
        'coffeescript-comment-do-what-i-really-mean)
      (add-hook 'coffee-mode-hook #'rainbow-mode)))
-(add-hook 'coffee-mode-hook
-          (lambda ()
-            (setq-local coffee-tab-width 2)
-            (rainbow-delimiters-mode -1)))
+(add-hook 'coffee-mode-hook (lambda () (setq coffee-tab-width 2)))
 (define-derived-mode cjsx-mode coffee-mode "CJSX"
   "Major mode for editing CJSX."
   (coffee-mode)
