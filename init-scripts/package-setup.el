@@ -183,6 +183,9 @@
 
 ;;; rainbow delimiters!
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+(defvar rainbow-delims-modes '(LaTeX-mode-hook))
+(loop for mode-hook in rainbow-delims-modes
+      do (add-hook mode-hook #'rainbow-delimiters-mode))
 
 (ido-mode t)
 ;;; makes searching fuzzier

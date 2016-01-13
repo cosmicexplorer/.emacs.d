@@ -589,7 +589,8 @@
 (eval-after-load 'ess
   '(progn
      (define-key ess-mode-map (kbd "C-c C-v") nil)
-     (define-key ess-mode-map (kbd "C-x C-e") #'ess-eval-paragraph-and-go)))
+     (define-key ess-mode-map (kbd "C-x C-e") #'ess-eval-paragraph-and-go)
+     (define-key ess-mode-map (kbd "C-h f") #'ess-display-help-on-object)))
 
 (eval-after-load 'helm
   '(progn
