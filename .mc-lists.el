@@ -30,6 +30,7 @@
         electric-pair-delete-pair
         end-of-buffer
         end-of-visual-line
+        ess-smart-comma
         helm-buffers-list
         helm-show-kill-ring
         html-newline-indent
