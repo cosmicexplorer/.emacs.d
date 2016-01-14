@@ -142,6 +142,21 @@
 (define-key magit-branch-section-map (kbd "R") #'magit-reset-popup)
 (define-key magit-file-section-map (kbd "R") #'magit-reset-popup)
 
+(defun my-magit-clean-all ()
+  (interactive)
+  (magit-run-git-async-no-revert "clean" "-x" "-f" "-d"))
+
+(magit-define-popup magit-clean-popup
+  "Popup console for clean commands."
+  'magit-commands
+  :man-page "git-clean"
+  :actions '((?C "Clean All (be careful!)" my-magit-clean-all)))
+
+(magit-add-action-to-popup
+ '(?C "Clean" magit-clean-popup) magit-dispatch-popup nil ?R)
+
+(define-key magit-mode-map (kbd "C") #'magit-clean-popup)
+
 (defconst git-gutter-fringe-hack-hooks git-gutter:update-hooks)
 (define-minor-mode git-gutter-fringe-hack-mode
   "hack to make git gutter work"
