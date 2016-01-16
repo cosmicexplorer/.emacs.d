@@ -2562,4 +2562,9 @@ by another percent."
           (set-window-start win win-st))
       (error (format "file for buffer %s doesn't exist!" (buffer-name buf))))))
 
+(defun newline-and-comment ()
+  (interactive)
+  (call-interactively #'newline-and-indent)
+  (call-interactively #'comment-dwim))
+
 (provide 'functions)

@@ -630,7 +630,8 @@
 (eval-after-load 'cc-mode
   '(progn
      (define-key c-mode-base-map (kbd "C-c C-a") #'my-ag)
-     (define-key c-mode-base-map (kbd "C-c C-r") #'my-ag-regexp)))
+     (define-key c-mode-base-map (kbd "C-c C-r") #'my-ag-regexp)
+     (define-key c-mode-base-map (kbd "C-M-;") #'newline-and-comment)))
 
 (eval-after-load 'ag
   '(progn
@@ -671,8 +672,12 @@
 (define-key diff-mode-map (kbd "C-k") #'diff-mode-copy)
 (define-key magit-mode-map (kbd "M-w") #'diff-mode-copy)
 (define-key magit-mode-map (kbd "C-k") #'diff-mode-copy)
+(with-eval-after-load 'git-rebase-mode
+  (define-key git-rebase-mode-map (kbd "C-z") #'git-rebase-undo))
 
 (global-set-key (kbd "C-M-h i") #'helm-info-elisp)
 (global-set-key (kbd "<M-home>") #'beginning-of-buffer)
 (global-set-key (kbd "<M-end>") #'end-of-buffer)
 (global-set-key (kbd "C-c R") #'resurrect-buffer-from-file)
+
+(define-key nxml-mode-map (kbd "C-c C-v") nil)

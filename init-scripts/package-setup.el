@@ -81,7 +81,7 @@
   (interactive (list (magit-read-remote-branch "remote branch to delete")))
   (run-hooks 'magit-credential-hook)
   (-let [(remote . target) (magit-split-branch-name remote-branch)]
-    (magit-run-git-async-no-revert "push" "-v" remote "--delete" target)))
+    (magit-run-git-async "push" "-v" remote "--delete" target)))
 
 (defun magit-add-action-to-popup (action popup &optional test after)
   (let ((actions (plist-get popup :actions))
@@ -144,7 +144,7 @@
 
 (defun my-magit-clean-all ()
   (interactive)
-  (magit-run-git-async-no-revert "clean" "-x" "-f" "-d"))
+  (magit-run-git-async "clean" "-x" "-f" "-d"))
 
 (magit-define-popup magit-clean-popup
   "Popup console for clean commands."
