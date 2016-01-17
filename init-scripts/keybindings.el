@@ -439,7 +439,8 @@
                      (find-function-switch-pfx #'magit-status nil t t))
      (global-set-key (kbd "C-c b") #'magit-blame)
      (define-key magit-mode-map (kbd "<tab>") #'magit-tab-dwim)
-     (define-key magit-mode-map (kbd "<backtab>") #'magit-section-up)))
+     (define-key magit-mode-map (kbd "<backtab>") #'magit-section-up)
+     (define-key magit-status-mode-map (kbd "C-w") nil)))
 (eval-after-load 'magit-blame
   '(progn (define-key magit-blame-mode-map (kbd "c") #'magit-show-commit)))
 
@@ -458,6 +459,7 @@
      (define-key haskell-mode-map (kbd "C-c C-v") nil)))
 
 (define-key compilation-mode-map (kbd "G") #'compile)
+(define-key compilation-mode-map (kbd "k") #'kill-compilation)
 
 (eval-after-load 'haskell-interactive-mode
   '(progn

@@ -414,9 +414,9 @@ parentheses. CURRENTLY BROKEN"
   :group 'my-customizations
   :type '(alist :key-type symbol :value-type function))
 
-(defun kill-buffer-and-move-file-to-trash ()
+(defun kill-buffer-and-move-file-to-trash (pfx)
   "Doesn't delete the file, just moves it to /tmp so that it goes away."
-  (interactive)
+  (interactive "P")
   (set-buffer-modified-p nil)           ; pretends buffer not modified
   (let ((msg
          (shell-command-to-string
@@ -440,7 +440,7 @@ parentheses. CURRENTLY BROKEN"
                                               (getenv "temp"))
                       (concat "mv " "\"" compiled-file "\"" " /tmp/")))))
         (message msg))))
-  (kill-this-buffer))
+  (if pfx (close-and-kill-this-pane nil) (kill-this-buffer)))
 
 (defun string/starts-with (s begins)
   "Return non-nil if string S starts with BEGINS."
@@ -2180,6 +2180,7 @@ by another percent."
 
 (defun delete-whole-line (n)
   (interactive "p")
+  (when (use-region-p) (delete-region (region-beginning) (region-end)))
   (loop for i from 1 upto n
         do (progn
              (delete-region (line-beginning-position) (line-end-position))

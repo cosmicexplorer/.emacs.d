@@ -16,6 +16,7 @@
         bison-electric-open-brace
         bison-electric-pipe
         c-electric-colon
+        c-electric-lt-gt
         c-electric-paren
         c-electric-semi&comma
         c-electric-slash
