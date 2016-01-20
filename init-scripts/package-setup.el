@@ -427,3 +427,6 @@
   (linum-mode -1))
 
 (add-hook 'eww-mode-hook #'turn-off-linum)
+
+(add-to-list 'dired-compress-files-alist
+             '("\\.tgz\\'" . "tar -c %i | gzip -c9 > %o"))

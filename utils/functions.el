@@ -178,7 +178,7 @@ Toggles between: lowercase->ALL CAPS->Initial Caps->(cycle)."
   "cc-mode's indentation procedures upon adding a new bracket or paren are
 annoying. This fixes that."
   (interactive)
-  (clang-format-line)
+  (when (memq major-mode '(c-mode c++-mode)) (clang-format-line))
   (newline-and-indent))
 
 (defun newline-and-indent-fix-js-mode ()
@@ -1225,20 +1225,24 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 (defun in-whitespace-region-p ()
   (and (looking-back previous-whitespace-regexp)
        (looking-at trailing-whitespace-maybe-regexp)))
+
+(defvar destroy-whitespace t)
+
 (defun nuke-whitespace-except-this-line ()
   (interactive)
-  (if (not (in-whitespace-region-p)) (remove-trailing-whitespace)
-    (let* ((pt (point))
-           (str (buffer-substring
-                 (let ((res (re-search-backward "[^[:space:]]" nil t)))
-                   (if res (progn
-                             (forward-char)
-                             (when (char-equal (char-after) ?\n) (forward-char))
-                             (point))
-                     (progn (goto-char pt) (point-min))))
-                 pt)))
-      (remove-trailing-whitespace)
-      (insert str))))
+  (when destroy-whitespace
+    (if (not (in-whitespace-region-p)) (remove-trailing-whitespace)
+      (let* ((pt (point))
+             (str (buffer-substring
+                   (let ((res (re-search-backward "[^[:space:]]" nil t)))
+                     (if res (progn
+                               (forward-char)
+                               (when (char-equal (char-after) ?\n) (forward-char))
+                               (point))
+                       (progn (goto-char pt) (point-min))))
+                   pt)))
+        (remove-trailing-whitespace)
+        (insert str)))))
 
 ;;; read-only text
 
@@ -2567,5 +2571,12 @@ by another percent."
   (interactive)
   (call-interactively #'newline-and-indent)
   (call-interactively #'comment-dwim))
+
+(defun factorial (n)
+  "Make sure the result isn't greater than `most-positive-fixnum'!"
+  (loop for i from 1 upto n
+        with base = 1
+        do (setq base (* base i))
+        finally return base))
 
 (provide 'functions)

@@ -682,4 +682,5 @@
 (global-set-key (kbd "<M-end>") #'end-of-buffer)
 (global-set-key (kbd "C-c R") #'resurrect-buffer-from-file)
 
-(define-key nxml-mode-map (kbd "C-c C-v") nil)
+(eval-after-load 'nxml-mode
+  '(define-key nxml-mode-map (kbd "C-c C-v") nil))
