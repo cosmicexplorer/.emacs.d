@@ -621,3 +621,14 @@ Check out your .emacs.\n")))))
       (quit-windows-on buf)
       (with-selected-window win
         (display-buffer-same-window buf nil)))))
+
+(defadvice shell (around no-switch-buf activate)
+  (let* ((win (selected-window))
+         (buf ad-do-it))
+    (unless current-prefix-arg
+      (quit-windows-on buf)
+      (with-selected-window win
+        (display-buffer-same-window buf nil)))
+    (with-current-buffer buf
+      (rename-buffer
+       (generate-new-buffer-name (rename-shell-buffer) (buffer-name))))))

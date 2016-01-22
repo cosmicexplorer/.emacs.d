@@ -2579,4 +2579,20 @@ by another percent."
         do (setq base (* base i))
         finally return base))
 
+(defun eval-sexp-and-newline ()
+  (interactive)
+  (unless (looking-back "\n\\s-*") (newline-and-indent))
+  (eval-last-sexp t)
+  (newline-and-indent))
+
+(defconst celsius-start 273.15)
+(defun k-to-c (degrees-celsius)
+  (- degrees-celsius celsius-start))
+(defun c-to-k (degree-kelvin)
+  (+ degree-kelvin celsius-start))
+
+(defun run-shell ()
+  (interactive)
+  (shell nil))
+
 (provide 'functions)

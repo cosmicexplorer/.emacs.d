@@ -458,7 +458,8 @@
        #'haskell-newline-actual-indent)
      (define-key haskell-mode-map (kbd "C-c C-v") nil)))
 
-(define-key compilation-mode-map (kbd "G") #'compile)
+(define-key compilation-mode-map (kbd "G")
+  (lambda () (interactive) (recompile t)))
 (define-key compilation-mode-map (kbd "k") #'kill-compilation)
 
 (eval-after-load 'haskell-interactive-mode
@@ -684,3 +685,7 @@
 
 (eval-after-load 'nxml-mode
   '(define-key nxml-mode-map (kbd "C-c C-v") nil))
+
+(define-key emacs-lisp-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
+(define-key lisp-interaction-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
+(global-set-key (kbd "C-x C-M-h") #'run-shell)
