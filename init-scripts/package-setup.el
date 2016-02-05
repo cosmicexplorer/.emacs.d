@@ -157,21 +157,23 @@
 
 (define-key magit-mode-map (kbd "C") #'magit-clean-popup)
 
-(defconst git-gutter-fringe-hack-hooks git-gutter:update-hooks)
+(defconst git-gutter-fringe-hack-hooks '(git-gutter:update-hooks))
+(defvar git-gutter-fringe-hack-not-modes '(minibuffer-inactive-mode))
 (define-minor-mode git-gutter-fringe-hack-mode
   "hack to make git gutter work"
   :group 'git-gutter
   :init-value nil
   :global nil
   :lighter git-gutter:lighter
-  (if git-gutter-fringe-hack-mode
-      (progn
-        (loop for hook in git-gutter-fringe-hack-hooks
-              do (add-hook hook #'git-gutter t t))
-        (git-gutter))
-    (loop for hook in git-gutter-fringe-hack-hooks
-          do (remove-hook hook #'git-gutter t))
-    (git-gutter:clear)))
+  (unless (apply #'derived-mode-p git-gutter-fringe-hack-not-modes)
+    (if git-gutter-fringe-hack-mode
+        (progn
+          (loop for hook in git-gutter-fringe-hack-hooks
+                do (add-hook hook #'git-gutter t t))
+          (git-gutter))
+      (loop for hook in git-gutter-fringe-hack-hooks
+            do (remove-hook hook #'git-gutter t))
+      (git-gutter:clear))))
 (defun git-gutter-fringe-hack-turn-on ()
   (git-gutter-fringe-hack-mode +1))
 (define-global-minor-mode global-git-gutter-fringe-hack-mode
