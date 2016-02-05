@@ -622,6 +622,13 @@ Check out your .emacs.\n")))))
       (with-selected-window win
         (display-buffer-same-window buf nil)))))
 
+(defadvice list-processes (around no-switch-buf activate)
+  (let* ((prev-config (current-window-configuration)))
+    ad-do-it
+    (unless current-prefix-arg
+      (set-window-configuration prev-config)
+      (switch-to-buffer "*Process List*"))))
+
 (defadvice shell (around no-switch-buf activate)
   (let* ((win (selected-window))
          (buf ad-do-it))
