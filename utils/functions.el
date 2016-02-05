@@ -2295,6 +2295,7 @@ by another percent."
 (defvar latex-compile-output-buffer "*TeX-Compile-Output*")
 (defun latex-compile ()
   (interactive)
+  (save-buffer)
   (unless (zerop (call-process latex-engine nil latex-compile-output-buffer t
                                (buffer-file-name)))
     (switch-to-latex-compile-output t)))
@@ -2309,8 +2310,10 @@ by another percent."
 (defun switch-to-latex-compile-output (arg)
   (interactive "P")
   (let ((buf (get-buffer latex-compile-output-buffer)))
-    (if arg (display-buffer buf)
-      (display-buffer-same-window buf nil))))
+    (set-window-point
+     (if arg (display-buffer buf)
+       (display-buffer-same-window buf nil))
+     (with-current-buffer buf (point-max)))))
 
 (defvar ediff-prev-window-config nil)
 (defadvice ediff (before save-window-config activate)
@@ -2594,5 +2597,19 @@ by another percent."
 (defun run-shell ()
   (interactive)
   (shell nil))
+
+(defun completing-read-multiple
+    (prompt table &optional predicate require-match initial-input
+            hist def inherit-input-method)
+  (loop
+   for i from 1
+   for res =
+   (condition-case nil
+       (completing-read (format "(%d) %s" i prompt)
+                        table predicate require-match initial-input
+                        hist def inherit-input-method)
+     (quit nil))
+   while res
+   collect res))
 
 (provide 'functions)
