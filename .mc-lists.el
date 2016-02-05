@@ -76,6 +76,7 @@
 (setq mc/cmds-to-run-once
       '(
         Custom-save
+        async-shell-command
         clang-format-buffer
         describe-key
         describe-variable
@@ -84,6 +85,7 @@
         helm-swoop
         isearch-backward-regexp
         isearch-delete-char
+        latex-compile
         mc/mark-next-not-cider
         mc/mark-prev-not-cider
         mouse-set-region
