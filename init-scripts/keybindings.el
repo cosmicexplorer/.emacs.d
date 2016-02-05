@@ -12,8 +12,8 @@
 ;;; 4. remember that M-= gets word counts!
 
 ;;; globally usable basic text insertion or command-running shortcuts
-(global-set-key (kbd "C-x d") #'open-dired-the-right-way)
-(global-set-key (kbd "C-x C-d") #'open-dired-the-right-way)
+(global-set-key (kbd "C-x d") #'dired)
+(global-set-key (kbd "C-x C-d") #'dired)
 (define-key dired-mode-map (kbd "M-f") #'find-dired)
 ;;; cause otherwise this doesn't work in graphical mode
 (global-set-key (kbd "<C-return>") 'newline-and-indent)
@@ -689,3 +689,8 @@
 (define-key emacs-lisp-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
 (define-key lisp-interaction-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
 (global-set-key (kbd "C-x C-M-h") #'run-shell)
+
+(eval-after-load 'slime
+  '(progn
+     (define-key slime-mode-map (kbd "C-c C-w") nil)
+     (define-key slime-mode-map (kbd "C-M-x") #'slime-eval-buffer)))
