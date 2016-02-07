@@ -72,7 +72,12 @@
 
 ;;; fix magit's inane keybinding changes
 (defun magit-reset-push-destination (remote-branch &optional current-branch)
-  (interactive (list (magit-read-remote-branch "remote branch to push to")))
+  (interactive (list (magit-read-remote-branch
+                      "remote branch to push to" nil
+                      (let ((remotes (magit-list-remotes)))
+                        (when remotes
+                          (concat (car remotes) "/"
+                                  (magit-get-current-branch)))))))
   (magit-git-push
    (or current-branch (magit-get-current-branch))
    remote-branch '("-u")))
