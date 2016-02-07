@@ -1931,8 +1931,12 @@ that."
   (interactive)
   (let ((res
          (shell-command-to-string
-          (format "\"%s\" \"%s\"" "touch"
-                  (read-file-name "filename: ")))))
+          (concat
+           "touch "
+           (shell-quote-argument
+            (file-relative-name
+             (read-file-name "filename: ")
+             default-directory))))))
     (revert-buffer)
     (message "%s" res)))
 
