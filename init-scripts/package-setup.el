@@ -162,7 +162,7 @@
 
 (define-key magit-mode-map (kbd "C") #'magit-clean-popup)
 
-(defconst git-gutter-fringe-hack-hooks '(git-gutter:update-hooks))
+(defconst git-gutter-fringe-hack-hooks git-gutter:update-hooks)
 (defvar git-gutter-fringe-hack-not-modes '(minibuffer-inactive-mode))
 (define-minor-mode git-gutter-fringe-hack-mode
   "hack to make git gutter work"
