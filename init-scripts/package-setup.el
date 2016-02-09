@@ -162,6 +162,16 @@
 
 (define-key magit-mode-map (kbd "C") #'magit-clean-popup)
 
+(defun my-magit-diff-paths (a b)
+  (interactive (list (completing-read
+                      "First file: " (magit-list-files) nil t)
+                     (completing-read
+                      "Second file: " (magit-list-files) nil t)))
+  (magit-diff-paths a b))
+
+(magit-define-popup-action 'magit-diff-popup ?p "Diff paths"
+  #'my-magit-diff-paths)
+
 (defconst git-gutter-fringe-hack-hooks git-gutter:update-hooks)
 (defvar git-gutter-fringe-hack-not-modes '(minibuffer-inactive-mode))
 (define-minor-mode git-gutter-fringe-hack-mode
