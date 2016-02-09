@@ -174,6 +174,25 @@
 
 (defconst git-gutter-fringe-hack-hooks git-gutter:update-hooks)
 (defvar git-gutter-fringe-hack-not-modes '(minibuffer-inactive-mode))
+
+(defun git-gutter:refresh ()
+  (git-gutter:clear)
+  (git-gutter))
+
+(defun my-git-gutter-fr:clear ()
+  (dolist (ov (overlays-in (point-min) (point-max)))
+    (when (or (overlay-get ov 'git-gutter)
+              (let* ((prop (overlay-get ov 'before-string))
+                     (val (when prop (get-text-property 0 'display prop))))
+                (cl-some (lambda (sym) (memq sym val))
+                         '(git-gutter-fr:added
+                           git-gutter-fr:modified
+                           git-gutter-fr:deleted))))
+      (delete-overlay ov)))
+  (setq git-gutter-fr:bitmap-references nil))
+(eval-after-load 'git-gutter-fringe
+  '(fset 'git-gutter-fr:clear (symbol-function #'my-git-gutter-fr:clear)))
+
 (define-minor-mode git-gutter-fringe-hack-mode
   "hack to make git gutter work"
   :group 'git-gutter
@@ -184,7 +203,7 @@
     (if git-gutter-fringe-hack-mode
         (progn
           (loop for hook in git-gutter-fringe-hack-hooks
-                do (add-hook hook #'git-gutter t t))
+                do (add-hook hook #'git-gutter:refresh t t))
           (git-gutter))
       (loop for hook in git-gutter-fringe-hack-hooks
             do (remove-hook hook #'git-gutter t))
