@@ -1291,6 +1291,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 (defun make-submodule (folder-name make-cmd onfinish timeout &rest make-args)
   (add-to-list 'submodules-to-make
                (list folder-name make-cmd onfinish timeout make-args)))
+(defvar-local process-should-be-killed nil)
 (defun actual-make-submodule (submodule-args)
   (destructuring-bind (folder-name make-cmd cb timeout make-args) submodule-args
     (unless (member folder-name submodule-makes-to-ignore)
@@ -1310,7 +1311,10 @@ way I prefer, and regards `comment-padding', unlike the standard version."
             (set-process-sentinel
              proc
              (lambda (proc ev)
-               (if (and (stringp ev) (string= ev "finished\n"))
+               (if (or (and (stringp ev) (string= ev "finished\n"))
+                       (and (with-current-buffer (process-buffer proc)
+                              process-should-be-killed)
+                            (not (process-live-p proc))))
                    (kill-buffer (process-buffer proc))
                  (when (process-live-p proc) (kill-process proc))
                  (switch-to-buffer (process-buffer proc))
@@ -1319,7 +1323,10 @@ way I prefer, and regards `comment-padding', unlike the standard version."
               (run-at-time
                timeout nil
                (lambda (proc)
-                 (when (process-live-p proc) (delete-process proc)))
+                 (when (process-live-p proc)
+                   (with-current-buffer (process-buffer proc)
+                     (setq process-should-be-killed t))
+                   (delete-process proc)))
                proc)))
           (cd prev-wd)
           (if cb (funcall cb)))))))
