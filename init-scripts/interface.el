@@ -605,7 +605,8 @@ Check out your .emacs.\n")))))
    (add-to-list 'load-path (concat init-home-folder-dir "org-mode/lisp/"))
    (autoload #'org-element-update-syntax "org-element.el")
    (autoload #'org-define-error "org-compat.el")
-   (require 'org)))
+   (require 'org))
+ nil)
 
 (defadvice eww-follow-link (after revis activate) (refresh-visual-line-mode))
 

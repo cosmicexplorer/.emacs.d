@@ -272,7 +272,7 @@
 (make-submodule
  "OmniSharpServer"
  (if (eq system-type 'windows-nt) "msbuild.exe" "xbuild")
- nil)
+ nil nil)
 
 (eval-after-load 'csharp-mode
   '(progn

@@ -35,7 +35,7 @@
 ;;; because it's not detecting this variable correctly on windows fsr
 (setq ess-lisp-directory (concat init-home-folder-dir "ESS/lisp"))
 
-(make-submodule "ESS" "make" nil)
+(make-submodule "ESS" "make" nil "1 min")
 
 ;;; now let's load it
 (when (file-directory-p (concat init-home-folder-dir "/ESS/lisp"))

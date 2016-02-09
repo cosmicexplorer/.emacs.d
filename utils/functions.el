@@ -1288,11 +1288,11 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (when cb (funcall cb)))
 
 (defvar submodules-to-make nil)
-(defun make-submodule (folder-name make-cmd onfinish &rest make-args)
+(defun make-submodule (folder-name make-cmd onfinish timeout &rest make-args)
   (add-to-list 'submodules-to-make
-               (list folder-name make-cmd onfinish make-args)))
+               (list folder-name make-cmd onfinish timeout make-args)))
 (defun actual-make-submodule (submodule-args)
-  (destructuring-bind (folder-name make-cmd cb make-args) submodule-args
+  (destructuring-bind (folder-name make-cmd cb timeout make-args) submodule-args
     (unless (member folder-name submodule-makes-to-ignore)
       (if (not (executable-find make-cmd))
           (with-current-buffer "*scratch*"
@@ -1301,18 +1301,26 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                                 (concat "*" folder-name "-make-errors*")))
               (prev-wd default-directory))
           (cd (concat init-home-folder-dir folder-name))
-          (set-process-sentinel
-           (apply #'start-process
-                  (append
-                   (list (concat "make-" folder-name)
-                         (buffer-name make-output-buf) make-cmd)
-                   make-args))
-           (lambda (proc ev)
-             (if (and (stringp ev) (string= ev "finished\n"))
-                 (kill-buffer (process-buffer proc))
-               (when (process-live-p proc) (kill-process proc))
-               (switch-to-buffer (process-buffer proc))
-               (throw 'submodule-make-failure ev))))
+          (let ((proc
+                 (apply #'start-process
+                        (append
+                         (list (concat "make-" folder-name)
+                               (buffer-name make-output-buf) make-cmd)
+                         make-args))))
+            (set-process-sentinel
+             proc
+             (lambda (proc ev)
+               (if (and (stringp ev) (string= ev "finished\n"))
+                   (kill-buffer (process-buffer proc))
+                 (when (process-live-p proc) (kill-process proc))
+                 (switch-to-buffer (process-buffer proc))
+                 (throw 'submodule-make-failure ev))))
+            (when timeout
+              (run-at-time
+               timeout nil
+               (lambda (proc)
+                 (when (process-live-p proc) (delete-process proc)))
+               proc)))
           (cd prev-wd)
           (if cb (funcall cb)))))))
 (defun actual-make-all-submodules (&optional cb)
