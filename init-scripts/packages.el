@@ -70,6 +70,7 @@
                       package-build
                       pacmacs
                       paredit
+                      pdf-tools
                       perl6-mode
                       php-mode
                       pkg-info
