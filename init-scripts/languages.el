@@ -412,19 +412,16 @@ Lisp code." t)
 ;;; clojure
 (load-my-init-script "cider-setup")
 
+(defcustom no-gfm nil "Turn off gfm mode."
+  :type 'boolean
+  :safe t)
+
 ;;; markdown
 (autoload 'markdown-mode "markdown-mode"
   "Major mode for editing Markdown files" t)
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-(add-hook
- 'markdown-mode-hook
- (lambda ()
-   (when (and (git-repo-is-github)
-              (not (eq major-mode 'gfm-mode)))
-     (gfm-mode))
-   (message "")))
 
 (add-hook 'markdown-mode-hook
           (lambda ()

@@ -63,6 +63,7 @@
         paredit-forward
         paredit-forward-delete
         paredit-forward-slurp-sexp
+        paredit-kill
         paredit-open-round
         paredit-open-square
         racket--paredit-open-square

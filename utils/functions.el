@@ -7,13 +7,10 @@
 (require 'utilities)
 
 (defun send-message-to-scratch (&rest msg-args)
-  (let ((str (apply #'concat msg-args)))
-    (with-current-buffer (get-buffer-create "*scratch*")
-      (goto-char (point-max))
-      (insert str)
-      (unless (bolp)
-        (newline)))
-    str))
+  (with-current-buffer (get-buffer-create "*scratch*")
+    (goto-char (point-max))
+    (insert (apply #'format msg-args))
+    (unless (bolp) (newline))))
 
 ;;; helper function used for loading custom scripts littered throughout here
 (defun local-file-path (filename)
@@ -518,8 +515,8 @@ that point."
 ;;; http://stackoverflow.com/a/26137517/2518889
 (defmacro with-system (type &rest body)
   "Evaluate body if `system-type' equals type."
+  (declare (indent 1))
   `(when (eq system-type ,type) ,@body))
-(put 'with-system 'lisp-indent-function 1)
 
 (defvar current-date-time-format "%a %b %d %H:%M:%S %Z %Y"
   "Format of date to insert with `insert-current-date-time' func

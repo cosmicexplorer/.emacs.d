@@ -500,6 +500,7 @@
 (define-key paredit-mode-map (kbd "C-M-a C-M-<left>")
   'paredit-backward-barf-sexp)
 (define-key slime-mode-indirect-map (kbd "C-M-a") nil)
+(define-key slime-mode-indirect-map (kbd "C-c C-v") #'delete-whole-line)
 (define-key slime-repl-mode-map (kbd "M-s") nil)
 ;; so that multiple-cursors can use these
 (define-key paredit-mode-map (kbd "C-x C-l") 'mc/edit-lines)
@@ -546,6 +547,7 @@
   '(define-key eww-mode-map (kbd "C-c v") #'refresh-visual-line-mode))
 
 ;;; git-gutter
+;;; FIXME: don't work sometimes, randomly
 (global-set-key (kbd "C-x l") #'num-lines-file)
 (global-set-key (kbd "C-c n") #'git-gutter:next-hunk)
 (global-set-key (kbd "C-c p") #'git-gutter:previous-hunk)
@@ -690,7 +692,14 @@
 (define-key lisp-interaction-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
 (global-set-key (kbd "C-x C-M-h") #'run-shell)
 
+(defun slime-eval-buffer-or-region ()
+  (interactive)
+  (if (use-region-p)
+      (prog1 (call-interactively #'slime-eval-region)
+        (message "evaluated region"))
+    (prog1 (call-interactively #'slime-eval-buffer)
+      (message "evaluated buffer %s" (buffer-name)))))
 (eval-after-load 'slime
   '(progn
      (define-key slime-mode-map (kbd "C-c C-w") nil)
-     (define-key slime-mode-map (kbd "C-M-x") #'slime-eval-buffer)))
+     (define-key slime-mode-map (kbd "C-M-x") #'slime-eval-buffer-or-region)))
