@@ -50,6 +50,8 @@
 (require 'sourcemap)
 (require 'eww)
 (require 'git-gutter-fringe)
+(require 'pdf-tools)
+(require 'mmm-mode)
 
 ;;; my stuff
 (require 'utilities)

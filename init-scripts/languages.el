@@ -510,3 +510,6 @@ Lisp code." t)
 
 ;;; bison
 (add-to-list 'auto-mode-alist '("\\.jison$" . bison-mode))
+
+;;; pdf-tools rox
+(add-to-list 'auto-mode-alist '("\\.pdf$" . pdf-view-mode))
