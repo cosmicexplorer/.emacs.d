@@ -623,6 +623,21 @@ Check out your .emacs.\n")))))
       (with-selected-window win
         (display-buffer-same-window buf nil)))))
 
+(defadvice woman (around no-switch-buf activate)
+  (let* ((win (selected-window))
+         (win-pt (window-point win))
+         (win-st (window-start win))
+         (prev-buf (current-buffer)))
+    ad-do-it
+    (let ((buf (get-buffer (cdr (first woman-buffer-alist)))))
+      (unless current-prefix-arg
+        (quit-windows-on buf)
+        (with-selected-window win
+          (set-window-buffer win prev-buf)
+          (set-window-point win win-pt)
+          (set-window-start win win-st)
+          (display-buffer-same-window buf nil))))))
+
 (defadvice list-processes (around no-switch-buf activate)
   (let* ((prev-config (current-window-configuration)))
     ad-do-it
