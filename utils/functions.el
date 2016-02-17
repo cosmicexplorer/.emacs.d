@@ -1947,7 +1947,7 @@ that."
            "touch "
            (shell-quote-argument
             (file-relative-name
-             (read-file-name "filename: ")
+             (read-string "filename: ")
              default-directory))))))
     (revert-buffer)
     (message "%s" res)))

@@ -467,7 +467,7 @@
 (add-to-list 'dired-compress-files-alist
              '("\\.tgz\\'" . "tar -c %i | gzip -c9 > %o"))
 
-(setq mmm-global-mode 'maybe)
+(setq mmm-global-mode nil)
 (setq mmm-parse-when-idle 't)
 ;;; from http://jblevins.org/log/mmm
 (defun my-mmm-markdown-auto-class (lang &optional submode)
@@ -482,8 +482,7 @@ If SUBMODE is not provided, use `LANG-mode' by default."
 (mapc 'my-mmm-markdown-auto-class
       '("awk" "bibtex" "c" "c++" "css" "html" "latex" "lisp" "makefile"
         "markdown" "python" "r" "ruby" "sql" "scala" "xml" "emacs-lisp"
-        "coffee"))
+        "coffee" "javascript"))
 (my-mmm-markdown-auto-class "fortran" 'f90-mode)
 (my-mmm-markdown-auto-class "perl" 'cperl-mode)
 (my-mmm-markdown-auto-class "shell" 'shell-script-mode)
-(my-mmm-markdown-auto-class "javascript" 'js2-mode)
