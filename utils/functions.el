@@ -2628,4 +2628,36 @@ by another percent."
    while res
    collect res))
 
+(defvar start-varname-regexp
+  "\\(['[:alnum:]-+!$\",_./:;?<=>#%&*@\\\\|^~]\\)")
+(defvar not-start-list-regexp
+  "\\([^(\\[{]\\)")
+(defvar not-end-list-regexp
+  "\\([^)\\]}]\\)")
+
+(defun right-sexp-or-camel ()
+  (interactive)
+  (let ((right-bound
+         (save-excursion
+           (call-interactively #'paredit-forward)
+           (point))))
+    (if (looking-at
+         (concat "[[:space:]\n]*" start-varname-regexp not-start-list-regexp))
+        (progn
+          (call-interactively #'camel-case-right-word)
+          (when (> (point) right-bound) (goto-char right-bound)))
+      (goto-char right-bound))))
+
+(defun left-sexp-or-camel ()
+  (interactive)
+  (let ((left-bound
+         (save-excursion
+           (call-interactively #'paredit-backward)
+           (point))))
+    (if (looking-back (concat start-varname-regexp "[[:space:]\n]*"))
+        (progn
+          (call-interactively #'camel-case-left-word)
+          (when (< (point) left-bound) (goto-char left-bound)))
+      (goto-char left-bound))))
+
 (provide 'functions)

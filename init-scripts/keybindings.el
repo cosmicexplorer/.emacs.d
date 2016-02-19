@@ -475,14 +475,13 @@
 (define-key paredit-mode-map (kbd "M-;") 'fix-paredit-comment-dwim)
 (define-key paredit-mode-map (kbd "C-M-<left>") 'windmove-left)
 (define-key paredit-mode-map (kbd "C-M-<right>") 'windmove-right)
-(define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward) ; remove key
-                                        ; here (slurp-forward)
+(define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward)
 (define-key paredit-mode-map (kbd "C-c <right>") 'paredit-forward)
-(define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward) ; remove key
-                                        ; here (slurp-backward)
+(define-key paredit-mode-map (kbd "C-<left>") 'paredit-backward)
 (define-key paredit-mode-map (kbd "C-c <left>") 'paredit-backward)
-(define-key paredit-mode-map (kbd "M-a") nil) ; kill this, it's a global but
-                                        ; it's annoying and i don't use it
+(define-key paredit-mode-map (kbd "C-S-<right>") #'right-sexp-or-camel)
+(define-key paredit-mode-map (kbd "C-S-<left>") #'left-sexp-or-camel)
+(define-key paredit-mode-map (kbd "M-a") nil)
 (define-key paredit-mode-map (kbd "M-a M-a") 'paredit-add-parens-in-front)
 (define-key paredit-mode-map (kbd "M-a M-s") 'paredit-remove-function-wrapper)
 (define-key paredit-mode-map (kbd "M-q") #'fill-paragraph)
