@@ -1939,17 +1939,18 @@ that."
       (sgml-skip-tag-backward 1))))
 
 ;;; dired
-(defun dired-touch-file ()
-  (interactive)
+(defun dired-touch-file (filename)
+  (interactive (list (read-string "filename: ")))
   (let ((res
          (shell-command-to-string
           (concat
            "touch "
            (shell-quote-argument
-            (file-relative-name
-             (read-string "filename: ")
-             default-directory))))))
+            (file-relative-name filename default-directory))))))
     (revert-buffer)
+    (goto-char (point-min))
+    (re-search-forward (concat "\\s-" (regexp-quote filename) "$"))
+    (dired-move-to-filename)
     (message "%s" res)))
 
 ;;; random
