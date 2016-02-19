@@ -486,3 +486,5 @@ If SUBMODE is not provided, use `LANG-mode' by default."
 (my-mmm-markdown-auto-class "fortran" 'f90-mode)
 (my-mmm-markdown-auto-class "perl" 'cperl-mode)
 (my-mmm-markdown-auto-class "shell" 'shell-script-mode)
+
+(defun ess-save-excursion-when-nil (_))
