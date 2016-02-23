@@ -263,6 +263,7 @@ Check out your .emacs."))
     (("\\*Async Shell Command\\*.*" display-buf-no-win-save-shell-command-buf))))
  '(ecb-options-version "2.40")
  '(ecb-tip-of-the-day nil)
+ '(edebug-eval-macro-args t)
  '(ediff-split-window-function (quote split-window-horizontally))
  '(erc-autojoin-mode t)
  '(erc-button-mode t)
@@ -380,7 +381,7 @@ Check out your .emacs."))
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (mmm-mode pdf-tools font-lock-studio shut-up git-gutter-fringe yaml-mode sourcemap helm-ag wgrep wgrep-ag wgrep-helm ag pacmacs bison-mode slime slime-company perl6-mode enh-ruby-mode robe tuareg solarized-theme color-theme-solarized highlight-parentheses racket-mode sage-shell-mode gnuplot-mode gnuplot sml-mode skewer-mode magit org csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode2 company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
+    (realgud mmm-mode pdf-tools font-lock-studio shut-up git-gutter-fringe yaml-mode sourcemap helm-ag wgrep wgrep-ag wgrep-helm ag pacmacs bison-mode slime slime-company perl6-mode enh-ruby-mode robe tuareg solarized-theme color-theme-solarized highlight-parentheses racket-mode sage-shell-mode gnuplot-mode gnuplot sml-mode skewer-mode magit org csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode2 company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters php-mode paredit package-build omnisharp multiple-cursors misc-cmds minimap markdown-mode literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
  '(perl6-indent-offset 2)
  '(rainbow-ansi-colors t)
  '(rainbow-html-colors t)
@@ -389,7 +390,9 @@ Check out your .emacs."))
  '(rainbow-x-colors t)
  '(safe-local-variable-values
    (quote
-    ((no-gfm . t)
+    ((Syntax . ANSI-Common-Lisp)
+     (Base . 10)
+     (no-gfm . t)
      (major-mode . sh-mode)
      (TeX-master . "proposal")
      (add-log-time-format lambda nil
