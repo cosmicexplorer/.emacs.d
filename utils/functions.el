@@ -1207,9 +1207,9 @@ way I prefer, and regards `comment-padding', unlike the standard version."
       (goto-char (point-min))
       (while (re-search-forward trailing-whitespace-regexp nil t)
         (let ((pt (point)))
-          (re-search-backward "[^[:space:]]")
+          (re-search-backward "^\\|[^[:space:]]")
           (when (char-equal (char-after (1+ (point))) ?\n) (forward-char))
-          (delete-region (1+ (point)) pt)))
+          (delete-region (point) pt)))
       (goto-char (point-max))
       ;; so having active region doesn't delete the entire buffer
       (push-mark)
