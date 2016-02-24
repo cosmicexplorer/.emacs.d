@@ -579,7 +579,9 @@
        (define-key LaTeX-mode-map (kbd "C-c m") #'latex-insert-math)
        (define-key LaTeX-mode-map (kbd "$") #'latex-insert-math)
        (define-key LaTeX-mode-map (kbd "C-c C-s")
-         #'switch-to-latex-compile-output))))
+         #'switch-to-latex-compile-output)
+       (define-key LaTeX-mode-map (kbd "C-c C-c")
+         #'TeX-command-buffer))))
 
 (eval-after-load 'sh-script
   '(define-key sh-mode-map (kbd "C-c C-w") nil))
