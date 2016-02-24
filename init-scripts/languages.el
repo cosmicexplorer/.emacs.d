@@ -423,18 +423,21 @@ Lisp code." t)
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
+(unless (executable-find "grip-no-header")
+  (user-error
+   "%s %s" "grip-no-header cannot be found! install from"
+   "https://github.com/cosmicexplorer/grip"))
+
 (add-hook 'markdown-mode-hook
           (lambda ()
-            (set (make-local-variable 'markdown-command)
-                 (if (eq major-mode 'gfm-mode)
-                     "pandoc -f markdown_github -t html -"
-                   "pandoc -f markdown -t html -"))))
-(add-hook 'gfm-mode-hook
-          (lambda ()
-            (set (make-local-variable 'markdown-command)
-                 "pandoc -f markdown_github -t html -")
-            (set (make-local-variable 'markdown-list-indent-width) 4)))
-
+            (if (eq major-mode 'gfm-mode)
+                (set (make-local-variable 'markdown-command)
+                     "grip-no-header --export -")
+              (if (zerop (call-process
+                          "git" nil nil nil "rev-parse" "--git-dir"))
+                  (gfm-mode)
+                (set (make-local-variable 'markdown-command)
+                     "pandoc -f markdown -t html -")))))
 
 ;;; coffeescript
 (eval-after-load "coffee-mode"
