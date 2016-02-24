@@ -433,8 +433,9 @@ Lisp code." t)
             (if (eq major-mode 'gfm-mode)
                 (set (make-local-variable 'markdown-command)
                      "grip-no-header --export -")
-              (if (zerop (call-process
-                          "git" nil nil nil "rev-parse" "--git-dir"))
+              (if (and (not no-gfm)
+                       (zerop (call-process
+                               "git" nil nil nil "rev-parse" "--git-dir")))
                   (gfm-mode)
                 (set (make-local-variable 'markdown-command)
                      "pandoc -f markdown -t html -")))))
