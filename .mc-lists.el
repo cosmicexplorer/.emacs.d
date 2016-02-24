@@ -27,6 +27,7 @@
         compile-goto-error
         cperl-electric-terminator
         delete-whole-line
+        destroy-all-whitespace-nearby
         dired-next-line
         electric-pair-delete-pair
         end-of-buffer
