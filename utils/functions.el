@@ -1001,13 +1001,13 @@ prompt the user for a coding system."
 also affects negative line numbers, even though it says it doesn't."
   (let* ((diff1 (- line-number linum-relative-last-pos))
          (diff (if (minusp diff1) diff1 (+ diff1 linum-relative-plusp-offset)))
-	 (current-p (= diff linum-relative-plusp-offset))
-	 (current-symbol (if (and linum-relative-current-symbol current-p)
-			     (if (string= "" linum-relative-current-symbol)
-				 (number-to-string line-number)
-			       linum-relative-current-symbol)
-			   (number-to-string diff)))
-	 (face (if current-p 'linum-relative-current-face 'linum)))
+         (current-p (= diff linum-relative-plusp-offset))
+         (current-symbol (if (and linum-relative-current-symbol current-p)
+                             (if (string= "" linum-relative-current-symbol)
+                                 (number-to-string line-number)
+                               linum-relative-current-symbol)
+                           (number-to-string diff)))
+         (face (if current-p 'linum-relative-current-face 'linum)))
     (propertize (format linum-relative-format current-symbol) 'face face)))
 
 (defun get-linum-relative-symbol ()
@@ -1200,23 +1200,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 ;;; basic utilities
 (defvar trailing-whitespace-regexp "\\([\t \u00A0]+\\)$")
-(defun remove-trailing-whitespace ()
-  (interactive)
-  (let ((eob (and (looking-at-p "[[:space:]\n]*\\'") (= (current-column) 0))))
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward trailing-whitespace-regexp nil t)
-        (let ((pt (point)))
-          (re-search-backward "^\\|[^[:space:]]")
-          (unless (char-equal (char-before) ?\n) (forward-char))
-          (delete-region (point) pt)))
-      (goto-char (point-max))
-      ;; so having active region doesn't delete the entire buffer
-      (push-mark)
-      (while (looking-back "[[:space:]\n]") (delete-backward-char 1))
-      (pop-mark)
-      (insert "\n"))
-    (if eob (goto-char (point-max)))))
 (defvar previous-whitespace-regexp "[\t \u00A0]+")
 (defvar trailing-whitespace-maybe-regexp "\\([\t \u00A0]*\\)$")
 (defun in-whitespace-region-p ()
@@ -1228,17 +1211,17 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 (defun nuke-whitespace-except-this-line ()
   (interactive)
   (when destroy-whitespace
-    (if (not (in-whitespace-region-p)) (remove-trailing-whitespace)
+    (if (not (in-whitespace-region-p)) (whitespace-cleanup)
       (let* ((pt (point))
              (str (buffer-substring
-                   (let ((res (re-search-backward "[^[:space:]]" nil t)))
+                   (let ((res (re-search-backward "^\\|[^[:space:]]" nil t)))
                      (if res (progn
                                (forward-char)
                                (when (char-equal (char-after) ?\n) (forward-char))
                                (point))
                        (progn (goto-char pt) (point-min))))
                    pt)))
-        (remove-trailing-whitespace)
+        (whitespace-cleanup)
         (insert str)))))
 
 ;;; read-only text
@@ -2168,7 +2151,7 @@ by another percent."
             obarray 'fboundp t nil nil
             (and fn (symbol-name fn)))))
      (list (if (equal val "")
-	       fn (intern val)))))
+               fn (intern val)))))
   (message "%S" (symbol-function fn-arg)))
 
 (defun rename-buffer-file (name)
