@@ -429,15 +429,18 @@ Lisp code." t)
    "https://github.com/cosmicexplorer/grip"))
 
 (defun setup-markdown-mode ()
-  (if (eq major-mode 'gfm-mode)
-      (set (make-local-variable 'markdown-command)
-           "grip-no-header --export -")
-    (if (and (not no-gfm)
-             (zerop (call-process
-                     "git" nil nil nil "rev-parse" "--git-dir")))
-        (gfm-mode)
-      (set (make-local-variable 'markdown-command)
-           "pandoc -f markdown -t html -"))))
+  (if (and (not no-gfm)
+           (zerop (call-process
+                   "git" nil nil nil "rev-parse" "--git-dir")))
+      (gfm-mode)
+    (set (make-local-variable 'markdown-command)
+         "pandoc -f markdown -t html -")))
+
+(defun set-gfm-markdown-command ()
+  (set (make-local-variable 'markdown-command)
+       "grip-no-header --export -"))
+
+(add-hook 'gfm-mode-hook #'set-gfm-markdown-command)
 
 (defun set-markdown-local-vars-hook ()
   (add-hook 'hack-local-variables-hook #'setup-markdown-mode t t))
