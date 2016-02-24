@@ -428,17 +428,21 @@ Lisp code." t)
    "%s %s" "grip-no-header cannot be found! install from"
    "https://github.com/cosmicexplorer/grip"))
 
-(add-hook 'markdown-mode-hook
-          (lambda ()
-            (if (eq major-mode 'gfm-mode)
-                (set (make-local-variable 'markdown-command)
-                     "grip-no-header --export -")
-              (if (and (not no-gfm)
-                       (zerop (call-process
-                               "git" nil nil nil "rev-parse" "--git-dir")))
-                  (gfm-mode)
-                (set (make-local-variable 'markdown-command)
-                     "pandoc -f markdown -t html -")))))
+(defun setup-markdown-mode ()
+  (if (eq major-mode 'gfm-mode)
+      (set (make-local-variable 'markdown-command)
+           "grip-no-header --export -")
+    (if (and (not no-gfm)
+             (zerop (call-process
+                     "git" nil nil nil "rev-parse" "--git-dir")))
+        (gfm-mode)
+      (set (make-local-variable 'markdown-command)
+           "pandoc -f markdown -t html -"))))
+
+(defun set-markdown-local-vars-hook ()
+  (add-hook 'hack-local-variables-hook #'setup-markdown-mode t t))
+
+(add-hook 'markdown-mode-hook #'set-markdown-local-vars-hook)
 
 ;;; coffeescript
 (eval-after-load "coffee-mode"

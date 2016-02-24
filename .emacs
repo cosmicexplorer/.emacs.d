@@ -390,7 +390,8 @@ Check out your .emacs."))
  '(rainbow-x-colors t)
  '(safe-local-variable-values
    (quote
-    ((Syntax . ANSI-Common-Lisp)
+    ((no-gfm)
+     (Syntax . ANSI-Common-Lisp)
      (Base . 10)
      (no-gfm . t)
      (major-mode . sh-mode)
