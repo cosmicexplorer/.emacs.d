@@ -32,6 +32,7 @@
         end-of-buffer
         end-of-visual-line
         ess-smart-comma
+        eval-last-sexp
         forward-sexp
         helm-buffers-list
         helm-show-kill-ring
