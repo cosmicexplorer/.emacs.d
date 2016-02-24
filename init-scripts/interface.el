@@ -655,3 +655,6 @@ Check out your .emacs.\n")))))
     (with-current-buffer buf
       (rename-buffer
        (generate-new-buffer-name (rename-shell-buffer) (buffer-name))))))
+
+(defadvice dired-async-after-file-create (after revert-bufs activate)
+  (run-with-timer 0 nil #'revert-buffer nil t))

@@ -2661,4 +2661,7 @@ by another percent."
           (when (< (point) left-bound) (goto-char left-bound)))
       (goto-char left-bound))))
 
+(defadvice dired-rename-file (after revert-stuff activate)
+  (revert-buffer))
+
 (provide 'functions)
