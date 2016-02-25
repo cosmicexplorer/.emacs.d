@@ -2647,4 +2647,12 @@ by another percent."
 (defadvice dired-rename-file (after revert-stuff activate)
   (revert-buffer))
 
+(defun toggle-subtree-markdown ()
+  (interactive)
+  (save-excursion
+    (end-of-line)
+    (if (eq (get-char-property (point) 'invisible) 'outline)
+        (markdown-show-subtree)
+      (markdown-hide-subtree))))
+
 (provide 'functions)

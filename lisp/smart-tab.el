@@ -125,21 +125,25 @@ the text at point."
               (use-region-p))
     (looking-at "\\_>")))
 
+(defcustom smart-tab-default-functions-alist nil
+  "Functions to call if `smart-tab' isn't at a word boundary."
+  :type '(alist
+          :key-type (symbol :tag "Major mode")
+          :value-type (function :tag "Completion function to use in this mode"))
+  :group 'smart-tab)
+
 (defun smart-tab-default ()
   "Indent region if mark is active, or current line otherwise."
   (interactive)
   (if smart-tab-debug
       (message "default"))
-  (if (use-region-p)
-      (cond ((eq major-mode 'org-mode)
-             (org-cycle))
-            (t
-             (indent-region (region-beginning)
-                            (region-end))))
-    (cond ((eq major-mode 'org-mode)
-           (org-cycle))
-          (t
-           (indent-for-tab-command)))))
+  (catch 'smart-tab-function-found
+    (cl-loop for el in smart-tab-default-functions-alist
+             when (derived-mode-p (car el))
+             do (throw 'smart-tab-function-found (funcall (cdr el))))
+    (if (use-region-p)
+        (indent-region (region-beginning) (region-end))
+      (indent-for-tab-command))))
 
 
 ;;;###autoload

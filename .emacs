@@ -407,6 +407,15 @@ Check out your .emacs."))
                             time))
      (destroy-whitespace)
      (destroy-whitespace . t))))
+ '(smart-tab-completion-functions-alist
+   (quote
+    ((lisp-mode . slime-complete-symbol)
+     (text-mode . dabbrev-completion))))
+ '(smart-tab-default-functions-alist
+   (quote
+    ((org-mode . org-cycle)
+     (markdown-mode . toggle-subtree-markdown))))
+ '(smart-tab-disabled-major-modes nil)
  '(smart-tab-using-hippie-expand t)
  '(warning-suppress-types (quote ((undo discard-info))))
  '(yank-pop-change-selection t))
