@@ -1216,7 +1216,8 @@ way I prefer, and regards `comment-padding', unlike the standard version."
              (str (buffer-substring
                    (let ((res (re-search-backward "^\\|[^[:space:]]" nil t)))
                      (if res (progn
-                               (forward-char)
+                               (unless (char-equal (char-before) ?\n)
+                                 (forward-char))
                                (when (char-equal (char-after) ?\n) (forward-char))
                                (point))
                        (progn (goto-char pt) (point-min))))
