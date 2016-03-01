@@ -1208,19 +1208,21 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 (defvar destroy-whitespace t)
 
+(defun search-back-bol-or-reg (reg)
+  (let ((reg-pt (1+ (save-excursion (re-search-backward reg nil t))))
+        (bol-pt (line-beginning-position)))
+    (goto-char (max bol-pt reg-pt))))
+
 (defun nuke-whitespace-except-this-line ()
   (interactive)
   (when destroy-whitespace
     (if (not (in-whitespace-region-p)) (whitespace-cleanup)
       (let* ((pt (point))
              (str (buffer-substring
-                   (let ((res (re-search-backward "^\\|[^[:space:]]" nil t)))
-                     (if res (progn
-                               (unless (char-equal (char-before) ?\n)
-                                 (forward-char))
-                               (when (char-equal (char-after) ?\n) (forward-char))
-                               (point))
-                       (progn (goto-char pt) (point-min))))
+                   (let ((res (search-back-bol-or-reg "[^[:space:]]")))
+                     (if res (point)
+                       (goto-char pt)
+                       (point-min)))
                    pt)))
         (whitespace-cleanup)
         (insert str)))))
