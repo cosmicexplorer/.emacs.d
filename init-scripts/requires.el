@@ -9,6 +9,8 @@
 (add-to-list 'load-path (concat init-home-folder-dir "lisp"))
 (load-file (concat init-home-folder-dir "emacs-helm-ag/helm-ag.el"))
 
+(defun org-babel-make-language-alias (&rest args))
+
 ;;; ESS is done in `./package-setup.el'
 
 (require 'ansi-color)
