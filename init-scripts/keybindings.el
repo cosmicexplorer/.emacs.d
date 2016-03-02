@@ -161,14 +161,14 @@
 
 ;;; c/c++/java
 (add-hook 'c-initialization-hook
-	  (lambda ()
-	    (define-key c-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
-	    (define-key c-mode-map (kbd "<C-return>")
+          (lambda ()
+            (define-key c-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
+            (define-key c-mode-map (kbd "<C-return>")
               'newline-and-indent-ctrl-j)
-	    (define-key c++-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
-	    (define-key c++-mode-map (kbd "<C-return>")
+            (define-key c++-mode-map (kbd "C-j") 'newline-and-indent-ctrl-j)
+            (define-key c++-mode-map (kbd "<C-return>")
               'newline-and-indent-ctrl-j)
-	    (define-key c++-mode-map (kbd "{") 'insert-brackets)
+            (define-key c++-mode-map (kbd "{") 'insert-brackets)
             (define-key java-mode-map (kbd "C-c C-w") nil)))
 
 ;;; cool but never used cause lol search key
@@ -581,7 +581,8 @@
        (define-key LaTeX-mode-map (kbd "C-c C-s")
          #'switch-to-latex-compile-output)
        (define-key LaTeX-mode-map (kbd "C-c C-c")
-         #'TeX-command-buffer))))
+         #'TeX-command-buffer)
+       (define-key LaTeX-mode-map (kbd "C-c `") #'TeX-next-error))))
 
 (eval-after-load 'sh-script
   '(define-key sh-mode-map (kbd "C-c C-w") nil))
