@@ -581,7 +581,7 @@
        (define-key LaTeX-mode-map (kbd "C-c C-s")
          #'switch-to-latex-compile-output)
        (define-key LaTeX-mode-map (kbd "C-c C-c")
-         #'TeX-command-buffer)
+         #'TeX-command-master)
        (define-key LaTeX-mode-map (kbd "C-c `") #'TeX-next-error))))
 
 (eval-after-load 'sh-script
