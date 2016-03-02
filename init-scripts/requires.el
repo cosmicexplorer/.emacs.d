@@ -54,6 +54,7 @@
 (require 'git-gutter-fringe)
 (require 'pdf-tools)
 (require 'mmm-mode)
+(require 'csharp-mode)
 
 ;;; my stuff
 (require 'utilities)
