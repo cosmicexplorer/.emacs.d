@@ -1,6 +1,0 @@
-;; Object srecode-map
-;; EIEIO PERSISTENT OBJECT
-(srecode-map "srecode-map"
-  :file "srecode-map.el"
-  :files '(("/home/cosmicexplorer/tools/emacs/etc/srecode/wisent.srt" . wisent-grammar-mode) ("/home/cosmicexplorer/tools/emacs/etc/srecode/texi.srt" . texinfo-mode) ("/home/cosmicexplorer/tools/emacs/etc/srecode/template.srt" . srecode-template-mode) ("/home/cosmicexplorer/tools/emacs/etc/srecode/make.srt" . makefile-mode) ("/home/cosmicexplorer/tools/emacs/etc/srecode/java.srt" . java-mode) ("/home/cosmicexplorer/tools/emacs/etc/srecode/el.srt" . emacs-lisp-mode) ("/home/cosmicexplorer/tools/emacs/etc/srecode/default.srt" . default) ("/home/cosmicexplorer/tools/emacs/etc/srecode/cpp.srt" . c++-mode) ("/home/cosmicexplorer/tools/emacs/etc/srecode/c.srt" . c-mode))
-  :apps '((tests ("/home/cosmicexplorer/tools/emacs/etc/srecode/test.srt" . srecode-template-mode)) (getset ("/home/cosmicexplorer/tools/emacs/etc/srecode/getset-cpp.srt" . c++-mode)) (ede ("/home/cosmicexplorer/tools/emacs/etc/srecode/ede-make.srt" . makefile-mode) ("/home/cosmicexplorer/tools/emacs/etc/srecode/ede-autoconf.srt" . autoconf-mode)) (document ("/home/cosmicexplorer/tools/emacs/etc/srecode/doc-java.srt" . java-mode) ("/home/cosmicexplorer/tools/emacs/etc/srecode/doc-default.srt" . default) ("/home/cosmicexplorer/tools/emacs/etc/srecode/doc-cpp.srt" . c-mode))))

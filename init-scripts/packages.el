@@ -103,6 +103,6 @@
 ;;; do the install (slow upon startup, but only for the first time)
 (loop for p in my-packages
   do (unless (package-installed-p p)
-      (package-install p)))
+       (ignore-errors (package-install p))))
 
 (when (get-buffer "*Compile-Log*") (delete-windows-on "*Compile-Log*"))
