@@ -46,6 +46,7 @@
         isearch-repeat-backward
         js-newline-indent-for-real
         kill-selected-region-default
+        latex-insert-math
         markdown-demote
         markdown-exdent-or-delete
         markdown-promote

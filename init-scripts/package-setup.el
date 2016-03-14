@@ -132,7 +132,7 @@
   (interactive (list (my-magit-read-branch-or-commit "Hard reset to")))
   (magit-reset-hard commit))
 
-(magit-define-popup magit-reset-popup
+(magit-define-popup my-magit-reset-popup
   "Popup console for reset commands."
   'magit-commands
   :man-page "git-reset"
@@ -141,11 +141,11 @@
              (?M "Mixed Reset" my-magit-reset-head)))
 
 (magit-add-action-to-popup
- '(?R "Reset" magit-reset-popup) magit-dispatch-popup nil ?!)
+ '(?R "Reset" my-magit-reset-popup) magit-dispatch-popup nil ?!)
 
-(define-key magit-status-mode-map (kbd "R") #'magit-reset-popup)
-(define-key magit-branch-section-map (kbd "R") #'magit-reset-popup)
-(define-key magit-file-section-map (kbd "R") #'magit-reset-popup)
+(define-key magit-status-mode-map (kbd "R") #'my-magit-reset-popup)
+(define-key magit-branch-section-map (kbd "R") #'my-magit-reset-popup)
+(define-key magit-file-section-map (kbd "R") #'my-magit-reset-popup)
 
 (defun my-magit-clean-all ()
   (interactive)

@@ -38,6 +38,7 @@
 (global-set-key (kbd "C-x k") #'kill-this-buffer-and-all-visiting)
 ;;; quit-window is more useful than i previously thought
 (global-set-key (kbd "C-c q") 'quit-window)
+(global-set-key (kbd "C-c C-q") 'quit-window)
 
 ;;; compatibility fixes for windows
 (global-set-key (kbd "<C-kp-home>")
