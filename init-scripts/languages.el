@@ -191,7 +191,7 @@
 (make-variable-buffer-local 'comment-region-function)
 (make-variable-buffer-local 'comment-insert-comment-function)
 (defun add-star-comment-region ()
-  (setq comment-region-function #'c-comment-region-stars)
+  (setq comment-region-function #'comment-region-default)
   (setq comment-insert-comment-function #'c-comment-end-of-line))
 (add-hook 'c-mode-hook #'add-star-comment-region)
 (add-hook 'c++-mode-hook #'add-star-comment-region)

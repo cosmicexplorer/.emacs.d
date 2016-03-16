@@ -597,7 +597,13 @@ Check out your .emacs.\n")))))
 
 (defadvice ansi-color-filter-apply (around no-errors activate)
   (let ((res (ignore-errors ad-do-it)))
-    (setq ad-return-value (or res (ad-get-arg 0)))))
+    (ignore-errors (setq ad-return-value (or res (ad-get-arg 0))))))
+
+(defadvice shell (around choose-shell activate)
+  (let ((explicit-shell-file-name
+         (if (string-match-p "^/ssh:" default-directory) "/bin/bash"
+           explicit-shell-file-name)))
+    ad-do-it))
 
 (make-submodule
  "org-mode" "make"
