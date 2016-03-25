@@ -10,6 +10,7 @@
         TeX-insert-dollar
         TeX-insert-sub-or-superscript
         TeX-newline
+        backward-sexp
         beg-of-line-text
         beginning-of-buffer
         beginning-of-visual-line
@@ -46,8 +47,10 @@
         isearch-repeat-backward
         js-newline-indent-for-real
         kill-selected-region-default
+        latex-insert-block
         latex-insert-math
         markdown-demote
+        markdown-electric-backquote
         markdown-exdent-or-delete
         markdown-promote
         newline-and-indent-fix-cc-mode
@@ -84,6 +87,7 @@
         clang-format-buffer
         describe-key
         describe-variable
+        ess-eval-buffer
         eval-buffer-and-message
         eval-expression
         helm-swoop
