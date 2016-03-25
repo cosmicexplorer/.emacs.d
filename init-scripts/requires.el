@@ -55,6 +55,7 @@
 (require 'pdf-tools)
 (require 'mmm-mode)
 (require 'csharp-mode)
+(require 'cuda-mode)
 
 ;;; my stuff
 (require 'utilities)
