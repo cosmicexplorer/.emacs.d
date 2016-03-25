@@ -170,6 +170,8 @@
             (define-key c++-mode-map (kbd "<C-return>")
               'newline-and-indent-ctrl-j)
             (define-key c++-mode-map (kbd "{") 'insert-brackets)
+            (define-key c-mode-map (kbd "C-c C-o") #'c-insert-block)
+            (define-key c++-mode-map (kbd "C-c C-o") #'cxx-insert-block)
             (define-key java-mode-map (kbd "C-c C-w") nil)))
 
 ;;; cool but never used cause lol search key

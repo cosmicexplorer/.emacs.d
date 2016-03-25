@@ -2658,4 +2658,29 @@ by another percent."
         (markdown-show-subtree)
       (markdown-hide-subtree))))
 
+
+(defun c-lang-insert-block (completions)
+  (let* ((block (completing-read "block types: " completions nil t))
+         (block-val (cdr (assoc block completions))))
+    (insert block "   ")
+    (backward-char)
+    (save-excursion
+      (insert "{}")
+      (when block-val (insert ";") (backward-char))
+      (backward-char)
+      (newline-and-indent)
+      (nuke-whitespace-except-this-line))
+    (backward-char)))
+
+(defconst c-block-completions '(("struct" . t)))
+(defun c-insert-block ()
+  (interactive)
+  (c-lang-insert-block c-block-completions))
+
+(defconst cxx-block-completions
+  (append c-block-completions '(("class" . t) ("namespace" . nil))))
+(defun cxx-insert-block ()
+  (interactive)
+  (c-lang-insert-block c++-block-completions))
+
 (provide 'functions)
