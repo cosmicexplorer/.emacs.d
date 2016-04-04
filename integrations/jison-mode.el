@@ -107,6 +107,8 @@
   (setq-local font-lock-defaults '(jison-bison-keywords))
   (setq-local font-lock-string-face nil)
   (add-hook 'jit-lock-after-change-extend-region-functions
-            #'jison-extend-region-function t t))
+            #'jison-extend-region-function t t)
+  (local-set-key
+   (kbd "(") (lambda () (interactive) (insert "()") (backward-char))))
 
 (provide 'jison-mode)
