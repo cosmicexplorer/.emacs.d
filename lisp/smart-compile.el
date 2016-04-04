@@ -128,7 +128,7 @@
                                  (go-mode            . (go-fmt-file-and-compile))
                                  (coffee-mode        . "coffee -bc --no-header %f")
                                  (qmake-mode         . "qmake")
-                                 (cmake-mode	     . "cmake %d")
+                                 (cmake-mode         . "cmake %d")
                                  (qmake-mode         . "qmake")
                                  )  "Alist of filename patterns vs corresponding format control strings.
 Each element looks like (REGEXP . STRING) or (MAJOR-MODE . STRING).

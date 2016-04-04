@@ -2681,6 +2681,6 @@ by another percent."
   (append c-block-completions '(("class" . t) ("namespace" . nil))))
 (defun cxx-insert-block ()
   (interactive)
-  (c-lang-insert-block c++-block-completions))
+  (c-lang-insert-block cxx-block-completions))
 
 (provide 'functions)

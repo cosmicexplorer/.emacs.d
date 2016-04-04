@@ -45,6 +45,7 @@
         isearch-forward-regexp
         isearch-printing-char
         isearch-repeat-backward
+        isearch-repeat-forward
         js-newline-indent-for-real
         kill-selected-region-default
         latex-insert-block
@@ -91,6 +92,7 @@
         eval-buffer-and-message
         eval-expression
         helm-swoop
+        help-for-help
         isearch-backward-regexp
         isearch-delete-char
         latex-compile

@@ -21,7 +21,6 @@
     auctex
     auto-complete
     better-defaults
-    bison-mode
     cider
     cloc
     clojure-mode

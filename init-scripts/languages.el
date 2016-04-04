@@ -399,7 +399,7 @@ Lisp code." t)
 (setq font-lock-maximum-decoration t)   ; turn it ALL the way on
 
 ;;; add code folding with hs-minor-mode
-(add-hook 'prog-mode-hook #'hs-minor-mode) ; add to all programming modes
+(add-hook 'prog-mode-hook (lambda () (ignore-errors (hs-minor-mode))))
 
 ;;; pretty sure this has to be done with a hook but i forget why
 (add-hook 'dired-load-hook
@@ -519,8 +519,9 @@ Lisp code." t)
 ;;; prolog
 (add-to-list 'auto-mode-alist '("\\.pro$" . prolog-mode))
 
-;;; bison
-(add-to-list 'auto-mode-alist '("\\.jison$" . bison-mode))
-
 ;;; pdf-tools rox
 (add-to-list 'auto-mode-alist '("\\.pdf$" . pdf-view-mode))
+
+;;; bison is dum
+(add-to-list 'auto-mode-alist '("\\.l\\'" . jison-flex-mode))
+(add-to-list 'auto-mode-alist '("\\.y\\'" . fundamental-mode))
