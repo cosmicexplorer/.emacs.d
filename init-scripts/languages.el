@@ -524,4 +524,4 @@ Lisp code." t)
 
 ;;; bison is dum
 (add-to-list 'auto-mode-alist '("\\.l\\'" . jison-flex-mode))
-(add-to-list 'auto-mode-alist '("\\.y\\'" . fundamental-mode))
+(add-to-list 'auto-mode-alist '("\\.y\\'" . jison-bison-mode))
