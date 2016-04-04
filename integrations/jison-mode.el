@@ -89,7 +89,7 @@
        (2 font-lock-type-face)
        (3 font-lock-keyword-face)
        (4 font-lock-preprocessor-face)))
-     ("^[ \t\r]*\\(:\\||\\)\\([^{]*?\\)\\s-+\\({\\)\\(\\(?:.\\|\n\\)*?\\)\\(}\\)[ \t\r]*$" .
+     ("^[ \t\r]*\\(:\\||\\)\\([^{|;]*?\\)\\s-+\\({\\)\\(\\(?:.\\|\n\\)*?\\)\\(}\\)[ \t\r]*$" .
       ((1 font-lock-keyword-face)
        (2 font-lock-type-face)
        (3 font-lock-keyword-face)
