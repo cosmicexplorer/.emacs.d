@@ -47,13 +47,16 @@
        (2 font-lock-variable-name-face)
        (3 font-lock-preprocessor-face)))
      ("^[_a-zA-Z][_a-zA-Z0-9]*" . ((0 font-lock-function-name-face)))
+     ("[^\\\\]\\(\\\\\\(?:\\\\\\\\\\)*\\)\\(\\(?:{\\|}\\|\\[\\|\\]\\|(\\|)\\|\"\\|'\\|\\*\\|\\+\\|\\^\\|,\\|\\-\\||\\|\\.\\|\\?\\)+\\)"
+      . ((1 font-lock-type-face)
+         (2 font-lock-type-face)))
      ("\\(?:\\`\\|[^\\]\\)\\(\\(?:\\\\\\\\\\)*\\)\\(\\(?:{\\|}\\|\\[\\|\\]\\|(\\|)\\|\"\\|'\\|\\*\\|\\+\\|\\^\\|,\\|\\-\\||\\|\\.\\|\\?\\)+\\)"
       . ((1 font-lock-preprocessor-face)
          (2 font-lock-keyword-face)))
      ("\\(\\(?:\\\\\\\\\\)+\\)\\(\\(?:{\\|}\\|\\[\\|\\]\\|(\\|)\\|\"\\|'\\|\\*\\|\\+\\|\\^\\|,\\|\\-\\||\\|\\.\\|\\?\\)+\\)"
       . ((1 font-lock-preprocessor-face)
          (2 font-lock-keyword-face)))
-     ("\\\\+." . ((0 font-lock-type-face)))
+     ("\\(?:\\\\\\)+." . ((0 font-lock-type-face)))
      ("\\(?:{\\|}\\|\\[\\|\\]\\|(\\|)\\|\"\\|'\\|\\*\\|\\+\\|\\^\\|,\\|\\-\\||\\|\\.\\|\\?\\)"
       . ((0 font-lock-keyword-face)))
      ("\\<return\\>" . ((0 font-lock-type-face)))
@@ -64,7 +67,9 @@
   (setq-local font-lock-defaults '(jison-flex-keywords))
   (setq-local font-lock-string-face nil)
   (add-hook 'jit-lock-after-change-extend-region-functions
-            #'jison-extend-region-function t t))
+            #'jison-extend-region-function t t)
+  (setq-local comment-start "/*")
+  (setq-local comment-end "*/"))
 
 (defface jison-string-face
   '((((class grayscale) (background light)) :foreground "DimGray" :slant italic)
@@ -108,6 +113,8 @@
   (setq-local font-lock-string-face nil)
   (add-hook 'jit-lock-after-change-extend-region-functions
             #'jison-extend-region-function t t)
+  (setq-local comment-start "/*")
+  (setq-local comment-end "*/")
   (local-set-key
    (kbd "(") (lambda () (interactive) (insert "()") (backward-char))))
 
