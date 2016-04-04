@@ -63,3 +63,4 @@
 (require 'long-lines)
 (require 'unix-find)
 (require 'ob-coffee)
+(require 'jison-mode)
