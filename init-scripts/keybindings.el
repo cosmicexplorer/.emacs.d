@@ -585,6 +585,7 @@
          #'switch-to-latex-compile-output)
        (define-key LaTeX-mode-map (kbd "C-c C-c")
          #'TeX-command-master)
+       (define-key LaTeX-mode-map (kbd "<C-return>") #'newline-and-indent)
        (define-key LaTeX-mode-map (kbd "C-c `") #'TeX-next-error))))
 
 (eval-after-load 'sh-script
@@ -600,7 +601,8 @@
   '(progn
      (define-key ess-mode-map (kbd "C-c C-v") nil)
      (define-key ess-mode-map (kbd "C-x C-e") #'ess-eval-paragraph-and-go)
-     (define-key ess-mode-map (kbd "C-h f") #'ess-display-help-on-object)))
+     (define-key ess-mode-map (kbd "C-h f") #'ess-display-help-on-object)
+     (define-key ess-mode-map (kbd "<C-return>") #'newline-and-indent)))
 
 (eval-after-load 'helm
   '(progn
