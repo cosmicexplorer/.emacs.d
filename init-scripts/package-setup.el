@@ -193,6 +193,9 @@
 (eval-after-load 'git-gutter-fringe
   '(fset 'git-gutter-fr:clear (symbol-function #'my-git-gutter-fr:clear)))
 
+(defun git-gutter-refresh-ignore-errors ()
+  (ignore-errors (git-gutter:refresh)))
+
 (define-minor-mode git-gutter-fringe-hack-mode
   "hack to make git gutter work"
   :group 'git-gutter
@@ -203,10 +206,10 @@
     (if git-gutter-fringe-hack-mode
         (progn
           (loop for hook in git-gutter-fringe-hack-hooks
-                do (add-hook hook #'git-gutter:refresh t t))
+                do (add-hook hook #'git-gutter-refresh-ignore-errors t t))
           (git-gutter))
       (loop for hook in git-gutter-fringe-hack-hooks
-            do (remove-hook hook #'git-gutter t))
+            do (remove-hook hook #'git-gutter-refresh-ignore-errors t))
       (git-gutter:clear))))
 (defun git-gutter-fringe-hack-turn-on ()
   (git-gutter-fringe-hack-mode +1))
