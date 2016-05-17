@@ -56,6 +56,8 @@
 (require 'mmm-mode)
 (require 'csharp-mode)
 (require 'cuda-mode)
+(require 'llvm-stuff)
+(require 'llvm-mode)
 
 ;;; my stuff
 (require 'utilities)
