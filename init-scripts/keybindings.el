@@ -221,10 +221,11 @@
      (define-key lisp-mode-map (kbd "C-h f") 'slime-documentation)
      (define-key lisp-mode-map (kbd "C-h v") 'slime-documentation)
      (define-key lisp-mode-map (kbd "C-h h") 'slime-hyperspec-lookup)
-     (define-key slime-mode-indirect-map (kbd "M-p")
-       #'mc/mark-previous-like-this)
-     (define-key slime-mode-indirect-map (kbd "M-n")
-       #'mc/mark-next-like-this)))
+     (when (boundp 'slime-mode-indirect-map)
+       (define-key slime-mode-indirect-map (kbd "M-p")
+         #'mc/mark-previous-like-this)
+       (define-key slime-mode-indirect-map (kbd "M-n")
+         #'mc/mark-next-like-this))))
 
 ;;; makefile
 (eval-after-load "make-mode"
@@ -501,9 +502,11 @@
   'paredit-forward-barf-sexp)
 (define-key paredit-mode-map (kbd "C-M-a C-M-<left>")
   'paredit-backward-barf-sexp)
-(define-key slime-mode-indirect-map (kbd "C-M-a") nil)
-(define-key slime-mode-indirect-map (kbd "C-c C-v") #'delete-whole-line)
-(define-key slime-repl-mode-map (kbd "M-s") nil)
+(eval-after-load 'slime
+   '(progn
+      (define-key slime-mode-indirect-map (kbd "C-M-a") nil)
+      (define-key slime-mode-indirect-map (kbd "C-c C-v") #'delete-whole-line
+      (define-key slime-repl-mode-map (kbd "M-s") nil))))
 ;; so that multiple-cursors can use these
 (define-key paredit-mode-map (kbd "C-x C-l") 'mc/edit-lines)
 (define-key paredit-mode-map (kbd "M-n") #'mc/mark-next-not-cider)

@@ -35,7 +35,11 @@
 ;;; because it's not detecting this variable correctly on windows fsr
 (setq ess-lisp-directory (concat init-home-folder-dir "ESS/lisp"))
 
-(make-submodule "ESS" "make" nil "1 min")
+(make-submodule "ESS" "make"
+                (lambda ()
+                  (remove-hook 'hack-local-variables-hook
+                               #'ess-r-package-activate-in-package))
+                "1 min")
 
 ;;; now let's load it
 (when (file-directory-p (concat init-home-folder-dir "/ESS/lisp"))
@@ -213,10 +217,7 @@
       (git-gutter:clear))))
 (defun git-gutter-fringe-hack-turn-on ()
   (git-gutter-fringe-hack-mode +1))
-(define-global-minor-mode global-git-gutter-fringe-hack-mode
-  git-gutter-fringe-hack-mode git-gutter-fringe-hack-turn-on
-  :group 'git-gutter)
-(global-git-gutter-fringe-hack-mode)
+(add-hook 'fundamental-mode-hook #'git-gutter-fringe-hack-mode)
 
 ;;; make git-gutter run on magit actions
 (defadvice magit-run-git (around run-git-gutter activate)

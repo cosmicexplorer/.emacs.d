@@ -423,7 +423,8 @@ Lisp code." t)
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
-(unless (executable-find "grip-no-header")
+(unless (or (executable-find "grip-no-header")
+            (file-exists-p "/usr/local/bin/grip-no-header"))
   (user-error
    "%s %s" "grip-no-header cannot be found! install from"
    "https://github.com/cosmicexplorer/grip"))
@@ -438,7 +439,10 @@ Lisp code." t)
 
 (defun set-gfm-markdown-command ()
   (set (make-local-variable 'markdown-command)
-       "grip-no-header --export -"))
+       (concat
+         (unless (executable-find "grip-no-header")
+           "/usr/local/bin/")
+         "grip-no-header --export -")))
 
 (add-hook 'gfm-mode-hook #'set-gfm-markdown-command)
 
@@ -525,3 +529,6 @@ Lisp code." t)
 ;;; bison is dum
 (add-to-list 'auto-mode-alist '("\\.l\\'" . jison-flex-mode))
 (add-to-list 'auto-mode-alist '("\\.y\\'" . jison-bison-mode))
+
+;;; llvm stuff
+(add-to-list 'auto-mode-alist '("\\.ll\\'" . llvm-mode))
