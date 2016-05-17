@@ -211,6 +211,8 @@ Check out your .emacs."))
 
 (garbage-collect)
 
+(setq visible-bell nil)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -255,7 +257,8 @@ Check out your .emacs."))
      ("\\.html\\'" "chromium" "firefox")
      ("\\.vi\\'" "labview")
      ("\\.R\\'" "Rscript")
-     ("\\.svg\\'" "inkscape"))))
+     ("\\.svg\\'" "inkscape")
+     ("\\.\\(?:mp3\\|wav\\|wmv\\)\\'" "cvlc --play-and-exit"))))
  '(dired-no-confirm t)
  '(dired-recursive-copies (quote always))
  '(dired-recursive-deletes (quote always))
@@ -391,7 +394,8 @@ Check out your .emacs."))
  '(rainbow-x-colors t)
  '(safe-local-variable-values
    (quote
-    ((no-gfm)
+    ((js2-basic-offset . 4)
+     (no-gfm)
      (Syntax . ANSI-Common-Lisp)
      (Base . 10)
      (no-gfm . t)

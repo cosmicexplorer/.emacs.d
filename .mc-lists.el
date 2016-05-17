@@ -16,9 +16,11 @@
         beginning-of-visual-line
         bison-electric-open-brace
         bison-electric-pipe
+        c-electric-brace
         c-electric-colon
         c-electric-lt-gt
         c-electric-paren
+        c-electric-pound
         c-electric-semi&comma
         c-electric-slash
         c-electric-star
@@ -30,6 +32,7 @@
         delete-whole-line
         destroy-all-whitespace-nearby
         dired-next-line
+        dired-previous-line
         electric-pair-delete-pair
         end-of-buffer
         end-of-visual-line
