@@ -117,6 +117,35 @@ also."
 
 (defalias 'small-text 'little-text)
 
+(defun increase-font-size ()
+  (interactive)
+  (let ((attr (face-attribute 'default :height)))
+    (set-face-attribute 'default nil :height (+ attr 10))))
+
+(defun increase-font-size-a-little ()
+  (interactive)
+  (let ((attr (face-attribute 'default :height)))
+    (set-face-attribute 'default nil :height (+ attr 5))))
+
+(defun decrease-font-size ()
+  (interactive)
+  (let ((attr (face-attribute 'default :height)))
+    (set-face-attribute 'default nil :height (- attr 10))))
+
+(defun decrease-font-size-a-little ()
+  (interactive)
+  (let ((attr (face-attribute 'default :height)))
+    (set-face-attribute 'default nil :height (- attr 5))))
+
+(define-minor-mode change-font-size-mode
+  "Change font size interactively!" nil "FontSize"
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "<up>") #'increase-font-size)
+    (define-key map (kbd "<down>") #'decrease-font-size)
+    (define-key map (kbd "<left>") #'decrease-font-size-a-little)
+    (define-key map (kbd "<right>") #'increase-font-size-a-little)
+    map))
+
 (defun tiny-text ()
   (interactive)
   (set-face-attribute 'default nil :height 50))
