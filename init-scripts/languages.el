@@ -431,6 +431,7 @@ Lisp code." t)
 
 (defun setup-markdown-mode ()
   (if (and (not no-gfm)
+           (not (derived-mode-p 'gfm-mode))
            (zerop (call-process
                    "git" nil nil nil "rev-parse" "--git-dir")))
       (gfm-mode)
