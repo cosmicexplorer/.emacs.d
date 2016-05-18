@@ -113,13 +113,19 @@
                                (if found (reverse results)
                                  (error "No match found for %S" after))))))))))
 
+(defun magit-just-pull (args)
+  (interactive (list (magit-pull-arguments)))
+  (magit-run-git-with-editor "pull" args))
+
 (with-eval-after-load 'magit-remote
   (magit-define-popup-action 'magit-push-popup ?u "I PUSH WHERE I WANT"
     #'magit-reset-push-destination ?p)
   (magit-define-popup-action 'magit-push-popup ?P "just fuckin push it lol"
     #'magit-push-current-to-upstream ?u)
   (magit-define-popup-action 'magit-pull-popup ?F "just fuckin pull it lol"
-    #'magit-pull-from-upstream ?u)
+    #'magit-just-pull ?u)
+  (magit-define-popup-action 'magit-pull-popup ?f "fancier"
+    #'magit-pull-from-upstream ?F)
   (magit-add-action-to-popup "DESTRUCTION" magit-push-popup)
   (magit-define-popup-action 'magit-push-popup ?d "DESTROY IT"
     #'magit-delete-remote-branch))
@@ -217,7 +223,9 @@
       (git-gutter:clear))))
 (defun git-gutter-fringe-hack-turn-on ()
   (git-gutter-fringe-hack-mode +1))
-(add-hook 'fundamental-mode-hook #'git-gutter-fringe-hack-mode)
+(define-globalized-minor-mode global-git-gutter-fringe-hack-mode
+  git-gutter-fringe-hack-mode git-gutter-fringe-hack-turn-on)
+(global-git-gutter-fringe-hack-mode)
 
 ;;; make git-gutter run on magit actions
 (defadvice magit-run-git (around run-git-gutter activate)
