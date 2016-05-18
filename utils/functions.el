@@ -2195,15 +2195,23 @@ by another percent."
     (set-visited-file-name name)
     (save-buffer)))
 
-(defun beg-of-line-text ()
+(defun beg-of-maybe-visual-line ()
   (interactive "^")
   (if (derived-mode-p 'text-mode) (beginning-of-visual-line)
-    (beginning-of-line))
+    (beginning-of-line)))
+
+(defun end-of-maybe-visual-line ()
+  (interactive "^")
+  (if (derived-mode-p 'text-mode) (end-of-visual-line) (end-of-line)))
+
+(defun beg-of-line-text ()
+  (interactive "^")
+  (beg-of-maybe-visual-line)
   (while (whitespacep (char-after)) (right-char)))
 
 (defun end-of-line-text ()
   (interactive "^")
-  (if (derived-mode-p 'text-mode) (end-of-visual-line) (end-of-line))
+  (end-of-maybe-visual-line)
   (while (whitespacep (char-before)) (left-char)))
 
 (defun delete-all-weird-buffers ()

@@ -552,7 +552,6 @@
   '(define-key eww-mode-map (kbd "C-c v") #'refresh-visual-line-mode))
 
 ;;; git-gutter
-;;; FIXME: don't work sometimes, randomly
 (global-set-key (kbd "C-x l") #'num-lines-file)
 (global-set-key (kbd "C-c n") #'git-gutter:next-hunk)
 (global-set-key (kbd "C-c p") #'git-gutter:previous-hunk)
@@ -560,7 +559,11 @@
 (global-set-key (kbd "C-c d") #'git-gutter:diff-and-switch)
 (global-set-key (kbd "C-c r") #'git-gutter:revert-hunk)
 (global-set-key (kbd "<home>") #'beg-of-line-text)
-(global-set-key (kbd "<end>") #'move-end-of-line)
+(global-set-key (kbd "<end>") #'end-of-line-text)
+(global-set-key (kbd "C-a") #'beg-of-line-text)
+(global-set-key (kbd "C-e") #'end-of-line-text)
+(global-set-key (kbd "C-M-S-a") #'beg-of-maybe-visual-line)
+(global-set-key (kbd "C-M-S-e") #'end-of-maybe-visual-line)
 
 (global-set-key (kbd "C-c C-v") #'delete-whole-line)
 (global-set-key (kbd "C-x C-r") #'revert-buffer-no-confirm)
