@@ -2712,4 +2712,10 @@ by another percent."
   (interactive)
   (c-lang-insert-block cxx-block-completions))
 
+(defun repeat-string (count str)
+  (cl-loop for i from 1 upto count
+           with start = ""
+           do (setq start (concat start str))
+           finally return start))
+
 (provide 'functions)

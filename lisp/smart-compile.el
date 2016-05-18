@@ -180,6 +180,8 @@ evaluate FUNCTION instead of running a compilation command.
 (make-variable-buffer-local 'smart-compile-check-gyp)
 (defvar smart-compile-check-cakefile t)
 (make-variable-buffer-local 'smart-compile-check-cakefile)
+(defvar-local smart-compile-check-pants t)
+(defvar-local pants-build-file nil)
 
 (defcustom smart-compile-make-program "make "
   "The command by which to invoke the make program."
@@ -275,7 +277,19 @@ which is defined in `smart-compile-alist'."
          "sh " "^compile\\.sh$" 4 t nil t add-compile-script-name))
        ((add-build-system
          (if (eq system-type 'windows-nt) "msbuild.exe" "xbuild")
-         "^.*\\.sln$" 5 nil nil t))))
+         "^.*\\.sln$" 5 nil nil t))
+       ((and smart-compile-check-pants
+             (setq pants-build-file
+                   (cl-find-if
+                    #'file-exists-p
+                    (append
+                     '("./pants")
+                     (cl-loop
+                      for num from 1 to 15
+                      collect (concat (repeat-string num "../") "pants"))))))
+        (setq-local compile-command pants-build-file)
+        (call-interactively 'compile)
+        t)))
 
     ;; compile
     (let( (alist smart-compile-alist)
