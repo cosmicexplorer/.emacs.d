@@ -664,3 +664,10 @@ Check out your .emacs.\n")))))
 
 (defadvice dired-async-after-file-create (after revert-bufs activate)
   (run-with-timer 0 nil #'revert-buffer nil t))
+
+;;; make sure we get any custom paths we add to the shell
+(let ((true-path
+       (concat
+        (shell-command-to-string "echo -n \"$PATH\"") ":" (getenv "PATH"))))
+  (setenv "PATH" true-path)
+  (setq exec-path (append (split-string true-path ":") exec-path)))
