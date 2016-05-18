@@ -671,3 +671,5 @@ Check out your .emacs.\n")))))
         (shell-command-to-string "echo -n \"$PATH\"") ":" (getenv "PATH"))))
   (setenv "PATH" true-path)
   (setq exec-path (append (split-string true-path ":") exec-path)))
+
+(setq ring-bell-function (lambda ()))
