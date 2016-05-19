@@ -517,6 +517,9 @@ Lisp code." t)
        (interactive)
        (ruby-send-region-and-go (point-min) (point-max)))))
 
+(eval-after-load 'company
+  '(push 'company-robe company-backends))
+
 ;;; ocaml
 (eval-after-load 'tuareg
   '(add-to-list 'auto-mode-alist '("\\.ocamlinit$" . tuareg-mode)))

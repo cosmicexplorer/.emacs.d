@@ -712,3 +712,6 @@
   '(progn
      (define-key slime-mode-map (kbd "C-c C-w") nil)
      (define-key slime-mode-map (kbd "C-M-x") #'slime-eval-buffer-or-region)))
+
+(with-eval-after-load 'ensime-mode
+  (define-key ensime-mode-map (kbd "C-c C-v") #'delete-whole-line))
