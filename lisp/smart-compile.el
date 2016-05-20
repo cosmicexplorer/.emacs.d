@@ -287,9 +287,11 @@ which is defined in `smart-compile-alist'."
                      (cl-loop
                       for num from 1 to 15
                       collect (concat (repeat-string num "../") "pants"))))))
-        (setq-local compile-command pants-build-file)
+        (setq-local compile-command
+                    (format "cd %s && ./pants "
+                            (file-name-directory pants-build-file)))
         (call-interactively 'compile)
-        t)))
+        (setq not-yet nil))))
 
     ;; compile
     (let( (alist smart-compile-alist)

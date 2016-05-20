@@ -40,6 +40,7 @@
     evil
     flycheck
     flycheck-package
+    font-lock-studio
     ggtags
     ghc
     git-gutter
@@ -89,6 +90,7 @@
     sml-mode
     sourcemap
     speech-tagger
+    thrift
     undo-tree
     w3m
     web-beautify

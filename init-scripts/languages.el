@@ -357,6 +357,7 @@ Lisp code." t)
 (setq auto-mode-alist
       (cons '("SConscript" . python-mode) auto-mode-alist))
 (add-hook 'python-mode-hook #'eldoc-mode)
+(add-to-list 'auto-mode-alist '("BUILD\\'" . python-mode))
 
 ;;; js/css/html
 (setq js-indent-level 2)
