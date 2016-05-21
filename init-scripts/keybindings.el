@@ -559,9 +559,9 @@
 (global-set-key (kbd "C-c d") #'git-gutter:diff-and-switch)
 (global-set-key (kbd "C-c r") #'git-gutter:revert-hunk)
 (global-set-key (kbd "<home>") #'beg-of-line-text)
-(global-set-key (kbd "<end>") #'end-of-line-text)
+(global-set-key (kbd "<end>") #'end-of-maybe-visual-line)
 (global-set-key (kbd "C-a") #'beg-of-line-text)
-(global-set-key (kbd "C-e") #'end-of-line-text)
+(global-set-key (kbd "C-e") #'end-of-maybe-visual-line)
 (global-set-key (kbd "C-M-S-a") #'beg-of-maybe-visual-line)
 (global-set-key (kbd "C-M-S-e") #'end-of-maybe-visual-line)
 
