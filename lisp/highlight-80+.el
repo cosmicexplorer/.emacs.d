@@ -54,26 +54,12 @@
   "*Face for showing characters beyond column `highlight-80+-columns'."
   :group 'highlight-80+-line)
 
-(defface highlight-80+-first
-  nil
-  "*Face for showing the first character beyond `highlight-80+-columns'."
-  :group 'highlight-80+-line)
-
 (defconst highlight-80+-keywords
   `((highlight-80+-matcher (0 'highlight-80+-line prepend)
-                           (1 'highlight-80+ prepend)
-                           (2 'highlight-80+-first prepend))))
+                           (1 'highlight-80+ prepend))))
 
-(defsubst highlight-80+-format ()
-  (if (< tab-width 2)
-      "^\\(\\)\\([^\n]\\)\\{80,\\}$"
-    (concat (format "^\\(?:[^\t\n]\\{%d\\}\\|[^\t\n]\\{,%d\\}\t\\)\\{%d\\}"
-                    tab-width (- tab-width 1)
-                    (/ highlight-80+-columns tab-width))
-            (let ((remainder (mod highlight-80+-columns tab-width)))
-              (when remainder
-                (format "\\(?:[^\t\n]\\{%d\\}\\|\t\\)" remainder)))
-            "\\(\\(.\\).*\\)$")))
+(defun highlight-80+-format ()
+  (format "^[^\n]\\{%d\\}\\([^\n]*\\)$" highlight-80+-columns))
 
 (defvar highlight-80+-last-width 0)
 (make-variable-buffer-local 'highlight-80+-last-width)
@@ -84,20 +70,25 @@
 (defun highlight-80+-matcher (limit)
   ;; Update search when `tab-width' has changed.
   (unless (equal highlight-80+-last-width tab-width)
-    (setq highlight-80+-last-keywords (highlight-80+-format)
-          highlight-80+-last-width tab-width)
+    (highlight-80+-reset)
     ;; The rest of the buffer can't be right, either.
     (let ((font-lock-keywords))
       (font-lock-fontify-buffer)))
   ;; re-search-forward is C and much faster checking columns ourselves
   (re-search-forward highlight-80+-last-keywords nil t))
 
+(defun highlight-80+-reset ()
+  (setq highlight-80+-last-keywords (highlight-80+-format)
+        highlight-80+-last-width tab-width))
+
 ;;;###autoload
 (define-minor-mode highlight-80+-mode
   "Highlight the portions of lines longer than 80 characters."
   nil " 80+" nil
   (if highlight-80+-mode
-      (font-lock-add-keywords nil highlight-80+-keywords t)
+      (progn
+        (font-lock-add-keywords nil highlight-80+-keywords t)
+        (add-hook 'hack-local-variables-hook #'highlight-80+-reset t t))
     (font-lock-remove-keywords nil highlight-80+-keywords)
     (kill-local-variable 'highlight-80+-last-keywords)
     (kill-local-variable 'highlight-80+-last-width))

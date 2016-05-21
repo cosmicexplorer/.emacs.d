@@ -502,3 +502,5 @@ If SUBMODE is not provided, use `LANG-mode' by default."
 (my-mmm-markdown-auto-class "shell" 'shell-script-mode)
 
 (defun ess-save-excursion-when-nil (_))
+
+(put 'highlight-80+-columns 'safe-local-variable (lambda (_) t))
