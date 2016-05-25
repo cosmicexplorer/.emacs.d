@@ -505,8 +505,8 @@
 (eval-after-load 'slime
    '(progn
       (define-key slime-mode-indirect-map (kbd "C-M-a") nil)
-      (define-key slime-mode-indirect-map (kbd "C-c C-v") #'delete-whole-line
-      (define-key slime-repl-mode-map (kbd "M-s") nil))))
+      (define-key slime-mode-indirect-map (kbd "C-c C-v") #'delete-whole-line)
+      (define-key slime-repl-mode-map (kbd "M-s") nil)))
 ;; so that multiple-cursors can use these
 (define-key paredit-mode-map (kbd "C-x C-l") 'mc/edit-lines)
 (define-key paredit-mode-map (kbd "M-n") #'mc/mark-next-not-cider)
