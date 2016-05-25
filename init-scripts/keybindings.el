@@ -465,6 +465,8 @@
 (define-key compilation-mode-map (kbd "G")
   (lambda () (interactive) (recompile t)))
 (define-key compilation-mode-map (kbd "k") #'kill-compilation)
+(define-key compilation-mode-map (kbd "p") #'compilation-previous-error)
+(define-key compilation-mode-map (kbd "n") #'compilation-next-error)
 
 (eval-after-load 'haskell-interactive-mode
   '(progn
@@ -714,4 +716,6 @@
      (define-key slime-mode-map (kbd "C-M-x") #'slime-eval-buffer-or-region)))
 
 (with-eval-after-load 'ensime-mode
-  (define-key ensime-mode-map (kbd "C-c C-v") #'delete-whole-line))
+  (define-key ensime-mode-map (kbd "C-c C-v") #'delete-whole-line)
+  (define-key ensime-mode-map (kbd "M-n") #'mc/mark-next-like-this)
+  (define-key ensime-mode-map (kbd "M-p") #'mc/mark-previous-like-this))
