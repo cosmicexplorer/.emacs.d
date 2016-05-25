@@ -358,6 +358,7 @@ Lisp code." t)
       (cons '("SConscript" . python-mode) auto-mode-alist))
 (add-hook 'python-mode-hook #'eldoc-mode)
 (add-to-list 'auto-mode-alist '("BUILD\\'" . python-mode))
+(add-to-list 'auto-mode-alist '("\\.aurora\\'" . python-mode))
 
 ;;; js/css/html
 (setq js-indent-level 2)
@@ -507,6 +508,16 @@ Lisp code." t)
       (setq ad-return-value
             (read-file-name "sbt project root: " nil "./" nil "./")))))
 ;;; also something so ensime runs "sbt gen-ensime" for you
+
+(defvar-local prev-indent-pt nil)
+(defadvice scala-indent:indent-line (after add-space activate)
+  (when (looking-back "//")
+    (insert " ")
+    (setq prev-indent-pt (point))))
+(defadvice comment-dwim (after maintain-space activate)
+  (when prev-indent-pt
+    (goto-char prev-indent-pt)
+    (setq prev-indent-pt nil)))
 
 ;;; lua stuff
 (add-to-list 'auto-mode-alist '("\\.nse$" . lua-mode))

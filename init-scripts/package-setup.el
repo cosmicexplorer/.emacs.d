@@ -355,7 +355,11 @@
          ("MATLAB" (mode . matlab-mode))
          ("Octave" (mode . octave-mode))
          ("OCaml" (mode . tuareg-mode))
+         ("Scala" (mode . scala-mode))
+         ("Thrift" (mode . thrift-mode))
          ("lexer" (name . "\\.l\\'"))
+         ("shell" (mode . shell-mode))
+         ("conf" (mode . conf-mode))
          ("grammar" (or (name . "\\.y\\'")
                         (name . "\\.jison\\'")))
          ("default" (name . "")))))
@@ -502,3 +506,5 @@ If SUBMODE is not provided, use `LANG-mode' by default."
 (my-mmm-markdown-auto-class "shell" 'shell-script-mode)
 
 (defun ess-save-excursion-when-nil (_))
+
+(put 'highlight-80+-columns 'safe-local-variable (lambda (_) t))
