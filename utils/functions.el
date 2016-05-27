@@ -2751,4 +2751,22 @@ by another percent."
       (goto-line line)
       (recenter))))
 
+(defun cleanup-git-gutter-buffers ()
+  (interactive)
+  (mapc #'kill-buffer
+        (cl-remove-if-not
+         (lambda (buf)
+           (string-match-p "\\`\\*git-gutter:.*\\*\\'" (buffer-name buf)))
+         (buffer-list))))
+
+(defun cleanup-all-temp-buffers ()
+  (interactive)
+  (mapatoms
+   (lambda (sym)
+     (when (and (functionp sym)
+                (string-match-p "\\`cleanup\\-.+\\-buffers\\'"
+                                (symbol-name sym))
+                (not (eq sym 'cleanup-all-temp-buffers)))
+       (call-interactively sym)))))
+
 (provide 'functions)
