@@ -2726,4 +2726,29 @@ by another percent."
            do (setq start (concat start str))
            finally return start))
 
+(defun show-the-time ()
+  (interactive)
+  (let ((fmt (format-time-string "%H:%M:%S@%Y-%m-%d" (current-time))))
+    (if (called-interactively-p 'any)
+        (message "%s" fmt)
+      fmt)))
+
+(defun goto-file-line-at-rev-magit (file line rev &optional other-window)
+  (interactive
+   (let ((file (buffer-file-name
+                (save-window-excursion (call-interactively #'ido-find-file)))))
+     (list file
+           (read-number "line number: ")
+           (let ((default-directory (file-name-directory file)))
+             (my-magit-read-branch-or-commit "revision"))
+           current-prefix-arg)))
+  (let* ((default-directory (file-name-directory file))
+         (buf
+          (if other-window
+              (magit-find-file-other-window rev file)
+            (magit-find-file rev file))))
+    (with-current-buffer buf
+      (goto-line line)
+      (recenter))))
+
 (provide 'functions)
