@@ -117,15 +117,24 @@
   (interactive (list (magit-pull-arguments)))
   (magit-run-git-with-editor "pull" args))
 
+(defun my-magit-pull-upstream-branch (args)
+  (interactive (list (magit-pull-arguments)))
+  (progn
+    (run-hooks 'magit-credential-hook)
+    (cl-destructuring-bind (remote . branch)
+        (magit-split-branch-name (magit-get-upstream-branch))
+      (magit-run-git-with-editor
+       "pull" "-v" args remote branch))))
+
 (with-eval-after-load 'magit-remote
   (magit-define-popup-action 'magit-push-popup ?u "I PUSH WHERE I WANT"
     #'magit-reset-push-destination ?p)
   (magit-define-popup-action 'magit-push-popup ?P "just fuckin push it lol"
     #'magit-push-current-to-upstream ?u)
   (magit-define-popup-action 'magit-pull-popup ?F "just fuckin pull it lol"
-    #'magit-just-pull ?u)
-  (magit-define-popup-action 'magit-pull-popup ?f "fancier"
-    #'magit-pull-from-upstream ?F)
+     #'my-magit-pull-upstream-branch ?u)
+  (magit-define-popup-action 'magit-pull-popup ?f "pull EVERYTHING"
+    #'magit-just-pull ?F)
   (magit-add-action-to-popup "DESTRUCTION" magit-push-popup)
   (magit-define-popup-action 'magit-push-popup ?d "DESTROY IT"
     #'magit-delete-remote-branch))
