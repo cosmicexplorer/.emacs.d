@@ -2769,4 +2769,21 @@ by another percent."
                 (not (eq sym 'cleanup-all-temp-buffers)))
        (call-interactively sym)))))
 
+(defun get-linewise-center (beg end)
+  (unless (<= beg end) (error (format "beg (%d) is before end (%d)" beg end)))
+  (save-excursion
+    (goto-char beg)
+    (catch 'done
+      (cl-loop for i from 0 to (/ (count-lines beg end) 2)
+               do (unless (re-search-forward "\n" end t)
+                    (throw 'done nil))))
+    (point)))
+
+(defun center-function ()
+  (interactive)
+  (let ((beg (save-excursion (beginning-of-defun) (point)))
+        (end (save-excursion (end-of-defun) (point))))
+    (goto-char (get-linewise-center beg end))
+    (recenter)))
+
 (provide 'functions)
