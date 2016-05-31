@@ -192,7 +192,6 @@
   #'my-magit-diff-paths)
 
 (defconst git-gutter-fringe-hack-hooks git-gutter:update-hooks)
-(defvar git-gutter-fringe-hack-not-modes '(minibuffer-inactive-mode))
 
 (defun git-gutter:refresh ()
   (git-gutter:clear)
@@ -221,7 +220,7 @@
   :init-value nil
   :global nil
   :lighter git-gutter:lighter
-  (unless (apply #'derived-mode-p git-gutter-fringe-hack-not-modes)
+  (ignore-errors
     (if git-gutter-fringe-hack-mode
         (progn
           (loop for hook in git-gutter-fringe-hack-hooks
