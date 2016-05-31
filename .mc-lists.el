@@ -35,6 +35,7 @@
         dired-previous-line
         electric-pair-delete-pair
         end-of-buffer
+        end-of-maybe-visual-line
         end-of-visual-line
         ess-smart-comma
         eval-last-sexp
