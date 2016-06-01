@@ -465,8 +465,16 @@
 (define-key compilation-mode-map (kbd "G")
   (lambda () (interactive) (recompile t)))
 (define-key compilation-mode-map (kbd "k") #'kill-compilation)
-(define-key compilation-mode-map (kbd "p") #'compilation-previous-error)
-(define-key compilation-mode-map (kbd "n") #'compilation-next-error)
+(define-key compilation-mode-map (kbd "p")
+  (lambda ()
+    (interactive)
+    (compilation-previous-error 1)
+    (recenter)))
+(define-key compilation-mode-map (kbd "n")
+  (lambda ()
+    (interactive)
+    (compilation-next-error 1)
+    (recenter)))
 
 (eval-after-load 'haskell-interactive-mode
   '(progn
