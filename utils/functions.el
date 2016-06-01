@@ -820,7 +820,8 @@ scope of the command's precision.")
                                      saved-files ": \"" cur-line "\""))
                      (newline))))
                (forward-line)))
-    (kill-buffer)))
+    (kill-buffer))
+  (cleanup-all-buffers))
 
 (defun compose-helper (arg quoted-funs)
   (if (null quoted-funs) arg
@@ -2759,15 +2760,16 @@ by another percent."
            (string-match-p "\\`\\*git-gutter:.*\\*\\'" (buffer-name buf)))
          (buffer-list))))
 
-(defun cleanup-all-temp-buffers ()
+(defun cleanup-all-buffers ()
   (interactive)
   (mapatoms
    (lambda (sym)
      (when (and (functionp sym)
                 (string-match-p "\\`cleanup\\-.+\\-buffers\\'"
                                 (symbol-name sym))
-                (not (eq sym 'cleanup-all-temp-buffers)))
-       (call-interactively sym)))))
+                (not (eq sym 'cleanup-all-buffers)))
+       (call-interactively sym))))
+  (clean-all-buffers-to-deleted-files))
 
 (defun get-linewise-center (beg end)
   (unless (<= beg end) (error (format "beg (%d) is before end (%d)" beg end)))
