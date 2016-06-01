@@ -82,6 +82,7 @@
     rainbow-mode
     s
     scala-mode2
+    scrooge
     shut-up
     skewer-mode
     slime
