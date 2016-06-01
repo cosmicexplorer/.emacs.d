@@ -689,6 +689,7 @@ scope of the command's precision.")
              (when (and
                     (not (string-match-p "\\`\\*.*\\*\\'" (buffer-name)))
                     (not (get-buffer-process (buffer-name)))
+                    (not (derived-mode-p 'magit-mode))
                     (or
                      (not (file-exists-p default-directory))
                      (not (and (buffer-file-name)
