@@ -81,7 +81,7 @@
     rainbow-delimiters
     rainbow-mode
     s
-    scala-mode2
+    scala-mode
     scrooge
     shut-up
     skewer-mode
