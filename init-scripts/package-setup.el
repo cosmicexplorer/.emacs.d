@@ -191,8 +191,6 @@
 (magit-define-popup-action 'magit-diff-popup ?p "Diff paths"
   #'my-magit-diff-paths)
 
-(add-hook 'magit-post-refresh-hook #'clean-all-buffers-to-deleted-files)
-
 ;;; git-gutter
 (defconst git-gutter-fringe-hack-hooks git-gutter:update-hooks)
 
