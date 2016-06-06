@@ -191,10 +191,10 @@
 (magit-define-popup-action 'magit-diff-popup ?p "Diff paths"
   #'my-magit-diff-paths)
 
-(defun my-magit-diff-from-merge-base (other-branch &optional this-branch)
-  (interactive
-   (list (magit-read-branch "branched from:")))
-  (let ((cur-branch (or this-branch (magit-get-current-branch))))
+(defun my-magit-diff-from-merge-base (pfx)
+  (interactive "P")
+  (let ((cur-branch (magit-get-current-branch))
+        (other-branch (if pfx (magit-read-branch "other branch") "master")))
     (magit-diff
      (format "%s..%s"
              (replace-regexp-in-string
@@ -204,15 +204,8 @@
                        magit-git-executable other-branch cur-branch)))
              cur-branch))))
 
-(defun my-magit-diff-from-master (&optional this-branch)
-  (interactive
-   (list (magit-get-current-branch)))
-  (my-magit-diff-from-merge-base "master" this-branch))
-
 (magit-define-popup-action 'magit-diff-popup ?m "merge-base"
   #'my-magit-diff-from-merge-base)
-(magit-define-popup-action 'magit-diff-popup ?M "master"
-  #'my-magit-diff-from-master)
 
 ;;; git-gutter
 (defconst git-gutter-fringe-hack-hooks git-gutter:update-hooks)
