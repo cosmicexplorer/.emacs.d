@@ -194,7 +194,8 @@
 (defun my-magit-diff-from-merge-base (pfx)
   (interactive "P")
   (let ((cur-branch (magit-get-current-branch))
-        (other-branch (if pfx (magit-read-branch "other branch") "master")))
+        (other-branch
+         (if pfx (magit-read-branch-or-commit "other branch") "master")))
     (magit-diff
      (format "%s..%s"
              (replace-regexp-in-string
