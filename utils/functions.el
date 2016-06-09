@@ -2770,7 +2770,9 @@ by another percent."
                                 (symbol-name sym))
                 (not (eq sym 'cleanup-all-buffers)))
        (call-interactively sym))))
-  (clean-all-buffers-to-deleted-files))
+  (clean-all-buffers-to-deleted-files)
+  (tramp-cleanup-all-connections)
+  (tramp-cleanup-all-buffers))
 
 (defun get-linewise-center (beg end)
   (unless (<= beg end) (error (format "beg (%d) is before end (%d)" beg end)))
