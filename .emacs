@@ -233,6 +233,8 @@ Check out your .emacs."))
  '(company-dabbrev-code-modes
    (quote
     (prog-mode batch-file-mode csharp-mode css-mode erlang-mode haskell-mode jde-mode lua-mode python-mode)))
+ '(company-dabbrev-downcase nil)
+ '(company-dabbrev-ignore-case t)
  '(compilation-scroll-output t)
  '(compile-command "make")
  '(dabbrev-case-replace nil)
