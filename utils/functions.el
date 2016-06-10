@@ -440,33 +440,40 @@ parentheses. CURRENTLY BROKEN"
   :group 'my-customizations
   :type '(alist :key-type symbol :value-type function))
 
-(defun kill-buffer-and-move-file-to-trash (pfx)
-  "Doesn't delete the file, just moves it to /tmp so that it goes away."
-  (interactive "P")
-  (set-buffer-modified-p nil)           ; pretends buffer not modified
-  (let ((msg
-         (shell-command-to-string
+(defun make-move-buf-to-tmp-file-command (fname)
+  (let* ((short-name (file-name-nondirectory fname))
+         (tmp-file (make-temp-file short-name))
+         (shell-cmd
           (if (eq system-type 'windows-nt)
-              (concat "move " "\"" (convert-standard-filename
-                                    (buffer-file-name)) "\" \""
-                                    (getenv "temp") "\"")
-            (concat "mv " "\"" (buffer-file-name) "\"" " /tmp/")))))
-    (let ((compiled-file                  ;  save generated filename
-           (let ((res (assq major-mode kill-buffer-trash-alist)))
-             (when res (funcall (cdr res) (buffer-file-name))))))
-      (unless (and compiled-file (file-exists-p compiled-file))
-        (setq compiled-file nil))
-      (if compiled-file
-          (message
-           (concat msg
-                   (shell-command-to-string
-                    (if (eq system-type 'windows-nt)
-                        (concat "move " "\"" (convert-standard-filename
-                                              compiled-file) "\" "
-                                              (getenv "temp"))
-                      (concat "mv " "\"" compiled-file "\"" " /tmp/")))))
-        (message msg))))
-  (if pfx (close-and-kill-this-pane nil) (kill-this-buffer)))
+              (format
+               "move \"%s\" \"%s\""
+               (convert-standard-filename fname)
+               (convert-standard-filename tmp-file))
+            (format "mv \"%s\" \"%s\"" fname tmp-file))))
+    (list shell-cmd tmp-file)))
+
+(defun kill-buffer-and-move-file-to-trash (pfx)
+  "Doesn't delete the file, just moves it to `temporary-file-directory' so that
+it goes away."
+  (interactive "P")
+  (set-buffer-modified-p nil)
+  (let ((fname (buffer-file-name)))
+    (cl-destructuring-bind (cmd tmp-file)
+        (make-move-buf-to-tmp-file-command fname)
+      (let ((compiled-file
+             (let ((res (assq major-mode kill-buffer-trash-alist)))
+               (when res (funcall (cdr res) (buffer-file-name))))))
+        (if pfx (close-and-kill-this-pane nil) (kill-this-buffer))
+        (if compiled-file
+            (cl-destructuring-bind (next-cmd next-tmp-file)
+                (make-move-buf-to-tmp-file-command compiled-file)
+              (message (concat "'%s' -> '%s' (output: '%s')\n"
+                               "'%s' -> '%s' (output: '%s')")
+                       fname tmp-file (shell-command-to-string cmd)
+                       compiled-file next-tmp-file
+                       (shell-command-to-string next-cmd)))
+          (message "'%s' -> '%s' (output: '%s')"
+                   fname tmp-file (shell-command-to-string cmd)))))))
 
 (defun string/starts-with (s begins)
   "Return non-nil if string S starts with BEGINS."
