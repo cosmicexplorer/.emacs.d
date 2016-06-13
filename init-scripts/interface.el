@@ -582,9 +582,14 @@ Check out your .emacs.\n")))))
 ;;; ibuffer moves things around when i mark things and this scares me
 (defadvice ibuffer-mark-interactive (after re-recenter activate) (recenter))
 
+(defvar-local is-find-dired-buffer nil)
+
 ;;; dired doesn't color the bottom file in a listing upon pressing
 ;;; TODO: submit fix for this
-(defadvice dired-mark (after dont-lie-to-me activate) (revert-buffer))
+(defadvice find-dired (after tell-me-if-find-dired activate)
+  (setq is-find-dired-buffer t))
+(defadvice dired-mark (after dont-lie-to-me activate)
+  (unless is-find-dired-buffer (revert-buffer)))
 
 ;;; i like living on the edge
 (setq dired-deletion-confirmer (lambda (&rest args) t))
