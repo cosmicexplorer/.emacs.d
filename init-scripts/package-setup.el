@@ -208,6 +208,26 @@
 (magit-define-popup-action 'magit-diff-popup ?m "merge-base"
   #'my-magit-diff-from-merge-base)
 
+(defcustom git-patch-default-outfile "file.patch"
+  "Default file to output patches to.")
+
+(defun make-patch-git (pfx)
+  (interactive "P")
+  (let* ((from-branch
+          (if pfx (magit-read-branch-or-commit "base branch") "master"))
+         (to-branch (magit-get-current-branch))
+         (merge-base (magit-git-string "merge-base" from-branch to-branch))
+         (output-file
+          (let ((default-directory
+                  (replace-regexp-in-string "/\\.git/\\'" "" (magit-git-dir))))
+            (expand-file-name
+             (ido-read-file-name
+              "output file: " nil nil nil git-patch-default-outfile)))))
+    (magit-run-git-with-logfile output-file "diff" merge-base to-branch)))
+
+(magit-define-popup-action 'magit-patch-popup ?W "patch from merge-base"
+  #'make-patch-git)
+
 ;;; git-gutter
 (defconst git-gutter-fringe-hack-hooks git-gutter:update-hooks)
 
