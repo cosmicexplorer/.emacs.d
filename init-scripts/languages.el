@@ -507,7 +507,11 @@ Lisp code." t)
     (unless res
       (setq ad-return-value
             (read-file-name "sbt project root: " nil "./" nil "./")))))
-;;; also something so ensime runs "sbt gen-ensime" for you
+;;; TODO: also something so ensime runs "sbt gen-ensime" for you
+;;; ensime sets company-idle-delay to 0 cause it's trash
+(defun reset-company-idle-delay ()
+  (setq company-idle-delay (default-value 'company-idle-delay)))
+(add-hook 'scala-mode-hook #'reset-company-idle-delay t)
 
 (defvar-local prev-indent-pt nil)
 (defadvice scala-indent:indent-line (after add-space activate)
