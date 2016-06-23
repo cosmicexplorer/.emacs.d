@@ -297,7 +297,7 @@ which is defined in `smart-compile-alist'."
                       collect
                       (concat (repeat-string num "../") "build.sbt"))))))
         (setq-local compile-command
-                    (format "cd %s && sbt"
+                    (format "cd %s && sbt "
                             (file-name-directory sbt-build-file)))
         (call-interactively 'compile)
         (setq not-yet nil))))
