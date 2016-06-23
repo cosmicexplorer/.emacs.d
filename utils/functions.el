@@ -2768,6 +2768,13 @@ by another percent."
            (string-match-p "\\`\\*git-gutter:.*\\*\\'" (buffer-name buf)))
          (buffer-list))))
 
+(defun cleanup-customize-buffers ()
+  (interactive)
+  (mapc #'kill-buffer
+        (cl-remove-if-not
+         (lambda (buf) (with-current-buffer buf (eq major-mode 'Custom-mode)))
+         (buffer-list))))
+
 (defun cleanup-all-buffers ()
   (interactive)
   (mapatoms
