@@ -22,7 +22,6 @@
 (require 'erc)
 (require 'erc-highlight-nicknames)      ; this file is in /lisp/
 (require 'erc-nicklist)                 ; this file is in /lisp/
-(require 'ggtags)
 (require 'helm-config)
 (require 'helm-gtags)
 (require 'helm-swoop)
