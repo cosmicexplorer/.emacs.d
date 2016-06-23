@@ -172,16 +172,10 @@ evaluate FUNCTION instead of running a compilation command.
 (put 'smart-compile-replace-alist 'risky-local-variable t)
 
 ;;; these are the things i added for automated build systems
-(defvar smart-compile-check-makefile t)
-(make-variable-buffer-local 'smart-compile-check-makefile)
-(defvar smart-compile-check-scons-files t)
-(make-variable-buffer-local 'smart-compile-check-scons-files)
-(defvar smart-compile-check-gyp t)
-(make-variable-buffer-local 'smart-compile-check-gyp)
-(defvar smart-compile-check-cakefile t)
-(make-variable-buffer-local 'smart-compile-check-cakefile)
 (defvar-local smart-compile-check-pants t)
 (defvar-local pants-build-file nil)
+(defvar-local smart-compile-check-sbt t)
+(defvar-local sbt-build-file nil)
 
 (defcustom smart-compile-make-program "make "
   "The command by which to invoke the make program."
@@ -289,7 +283,22 @@ which is defined in `smart-compile-alist'."
                       collect (concat (repeat-string num "../") "pants"))))))
         (setq-local compile-command
                     (format "cd %s && ./pants "
-                            (file-name-directory pants-build-file)))
+                            ))
+        (call-interactively 'compile)
+        (setq not-yet nil))
+       ((and smart-compile-check-sbt
+             (setq sbt-build-file
+                   (cl-find-if
+                    #'file-exists-p
+                    (append
+                     '("./build.sbt")
+                     (cl-loop
+                      for num from 1 to 15
+                      collect
+                      (concat (repeat-string num "../") "build.sbt"))))))
+        (setq-local compile-command
+                    (format "cd %s && sbt"
+                            (file-name-directory sbt-build-file)))
         (call-interactively 'compile)
         (setq not-yet nil))))
 
