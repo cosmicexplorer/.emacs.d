@@ -2805,4 +2805,10 @@ by another percent."
     (goto-char (get-linewise-center beg end))
     (recenter)))
 
+(defun delete-other-windows-maybe-save (pfx)
+  (interactive "P")
+  (when pfx (save-current-window-configuration))
+  (let ((current-prefix-arg nil))
+    (delete-other-windows)))
+
 (provide 'functions)
