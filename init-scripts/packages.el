@@ -38,6 +38,7 @@
     epresent
     espuds
     evil
+    f3
     flycheck
     flycheck-package
     font-lock-studio
