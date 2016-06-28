@@ -283,7 +283,7 @@ which is defined in `smart-compile-alist'."
                       collect (concat (repeat-string num "../") "pants"))))))
         (setq-local compile-command
                     (format "cd %s && ./pants "
-                            ))
+                            (file-name-directory pants-build-file)))
         (call-interactively 'compile)
         (setq not-yet nil))
        ((and smart-compile-check-sbt
