@@ -512,6 +512,10 @@ Lisp code." t)
 (defun reset-company-idle-delay ()
   (setq company-idle-delay (default-value 'company-idle-delay)))
 (add-hook 'scala-mode-hook #'reset-company-idle-delay t)
+(setq auto-mode-alist
+      (cl-remove-if (lambda (el) (eq (cdr el) 'scala-mode)) auto-mode-alist))
+(add-to-list 'auto-mode-alist '("\\.scala\\'" . scala-mode))
+(add-to-list 'auto-mode-alist '("\\.sbt\\'" . scala-mode))
 
 (defvar-local prev-indent-pt nil)
 (defadvice scala-indent:indent-line (after add-space activate)
