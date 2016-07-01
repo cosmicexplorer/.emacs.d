@@ -462,6 +462,7 @@
        #'haskell-newline-actual-indent)
      (define-key haskell-mode-map (kbd "C-c C-v") nil)))
 
+;;; compilation
 (define-key compilation-mode-map (kbd "G")
   (lambda () (interactive) (recompile t)))
 (define-key compilation-mode-map (kbd "k") #'kill-compilation)
@@ -475,6 +476,7 @@
     (interactive)
     (compilation-next-error 1)
     (recenter)))
+(define-key compilation-mode-map (kbd "h") nil)
 
 (eval-after-load 'haskell-interactive-mode
   '(progn
