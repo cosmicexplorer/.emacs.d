@@ -566,33 +566,37 @@ scope of the command's precision.")
 ;;; these won't change.........................................
 ;;; currently working on emacs 24.5
 (when save-eshell-history
+  (defun eshell-append-str (str)
+    (unless (zerop (with-temp-buffer
+                     (insert str)
+                     (shell-command-on-region
+                      (point-min) (point-max)
+                      (format ">> %s" eshell-user-output-file)
+                      t)))
+      (error "failed to write eshell output")))
+
   (defun eshell-send-input-to-history ()
-    (append-to-file
-     (concat "--in--: " default-directory ": "
-             (format-time-string current-date-time-format (current-time))
-             "\n"
-             (buffer-substring-no-properties
-              (marker-position eshell-last-input-start)
-              (point)))
-     nil eshell-user-output-file)
-    ;; because append-to-file cheerfully tells us that it has written to the
-    ;; file, and that's annoying
-    (message ""))
+    (let ((str
+           (concat
+            "--in--: " default-directory ": "
+            (format-time-string current-date-time-format (current-time))
+            "\n"
+            (buffer-substring-no-properties
+             (marker-position eshell-last-input-start)
+             (point)))))
+      (eshell-append-str str)))
 
   (defun eshell-send-output-to-history ()
-    (append-to-file
-     (let* ((str
-             (concat "--out--: " default-directory ": "
-                     (format-time-string current-date-time-format
-                                         (current-time))
-                     "\n"
-                     (buffer-substring-no-properties
-                      (marker-position eshell-last-input-end)
-                      (marker-position eshell-last-output-start))))
-            (res (string-match-p "\n$" str)))
-       (if res str (concat str "\n")))
-     nil eshell-user-output-file)
-    (message "")))
+    (let ((str
+           (concat "--out--: " default-directory ": "
+                   (format-time-string current-date-time-format
+                                       (current-time))
+                   "\n"
+                   (buffer-substring-no-properties
+                    (marker-position eshell-last-input-end)
+                    (marker-position eshell-last-output-start))))
+          (res (string-match-p "\n$" str)))
+      (eshell-append-str (if res str (concat str "\n"))))))
 
 (defun mostly-whitespace-p (str)
   (>
@@ -609,21 +613,26 @@ scope of the command's precision.")
   (defvar was-last-output nil)
   (make-variable-buffer-local 'was-last-output)
 
+  (defun shell-append-str (str)
+    (unless (zerop (with-temp-buffer
+                     (insert str)
+                     (shell-command-on-region
+                      (point-min) (point-max)
+                      (format ">> %s" shell-user-output-file)
+                      t)))
+      (error "failed to write shell output")))
+
   (defun shell-send-input-to-history (str-to-send)
-    (append-to-file
-     (ansi-color-filter-apply
-      (let* ((str
-              (concat "\n" "--in--: " default-directory ": "
-                      (format-time-string current-date-time-format
-                                          (current-time))
-                      "\n"
-                      str-to-send))
-             (res (string-match-p "\n$" str)))
-        (if res str (concat str "\n"))))
-     nil shell-user-output-file)
-    (setq prev-shell-input str-to-send)
-    (setq was-last-output nil)
-    (message ""))
+    (let ((str
+           (ansi-color-filter-apply
+            (concat "\n" "--in--: " default-directory ": "
+                    (format-time-string current-date-time-format
+                                        (current-time))
+                    "\n"
+                    str-to-send))))
+      (shell-append-str str)
+      (setq prev-shell-input str-to-send)
+      (setq was-last-output nil)))
 
   (defvar my-shell-prompt-pattern "^[^#%$>
 -]*[#$%>] *")
@@ -659,12 +668,8 @@ scope of the command's precision.")
                                   "\n"))))
         (unless (or (string-match-p whitespace-regex str-to-send)
                     (string-match-p whitespace-regex treated-str))
-          (append-to-file
-           (concat header-str
-                   treated-str)
-           nil shell-user-output-file)
-          (setq was-last-output t)
-          (message ""))))))
+          (shell-append-str (concat header-str treated-str))
+          (setq was-last-output t))))))
 
 ;;; functions to save and reset window configuration to a list
 ;;; since i only use a single frame mostly the intricacies of multiple frames
