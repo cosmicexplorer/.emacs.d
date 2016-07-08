@@ -74,6 +74,14 @@
       (push-mark)
       (magit-section-goto (magit-get-section sec-diff)))))
 
+(defcustom run-kinit-magit-creds nil
+  "Whether to run kinit before magit credential operations."
+  :safe 'booleanp)
+(defun call-kinit-if-necessary-magit ()
+  (when (and run-kinit-magit-creds (executable-find "kinit"))
+    (call-process "kinit")))
+(add-hook 'magit-credential-hook #'call-kinit-if-necessary-magit)
+
 ;;; fix magit's inane keybinding changes
 (defun magit-reset-push-destination (remote-branch &optional current-branch)
   (interactive (list (magit-read-remote-branch
