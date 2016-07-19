@@ -501,7 +501,7 @@ Lisp code." t)
   (ghc-check-syntax))
 
 ;;; scala
-(add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
+;; (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
 (defadvice sbt:find-root (around spoof-root activate)
   (let ((res ad-do-it))
     (unless res
@@ -519,7 +519,7 @@ Lisp code." t)
 
 (defvar-local prev-indent-pt nil)
 (defadvice scala-indent:indent-line (after add-space activate)
-  (when (looking-back "//")
+  (when (looking-back "//" (line-beginning-position))
     (insert " ")
     (setq prev-indent-pt (point))))
 (defadvice comment-dwim (after maintain-space activate)
