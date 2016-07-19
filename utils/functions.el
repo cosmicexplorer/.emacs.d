@@ -2816,4 +2816,38 @@ by another percent."
   (let ((current-prefix-arg nil))
     (delete-other-windows)))
 
+(defcustom set-mark-end-delay 0.5
+  "Delay for `set-mark-end-process-output-mode' to process with an idle timer.")
+(defvar-local set-mark-end-do-set nil)
+(defvar-local set-mark-end-idle-timer nil)
+(defvar-local set-mark-end-process-output-mode nil)
+(defun set-mark-end-when-at-end ()
+  (with-temp-message ""
+    (when set-mark-end-do-set
+      (let ((inhibit-message t))
+        (call-interactively #'end-of-buffer)
+        (redisplay)))))
+(defun set-mark-end-set-do-set ()
+  (interactive)
+  (call-interactively #'end-of-buffer)
+  (setq set-mark-end-do-set t))
+(defun set-mark-end-unset-do-set ()
+  (interactive)
+  (call-interactively #'beginning-of-buffer)
+  (setq set-mark-end-do-set nil))
+(define-minor-mode set-mark-end-process-output-mode
+  "Set point and mark to the end of the buffer every half a second, if already
+at the end of the buffer."
+  :lighter "M->"
+  :keymap (let ((map (make-sparse-keymap)))
+            (define-key map (kbd "M->") #'set-mark-end-set-do-set)
+            (define-key map (kbd "M-<") #'set-mark-end-unset-do-set)
+            map)
+  (if set-mark-end-process-output-mode
+      (setq set-mark-end-idle-timer
+            (run-with-idle-timer
+             set-mark-end-delay t #'set-mark-end-when-at-end))
+    (cancel-timer set-mark-end-idle-timer)
+    (setq set-mark-end-idle-timer nil)))
+
 (provide 'functions)

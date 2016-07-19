@@ -678,3 +678,7 @@ Check out your .emacs.\n")))))
   (setq exec-path (append (split-string true-path ":") exec-path)))
 
 (setq ring-bell-function (lambda ()))
+
+;;; TODO: make this work, then add these; they get kind of annoying, though
+;; (add-hook 'shell-mode-hook #'set-mark-end-process-output-mode)
+;; (add-hook 'compilation-mode-hook #'set-mark-end-process-output-mode)
