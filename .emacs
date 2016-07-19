@@ -399,7 +399,8 @@ Check out your .emacs."))
  '(rainbow-x-colors t)
  '(safe-local-variable-values
    (quote
-    ((js2-basic-offset . 4)
+    ((f3-before-args "-not" "(" "-ipath" "*.git*" "-or" "-ipath" "*.pants.d*" ")")
+     (js2-basic-offset . 4)
      (no-gfm)
      (Syntax . ANSI-Common-Lisp)
      (Base . 10)
