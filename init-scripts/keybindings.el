@@ -477,6 +477,8 @@
     (compilation-next-error 1)
     (recenter)))
 (define-key compilation-mode-map (kbd "h") nil)
+(define-key compilation-mode-map (kbd "b") #'back-to-window-before-compilation)
+(global-set-key (kbd "C-c C-c b") #'back-to-compilation-window)
 
 (eval-after-load 'haskell-interactive-mode
   '(progn
