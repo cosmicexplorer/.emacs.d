@@ -595,7 +595,8 @@ Check out your .emacs.\n")))))
 (setq dired-deletion-confirmer (lambda (&rest args) t))
 (defun dired-find-marked-files-no-show ()
   "Better than `dired-do-find-marked-files'."
-  (interactive) (dired-do-find-marked-files t))
+  (interactive)
+  (cl-mapc #'find-file-noselect (dired-get-marked-files)))
 
 ;;; keep dired in sync
 (add-hook 'dired-mode-hook #'auto-revert-mode)
@@ -682,3 +683,6 @@ Check out your .emacs.\n")))))
 ;;; TODO: make this work, then add these; they get kind of annoying, though
 ;; (add-hook 'shell-mode-hook #'set-mark-end-process-output-mode)
 ;; (add-hook 'compilation-mode-hook #'set-mark-end-process-output-mode)
+
+(defadvice smart-compile (after switch-to-buffer activate)
+  (pop-to-buffer "*compilation*"))

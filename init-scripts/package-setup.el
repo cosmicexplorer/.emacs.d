@@ -404,17 +404,6 @@
               (name . "\*compilation\*")
               (name . "\*Backtrace\*")
               (name . "\*Shell Command Output\*")))
-         ("documentation"
-          (or
-           (name . "help")
-           (name . "Help")
-           (name . "Apropos")
-           (name . "apropos")
-           (name . "Info")
-           (name . "info")
-           (name . "doc")
-           (name . "Doc")
-           (mode . Man-mode)))
          ("yaml" (filename . "\\.yaml\\'"))
          ("matlab" (mode . matlab-mode))
          ("octave" (mode . octave-mode))
@@ -427,6 +416,17 @@
                         (name . "\\.jison\\'")))
          ("thrift" (or (mode . thrift-mode)
                        (mode . scrooge-mode)))
+         ("documentation"
+          (or
+           (name . "help")
+           (name . "Help")
+           (name . "Apropos")
+           (name . "apropos")
+           (name . "Info")
+           (name . "info")
+           (name . "doc")
+           (name . "Doc")
+           (mode . Man-mode)))
          ("default" (name . "")))))
 
 ;;; more ibuffer stuff

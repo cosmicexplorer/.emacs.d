@@ -347,9 +347,7 @@ which is defined in `smart-compile-alist'."
       )
 
     ;; compile
-    (if not-yet (call-interactively 'compile) )
-
-    ))
+    (when not-yet (call-interactively 'compile))))
 
 (defun smart-compile-string (format-string)
   "Document forthcoming..."

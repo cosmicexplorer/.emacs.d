@@ -90,6 +90,7 @@
         Custom-save
         async-shell-command
         clang-format-buffer
+        delete-other-windows-maybe-save
         describe-key
         describe-variable
         ess-eval-buffer
