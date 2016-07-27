@@ -463,6 +463,10 @@
      (define-key haskell-mode-map (kbd "C-c C-v") nil)))
 
 ;;; compilation
+(define-key compilation-mode-map (kbd "g")
+  (lambda (pfx)
+    (interactive "P")
+    (compilation-start (car compilation-arguments) (consp pfx))))
 (define-key compilation-mode-map (kbd "G")
   (lambda () (interactive) (recompile t)))
 (define-key compilation-mode-map (kbd "k") #'kill-compilation)
@@ -479,6 +483,7 @@
 (define-key compilation-mode-map (kbd "h") nil)
 (define-key compilation-mode-map (kbd "b") #'back-to-window-before-compilation)
 (global-set-key (kbd "C-c C-c b") #'back-to-compilation-window)
+(global-set-key (kbd "C-c C-c w") #'reset-window-before-compilation)
 
 (eval-after-load 'haskell-interactive-mode
   '(progn

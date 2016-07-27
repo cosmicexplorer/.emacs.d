@@ -282,7 +282,7 @@ which is defined in `smart-compile-alist'."
                       for num from 1 to 15
                       collect (concat (repeat-string num "../") "pants"))))))
         (setq-local compile-command
-                    (format "cd %s && ./pants "
+                    (format "pushd %s >/dev/null && ./pants "
                             (file-name-directory pants-build-file)))
         (call-interactively 'compile)
         (setq not-yet nil))
@@ -297,7 +297,7 @@ which is defined in `smart-compile-alist'."
                       collect
                       (concat (repeat-string num "../") "build.sbt"))))))
         (setq-local compile-command
-                    (format "cd %s && sbt "
+                    (format "pushd %s >/dev/null && sbt "
                             (file-name-directory sbt-build-file)))
         (call-interactively 'compile)
         (setq not-yet nil))))
