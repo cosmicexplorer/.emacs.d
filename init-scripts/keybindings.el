@@ -740,3 +740,5 @@
   (define-key ensime-mode-map (kbd "M-p") #'mc/mark-previous-like-this))
 
 (define-key prog-mode-map (kbd "C-c C-f") #'center-function)
+
+(global-set-key (kbd "C-v") #'delete-whole-line)
