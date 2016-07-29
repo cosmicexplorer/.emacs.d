@@ -2878,7 +2878,7 @@ at the end of the buffer."
           (end-mark (make-marker)))
       (move-marker end-mark end)
       ;; handles case of comments having leading space before them due to bad
-      ;; previous fills (like this)
+      ;;    previous fills (like this)
       (search-replace-region-if-valid
        beg end-mark
        (format "\\(%s\\)%s+\\(%s\\)"
@@ -2890,6 +2890,15 @@ at the end of the buffer."
       (let ((fill-column (- fill-column
                             (+ (length comment-start) (length comment-end)))))
         (fill-region-as-paragraph beg (marker-position end-mark)))
+      ;; do this again, because filling the region as paragraph can introduce
+      ;; new spaces. this isn't perfect (can be suboptimal fill), but it will be
+      ;; correct.
+      ;; TODO: may be a way to ensure this works in fill-region
+      (search-replace-region-if-valid
+       beg end-mark
+       (format "\\(%s\\)%s+\\(%s\\)"
+               not-space-regexp space-non-newline-regexp not-space-regexp)
+       "\\1 \\2")
       (comment-region beg (marker-position end-mark))
       ;; TODO: make this shut up?
       (indent-region beg (marker-position end-mark))
