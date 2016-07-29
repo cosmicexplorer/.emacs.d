@@ -2867,12 +2867,23 @@ at the end of the buffer."
         (goto-char beg)
         (re-search-forward search end t)))))
 
+(defconst space-non-newline-regexp "[ \t\r\f]")
+(defconst not-space-regexp "[^ \t\n\r\f]")
+
 (defun comment-fill-paragraph (beg end)
   (interactive "r")
-  (when (region-probably-is-commented beg end)
+  (if (not (region-probably-is-commented beg end))
+      (fill-region-as-paragraph beg end)
     (let ((pt (point))
           (end-mark (make-marker)))
       (move-marker end-mark end)
+      ;; handles case of comments having leading space before them due to bad
+      ;; previous fills (like this)
+      (search-replace-region-if-valid
+       beg end-mark
+       (format "\\(%s\\)%s+\\(%s\\)"
+               not-space-regexp space-non-newline-regexp not-space-regexp)
+       "\\1 \\2")
       (search-replace-region-if-valid beg end-mark (regexp-quote comment-start))
       (search-replace-region-if-valid beg end-mark (regexp-quote comment-end))
       (goto-char beg)
@@ -2880,6 +2891,8 @@ at the end of the buffer."
                             (+ (length comment-start) (length comment-end)))))
         (fill-region-as-paragraph beg (marker-position end-mark)))
       (comment-region beg (marker-position end-mark))
+      ;; TODO: make this shut up?
+      (indent-region beg (marker-position end-mark))
       (if (= pt beg)
           (progn
             (goto-char beg)

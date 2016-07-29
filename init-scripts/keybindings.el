@@ -398,6 +398,7 @@
 ;;; more emacs lisp stuff
 (define-key emacs-lisp-mode-map (kbd "C-M-x") #'eval-buffer-and-message)
 (define-key emacs-lisp-mode-map (kbd "<return>") #'newline)
+(define-key paredit-mode-map (kbd "M-q") #'comment-fill-paragraph)
 
 ;;; erc stuff
 (global-set-key (kbd "C-c M-e") #'message-erc-modded-chans)

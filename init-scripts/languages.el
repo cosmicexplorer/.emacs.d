@@ -554,3 +554,6 @@ Lisp code." t)
 
 ;;; llvm stuff
 (add-to-list 'auto-mode-alist '("\\.ll\\'" . llvm-mode))
+
+;;; elisp
+(add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-padding " ")))
