@@ -14,7 +14,6 @@
 ;; i hate the young whippersnappers and their strange and weird ways
 (add-hook 'c++-mode-hook #'make-comments-like-c)
 (add-hook 'c-mode-hook #'make-comments-like-c)
-(add-hook 'java-mode-hook #'make-comments-like-c)
 (add-hook 'fundamental-mode-hook (lambda ()
                                    (setq comment-start "-" comment-end "")))
 ;;; format comments like a normal person
@@ -195,7 +194,6 @@
   (setq comment-insert-comment-function #'c-comment-end-of-line))
 (add-hook 'c-mode-hook #'add-star-comment-region)
 (add-hook 'c++-mode-hook #'add-star-comment-region)
-(add-hook 'java-mode-hook #'add-star-comment-region)
 ;;; don't indent namespaces wtf
 (c-set-offset 'innamespace 0)
 ;;; add modes for random c++ filetypes
