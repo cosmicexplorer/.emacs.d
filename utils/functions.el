@@ -2850,4 +2850,41 @@ at the end of the buffer."
     (cancel-timer set-mark-end-idle-timer)
     (setq set-mark-end-idle-timer nil)))
 
+(defun valid-comment-string-p (str)
+  (not (string= str "")))
+
+(defun search-replace-region-if-valid (beg end-mark regexp &optional replace)
+  (when (valid-comment-string-p regexp)
+    (save-excursion
+      (goto-char beg)
+      (while (re-search-forward regexp (marker-position end-mark) t)
+        (replace-match (or replace ""))))))
+
+(defun region-probably-is-commented (beg end)
+  (let ((search (regexp-quote comment-start)))
+    (when (valid-comment-string-p search)
+      (save-excursion
+        (goto-char beg)
+        (re-search-forward search end t)))))
+
+(defun comment-fill-paragraph (beg end)
+  (interactive "r")
+  (when (region-probably-is-commented beg end)
+    (let ((pt (point))
+          (end-mark (make-marker)))
+      (move-marker end-mark end)
+      (search-replace-region-if-valid beg end-mark (regexp-quote comment-start))
+      (search-replace-region-if-valid beg end-mark (regexp-quote comment-end))
+      (goto-char beg)
+      (let ((fill-column (- fill-column
+                            (+ (length comment-start) (length comment-end)))))
+        (fill-region-as-paragraph beg (marker-position end-mark)))
+      (comment-region beg (marker-position end-mark))
+      (if (= pt beg)
+          (progn
+            (goto-char beg)
+            (push-mark (marker-position end-mark) t t))
+        (goto-char (marker-position end-mark))
+        (push-mark beg t t)))))
+
 (provide 'functions)

@@ -742,3 +742,6 @@
 (define-key prog-mode-map (kbd "C-c C-f") #'center-function)
 
 (global-set-key (kbd "C-v") #'delete-whole-line)
+
+(with-eval-after-load 'scala-mode
+  (define-key scala-mode-map (kbd "M-q") #'comment-fill-paragraph))
