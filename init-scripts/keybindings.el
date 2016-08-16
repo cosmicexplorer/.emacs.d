@@ -746,3 +746,10 @@
 
 (with-eval-after-load 'scala-mode
   (define-key scala-mode-map (kbd "M-q") #'comment-fill-paragraph))
+
+(with-eval-after-load 'ensime
+  (define-key ensime-mode-map (kbd "C-c e") #'ensime-print-errors-at-point)
+  (define-key ensime-mode-map (kbd "C-c t") #'ensime-type-at-point)
+  (define-key ensime-mode-map (kbd "C-c C-e")
+    #'ensime-show-all-errors-and-warnings)
+  (define-key ensime-mode-map (kbd "C-c l") #'ensime-inf-eval-buffer))

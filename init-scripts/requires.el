@@ -59,6 +59,7 @@
 (require 'llvm-mode)
 (when (featurep 'scala-mode2) (unload-feature 'scala-mode2))
 (require 'scala-mode)
+(require 'haskell)
 
 ;;; my stuff
 (require 'utilities)
