@@ -19,7 +19,7 @@
 (define-key help-map "a" 'apropos)      ; get useful help for once
 
 ;;; the mark is stupid as a ui concept even if it's great in scripts
-(transient-mark-mode 0)
+(transient-mark-mode 1)
 (setq shift-select-mode t)
 
 ;;; i don't want to have to guess which version of my file is the right one

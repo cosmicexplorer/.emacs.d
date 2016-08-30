@@ -753,3 +753,17 @@
   (define-key ensime-mode-map (kbd "C-c C-e")
     #'ensime-show-all-errors-and-warnings)
   (define-key ensime-mode-map (kbd "C-c l") #'ensime-inf-eval-buffer))
+
+(defun highlight-to-begin ()
+  (interactive "^")
+  (call-interactively #'beginning-of-buffer)
+  (call-interactively #'exchange-point-and-mark)
+  (call-interactively #'exchange-point-and-mark))
+(defun highlight-to-end ()
+  (interactive "^")
+  (call-interactively #'end-of-buffer)
+  (call-interactively #'exchange-point-and-mark)
+  (call-interactively #'exchange-point-and-mark))
+
+(global-set-key (kbd "C-M-<") #'highlight-to-begin)
+(global-set-key (kbd "C-M->") #'highlight-to-end)
