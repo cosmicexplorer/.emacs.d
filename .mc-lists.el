@@ -42,6 +42,7 @@
         forward-sexp
         helm-buffers-list
         helm-show-kill-ring
+        html-autoclose-tag
         html-newline-indent
         ido-find-file
         isearch-abort
@@ -64,6 +65,8 @@
         org-return
         org-self-insert-command
         org-shiftcontrolleft
+        org-shiftleft
+        org-shiftright
         org-yank
         paredit-backslash
         paredit-backspace-delete-highlight
@@ -94,6 +97,7 @@
         describe-key
         describe-variable
         ess-eval-buffer
+        ess-load-file
         eval-buffer-and-message
         eval-expression
         helm-swoop
