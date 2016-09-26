@@ -614,7 +614,8 @@
        (define-key LaTeX-mode-map (kbd "C-c C-c")
          #'TeX-command-master)
        (define-key LaTeX-mode-map (kbd "<C-return>") #'newline-and-indent)
-       (define-key LaTeX-mode-map (kbd "C-c `") #'TeX-next-error))))
+       (define-key LaTeX-mode-map (kbd "C-c `") #'TeX-next-error)
+       (define-key LaTeX-mode-map (kbd "C-c e") #'LaTeX-environment))))
 
 (eval-after-load 'sh-script
   '(define-key sh-mode-map (kbd "C-c C-w") nil))
