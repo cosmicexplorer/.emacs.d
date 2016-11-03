@@ -5,7 +5,6 @@
 ;;; add package lists
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
 (add-to-list 'package-archives
              '("gnu" . "http://elpa.gnu.org/packages/") t)
 
@@ -69,7 +68,6 @@
     mmm-mode
     multiple-cursors
     omnisharp
-    org
     package-build
     pacmacs
     paredit
