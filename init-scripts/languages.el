@@ -367,6 +367,8 @@ Lisp code." t)
 (add-to-list 'auto-mode-alist '("\\.babelrc" . js-mode))
 (add-to-list 'auto-mode-alist '("\\.cshtml\\'" . html-mode))
 
+(add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode))
+
 ;;; config files
 (add-to-list 'auto-mode-alist '("\\.jsbeautifyrc\\'" . js-mode))
 (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . conf-mode))
