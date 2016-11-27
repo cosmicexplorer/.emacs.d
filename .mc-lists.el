@@ -12,6 +12,7 @@
         TeX-newline
         backward-sexp
         beg-of-line-text
+        beg-of-maybe-visual-line
         beginning-of-buffer
         beginning-of-visual-line
         bison-electric-open-brace

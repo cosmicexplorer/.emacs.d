@@ -317,6 +317,7 @@
   (sh-mode))
 (add-to-list 'auto-mode-alist '("\\.zsh\\'" . zsh-mode))
 (add-to-list 'auto-mode-alist '("\\`\\.zshrc\\'" . zsh-mode))
+(add-hook 'shell-mode-hook #'turn-off-auto-fill)
 
 ;;; lisp and related
 (defmacro add-fun-to-hooks (fun &rest hooks)
