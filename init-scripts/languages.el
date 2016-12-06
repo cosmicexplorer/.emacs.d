@@ -477,6 +477,22 @@ Lisp code." t)
 
 ;;; latex
 (setq LaTeX-command-style '(("" "%(PDF)%(latex) -file-line-error %S%(PDFout)")))
+(defconst latex-widen-cash-regexp "[^[:space:]]")
+(defconst latex-cash-default-delim "$")
+(defun latex-double-cash (pfx)
+  (interactive "P")
+  (let ((ins-str (if pfx (read-string "delimiter to insert: ")
+                  latex-cash-default-delim)))
+    (re-search-backward latex-widen-cash-regexp)
+    (forward-char 1)
+    (insert ins-str)
+    (let ((right (save-excursion
+                   (re-search-forward latex-widen-cash-regexp)
+                   (forward-char -1)
+                   (point))))
+      (delete-region (point) right))
+    (insert ins-str)
+    (forward-char -1)))
 
 ;;; haskell
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
