@@ -769,3 +769,7 @@
 
 (global-set-key (kbd "C-M-<") #'highlight-to-begin)
 (global-set-key (kbd "C-M->") #'highlight-to-end)
+
+;;; isearch
+(eval-after-load 'isearch
+  '(define-key isearch-mode-map (kbd "DEL") #'isearch-del-char))

@@ -724,3 +724,58 @@ Check out your .emacs.\n")))))
       (message "%s" "already in compilation buffer!")
     (setq buffer-before-compilation (current-buffer)
           window-before-compilation (selected-window))))
+
+;;; char folding
+;; add minus sign − to equivalence for - (hyphen)
+(require 'char-fold)
+(defvar orig-char-fold-table (let ((tab (make-char-table 'backup)))
+                               (set-char-table-parent tab char-fold-table)
+                               tab))
+
+(defun add-char-fold-chars (base added)
+  (let* ((entry (char-table-range orig-char-fold-table base))
+         (chars (cl-loop for i from 0 upto (- (length entry) 1)
+                         for s = (substring entry i (1+ i))
+                         when (string-match-p
+                               (char-fold-to-regexp (char-to-string base))
+                               s)
+                         collect s))
+         (opt-reg
+          (regexp-opt (append chars (cl-mapcar #'char-to-string added)))))
+    (set-char-table-range orig-char-fold-table base entry)
+    (set-char-table-range char-fold-table base opt-reg)))
+
+;;; minus signs
+(add-char-fold-chars ?- '(?−))
+
+(with-eval-after-load 'misearch
+  (remove-hook 'isearch-mode-hook #'multi-isearch-setup))
+
+(defun char-fold-if-generic (str &optional lax)
+  (if (cl-find-if (lambda (ch) (null (char-table-range char-fold-table ch)))
+                  (string-to-vector str))
+      str
+    (char-fold-to-regexp str lax)))
+
+(defun word-boundary-fold (str)
+  (replace-regexp-in-string "[[:space:]]+" ".*" (trim-whitespace str)))
+
+(defun isearch-fast-and-loose (string &optional bound noerror count)
+  (let* ((fun (if isearch-forward #'re-search-forward #'re-search-backward))
+         (char-folded (char-fold-if-generic string t))
+         (word-folded (word-boundary-fold char-folded)))
+    (condition-case er
+        (funcall fun word-folded bound noerror count)
+      (search-failed
+       (signal (car er)
+               (if-let ((prefix (get isearch-regexp-function
+                                     'isearch-message-prefix)))
+                   (and (stringp prefix)
+                        (list (format "%s   [using %ssearch]" string prefix)))
+                 (cdr er)))))))
+
+(defcustom my-isearch-search-fun #'isearch-fast-and-loose
+  "`defcustom' because it deserves one."
+  :type 'function)
+(defun isearch-get-fun () (symbol-function my-isearch-search-fun))
+(setq isearch-search-fun-function #'isearch-get-fun)
