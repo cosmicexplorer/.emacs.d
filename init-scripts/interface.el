@@ -37,11 +37,10 @@
 (defun set-correct-trailing-whitespace ()
   (setq show-trailing-whitespace
         (not (apply #'derived-mode-p no-show-whitespace-modes))))
-(add-hook
- 'buffer-list-update-hook
- (lambda ()
-   (loop for buf in (buffer-list)
-         do (with-current-buffer buf (set-correct-trailing-whitespace)))))
+(defun set-correct-trailing-whitespace-all-buffers ()
+  (loop for buf in (buffer-list)
+        do (with-current-buffer buf (set-correct-trailing-whitespace))))
+(add-hook 'buffer-list-update-hook #'set-correct-trailing-whitespace-all-buffers)
 (add-hook 'after-change-major-mode-hook #'set-correct-trailing-whitespace)
 
 ;; do backups well and put them into a separate folder
@@ -95,8 +94,8 @@
   ;; "->X☢☣☠⚠☤⚕⚚†☯⚖☮⚘⚔☭⚒⚓⚛⚜⚡⚶☥✠✙✞✟✧⋆★☆✪✫✬✭✮✯✰⚝✡☫☬☸✵❂☘♡♥❤⚘❀❃❁✼☀✌♫♪☃❄❅❆☕☂❦✈♕♛♖♜☁☾"
   "A vector of strings to represent the marker on the current line. Used in
 `get-linum-relative-symbol'.")
-(make-variable-buffer-local 'linum-relative-current-symbol)
-(add-hook 'after-change-major-mode-hook 'get-linum-relative-symbol)
+;; (make-variable-buffer-local 'linum-relative-current-symbol)
+;; (add-hook 'after-change-major-mode-hook 'get-linum-relative-symbol)
 
 ;;; RAINBOW
 (add-hook 'text-mode-hook #'rainbow-mode)
