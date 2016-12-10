@@ -435,6 +435,7 @@ parentheses. CURRENTLY BROKEN"
                    (delete-forward-char 1)
                  (forward-line 1))))))
 
+(defgroup my-customizations nil "My personal `defcustom' set.")
 (defcustom kill-buffer-trash-alist nil
   "alist for other files to delete in `kill-buffer-and-move-file-to-trash'"
   :group 'my-customizations
@@ -2570,10 +2571,9 @@ by another percent."
         (set-mark (point))
       (setq deactivate-mark t))))
 
-(defun display-buffer-other-window (buf)
-  (let ((cur-buf (current-buffer)))
-    (switch-to-buffer-other-window buf)
-    (set-buffer cur-buf)))
+(defun display-buffer-other-window (buf &optional no-switch)
+  (let ((win (display-buffer buf)))
+    (if no-switch win (select-window win))))
 
 (defun pop-buf-or-global-mark (pfx)
   (interactive "P")
@@ -2602,12 +2602,6 @@ by another percent."
                        (1+ my-magit-num-commits-back-to-search)))
        nil nil nil 'magit-revision-history "HEAD~1")
       (user-error "Nothing selected")))
-
-(defun my-display-buffer-other-window (buf)
-  (let ((cur-buf (current-buffer)))
-    (switch-to-buffer-other-window buf)
-    (set-buffer cur-buf)
-    (get-buffer-window buf)))
 
 (defun resurrect-buffer-from-file (&optional buf win)
   (interactive)
@@ -2908,5 +2902,49 @@ at the end of the buffer."
             (push-mark (marker-position end-mark) t t))
         (goto-char (marker-position end-mark))
         (push-mark beg t t)))))
+
+(defcustom convert-string-alist
+  '((numberp "%c")
+    (stringp "%s"))
+  "Alist of predicates to format strings for `convert-char-string-or-other'."
+  :type '(alist :key-type 'function :value-type 'string)
+  :group 'my-customizations)
+
+(defun convert-char-string-or-other (o)
+  (or (second (cl-find-if (lambda (el) (funcall (car el) o))
+                          convert-string-alist))
+      "%S"))
+
+(defun format-char-string-or-other (o)
+  (format (convert-char-string-or-other o) o))
+
+(defun switch-to-messages (pfx)
+  (interactive "P")
+  (let ((msg (messages-buffer)))
+    (if pfx (display-buffer-same-window msg nil)
+      (display-buffer-other-window msg))))
+
+(defmacro make-fall-through-binding (condition alternative)
+  (declare (indent 1))
+  (pcase condition
+    ((and `(,bindings . ,result) (guard (listp bindings)))
+     `(if-let ,bindings (progn ,@result) ,alternative))
+    (x (if alternative `(or ,x ,alternative) x))))
+
+(defmacro bind-fall-through (&rest conditions)
+  (declare (indent nil))
+  (let* ((x (car conditions))
+         (xs (cdr conditions)))
+    (and x `(make-fall-through-binding ,x
+              ,(and xs `(bind-fall-through ,@xs))))))
+
+(defun macroexpand-all-except (expr &optional atomic-macros)
+  (let ((hidden-macros-alist
+         (cl-mapcar (lambda (mac) (cons mac nil)) atomic-macros)))
+    (macroexpand-all expr hidden-macros-alist)))
+
+(defmacro get-and-check (bindings test-form &rest body)
+  (declare (indent 2))
+  `(let ,bindings (and ,test-form ,@body)))
 
 (provide 'functions)
