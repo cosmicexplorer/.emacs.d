@@ -778,3 +778,8 @@ Check out your .emacs.\n")))))
   :type 'function)
 (defun isearch-get-fun () (symbol-function my-isearch-search-fun))
 (setq isearch-search-fun-function #'isearch-get-fun)
+
+(defface cperl-no-trailing-whitespace-face
+  '((((class color))))
+  "NO" :group 'cperl-mode)
+

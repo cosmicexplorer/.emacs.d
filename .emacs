@@ -237,6 +237,8 @@ Check out your .emacs."))
  '(company-dabbrev-ignore-case t)
  '(compilation-scroll-output t)
  '(compile-command "make")
+ '(cperl-hairy t)
+ '(cperl-invalid-face (quote cperl-no-trailing-whitespace-face))
  '(dabbrev-case-replace nil)
  '(dired-auto-revert-buffer t)
  '(dired-clean-up-buffers-too nil)
@@ -536,6 +538,7 @@ Check out your .emacs."))
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(cperl-no-trailing-whitespace-face ((t (:underline nil))))
  '(italic ((t (:foreground "magenta" :slant italic))))
  '(underline ((t (:foreground "yellow" :underline t))))
  '(woman-unknown ((t (:background "#333333" :foreground "#ff0000")))))

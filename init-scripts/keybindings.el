@@ -211,7 +211,8 @@
             (define-key cperl-mode-map (kbd "C-c C-k") nil)
             (define-key cperl-mode-map (kbd "C-h f") #'cperl-perldoc)
             (define-key cperl-mode-map (kbd "C-c C-w") nil)
-            (define-key cperl-mode-map (kbd "C-c C-v") nil)))
+            (define-key cperl-mode-map (kbd "C-c C-v") nil)
+            (define-key cperl-mode-map (kbd "C-c <tab>") #'cperl-linefeed)))
 
 ;;; lisp
 ;;; so it's all emacsy
