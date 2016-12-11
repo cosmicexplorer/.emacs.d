@@ -401,6 +401,7 @@
 (define-key emacs-lisp-mode-map (kbd "C-M-x") #'eval-buffer-and-message)
 (define-key emacs-lisp-mode-map (kbd "<return>") #'newline)
 (define-key paredit-mode-map (kbd "M-q") #'comment-fill-paragraph)
+(define-key emacs-lisp-mode-map (kbd "C-c C-e") #'view-macro-expansion)
 
 ;;; erc stuff
 (global-set-key (kbd "C-c M-e") #'message-erc-modded-chans)

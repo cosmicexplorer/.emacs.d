@@ -2947,4 +2947,67 @@ at the end of the buffer."
   (declare (indent 2))
   `(let ,bindings (and ,test-form ,@body)))
 
+(cl-defmacro modify-list ((var expr &key in out) &rest body)
+  (let* ((input (if in `(cl-remove-if-not (lambda (,var) ,in) ,expr)
+                  expr))
+         (result `(cl-mapcar (lambda (,var) ,@(or body (list var))) ,input)))
+    (if out `(cl-remove-if-not (lambda (,var) ,out) ,result)
+      result)))
+
+(defun quit-and-kill ()
+  (interactive)
+  (quit-windows-on (current-buffer) t))
+
+(defvar dismiss-lisp-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map emacs-lisp-mode-map)
+    (define-key map (kbd "q") #'quit-and-kill)
+    map))
+(define-derived-mode dismiss-lisp-mode emacs-lisp-mode "Dismissable"
+  "Create a buffer to display emacs lisp which can be dismissed.")
+
+(defun get-string-match (reg str &optional fmt)
+  (when (string-match reg str)
+    (if (not fmt) (match-string 0 str)
+      (let ((data (match-data))
+            (all (match-string 0 str)))
+        (cl-loop with fmt-str = fmt
+                 for i from 0 to 9
+                 do (set-match-data data)
+                 for group = (match-string i str)
+                 while group
+                 do (setq fmt-str
+                          (replace-regexp-in-string
+                           (format "\\(\\(?:\\\\\\)*\\)\\\\%d" i)
+                           (concat "\\1" group)
+                           fmt-str))
+                 finally (return fmt-str))))))
+
+(defun view-macro-expansion (pfx)
+  (interactive "p")
+  (let* ((sexp (pp-last-sexp))
+         (macro-name
+          (get-string-match
+           "\\`(\\([^[:space:]\n]+\\)" (format "%S" sexp) "\\1"))
+         (expanded (format "%S" (macroexpand-1 sexp)))
+         (buf (generate-new-buffer
+               (format "Macro-View: %s" macro-name))))
+    (with-current-buffer buf
+      (dismiss-lisp-mode)
+      (insert expanded)
+      (goto-char (point-min))
+      (indent-pp-sexp t))
+    (if pfx (display-buffer-other-window buf)
+      (pop-to-buffer buf))))
+
+(defmacro catch-nil (&rest body)
+  `(condition-case nil
+       (progn ,@body)
+     (error nil)))
+
+(defmacro do-point (&rest body)
+  `(progn ,@body (point)))
+(defmacro do-point-save (&rest body)
+  `(save-excursion ,@body (point)))
+
 (provide 'functions)
