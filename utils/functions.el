@@ -2948,6 +2948,7 @@ at the end of the buffer."
   `(let ,bindings (and ,test-form ,@body)))
 
 (cl-defmacro modify-list ((var expr &key in out) &rest body)
+  (declare (indent 1))
   (let* ((input (if in `(cl-remove-if-not (lambda (,var) ,in) ,expr)
                   expr))
          (result `(cl-mapcar (lambda (,var) ,@(or body (list var))) ,input)))

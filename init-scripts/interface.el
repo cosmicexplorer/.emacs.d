@@ -783,3 +783,20 @@ Check out your .emacs.\n")))))
   '((((class color))))
   "NO" :group 'cperl-mode)
 
+;;; help
+(defun new-help-page (pfx)
+  (interactive "P")
+  (let* ((help-vars
+          (modify-list
+              (el (buffer-local-variables)
+                  :in (string-match-p "^help-" (symbol-name (car el))))))
+         (buf-str (buffer-string))
+         (cleaned-buf-name
+          (replace-regexp-in-string "<[0-9]+>\\'" "" (buffer-name)))
+         (newbuf (generate-new-buffer cleaned-buf-name)))
+    (with-current-buffer newbuf
+      (insert buf-str)
+      (loop for (var . val) in help-vars
+            do (set var val))
+      (help-mode))
+    (switch-to-buffer newbuf)))
