@@ -3011,4 +3011,8 @@ at the end of the buffer."
 (defmacro do-point-save (&rest body)
   `(save-excursion ,@body (point)))
 
+(defun remove-multiple-buffer-copies-name (&optional buf)
+  (replace-regexp-in-string
+   "<[0-9]+>\\'" "" (if (bufferp buf) (buffer-name buf) buf)))
+
 (provide 'functions)

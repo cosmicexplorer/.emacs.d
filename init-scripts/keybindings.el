@@ -776,3 +776,6 @@
 ;;; isearch
 (eval-after-load 'isearch
   '(define-key isearch-mode-map (kbd "DEL") #'isearch-del-char))
+
+(define-key Info-mode-map (kbd "b") #'Info-history-back)
+(define-key Info-mode-map (kbd "f") #'Info-history-forward)

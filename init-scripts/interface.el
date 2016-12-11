@@ -135,8 +135,10 @@
 ;;; million years to scroll through it otherwise
 (add-hook 'after-change-major-mode-hook
           (lambda ()
-            (when (eq major-mode 'doc-view-mode)
+            (when (derived-mode-p 'doc-view-mode)
               (linum-mode 0))))
+(add-hook 'help-mode-hook 'turn-off-linum)
+(add-hook 'Info-mode-hook 'turn-off-linum)
 
 (defadvice dired-do-shell-command (after refresh activate)
   (revert-buffer))
@@ -362,9 +364,11 @@ mode-name &optional advice-type advice-forms))."
                                               ,(gensym) activate)
                        ,@(or (nthcdr 4 arg)
                              `((rename-buffer
-                                (generate-new-buffer-name
-                                 (funcall ,(third arg) (quote ,(fourth arg)))
-                                 (buffer-name)))
+                                (remove-multiple-buffer-copies-name
+                                 (generate-new-buffer-name
+                                  (funcall ,(third arg) (quote ,(fourth arg)))
+                                  (buffer-name)))
+                                t)
                                (set
                                 (intern
                                  (concat "last-" ,(symbol-name el)
@@ -378,9 +382,11 @@ mode-name &optional advice-type advice-forms))."
                                      ,(gensym) activate)
                        ,@(or (nthcdr 4 arg)
                              `((rename-buffer
-                                (generate-new-buffer-name
-                                 (funcall ,(third arg) (quote ,(fourth arg)))
-                                 (buffer-name)))
+                                (remove-multiple-buffer-copies-name
+                                 (generate-new-buffer-name
+                                  (funcall ,(third arg) (quote ,(fourth arg)))
+                                  (buffer-name)))
+                                t)
                                (set
                                 (intern
                                  (concat "last-" ,(symbol-name el)
@@ -784,19 +790,64 @@ Check out your .emacs.\n")))))
   "NO" :group 'cperl-mode)
 
 ;;; help
-(defun new-help-page (pfx)
-  (interactive "P")
+(defun new-help-info-page (buf-regex mode)
   (let* ((help-vars
-          (modify-list
-              (el (buffer-local-variables)
-                  :in (string-match-p "^help-" (symbol-name (car el))))))
+          (cl-remove-if-not
+           (lambda (el) (string-match-p buf-regex (symbol-name (car el))))
+           (buffer-local-variables)))
          (buf-str (buffer-string))
-         (cleaned-buf-name
-          (replace-regexp-in-string "<[0-9]+>\\'" "" (buffer-name)))
-         (newbuf (generate-new-buffer cleaned-buf-name)))
+         (newname (remove-multiple-buffer-copies-name (current-buffer)))
+         (newbuf (generate-new-buffer newname)))
     (with-current-buffer newbuf
       (insert buf-str)
-      (loop for (var . val) in help-vars
-            do (set var val))
-      (help-mode))
-    (switch-to-buffer newbuf)))
+      (funcall mode)
+      (rename-buffer newname t))
+    newbuf))
+
+(defadvice help-do-xref (around make-copy activate)
+  (let ((cur (current-buffer))
+        (buf (new-help-info-page "^help-" #'help-mode))
+        (pt (window-point))
+        (scr (window-start)))
+    ad-do-it
+    (with-current-buffer buf
+      (rename-buffer (remove-multiple-buffer-copies-name buf) t)
+      (set-window-start (selected-window) scr)
+      (set-window-point (selected-window) pt)
+      (switch-to-buffer buf)
+      (quit-window)
+      (unbury-buffer)
+      (switch-to-buffer cur))))
+
+(defvar info-recur-marker nil)
+
+(defadvice Info-goto-node (around make-copy activate)
+  (if (or (not (derived-mode-p 'Info-mode))
+          info-recur-marker)
+      ad-do-it
+    (let* ((info-recur-marker t)
+           (cur (current-buffer))
+           (prevname (buffer-name))
+           (info-filename Info-current-file)
+           (pt (window-point))
+           (scr (window-start))
+           (buf (generate-new-buffer "xx")))
+      ad-do-it
+      (with-current-buffer buf
+        (info-setup info-filename buf)
+        (switch-to-buffer buf)
+        (set-window-start (selected-window) scr)
+        (set-window-point (selected-window) pt)
+        (quit-windows-on buf)
+        (unbury-buffer)
+        (switch-to-buffer cur))
+      (with-current-buffer cur
+        (rename-buffer
+         (remove-multiple-buffer-copies-name
+          (help-info-get-buffer-name 'Info))
+         t))
+      (with-current-buffer buf
+        (rename-buffer
+         (remove-multiple-buffer-copies-name
+          (help-info-get-buffer-name 'Info))
+         t)))))
