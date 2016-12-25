@@ -763,7 +763,7 @@ Check out your .emacs.\n")))))
     (char-fold-to-regexp str lax)))
 
 (defun word-boundary-fold (str)
-  (replace-regexp-in-string "[[:space:]]+" ".*" (trim-whitespace str)))
+  (replace-regexp-in-string "[[:space:]\n]+" ".*" (trim-whitespace str)))
 
 (defun isearch-fast-and-loose (string &optional bound noerror count)
   (let* ((fun (if isearch-forward #'re-search-forward #'re-search-backward))
@@ -810,14 +810,16 @@ Check out your .emacs.\n")))))
         (pt (window-point))
         (scr (window-start)))
     ad-do-it
-    (with-current-buffer buf
-      (rename-buffer (remove-multiple-buffer-copies-name buf) t)
-      (set-window-start (selected-window) scr)
-      (set-window-point (selected-window) pt)
-      (switch-to-buffer buf)
-      (quit-window)
-      (unbury-buffer)
-      (switch-to-buffer cur))))
+    (if (not (derived-mode-p 'help-mode))
+        (kill-buffer buf)
+      (with-current-buffer buf
+        (rename-buffer (remove-multiple-buffer-copies-name buf) t)
+        (set-window-start (selected-window) scr)
+        (set-window-point (selected-window) pt)
+        (switch-to-buffer buf)
+        (quit-window)
+        (unbury-buffer)
+        (switch-to-buffer cur)))))
 
 (defvar info-recur-marker nil)
 
