@@ -495,27 +495,96 @@ Lisp code." t)
     (forward-char -1)))
 
 ;;; haskell
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
-(autoload 'ghc-init "ghc" nil t)
-(autoload 'ghc-debug "ghc" nil t)
-(add-hook 'haskell-mode-hook #'ghc-init)
-(add-hook 'haskell-mode-hook #'interactive-haskell-mode)
-(get-buffer-create "*GHC Info*")        ; some ghc-mod things look for this lol
+(require 'haskell-mode)
 
-(defun haskell-newline-actual-indent ()
-  (interactive)
-  (haskell-indentation-newline-and-indent)
-  (indent-for-tab-command))
+(add-hook 'haskell-mode-hook #'intero-mode)
 
-(defadvice ghc-check-syntax (around stop-ghc-syntax-check activate) nil)
-(defun disable-ghc-check ()
+(defconst hlint-output-start-regexp
+  "^\\([^:]+\\):\\([0-9]+\\):\\([0-9]+\\): \\([^:]+\\): \\([^:]+\\)\n")
+(defconst hlint-trim-ws-regexp
+  "\\`[[:space:]\n]+\\|[[:space:]\n]\\'")
+(defconst hlint-typo-regexp
+  (format "\\`%s%s\\'"
+          "Found:[[:space:]\n]+\\(\\(?:.\\|[[:space:]]\\)+\\)\n"
+          "Why not:[[:space:]\n]+\\(\\(?:.\\|[[:space:]]\\)+\\)"))
+(defconst hlint-error-type-alist
+  '(("Suggestion" . info)
+    ("Warning" . warning)
+    ("Error" . error)))
+
+;;; makes hlint able to correct with intero!
+(flycheck-define-checker haskell-hlint-better
+  "A Haskell style checker using hlint.
+
+See URL `https://github.com/ndmitchell/hlint'."
+  :command ("hlint"
+            (option-list "-X" flycheck-hlint-language-extensions concat)
+            (option-list "-i=" flycheck-hlint-ignore-rules concat)
+            (option-list "-h" flycheck-hlint-hint-packages concat)
+            (config-file "-h" flycheck-hlintrc)
+            (eval flycheck-hlint-args)
+            source-inplace)
+  :error-parser
+  (lambda (output _ buffer)
+    (with-temp-buffer
+      (insert output)
+      (goto-char (point-min))
+      (cl-loop
+       while (re-search-forward hlint-output-start-regexp nil t)
+       collect (let ((file (match-string 1))
+                     (line (string-to-number (match-string 2)))
+                     (col (string-to-number (match-string 3)))
+                     (type (match-string 4))
+                     (name (match-string 5))
+                     (pt (point)))
+                 (re-search-forward "\n\n")
+                 (let ((txt (replace-regexp-in-string
+                             hlint-trim-ws-regexp ""
+                             (buffer-substring-no-properties pt (1- (point)))))
+                       (level (or (cdr (assoc type hlint-error-type-alist))
+                                  'info)))
+                   (when (string-match hlint-typo-regexp txt)
+                     (let ((found (match-string 1 txt))
+                           (rep (match-string 2 txt)))
+                       (with-current-buffer buffer
+                         (add-to-list
+                          'intero-suggestions
+                          (list :type 'fix-typo
+                                :typo found
+                                :replacement rep
+                                :column col
+                                :line line) t))))
+                   (flycheck-error-new-at
+                    line col level (format "%s\n%s" name txt)
+                    :checker 'haskell-hlint-better
+                    :id type
+                    :filename (buffer-file-name buffer)
+                    :buffer buffer))))))
+  :modes (haskell-mode literate-haskell-mode))
+
+(add-to-list 'flycheck-checkers 'haskell-hlint-better)
+
+(defconst activate-buttons-alist
+  '((toggle . widget-toggle-action)))
+
+(defun press-all-buttons-and-exit ()
   (interactive)
-  (ad-activate 'ghc-check-syntax)
-  (remove-overlays (point-min) (point-max) 'ghc-check t))
-(defun enable-ghc-check ()
-  (interactive)
-  (ad-deactivate 'ghc-check-syntax)
-  (ghc-check-syntax))
+  (widget-map-buttons
+   (lambda (but _)
+     (if-let ((action (cdr (assoc (widget-type but) activate-buttons-alist))))
+         (progn (funcall action but) nil)
+       nil)))
+  (exit-recursive-edit))
+
+(defadvice intero-multiswitch (around press-q-to-quit activate)
+  (let ((widget-keymap
+         (copy-keymap widget-keymap)))
+    (define-key widget-keymap (kbd "q") #'abort-recursive-edit)
+    (define-key widget-keymap (kbd "<C-return>") #'press-all-buttons-and-exit)
+    ad-do-it))
+
+(eval-after-load 'intero
+  '(flycheck-add-next-checker 'intero 'haskell-hlint-better t))
 
 ;;; scala
 ;; (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)

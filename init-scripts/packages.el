@@ -25,15 +25,17 @@
     clojure-mode
     coffee-mode
     color-theme
+    color-theme-solarized
     company
     company-ghc
     company-ghci
     csharp-mode
     csv-mode
     dash
+    cuda-mode
     ein
+    enh-ruby-mode
     ensime
-    epl
     epresent
     espuds
     evil
@@ -54,6 +56,7 @@
     helm-gtags
     helm-swoop
     highlight-parentheses
+    intero
     js2-mode
     less-css-mode
     linum
@@ -67,6 +70,7 @@
     misc-cmds
     mmm-mode
     multiple-cursors
+    nhexl-mode
     omnisharp
     package-build
     pacmacs
@@ -76,24 +80,32 @@
     php-mode
     pkg-info
     queue
+    projectile
     racket-mode
     rainbow-delimiters
     rainbow-mode
-    s
-    scala-mode
+    realgud
+    robe
+    sage-shell-mode
+    scala-mode2
     scrooge
+    shm
     shut-up
     skewer-mode
     slime
     slime-company
     smartrep
     sml-mode
+    solarized-theme
     sourcemap
     speech-tagger
     thrift
     undo-tree
+    tuareg
+    visual-fill-column
     w3m
     web-beautify
+    web-mode
     wgrep
     wgrep-ag
     wgrep-helm

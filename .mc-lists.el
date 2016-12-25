@@ -14,6 +14,7 @@
         beg-of-line-text
         beg-of-maybe-visual-line
         beginning-of-buffer
+        beginning-of-defun
         beginning-of-visual-line
         bison-electric-open-brace
         bison-electric-pipe
@@ -53,6 +54,7 @@
         isearch-repeat-backward
         isearch-repeat-forward
         js-newline-indent-for-real
+        kill-line-or-region
         kill-selected-region-default
         latex-insert-block
         latex-insert-math
@@ -66,6 +68,7 @@
         org-return
         org-self-insert-command
         org-shiftcontrolleft
+        org-shiftcontrolright
         org-shiftleft
         org-shiftright
         org-yank
@@ -84,6 +87,7 @@
         racket--paredit-open-square
         sgml-slash
         smart-tab
+        tex-handle-newline
         toggle-letter-case
         transpose-words
         wgrep-finish-edit
