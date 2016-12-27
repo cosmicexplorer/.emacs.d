@@ -512,58 +512,7 @@ Lisp code." t)
     ("Warning" . warning)
     ("Error" . error)))
 
-(defun hlint-format-line-col-str (line col)
-  (format "%d:%d" line col))
-
-(defun hlint-format-line-col (err)
-  (hlint-format-line-col-str
-   (flycheck-error-line err) (flycheck-error-column err)))
-
 ;;; makes hlint able to correct with intero!
-;; (defun hlint-checker-fun (output _ buffer)
-;;   (with-temp-buffer
-;;     (insert output)
-;;     (goto-char (point-min))
-;;     (append
-;;      intero-errors
-;;      (cl-remove-if
-;;       #'null
-;;       (cl-loop
-;;        while (re-search-forward hlint-output-start-regexp nil t)
-;;        collect (let ((file (match-string 1))
-;;                      (line (string-to-number (match-string 2)))
-;;                      (col (string-to-number (match-string 3)))
-;;                      (type (match-string 4))
-;;                      (name (match-string 5))
-;;                      (pt (point)))
-;;                  (re-search-forward "\n\n")
-;;                  (let ((txt (replace-regexp-in-string
-;;                              hlint-trim-ws-regexp ""
-;;                              (buffer-substring-no-properties pt (1- (point)))))
-;;                        (level (or (cdr (assoc type hlint-error-type-alist))
-;;                                   'info))
-;;                        (fmt (hlint-format-line-col-str line col)))
-;;                    (unless (cl-some
-;;                             (lambda (err)
-;;                               (string-equal fmt (hlint-format-line-col err)))
-;;                             (with-current-buffer buffer intero-errors))
-;;                      (when (string-match hlint-typo-regexp txt)
-;;                        (let ((found (match-string 1 txt))
-;;                              (rep (match-string 2 txt)))
-;;                          (with-current-buffer buffer
-;;                            (add-to-list
-;;                             'intero-suggestions
-;;                             (list :type 'fix-typo
-;;                                   :typo found
-;;                                   :replacement rep
-;;                                   :column col
-;;                                   :line line) t))))
-;;                      (flycheck-error-new-at
-;;                       line col level (format "%s\n%s" name txt)
-;;                       :checker 'haskell-hlint-better
-;;                       :id type
-;;                       :filename (buffer-file-name buffer)
-;;                       :buffer buffer)))))))))
 (defun hlint-checker-fun (output _ buffer)
   (with-temp-buffer
     (insert output)
@@ -583,8 +532,7 @@ Lisp code." t)
                             hlint-trim-ws-regexp ""
                             (buffer-substring-no-properties pt (1- (point)))))
                       (level (or (cdr (assoc type hlint-error-type-alist))
-                                 'info))
-                      (fmt (hlint-format-line-col-str line col)))
+                                 'info)))
                   (when (string-match hlint-typo-regexp txt)
                     (let ((found (match-string 1 txt))
                           (rep (match-string 2 txt)))
@@ -621,26 +569,6 @@ See URL `https://github.com/ndmitchell/hlint'."
 (eval-after-load 'intero
   '(flycheck-add-next-checker 'intero 'haskell-hlint-better t))
 
-;; (defadvice flycheck-finish-checker-process (around fix-exit-status activate)
-;;   (message "files: '%S'" (ad-get-arg 2))
-;;   ;; (when (eq (ad-get-arg 0) 'haskell-hlint-better)
-;;   ;;   (ad-set-arg 1 0))
-;;   ad-do-it)
-
-;; (defvar-local intero-errors nil)
-
-;; (defadvice intero-temp-file-name (around do-not-make-temp activate)
-;;   (if (buffer-file-name)
-;;       (setq ad-return-value (buffer-file-name))
-;;     ad-do-it))
-
-;; (defun flycheck-error-equal (a b)
-;;   (cl-every
-;;    (lambda (slot)
-;;      (equal (cl-struct-slot-value 'flycheck-error slot a)
-;;             (cl-struct-slot-value 'flycheck-error slot b)))
-;;    (cdr (mapcar #'car (cl-struct-slot-info 'flycheck-error)))))
-
 (defvar-local stack-project-root nil)
 
 (defun stack-set-project-root ()
@@ -657,10 +585,6 @@ See URL `https://github.com/ndmitchell/hlint'."
 
 (add-hook 'haskell-mode-hook #'stack-set-project-root)
 
-;; (defvar-local hlint-ghci-errors nil)
-
-;; (ad-deactivate 'intero-parse-errors-warnings-splices)
-;; (ad-remove-advice 'intero-parse-errors-warnings-splices 'around 'set-errors-for-hlint)
 (defadvice intero-parse-errors-warnings-splices
     (around set-errors-for-hlint activate)
   (let* ((buf (ad-get-arg 1))
