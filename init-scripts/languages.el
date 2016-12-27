@@ -636,9 +636,12 @@ Lisp code." t)
                               file-literal fname err-msg nil t)
              do (setf (flycheck-error-message err) fixed-msg))))
 
+(defun say-yes (&rest args) t)
+
 (defcustom haskell-mode-generate-tags-p nil
   "Whether `haskell-mode-generate-tags' does anything."
-  :safe t)
+  :type 'boolean
+  :safe #'say-yes)
 
 (defadvice haskell-mode-generate-tags (around do-not-generate-tags activate)
   (when haskell-mode-generate-tags-p ad-do-it))
