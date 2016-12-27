@@ -326,7 +326,7 @@
           (set-marker mk start-pt)
           (push mk global-mark-ring)))
       (save-window-excursion
-        (let ((current-prefix-arg (not no-prefix)))
+        (let ((current-prefix-arg (and (not no-prefix) pfx)))
           (call-interactively cmd))
         (setq final-buf (current-buffer)
               win-pt (window-point)
@@ -334,9 +334,10 @@
               failure (and (eq orig-buf final-buf)
                            (= start-pt win-pt))))
       (unless failure
-        (if (or (and invert (not pfx))
-                (and pfx (not invert)))
-            (display-buffer-other-window final-buf)
+        (if (org-xor invert pfx)
+            (if (eq orig-buf final-buf)
+                (progn (other-window 1) (switch-to-buffer orig-buf))
+              (display-buffer-other-window final-buf))
           (display-buffer-same-window final-buf nil))
         (set-window-point (selected-window) win-pt)
         (set-window-start (selected-window) win-st)))))
