@@ -567,111 +567,98 @@ scope of the command's precision.")
 ;;; eshell-last-input-end, and eshell-last-output-start internally! hopefully
 ;;; these won't change.........................................
 ;;; currently working on emacs 24.5
-(when save-eshell-history
-  (defun eshell-append-str (str)
-    (unless (zerop (with-temp-buffer
-                     (insert str)
-                     (shell-command-on-region
-                      (point-min) (point-max)
-                      (format ">> %s" eshell-user-output-file)
-                      t)))
-      (error "failed to write eshell output")))
+(defun eshell-append-str (str)
+  (unless (zerop (with-temp-buffer
+                   (insert str)
+                   (shell-command-on-region
+                    (point-min) (point-max)
+                    (format ">> %s" eshell-user-output-file)
+                    t)))
+    (error "failed to write eshell output")))
 
-  (defun eshell-send-input-to-history ()
-    (let ((str
-           (concat
-            "--in--: " default-directory ": "
-            (format-time-string current-date-time-format (current-time))
-            "\n"
-            (buffer-substring-no-properties
-             (marker-position eshell-last-input-start)
-             (point)))))
-      (eshell-append-str str)))
+(defun eshell-send-input-to-history ()
+  (let ((str
+         (concat
+          "--in--: " default-directory ": "
+          (format-time-string current-date-time-format (current-time))
+          "\n"
+          (buffer-substring-no-properties
+           (marker-position eshell-last-input-start)
+           (point)))))
+    (eshell-append-str str)))
 
-  (defun eshell-send-output-to-history ()
-    (let ((str
-           (concat "--out--: " default-directory ": "
-                   (format-time-string current-date-time-format
-                                       (current-time))
-                   "\n"
-                   (buffer-substring-no-properties
-                    (marker-position eshell-last-input-end)
-                    (marker-position eshell-last-output-start))))
-          (res (string-match-p "\n$" str)))
-      (eshell-append-str (if res str (concat str "\n"))))))
+(defun eshell-send-output-to-history ()
+  (let* ((str
+          (concat "--out--: " default-directory ": "
+                  (format-time-string current-date-time-format
+                                      (current-time))
+                  "\n"
+                  (buffer-substring-no-properties
+                   (marker-position eshell-last-input-end)
+                   (marker-position eshell-last-output-start))))
+         (res (string-match-p "\n$" str)))
+    (eshell-append-str (if res str (concat str "\n")))))
 
-(defun mostly-whitespace-p (str)
-  (>
-   (/
-    (cl-count-if
-     (lambda (s) (string-match-p "[[:space:]\r\n]" (char-to-string s)))
-     str)
-    (float (length str)))
-   0.8))
+(defvar-local prev-shell-input "")
+(defvar-local was-last-output nil)
 
-(when save-shell-history
-  (defvar prev-shell-input "")
-  (make-variable-buffer-local 'prev-shell-input)
-  (defvar was-last-output nil)
-  (make-variable-buffer-local 'was-last-output)
+(defun shell-append-str (str)
+  (unless (zerop (with-temp-buffer
+                   (insert str)
+                   (shell-command-on-region
+                    (point-min) (point-max)
+                    (format ">> %s" shell-user-output-file)
+                    t)))
+    (error "failed to write shell output")))
 
-  (defun shell-append-str (str)
-    (unless (zerop (with-temp-buffer
-                     (insert str)
-                     (shell-command-on-region
-                      (point-min) (point-max)
-                      (format ">> %s" shell-user-output-file)
-                      t)))
-      (error "failed to write shell output")))
+(defun shell-send-input-to-history (str-to-send)
+  (let ((str
+         (ansi-color-filter-apply
+          (concat "\n" "--in--: " default-directory ": "
+                  (format-time-string current-date-time-format
+                                      (current-time))
+                  "\n"
+                  str-to-send))))
+    (shell-append-str str)
+    (setq prev-shell-input str-to-send)
+    (setq was-last-output nil)))
 
-  (defun shell-send-input-to-history (str-to-send)
-    (let ((str
-           (ansi-color-filter-apply
-            (concat "\n" "--in--: " default-directory ": "
-                    (format-time-string current-date-time-format
-                                        (current-time))
-                    "\n"
-                    str-to-send))))
-      (shell-append-str str)
-      (setq prev-shell-input str-to-send)
-      (setq was-last-output nil)))
-
-  (defvar my-shell-prompt-pattern "^[^#%$>
+(defvar my-shell-prompt-pattern "^[^#%$>
 -]*[#$%>] *")
 
-  (defun shell-send-output-to-history (str-to-send)
-    (let ((extra-prompt-regexen
-           (list (concat ".\\{,4\\}"
-                         (regexp-quote (user-login-name))
-                         "@.*$")
-                 my-shell-prompt-pattern)))
-      (let ((treated-str
-             (trim-whitespace
+(defun shell-send-output-to-history (str-to-send)
+  (let ((extra-prompt-regexen
+         (list (concat ".\\{,4\\}"
+                       (regexp-quote (user-login-name))
+                       "@.*$")
+               my-shell-prompt-pattern)))
+    (let ((treated-str
+           (trim-whitespace
+            (replace-regexp-in-string
+             "%[[:space:]\r\n]*\\'"
+             ""
+             (replace-regexp-in-string
+              (concat
+               "\\("
+               (reduce (lambda (a b) (concat a "\\|" b))
+                       extra-prompt-regexen)
+               "\\)")
+              ""
               (replace-regexp-in-string
-               "%[[:space:]\r\n]*\\'"
+               (regexp-quote
+                (trim-whitespace prev-shell-input))
                ""
-               (replace-regexp-in-string
-                (concat
-                 "\\("
-                 (reduce (lambda (a b) (concat a "\\|" b))
-                         extra-prompt-regexen)
-                 "\\)")
-                ""
-                (replace-regexp-in-string
-                 (regexp-quote
-                  (trim-whitespace prev-shell-input))
-                 ""
-                 (ansi-color-filter-apply str-to-send))))))
-            (whitespace-regex "\\`[[:space:]\r\n]*\\'")
-            (header-str (if was-last-output ""
-                          (concat "--out--: " default-directory ": "
-                                  (format-time-string current-date-time-format
-                                                      (current-time))
-                                  "\n"))))
-        (unless (or (string-match-p whitespace-regex str-to-send)
-                    (string-match-p whitespace-regex treated-str))
-          (shell-append-str (concat header-str treated-str))
-          (setq was-last-output t))))))
+               (ansi-color-filter-apply str-to-send))))))
+          (whitespace-regex "\\`[[:space:]\r\n]*\\'")
+          (header-str (if was-last-output ""
+                        (concat "--out--: " default-directory ": "
+                                (format-time-string current-date-time-format
+                                                    (current-time))
+                                "\n"))))
+      (unless (or (string-match-p whitespace-regex str-to-send)
+                  (string-match-p whitespace-regex treated-str))
+        (shell-append-str (concat header-str treated-str))
+        (setq was-last-output t)))))
 
 ;;; functions to save and reset window configuration to a list
 ;;; since i only use a single frame mostly the intricacies of multiple frames
@@ -694,21 +681,6 @@ scope of the command's precision.")
   (interactive)
   (setq window-configuration-ring nil
         cur-window-config nil))
-
-;;; clear out all files which no longer exist or have moved
-(defun clean-all-buffers-to-deleted-files ()
-  (interactive)
-  (loop for buf in (buffer-list)
-        do (with-current-buffer buf
-             (when (and
-                    (not (string-match-p "\\`\\*.*\\*\\'" (buffer-name)))
-                    (not (get-buffer-process (buffer-name)))
-                    (not (derived-mode-p 'magit-mode))
-                    (or
-                     (not (file-exists-p default-directory))
-                     (not (and (buffer-file-name)
-                               (file-exists-p (buffer-file-name))))))
-               (kill-buffer buf)))))
 
 ;;; load file into buffer asynchronously
 ;;; this is unfortunately somewhat useless because emacs has to stop the world
@@ -847,12 +819,12 @@ scope of the command's precision.")
 
 (defvar init-loaded-fully nil
   "Set to t after init loads fully.")
-(defun save-visiting-files-to-buffer (&optional is-called-interactively)
-  (interactive "p")
-  (when (or is-called-interactively
-            ;; used so that init failures (which do not load any files from the
-            ;; saved-files file) do not delete all history
-            init-loaded-fully)
+(defun save-visiting-files-to-buffer (&optional no-clean-bufs)
+  (interactive "P")
+  ;; used so that init failures (which do not load any files from the
+  ;; saved-files file) do not delete all history
+  (when init-loaded-fully
+    (unless no-clean-bufs (cleanup-all-buffers))
     ;; TODO: make this more error-resistant, somehow. having to send emacs a
     ;; sigterm because this function fails on quit is annoying.
     (with-current-buffer (find-file saved-files)
@@ -2643,9 +2615,11 @@ by another percent."
 (defun c-to-k (degree-kelvin)
   (+ degree-kelvin celsius-start))
 
-(defun run-shell ()
-  (interactive)
-  (shell nil))
+(defun run-shell (pfx)
+  (interactive "P")
+  (let ((buf
+         (save-window-excursion (shell nil))))
+    (if pfx (pop-to-buffer buf) (switch-to-buffer buf))))
 
 (defun completing-read-multiple
     (prompt table &optional predicate require-match initial-input
@@ -2760,33 +2734,25 @@ by another percent."
       (goto-line line)
       (recenter))))
 
-(defun cleanup-git-gutter-buffers ()
-  (interactive)
-  (mapc #'kill-buffer
-        (cl-remove-if-not
-         (lambda (buf)
-           (string-match-p "\\`\\*git-gutter:.*\\*\\'" (buffer-name buf)))
-         (buffer-list))))
+(defconst important-buffer-names '("*Messages*"))
+(defconst important-buffer-names-regexp (regexp-opt important-buffer-names))
 
-(defun cleanup-customize-buffers ()
+(defun clean-all-buffers-to-deleted-files ()
   (interactive)
-  (mapc #'kill-buffer
-        (cl-remove-if-not
-         (lambda (buf) (with-current-buffer buf (eq major-mode 'Custom-mode)))
-         (buffer-list))))
+  (loop for buf in (buffer-list)
+        unless (or (string-match-p
+                    important-buffer-names-regexp (buffer-name buf))
+                   (when-let ((proc (get-buffer-process buf)))
+                     (process-live-p proc))
+                   (when-let ((fname (buffer-file-name buf)))
+                     (file-exists-p fname)))
+        do (kill-buffer buf)))
 
 (defun cleanup-all-buffers ()
   (interactive)
-  (mapatoms
-   (lambda (sym)
-     (when (and (functionp sym)
-                (string-match-p "\\`cleanup\\-.+\\-buffers\\'"
-                                (symbol-name sym))
-                (not (eq sym 'cleanup-all-buffers)))
-       (call-interactively sym))))
-  (clean-all-buffers-to-deleted-files)
   (tramp-cleanup-all-connections)
-  (tramp-cleanup-all-buffers))
+  (tramp-cleanup-all-buffers)
+  (clean-all-buffers-to-deleted-files))
 
 (defun get-linewise-center (beg end)
   (unless (<= beg end) (error (format "beg (%d) is before end (%d)" beg end)))

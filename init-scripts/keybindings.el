@@ -424,17 +424,17 @@
 (global-set-key (kbd "C-h d") #'describe-function-or-variable)
 (global-set-key (kbd "C-M-h d")
                 #'describe-function-or-variable-at-point)
-(defun current-help-window-or-pfx (cmd)
-  (lambda (pfx)
-    (interactive "P")
-    (let ((failure
-           (save-window-excursion
-             (let ((res (call-interactively cmd)))
-               (and (stringp res)
-                    (string-match-p "\\`[^\n]* is undefined\\'" res))))))
-      (unless failure
-        (if (not pfx) (display-buffer-other-window last-help-mode-buffer)
-          (display-buffer-same-window last-help-mode-buffer nil))))))
+;; (defun current-help-window-or-pfx (cmd)
+;;   (lambda (pfx)
+;;     (interactive "P")
+;;     (let ((failure
+;;            (save-window-excursion
+;;              (let ((res (call-interactively cmd)))
+;;                (and (stringp res)
+;;                     (string-match-p "\\`[^\n]* is undefined\\'" res))))))
+;;       (unless failure
+;;         (if (not pfx) (display-buffer-other-window last-help-mode-buffer)
+;;           (display-buffer-same-window last-help-mode-buffer nil))))))
 (defun find-function-switch-pfx (cmd &optional nomark invert no-prefix)
   (lambda (pfx)
     (interactive "P")
@@ -442,7 +442,7 @@
                   win-pt win-st (start-pt (point)))
       (unless nomark
         (let ((mk (make-marker)))
-          (set-marker mk start-pt)
+          (push-mark mk start-pt)
           (push mk global-mark-ring)))
       (save-window-excursion
         (let ((current-prefix-arg (and (not no-prefix) pfx)))
@@ -460,31 +460,35 @@
           (display-buffer-same-window final-buf nil))
         (set-window-point (selected-window) win-pt)
         (set-window-start (selected-window) win-st)))))
-(global-set-key (kbd "C-h f") (current-help-window-or-pfx #'describe-function))
-(global-set-key (kbd "C-h v") (current-help-window-or-pfx #'describe-variable))
-(global-set-key (kbd "C-h k") (current-help-window-or-pfx #'describe-key))
-(global-set-key (kbd "C-h C-k") (current-help-window-or-pfx #'describe-key))
-(global-set-key (kbd "C-h d")
-                (current-help-window-or-pfx #'describe-function-or-variable))
 (global-set-key
- (kbd "C-M-h d")
- (current-help-window-or-pfx #'describe-function-or-variable-at-point))
+ (kbd "C-h f")
+ (find-function-switch-pfx (make-new-help #'describe-function) nil t))
+(global-set-key
+ (kbd "C-h v")
+ (find-function-switch-pfx (make-new-help #'describe-variable) nil t))
+;; (global-set-key (kbd "C-h k") (current-help-window-or-pfx #'describe-key))
+;; (global-set-key (kbd "C-h C-k") (current-help-window-or-pfx #'describe-key))
+;; (global-set-key (kbd "C-h d")
+;;                 (current-help-window-or-pfx #'describe-function-or-variable))
+;; (global-set-key
+;;  (kbd "C-M-h d")
+;;  (current-help-window-or-pfx #'describe-function-or-variable-at-point))
 (global-set-key (kbd "C-h C-d")
                 (find-function-switch-pfx #'find-function-or-variable))
 (global-set-key
  (kbd "C-M-h C-d")
  (find-function-switch-pfx #'find-function-or-variable-at-point))
-(global-set-key (kbd "C-M-h f")
-                (current-help-window-or-pfx #'describe-function-at-point))
-(global-set-key (kbd "C-M-h v")
-                (current-help-window-or-pfx #'describe-variable-at-point))
+;; (global-set-key (kbd "C-M-h f")
+;;                 (current-help-window-or-pfx #'describe-function-at-point))
+;; (global-set-key (kbd "C-M-h v")
+;;                 (current-help-window-or-pfx #'describe-variable-at-point))
 (global-set-key (kbd "C-h C-f") (find-function-switch-pfx #'find-function))
 (global-set-key (kbd "C-M-h C-f")
                 (find-function-switch-pfx #'find-function-at-point))
 (global-set-key (kbd "C-h C-v") (find-function-switch-pfx #'find-variable))
 (global-set-key (kbd "C-M-h C-v")
                 (find-function-switch-pfx #'find-variable-at-point))
-(global-set-key (kbd "C-h b") (current-help-window-or-pfx #'describe-bindings))
+;; (global-set-key (kbd "C-h b") (current-help-window-or-pfx #'describe-bindings))
 
 ;;; now for c
 (eval-after-load 'cc-mode
