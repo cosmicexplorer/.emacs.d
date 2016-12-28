@@ -3016,4 +3016,10 @@ at the end of the buffer."
   (replace-regexp-in-string
    "<[0-9]+>\\'" "" (if (bufferp buf) (buffer-name buf) buf)))
 
+(defun non-nil-and-equal (&rest els)
+  (and els
+       (cl-reduce (lambda (a b)
+                    (and (equal a b) a))
+                  els)))
+
 (provide 'functions)

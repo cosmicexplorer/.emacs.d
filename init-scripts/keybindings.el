@@ -252,6 +252,112 @@
   (unless (bobp)
     (if (re-search-backward "\n\n[^\n]" nil t) (forward-char)
       (beginning-of-buffer))))
+
+(defun my-org-up-section ()
+  (interactive)
+  (cond ((org-at-item-p)
+         (org-beginning-of-item-list)
+         (org-up-element)
+         (-when-let* ((struct (org-list-struct))
+                      (cur (car (member (assq (point-at-bol) struct) struct)))
+                      (indent (cl-second cur)))
+           (forward-char indent)))
+        (t (org-up-element))))
+(defun my-org-down-section ()
+  (interactive)
+  (if (org-at-heading-p) (org-down-element)
+    (-if-let* ((struct (org-list-struct)))
+        (-if-let* ((bol (point-at-bol))
+                   (subitem (nth 1 (member (assq bol struct) struct)))
+                   (st
+                    (non-nil-and-equal
+                     (org-list-has-child-p bol struct)
+                     (cl-first subitem)))
+                   (indent (cl-second subitem)))
+            (progn
+              (-when-let*
+                  ((eol (point-at-eol))
+                   (invisible-olay
+                    (cl-find-if
+                     (lambda (olay) (= (overlay-start olay) eol))
+                     (overlays-at st)))
+                   (invisible-prop (overlay-get invisible-olay 'invisible)))
+                (org-list-set-item-visibility bol struct 'children))
+              (goto-char st)
+              (forward-char indent))
+          (message "%s" "No deeper list item!"))
+      (message "%s" "Can't go down further!"))))
+
+(defun my-org-next-section ()
+  (interactive)
+  (if (org-at-item-p)
+      (let* ((struct (org-list-struct))
+             (cur-rest
+              (cl-loop with bol = (point-at-bol)
+                       for head = struct then (cdr head)
+                       until (or (null head)
+                                 (eq (caar head) bol))
+                       finally (return head)))
+             (cur (car cur-rest))
+             (indent (cl-second cur))
+             (next
+              (cl-loop for item in (cdr cur-rest)
+                       if (< (cl-second item) indent) return nil
+                       until (eq (cl-second item) indent)
+                       finally (return item))))
+        (if next
+            (progn
+              (goto-char (cl-first next))
+              (forward-char indent))
+          (message "%s" "No more list items!")))
+    (org-forward-element)))
+(defun my-org-previous-section ()
+  (interactive)
+  (if (org-at-item-p)
+      (let* ((struct (reverse (org-list-struct)))
+             (cur-rest
+              (cl-loop with bol = (point-at-bol)
+                       for head = struct then (cdr head)
+                       until (or (null head)
+                                 (eq (caar head) bol))
+                       finally (return head)))
+             (cur (car cur-rest))
+             (indent (cl-second cur))
+             (next
+              (cl-loop for item in (cdr cur-rest)
+                       if (< (cl-second item) indent) return nil
+                       until (eq (cl-second item) indent)
+                       finally (return item))))
+        (if next
+            (progn
+              (goto-char (cl-first next))
+              (forward-char indent))
+          (message "%s" "No previous list items!")))
+    (org-backward-element)))
+
+(defun my-org-beginning-of-section ()
+  (interactive)
+  (if (org-at-item-p)
+      (org-beginning-of-item-list)
+    (org-previous-visible-heading 1)))
+(defun my-org-end-of-section ()
+  (interactive)
+  (if (org-at-item-p)
+      (org-end-of-item-list)
+    (org-next-visible-heading 1))
+  (backward-char))
+
+(defun my-org-previous-element ()
+  (interactive)
+  (when (org-at-item-p)
+    (goto-char (caar (org-list-struct))))
+  (org-backward-element))
+(defun my-org-next-element ()
+  (interactive)
+  (when (org-at-item-p)
+    (goto-char (caar (reverse (org-list-struct)))))
+  (org-forward-element))
+
 (eval-after-load 'org
   '(progn
      (define-key org-mode-map (kbd "<C-up>") #'org-replace-backward-paragraph)
@@ -273,7 +379,20 @@
      (define-key org-mode-map (kbd "S-<down>") #'org-shiftdown)
      (define-key org-mode-map (kbd "C-p") #'outline-previous-heading)
      (define-key org-mode-map (kbd "C-n") #'outline-next-heading)
-     (define-key org-mode-map (kbd "C-M-u") #'outline-up-heading)))
+     (define-key org-mode-map (kbd "C-M-u") #'outline-up-heading)
+     (define-key org-mode-map (kbd "M-a") nil)
+     (define-key org-mode-map (kbd "M-a <up>") #'my-org-previous-section)
+     (define-key org-mode-map (kbd "M-a <down>") #'my-org-next-section)
+     (define-key org-mode-map (kbd "M-a <left>") #'my-org-up-section)
+     (define-key org-mode-map (kbd "M-a <right>") #'my-org-down-section)
+     (define-key org-mode-map (kbd "M-a M-<up>") #'my-org-previous-section)
+     (define-key org-mode-map (kbd "M-a M-<down>") #'my-org-next-section)
+     (define-key org-mode-map (kbd "M-a M-<left>") #'my-org-up-section)
+     (define-key org-mode-map (kbd "M-a M-<right>") #'my-org-down-section)
+     (define-key org-mode-map (kbd "M-a M-a") #'my-org-beginning-of-section)
+     (define-key org-mode-map (kbd "M-a M-s") #'my-org-end-of-section)
+     (define-key org-mode-map (kbd "M-a M-n") #'my-org-next-element)
+     (define-key org-mode-map (kbd "M-a M-p") #'my-org-previous-element)))
 
 ;;; convenience bindings from working with windows
 (global-set-key (kbd "M-`") #'indent-regardless-of-mode)
