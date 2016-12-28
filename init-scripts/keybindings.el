@@ -420,51 +420,16 @@
 (eval-after-load 'grep
   '(define-key grep-mode-map (kbd "G") #'refind-or-grep))
 
-(global-set-key (kbd "C-M-h") nil)
-(global-set-key (kbd "C-h d") #'describe-function-or-variable)
-(global-set-key (kbd "C-M-h d")
-                #'describe-function-or-variable-at-point)
-;; (defun current-help-window-or-pfx (cmd)
-;;   (lambda (pfx)
-;;     (interactive "P")
-;;     (let ((failure
-;;            (save-window-excursion
-;;              (let ((res (call-interactively cmd)))
-;;                (and (stringp res)
-;;                     (string-match-p "\\`[^\n]* is undefined\\'" res))))))
-;;       (unless failure
-;;         (if (not pfx) (display-buffer-other-window last-help-mode-buffer)
-;;           (display-buffer-same-window last-help-mode-buffer nil))))))
 (defun find-function-switch-pfx (cmd &optional invert no-prefix nomark)
   (lambda (pfx)
     (interactive "P")
-    (let (failure final-buf (orig-buf (current-buffer))
-                  win-pt win-st (start-pt (point)))
-      (unless nomark
-        (unless (= (mark t) start-pt)
-          (push-mark start-pt)))
-      (save-window-excursion
-        (let ((current-prefix-arg (and (not no-prefix) pfx)))
-          (call-interactively cmd))
-        (setq final-buf (current-buffer)
-              win-pt (window-point)
-              win-st (window-start)
-              failure (and (eq orig-buf final-buf)
-                           (= start-pt win-pt))))
-      (unless failure
-        (let ((win
-               (if (org-xor invert pfx)
-                   (if (eq orig-buf final-buf)
-                       (progn
-                         (other-window 1)
-                         (switch-to-buffer orig-buf)
-                         (selected-window))
-                     (display-buffer-other-window final-buf))
-                 (display-buffer-same-window final-buf nil)
-                 (selected-window))))
-          (with-selected-window win
-            (set-window-point (selected-window) win-pt)
-            (set-window-start (selected-window) win-st)))))))
+    (switch-window-prep-fn
+     pfx
+     (lambda ()
+       (let ((current-prefix-arg (and (not no-prefix) pfx)))
+         (call-interactively cmd)))
+     invert
+     nomark)))
 
 (global-set-key
  (kbd "C-h f")
@@ -487,11 +452,11 @@
   (make-new-help #'describe-function-or-variable-at-point) t))
 (global-set-key
  (kbd "C-h C-d")
- (find-function-switch-pfx (make-new-help #'find-function-or-variable)))
+ (find-function-switch-pfx #'find-function-or-variable))
 (global-set-key
  (kbd "C-M-h C-d")
  (find-function-switch-pfx
-  (make-new-help #'find-function-or-variable-at-point)))
+  #'find-function-or-variable-at-point))
 (global-set-key
  (kbd "C-M-h f")
  (find-function-switch-pfx
@@ -501,16 +466,16 @@
  (find-function-switch-pfx
   (make-new-help #'describe-variable-at-point)))
 (global-set-key
- (kbd "C-h C-f") (find-function-switch-pfx (make-new-help #'find-function)))
+ (kbd "C-h C-f") (find-function-switch-pfx #'find-function))
 (global-set-key
  (kbd "C-M-h C-f")
- (find-function-switch-pfx (make-new-help #'find-function-at-point)))
+ (find-function-switch-pfx #'find-function-at-point))
 (global-set-key
  (kbd "C-h C-v")
- (find-function-switch-pfx (make-new-help #'find-variable)))
+ (find-function-switch-pfx #'find-variable))
 (global-set-key
  (kbd "C-M-h C-v")
- (find-function-switch-pfx (make-new-help #'find-variable-at-point)))
+ (find-function-switch-pfx #'find-variable-at-point))
 (global-set-key
  (kbd "C-h b")
  (find-function-switch-pfx (make-new-help #'describe-bindings) t))

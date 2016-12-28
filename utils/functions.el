@@ -2988,4 +2988,33 @@ at the end of the buffer."
                     (and (equal a b) a))
                   els)))
 
+(defun switch-window-prep-fn (other fn &optional invert nomark)
+  (let (failure final-buf (orig-buf (current-buffer))
+                win-pt win-st (start-pt (point)))
+    (unless nomark
+      (unless (= (mark t) start-pt)
+        (push-mark start-pt)))
+    (save-excursion
+      (save-window-excursion
+        (funcall fn)
+        (setq final-buf (current-buffer)
+              win-pt (window-point)
+              win-st (window-start)
+              failure (and (eq orig-buf final-buf)
+                           (= start-pt win-pt)))))
+    (unless failure
+      (let ((win
+             (if (org-xor invert other)
+                 (if (eq orig-buf final-buf)
+                     (progn
+                       (other-window 1)
+                       (switch-to-buffer orig-buf)
+                       (selected-window))
+                   (display-buffer-other-window final-buf))
+               (display-buffer-same-window final-buf nil)
+               (selected-window))))
+        (with-selected-window win
+          (set-window-point (selected-window) win-pt)
+          (set-window-start (selected-window) win-st))))))
+
 (provide 'functions)
