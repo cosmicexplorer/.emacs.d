@@ -263,9 +263,10 @@ annoying. This fixes that."
     (string-match-p "\\`[A-Z]*\\'" str)))
 
 (defun char-is-capitalized-p (char)
-  (let ((case-fold-search nil)
-        (str-from-char (string char)))
-    (string-match-p "\\`[A-Z]*\\'" str-from-char)))
+  (when (characterp char)
+    (let ((case-fold-search nil)
+          (str-from-char (string char)))
+      (string-match-p "\\`[A-Z]*\\'" str-from-char))))
 
 (defun insert-brackets ()
   (interactive)
