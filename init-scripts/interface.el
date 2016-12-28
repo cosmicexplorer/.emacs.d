@@ -327,61 +327,23 @@ lowercase, and Initial Caps versions."
       Info-current-node)
      t)))
 
-;; (defun help-info-get-buffer-name (&optional my-mode)
-;;   (let* ((mode (or my-mode major-mode))
-;;          (mode-str
-;;           (replace-regexp-in-string mode-fun-regex "" (symbol-name mode))))
-;;     (cond ((eq major-mode 'Info-mode)
-;;            (format "%s: %s->%s"
-;;                    mode-str
-;;                    (file-name-nondirectory Info-current-file)
-;;                    Info-current-node))
-;;           ((eq major-mode 'help-mode)
-;;            (pcase help-xref-stack-item
-;;              (`(describe-bindings nil ,buf)
-;;               (let ((buf-mode (with-current-buffer buf major-mode)))
-;;                 (format "%s(describe-bindings): %s<%S>"
-;;                         mode-str (buffer-name buf) buf-mode)))
-;;              (`(,_ ,item . ,_)
-;;               (let ((desc-type
-;;                      (cond ((fboundp item) "function")
-;;                            ((boundp item) "variable")
-;;                            (t "something"))))
-;;                 (format "%s(describe-%s): %s" mode-str desc-type item)))))
-;;           (t (buffer-name)))))
-
-;; (defun reread-bindings-description-into (buffer)
-;;   (let* ((help-buf (help-buffer))
-;;          (contents (with-current-buffer help-buf (buffer-string))))
-;;     (with-current-buffer buffer
-;;       (read-only-mode -1)
-;;       (insert contents)
-;;       (goto-char (point-min))
-;;       (set-buffer-modified-p nil)
-;;       (read-only-mode 1))
-;;     (kill-buffer help-buf)))
-
-;; (defadvice describe-bindings (after fill-bindings-buffer activate)
-;;   (let ((buf last-help-mode-buffer))
-;;     (when (buffer-live-p buf)
-;;       (reread-bindings-description-into buf))))
-
-(defun cider-doc-get-buffer-name (&optional my-mode)
-  (format "%s: %s (%s)"
-          "cider-doc"
-          cider-docview-symbol
-          (let ((info (cider-var-info cider-docview-symbol)))
-            (reduce
-             (lambda (a b) (if (and a b) (concat a ":" b) a))
-             (mapcar
-              (lambda (str-or-list)
-                (if (listp str-or-list)
-                    (when (nrepl-dict-get info (car str-or-list))
-                      (car str-or-list))
-                  (nrepl-dict-get info str-or-list)))
-              (list '("macro") '("special-form") "class" "member"
-                    "super" "interfaces" "forms-str"))
-             :initial-value ""))))
+(defun cider-doc-rename-buf ()
+  (rename-buffer
+   (format "cider-doc: %s (%s)"
+           cider-docview-symbol
+           (let ((info (cider-var-info cider-docview-symbol)))
+             (reduce
+              (lambda (a b) (if (and a b) (concat a ":" b) a))
+              (mapcar
+               (lambda (str-or-list)
+                 (if (listp str-or-list)
+                     (when (nrepl-dict-get info (car str-or-list))
+                       (car str-or-list))
+                   (nrepl-dict-get info str-or-list)))
+               (list '("macro") '("special-form") "class" "member"
+                     "super" "interfaces" "forms-str"))
+              :initial-value "")))
+   t))
 
 ;;; TODO: this for eww!
 (defun eww-get-buffer-name (&optional my-mode)
@@ -394,66 +356,8 @@ lowercase, and Initial Caps versions."
   (with-current-buffer (process-buffer ad-do-it)
     (rename-buffer "*Python*")))
 
-;; (defmacro better-navigation (&rest args)
-;;   "ARGS are of form ((start-func change-func generate-buffer-name-func
-;; mode-name &optional advice-type advice-forms))."
-;;   `(progn
-;;      ,@(mapcar
-;;         (lambda (arg)
-;;           `(progn
-;;              (defvar ,(intern
-;;                        (concat "last-" (symbol-name (first arg)) "-buffer"))
-;;                nil)
-;;              (when ,(sixth arg)
-;;                (add-to-list 'special-buffer-names ,(sixth arg)))
-;;              ,@(unless (null (first arg))
-;;                  (mapcar
-;;                   (lambda (el)
-;;                     `(defadvice ,el (,(or (fifth arg) 'after)
-;;                                               ,(gensym) activate)
-;;                        ,@(or (nthcdr 4 arg)
-;;                              `((rename-buffer
-;;                                 (funcall ,(third arg) (quote ,(fourth arg)))
-;;                                 t)
-;;                                (set
-;;                                 (intern
-;;                                  (concat "last-" ,(symbol-name el)
-;;                                          "-buffer"))
-;;                                 (current-buffer))))))
-;;                   (if (listp (first arg)) (first arg) (list (first arg)))))
-;;              ,@(unless (null (second arg))
-;;                  (mapcar
-;;                   (lambda (el)
-;;                     `(defadvice ,el (,(or (fifth arg) 'after)
-;;                                      ,(gensym) activate)
-;;                        ,@(or (nthcdr 4 arg)
-;;                              `((rename-buffer
-;;                                 (remove-multiple-buffer-copies-name
-;;                                  (generate-new-buffer-name
-;;                                   (funcall ,(third arg) (quote ,(fourth arg)))
-;;                                   (buffer-name)))
-;;                                 t)
-;;                                (set
-;;                                 (intern
-;;                                  (concat "last-" ,(symbol-name el)
-;;                                          "-buffer"))
-;;                                 (current-buffer))))))
-;;                   (if (listp (second arg)) (second arg) (list (second arg)))))
-;;              (defun ,(intern (concat "cleanup-"
-;;                                      (replace-regexp-in-string
-;;                                       mode-fun-regex ""
-;;                                       (symbol-name (fourth arg)))
-;;                                      "-buffers")) ()
-;;                (interactive)
-;;                (loop for buf in (buffer-list)
-;;                      do (with-current-buffer buf
-;;                           (when (eq major-mode (quote ,(fourth arg)))
-;;                             (kill-buffer buf)))))))
-;;         args)))
-
-;; (better-navigation
-;;  (info Info-goto-node #'help-info-get-buffer-name Info-mode)
-;;  (nil cider-doc-lookup #'cider-doc-get-buffer-name cider-docview-mode))
+(defadvice cider-doc-lookup (after reread-name activate)
+  (cider-doc-rename-buf))
 
 (defvar prev-help-buf nil)
 
@@ -866,51 +770,3 @@ Check out your .emacs.\n")))))
 (defface cperl-no-trailing-whitespace-face
   '((((class color))))
   "NO" :group 'cperl-mode)
-
-;;; help
-;; (defun new-help-info-page (buf-regex mode)
-;;   (let* ((help-vars
-;;           (cl-remove-if-not
-;;            (lambda (el) (string-match-p buf-regex (symbol-name (car el))))
-;;            (buffer-local-variables)))
-;;          (buf-str (buffer-string))
-;;          (newname (remove-multiple-buffer-copies-name (current-buffer)))
-;;          (newbuf (generate-new-buffer newname)))
-;;     (with-current-buffer newbuf
-;;       (insert buf-str)
-;;       (funcall mode)
-;;       (rename-buffer newname t))
-;;     newbuf))
-
-;; (defvar info-recur-marker nil)
-
-;; (defadvice Info-goto-node (around make-copy activate)
-;;   (if (or (not (derived-mode-p 'Info-mode))
-;;           info-recur-marker)
-;;       ad-do-it
-;;     (let* ((info-recur-marker t)
-;;            (cur (current-buffer))
-;;            (prevname (buffer-name))
-;;            (info-filename Info-current-file)
-;;            (pt (window-point))
-;;            (scr (window-start))
-;;            (buf (generate-new-buffer "xx")))
-;;       ad-do-it
-;;       (with-current-buffer buf
-;;         (info-setup info-filename buf)
-;;         (switch-to-buffer buf)
-;;         (set-window-start (selected-window) scr)
-;;         (set-window-point (selected-window) pt)
-;;         (quit-windows-on buf)
-;;         (unbury-buffer)
-;;         (switch-to-buffer cur))
-;;       (with-current-buffer cur
-;;         (rename-buffer
-;;          (remove-multiple-buffer-copies-name
-;;           (help-info-get-buffer-name 'Info))
-;;          t))
-;;       (with-current-buffer buf
-;;         (rename-buffer
-;;          (remove-multiple-buffer-copies-name
-;;           (help-info-get-buffer-name 'Info))
-;;          t)))))
