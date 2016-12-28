@@ -313,10 +313,34 @@ lowercase, and Initial Caps versions."
                    (file-name-nondirectory Info-current-file)
                    Info-current-node))
           ((eq major-mode 'help-mode)
-           (format "%s: %s"
-                   mode-str
-                   (second help-xref-stack-item)))
+           (pcase help-xref-stack-item
+             (`(describe-bindings nil ,buf)
+              (let ((buf-mode (with-current-buffer buf major-mode)))
+                (format "%s(describe-bindings): %s<%S>"
+                        mode-str (buffer-name buf) buf-mode)))
+             (`(,_ ,item . ,_)
+              (let ((desc-type
+                     (cond ((fboundp item) "function")
+                           ((boundp item) "variable")
+                           (t "something"))))
+                (format "%s(describe-%s): %s" mode-str desc-type item)))))
           (t (buffer-name)))))
+
+(defun reread-bindings-description-into (buffer)
+  (let* ((help-buf (help-buffer))
+         (contents (with-current-buffer help-buf (buffer-string))))
+    (with-current-buffer buffer
+      (read-only-mode -1)
+      (insert contents)
+      (goto-char (point-min))
+      (set-buffer-modified-p nil)
+      (read-only-mode 1))
+    (kill-buffer help-buf)))
+
+(defadvice describe-bindings (after fill-bindings-buffer activate)
+  (let ((buf last-help-mode-buffer))
+    (when (buffer-live-p buf)
+      (reread-bindings-description-into buf))))
 
 (defun cider-doc-get-buffer-name (&optional my-mode)
   (format "%s: %s (%s)"
@@ -364,10 +388,7 @@ mode-name &optional advice-type advice-forms))."
                                               ,(gensym) activate)
                        ,@(or (nthcdr 4 arg)
                              `((rename-buffer
-                                (remove-multiple-buffer-copies-name
-                                 (generate-new-buffer-name
-                                  (funcall ,(third arg) (quote ,(fourth arg)))
-                                  (buffer-name)))
+                                (funcall ,(third arg) (quote ,(fourth arg)))
                                 t)
                                (set
                                 (intern

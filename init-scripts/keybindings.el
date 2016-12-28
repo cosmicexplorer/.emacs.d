@@ -365,6 +365,7 @@
 (global-set-key (kbd "C-h C-v") (find-function-switch-pfx #'find-variable))
 (global-set-key (kbd "C-M-h C-v")
                 (find-function-switch-pfx #'find-variable-at-point))
+(global-set-key (kbd "C-h b") (current-help-window-or-pfx #'describe-bindings))
 
 ;;; now for c
 (eval-after-load 'cc-mode
