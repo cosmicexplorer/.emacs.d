@@ -738,21 +738,36 @@ Check out your .emacs.\n")))))
 (with-eval-after-load 'misearch
   (remove-hook 'isearch-mode-hook #'multi-isearch-setup))
 
-(defun char-fold-if-generic (str &optional lax)
-  (if (cl-find-if (lambda (ch) (null (char-table-range char-fold-table ch)))
-                  (string-to-vector str))
-      str
-    (char-fold-to-regexp str lax)))
+(defconst regexp-special '("\\(?:" "\\(" "\\|" "\\)" "." "[" "]" "?" "??"
+                           "*" "*?" "+" "+?" "-"))
+(defconst regexp-special-impure '("\\(?:\\`\\|\\\\(\\|\\\\(?:\\|\\[\\)\\^"
+                                  "\\$\\(?:\\'\\|\\\\)\\)"
+                                  "\\[:[a-z]+:\\]"
+                                  "\\\\{[0-9]+\\(?:,[0-9]+\\)?\\\\}"
+                                  "\\\\[a-zA-Z=`'<>]"))
+(defconst backslash-regexp-special "\\(?:\\\\\\\\\\)*")
+(defconst regexp-special-coalesced
+  (let ((concd
+         (format "\\(?:%s\\|%s\\)"
+                 (mapconcat (lambda (str) (format "\\(?:%s\\)" str))
+                            regexp-special-impure "\\|")
+                 (regexp-opt regexp-special))))
+    (concat backslash-regexp-special concd)))
+
+(defun char-fold-non-special (str)
+  (operate-on-non-regexp-special #'char-fold-to-regexp str))
 
 (defun word-boundary-fold (str)
-  (replace-regexp-in-string "[[:space:]\n]+" ".*" (trim-whitespace str)))
+  (replace-regexp-in-string "[[:space:]\n]+" "\\(?:.\\|\n\\)*?"
+                            (trim-whitespace str) nil t))
 
-(defun isearch-fast-and-loose (string &optional bound noerror count)
-  (let* ((fun (if isearch-forward #'re-search-forward #'re-search-backward))
-         (char-folded (char-fold-if-generic string t))
-         (word-folded (word-boundary-fold char-folded)))
+(defun do-complete-char-word-fold (re)
+  (word-boundary-fold (char-fold-non-special re)))
+
+(defun do-isearch (real-regexp string bound noerror count)
+  (let* ((fun (if isearch-forward #'re-search-forward #'re-search-backward)))
     (condition-case er
-        (funcall fun word-folded bound noerror count)
+        (funcall fun real-regexp bound noerror count)
       (search-failed
        (signal (car er)
                (if-let ((prefix (get isearch-regexp-function
@@ -760,6 +775,19 @@ Check out your .emacs.\n")))))
                    (and (stringp prefix)
                         (list (format "%s   [using %ssearch]" string prefix)))
                  (cdr er)))))))
+
+(defun isearch-fast-and-loose (string &optional bound noerror count)
+  (do-isearch
+   (if isearch-normal-search string (do-complete-char-word-fold string))
+   string bound noerror count))
+
+(defvar isearch-normal-search nil)
+
+(isearch-define-mode-toggle normal "l" nil "\
+Turning on normal search turns off fast-and-loose mode."
+  (setq isearch-normal-search (not isearch-normal-search))
+  (isearch--momentary-message
+   (if isearch-normal-search "normal search" "abnormal search")))
 
 (defcustom my-isearch-search-fun #'isearch-fast-and-loose
   "`defcustom' because it deserves one."

@@ -3018,4 +3018,27 @@ at the end of the buffer."
           (set-window-point (selected-window) win-pt)
           (set-window-start (selected-window) win-st))))))
 
+(defun operate-on-non-regexp-special (fn str)
+  (with-temp-buffer
+    (insert str)
+    (goto-char (point-min))
+    (let ((mk (make-marker)))
+      (set-marker mk (point))
+      (cl-loop
+       for pt = (point)
+       while (re-search-forward regexp-special-coalesced nil t)
+       for beg = (match-beginning 0)
+       for end = (match-end 0)
+       do (set-marker mk end)
+       do (goto-char pt)
+       for fold-str = (buffer-substring pt beg)
+       do (delete-region pt beg)
+       do (insert (funcall fn fold-str))
+       do (goto-char (marker-position mk))
+       finally (progn
+                 (let ((final-str (buffer-substring pt (point-max))))
+                   (delete-region pt (point-max))
+                   (insert (funcall fn final-str)))
+                 (return (buffer-string)))))))
+
 (provide 'functions)
