@@ -2734,7 +2734,7 @@ by another percent."
       (goto-line line)
       (recenter))))
 
-(defconst important-buffer-names '("*Messages*"))
+(defconst important-buffer-names '("*Messages*" "*scratch*"))
 (defconst important-buffer-names-regexp (regexp-opt important-buffer-names))
 
 (defun clean-all-buffers-to-deleted-files ()

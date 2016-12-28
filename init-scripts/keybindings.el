@@ -446,6 +446,7 @@
 (global-set-key
  (kbd "C-h d")
  (find-function-switch-pfx (make-new-help #'describe-function-or-variable) t))
+(global-set-key (kbd "C-M-h") nil)
 (global-set-key
  (kbd "C-M-h d")
  (find-function-switch-pfx
@@ -479,6 +480,9 @@
 (global-set-key
  (kbd "C-h b")
  (find-function-switch-pfx (make-new-help #'describe-bindings) t))
+(global-set-key
+ (kbd "C-h l")
+ (find-function-switch-pfx (make-new-help #'view-lossage) t))
 
 ;;; now for c
 (eval-after-load 'cc-mode

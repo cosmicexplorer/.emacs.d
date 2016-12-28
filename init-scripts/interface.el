@@ -312,8 +312,20 @@ lowercase, and Initial Caps versions."
                         (cond ((fboundp item) "function")
                               ((boundp item) "variable")
                               (t "something"))))
-                   (format "help(describe-%s): %s" desc-type item))))))
+                   (format "help(describe-%s): %s" desc-type item)))
+                (`(,x)
+                 (format "help(%s)" x)))))
     (rename-buffer name t)))
+
+(defun info-rename-buffer ()
+  (when-let ((file Info-current-file)
+             (node Info-current-node))
+    (rename-buffer
+     (format
+      "Info: %s->%s"
+      (file-name-nondirectory Info-current-file)
+      Info-current-node)
+     t)))
 
 ;; (defun help-info-get-buffer-name (&optional my-mode)
 ;;   (let* ((mode (or my-mode major-mode))
@@ -441,7 +453,6 @@ lowercase, and Initial Caps versions."
 
 ;; (better-navigation
 ;;  (info Info-goto-node #'help-info-get-buffer-name Info-mode)
-;;  (help-mode nil #'help-info-get-buffer-name help-mode)
 ;;  (nil cider-doc-lookup #'cider-doc-get-buffer-name cider-docview-mode))
 
 (defvar prev-help-buf nil)
@@ -462,6 +473,28 @@ lowercase, and Initial Caps versions."
     (interactive)
     (call-interactively help-fn)
     (switch-to-buffer prev-help-buf)))
+
+(defvar info-prev-file nil)
+(defvar info-prev-node nil)
+
+(defun info-make-backup ()
+  (setq info-prev-file Info-current-file
+        info-prev-node Info-current-node))
+(defun info-copy-from-backup ()
+  (when-let ((file info-prev-file)
+             (node info-prev-node))
+    (save-window-excursion
+      (info (format "(%s)%s" file node)))
+    (setq info-prev-file nil
+          info-prev-node nil)))
+
+(defadvice Info-directory (after rename-info-buffer activate)
+  (info-rename-buffer))
+(defadvice Info-goto-node (before make-copy-info-buffer activate)
+  (info-make-backup))
+(defadvice Info-goto-node (after rename-new-info-buffer activate)
+  (info-rename-buffer)
+  (info-copy-from-backup))
 
 (add-hook 'eshell-mode-hook #'rename-shell-buffer)
 (add-hook 'eshell-directory-change-hook #'rename-shell-buffer)
@@ -848,23 +881,6 @@ Check out your .emacs.\n")))))
 ;;       (funcall mode)
 ;;       (rename-buffer newname t))
 ;;     newbuf))
-
-;; (defadvice help-do-xref (around make-copy activate)
-;;   (let ((cur (current-buffer))
-;;         (buf (new-help-info-page "^help-" #'help-mode))
-;;         (pt (window-point))
-;;         (scr (window-start)))
-;;     ad-do-it
-;;     (if (not (derived-mode-p 'help-mode))
-;;         (kill-buffer buf)
-;;       (with-current-buffer buf
-;;         (rename-buffer (remove-multiple-buffer-copies-name buf) t)
-;;         (set-window-start (selected-window) scr)
-;;         (set-window-point (selected-window) pt)
-;;         (switch-to-buffer buf)
-;;         (quit-window)
-;;         (unbury-buffer)
-;;         (switch-to-buffer cur)))))
 
 ;; (defvar info-recur-marker nil)
 
