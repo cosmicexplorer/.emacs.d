@@ -301,19 +301,19 @@ lowercase, and Initial Caps versions."
 
 ;;; same for info and help
 (defun help-rename-buffer ()
-  (rename-buffer
-   (pcase help-xref-stack-item
-     (`(describe-bindings nil ,buf)
-      (let ((buf-mode (with-current-buffer buf major-mode)))
-        (format "help(describe-bindings): %s<%S>"
-                (buffer-name buf) buf-mode)))
-     (`(,_ ,item . ,_)
-      (let ((desc-type
-             (cond ((fboundp item) "function")
-                   ((boundp item) "variable")
-                   (t "something"))))
-        (format "help(describe-%s): %s" desc-type item))))
-   t))
+  (when-let ((name
+              (pcase help-xref-stack-item
+                (`(describe-bindings nil ,buf)
+                 (let ((buf-mode (with-current-buffer buf major-mode)))
+                   (format "help(describe-bindings): %s<%S>"
+                           (buffer-name buf) buf-mode)))
+                (`(,_ ,item . ,_)
+                 (let ((desc-type
+                        (cond ((fboundp item) "function")
+                              ((boundp item) "variable")
+                              (t "something"))))
+                   (format "help(describe-%s): %s" desc-type item))))))
+    (rename-buffer name t)))
 
 ;; (defun help-info-get-buffer-name (&optional my-mode)
 ;;   (let* ((mode (or my-mode major-mode))
@@ -444,12 +444,24 @@ lowercase, and Initial Caps versions."
 ;;  (help-mode nil #'help-info-get-buffer-name help-mode)
 ;;  (nil cider-doc-lookup #'cider-doc-get-buffer-name cider-docview-mode))
 
+(defvar prev-help-buf nil)
+
+(defadvice help-setup-xref (before make-prev-buf activate)
+  (setq prev-help-buf (get-buffer-create "~Help~")))
+
+(defadvice help-buffer (around use-prev activate)
+  (setq ad-return-value prev-help-buf))
+
+(defun set-help-prev-buf ()
+  (push (current-buffer) prev-help-bufs))
+
+(add-hook 'help-mode-hook #'help-rename-buffer)
+
 (defun make-new-help (help-fn)
   (lambda ()
     (interactive)
     (call-interactively help-fn)
-    (switch-to-buffer (help-buffer))
-    (help-rename-buffer)))
+    (switch-to-buffer prev-help-buf)))
 
 (add-hook 'eshell-mode-hook #'rename-shell-buffer)
 (add-hook 'eshell-directory-change-hook #'rename-shell-buffer)

@@ -420,13 +420,13 @@
 (eval-after-load 'grep
   '(define-key grep-mode-map (kbd "G") #'refind-or-grep))
 
-(defun find-function-switch-pfx (cmd &optional invert no-prefix nomark)
+(defun find-function-switch-pfx (cmd &optional invert use-prefix nomark)
   (lambda (pfx)
     (interactive "P")
     (switch-window-prep-fn
      pfx
      (lambda ()
-       (let ((current-prefix-arg (and (not no-prefix) pfx)))
+       (let ((current-prefix-arg use-prefix))
          (call-interactively cmd)))
      invert
      nomark)))
@@ -559,7 +559,7 @@
 (eval-after-load "magit"
   '(progn
      (global-set-key (kbd "C-c g")
-                     (find-function-switch-pfx #'magit-status t t))
+                     (find-function-switch-pfx #'magit-status t))
      (global-set-key (kbd "C-c b") #'magit-blame)
      (define-key magit-mode-map (kbd "<tab>") #'magit-tab-dwim)
      (define-key magit-mode-map (kbd "<backtab>") #'magit-section-cycle-global)

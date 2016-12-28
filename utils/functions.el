@@ -808,7 +808,7 @@ scope of the command's precision.")
                      (newline))))
                (forward-line)))
     (kill-buffer))
-  (cleanup-all-buffers))
+  (clean-nonvisiting-buffers))
 
 (defun compose-helper (arg quoted-funs)
   (if (null quoted-funs) arg
@@ -824,7 +824,7 @@ scope of the command's precision.")
   ;; used so that init failures (which do not load any files from the
   ;; saved-files file) do not delete all history
   (when init-loaded-fully
-    (unless no-clean-bufs (cleanup-all-buffers))
+    (unless no-clean-bufs (clean-nonvisiting-buffers))
     ;; TODO: make this more error-resistant, somehow. having to send emacs a
     ;; sigterm because this function fails on quit is annoying.
     (with-current-buffer (find-file saved-files)
@@ -2748,7 +2748,7 @@ by another percent."
                      (file-exists-p fname)))
         do (kill-buffer buf)))
 
-(defun cleanup-all-buffers ()
+(defun clean-nonvisiting-buffers ()
   (interactive)
   (tramp-cleanup-all-connections)
   (tramp-cleanup-all-buffers)
@@ -2992,8 +2992,9 @@ at the end of the buffer."
   (let (failure final-buf (orig-buf (current-buffer))
                 win-pt win-st (start-pt (point)))
     (unless nomark
-      (unless (= (mark t) start-pt)
-        (push-mark start-pt)))
+      (let ((mk (mark t)))
+        (unless (and mk (= mk start-pt))
+          (push-mark start-pt))))
     (save-excursion
       (save-window-excursion
         (funcall fn)
