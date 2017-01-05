@@ -3041,4 +3041,16 @@ at the end of the buffer."
                    (insert (funcall fn final-str)))
                  (return (buffer-string)))))))
 
+(defun not-whitespace-at-point ()
+  (save-excursion
+    (when (whitespacep (char-before))
+      (re-search-backward "[^[:space:]]" nil t))
+    (if (re-search-backward "[[:space:]]" nil t)
+        (forward-char)
+      (goto-char (point-min)))
+    (let ((right (save-excursion
+                   (re-search-forward "[[:space:]]" nil t)
+                   (if (eobp) (point) (1- (point))))))
+      (buffer-substring (point) right))))
+
 (provide 'functions)

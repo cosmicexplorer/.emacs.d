@@ -579,11 +579,27 @@
      #'litcoffee-toggle-code-prose))
 
 ;;; haskell
+(defconst hoogle-base-url "https://www.haskell.org/hoogle/")
+
+(defvar hoogle-internet-history nil)
+
+(defun hoogle-internet (query)
+  (interactive
+   (list
+    (let ((def (not-whitespace-at-point)))
+      (read-string
+       (format "hoogle (default '%s'): " def)
+       nil
+       'hoogle-internet-history
+       def))))
+  (browse-url (url-encode-url (format "%s?hoogle=%s" hoogle-base-url query))))
+
 (eval-after-load "haskell-mode"
   '(progn
      (define-key haskell-mode-map (kbd "<return>")
        #'haskell-indentation-newline-and-indent)
-     (define-key haskell-mode-map (kbd "C-c C-v") nil)))
+     (define-key haskell-mode-map (kbd "C-c C-v") nil)
+     (define-key haskell-mode-map (kbd "C-h f") #'hoogle-internet)))
 
 ;;; compilation
 (define-key compilation-mode-map (kbd "g")

@@ -520,7 +520,8 @@ Check out your .emacs."))
                             (set-time-zone-rule tz)
                             time))
      (destroy-whitespace)
-     (destroy-whitespace . t))))
+     (nil)
+     (flycheck-mode))))
  '(search-default-mode (quote char-fold-to-regexp))
  '(smart-tab-completion-functions-alist
    (quote

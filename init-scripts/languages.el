@@ -611,15 +611,19 @@ See URL `https://github.com/ndmitchell/hlint'."
 (defadvice haskell-mode-generate-tags (around do-not-generate-tags activate)
   (when haskell-mode-generate-tags-p ad-do-it))
 
+(defun turn-on-toggle-button (but)
+  (unless (widget-get but :value)
+    (widget-toggle-action but)))
+
 (defconst activate-buttons-alist
-  '((toggle . widget-toggle-action)))
+  '((toggle . turn-on-toggle-button)))
 
 (defun press-all-buttons-and-exit ()
   (interactive)
   (widget-map-buttons
    (lambda (but _)
-     (if-let ((action (cdr (assoc (widget-type but) activate-buttons-alist))))
-         (progn (funcall action but) nil)
+     (when-let ((action (cdr (assoc (widget-type but) activate-buttons-alist))))
+       (funcall action but)
        nil)))
   (exit-recursive-edit))
 
