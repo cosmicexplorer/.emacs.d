@@ -40,21 +40,23 @@
 (defconst rmd-knitr-fmt-str
   "require(knitr); require(markdown); knit(\"%s\",\"%s\")")
 
+(defun rmd-export-sentinel (proc _)
+  (message "%s" (with-current-buffer (process-buffer proc) (buffer-string))))
+
 (defun rmd-export-pdf (infile)
   (interactive (list (buffer-file-name)))
   (let* ((interfile (replace-regexp-in-string "\\.[rR]md\\'" ".md" infile))
          (outfile (replace-regexp-in-string "\\.[rR]md\\'" ".pdf" infile))
-         (cmd (format "%s %s '%s'"
-                      shell-file-name
-                      shell-command-switch
-                      (format rmd-export-cmd-fmt-str interfile outfile)))
-         (res
-          (with-temp-buffer
-            (insert (format rmd-knitr-fmt-str infile interfile))
-            (shell-command-on-region
-             (point-min) (point-max) cmd (current-buffer) t)
-            (buffer-string))))
-    (message "%s" res)))
+         (proc
+          (make-process
+           :command (list shell-file-name shell-command-switch
+                          (format rmd-export-cmd-fmt-str interfile outfile))
+           :name "*rmd-export*"
+           :buffer (generate-new-buffer "rmd-export")
+           :connection-type 'pipe
+           :sentinel #'rmd-export-sentinel)))
+    (process-send-string proc (format rmd-knitr-fmt-str infile interfile))
+    (process-send-eof proc)))
 
 ;;; highlight cursor and auto-fill when over 80 chars in certain modes
 (defvar no-auto-fill-modes
