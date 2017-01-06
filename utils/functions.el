@@ -3053,4 +3053,90 @@ at the end of the buffer."
                    (if (eobp) (point) (1- (point))))))
       (buffer-substring (point) right))))
 
+(defun markdown-get-block-info ()
+  (save-excursion
+    (cond ((get-text-property (point) 'markdown-gfm-block-begin)
+           (forward-line 1)
+           (beginning-of-line)
+           (unless (get-text-property (point) 'markdown-gfm-code)
+             (error "empty block")))
+          ((get-text-property (point) 'markdown-gfm-block-end)
+           (forward-line -1)
+           (beginning-of-line)
+           (unless (get-text-property (point) 'markdown-gfm-code)
+             (error "empty block")))
+          ((not (get-text-property (point) 'markdown-gfm-code))
+           (error "not in block")))
+    (markdown-block-from-middle
+     (get-text-property (point) 'markdown-gfm-code))))
+
+(defun markdown-block-from-middle (val)
+  (cl-destructuring-bind (beg end) val
+    (list
+     :lang (markdown-block-from-top (1- beg))
+     :beg beg
+     :end end)))
+
+(defun markdown-block-from-top (st)
+  (save-excursion
+    (goto-char st)
+    (beginning-of-line)
+    (re-search-forward markdown-regex-gfm-code-block-open)
+    (let ((all (replace-regexp-in-string "\\`{\\|}\\'" "" (match-string 2))))
+      (replace-regexp-in-string "[[:space:]].*\\'" "" all))))
+
+(defun ess-eval-region-rmd (info pfx)
+  (save-window-excursion
+    (ess-eval-region (plist-get info :beg) (plist-get info :end) nil))
+  (when pfx (ess-switch-to-ESS nil)))
+
+(defun python-eval-region-rmd (info pfx)
+  (save-window-excursion (unless (python-shell-get-process) (run-python)))
+  (python-shell-send-string
+   (buffer-substring (plist-get info :beg) (plist-get info :end))
+   nil t)
+  (when pfx (python-shell-switch-to-shell t)))
+
+(defvar-local rmd-bash-buffer nil)
+
+(defun bash-eval-region-rmd (info pfx)
+  (unless (buffer-live-p rmd-bash-buffer)
+    (setq rmd-bash-buffer (save-window-excursion (shell nil))))
+  (comint-send-region (get-buffer-process rmd-bash-buffer)
+                      (plist-get info :beg) (plist-get info :end))
+  (when pfx (pop-to-buffer rmd-bash-buffer)))
+
+(defconst rmd-shell-alist
+  '(("r" . ess-eval-region-rmd)
+    ("python" . python-eval-region-rmd)
+    ("bash" . bash-eval-region-rmd)))
+
+(defun switch-ess-shell ()
+  (ess-switch-to-ESS nil))
+
+(defun switch-python-shell ()
+  (python-shell-switch-to-shell t))
+
+(defun switch-bash-shell ()
+  (if rmd-bash-buffer (pop-to-buffer rmd-bash-buffer)
+    (error "no bash buffer available!")))
+
+(defconst rmd-switch-shell-alist
+  '(("r" . switch-ess-shell)
+    ("python" . switch-python-shell)
+    ("bash" . switch-bash-shell)))
+
+(defun markdown-send-to-shell (pfx)
+  (interactive "P")
+  (let* ((info (markdown-get-block-info))
+         (send-fun (cdr (assoc (plist-get info :lang) rmd-shell-alist))))
+    (funcall send-fun info pfx)))
+
+(defun markdown-switch-shell (pfx)
+  (interactive "P")
+  (let* ((info (markdown-get-block-info))
+         (switch-fun
+          (cdr (assoc (plist-get info :lang) rmd-switch-shell-alist))))
+    (funcall switch-fun)))
+
 (provide 'functions)

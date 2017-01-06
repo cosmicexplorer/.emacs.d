@@ -29,6 +29,33 @@
 ;;; assembly before S
 (push '("\\.[sS]\\'" . asm-mode) auto-mode-alist)
 
+;;; knitr support
+(require 'poly-R)
+(require 'poly-markdown)
+
+(add-to-list 'auto-mode-alist '("\\.[rR]md\\'" . poly-markdown+r-mode))
+
+(defconst rmd-export-cmd-fmt-str
+  "Rscript - && pandoc \"%s\" -o \"%s\"")
+(defconst rmd-knitr-fmt-str
+  "require(knitr); require(markdown); knit(\"%s\",\"%s\")")
+
+(defun rmd-export-pdf (infile)
+  (interactive (list (buffer-file-name)))
+  (let* ((interfile (replace-regexp-in-string "\\.[rR]md\\'" ".md" infile))
+         (outfile (replace-regexp-in-string "\\.[rR]md\\'" ".pdf" infile))
+         (cmd (format "%s %s '%s'"
+                      shell-file-name
+                      shell-command-switch
+                      (format rmd-export-cmd-fmt-str interfile outfile)))
+         (res
+          (with-temp-buffer
+            (insert (format rmd-knitr-fmt-str infile interfile))
+            (shell-command-on-region
+             (point-min) (point-max) cmd (current-buffer) t)
+            (buffer-string))))
+    (message "%s" res)))
+
 ;;; highlight cursor and auto-fill when over 80 chars in certain modes
 (defvar no-auto-fill-modes
   '(litcoffee-mode tex-mode markdown-mode elisp-byte-code-mode))

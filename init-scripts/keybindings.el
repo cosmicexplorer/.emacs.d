@@ -415,7 +415,10 @@
      (define-key markdown-mode-map (kbd "M-n") #'mc/mark-next-like-this)
      (define-key markdown-mode-map (kbd "M-p") #'mc/mark-previous-like-this)
      (define-key markdown-mode-map (kbd "`") #'markdown-literal-region-too)
-     (define-key markdown-mode-map (kbd "C-k") #'kill-line-or-region)))
+     (define-key markdown-mode-map (kbd "C-k") #'kill-line-or-region)
+     (define-key markdown-mode-map (kbd "C-c C-c") #'markdown-send-to-shell)
+     (define-key markdown-mode-map (kbd "C-c C-z") #'markdown-switch-shell)
+     (define-key markdown-mode-map (kbd "C-c C-b") #'rmd-export-pdf)))
 
 (eval-after-load 'grep
   '(define-key grep-mode-map (kbd "G") #'refind-or-grep))

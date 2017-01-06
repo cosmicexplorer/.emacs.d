@@ -79,6 +79,7 @@
     perl6-mode
     php-mode
     pkg-info
+    polymode
     queue
     projectile
     racket-mode
