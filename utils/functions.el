@@ -2740,8 +2740,9 @@ by another percent."
 (defun clean-all-buffers-to-deleted-files ()
   (interactive)
   (loop for buf in (buffer-list)
-        unless (or (string-match-p
-                    important-buffer-names-regexp (buffer-name buf))
+        unless (or (and (buffer-name buf)
+                        (string-match-p
+                         important-buffer-names-regexp (buffer-name buf)))
                    (when-let ((proc (get-buffer-process buf)))
                      (process-live-p proc))
                    (when-let ((fname (buffer-file-name buf)))
@@ -3138,5 +3139,13 @@ at the end of the buffer."
          (switch-fun
           (cdr (assoc (plist-get info :lang) rmd-switch-shell-alist))))
     (funcall switch-fun)))
+
+(defun count-chars-words-lines-buffer ()
+  (interactive)
+  (let ((chars (- (point-max) (point-min)))
+        (words (count-words (point-min) (point-max)))
+        (lines (count-lines (point-min) (point-max))))
+    (message "chars: %d, words: %d, lines: %d"
+             chars words lines)))
 
 (provide 'functions)

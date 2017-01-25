@@ -907,3 +907,5 @@
 
 (define-key Info-mode-map (kbd "b") #'Info-history-back)
 (define-key Info-mode-map (kbd "f") #'Info-history-forward)
+
+(global-set-key (kbd "M-=") #'count-chars-words-lines-buffer)
