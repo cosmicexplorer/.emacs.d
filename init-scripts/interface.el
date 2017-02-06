@@ -733,7 +733,19 @@ Check out your .emacs.\n")))))
     (set-char-table-range char-fold-table base opt-reg)))
 
 ;;; minus signs
-(add-char-fold-chars ?- '(?−))
+(defun add-minus-eq-char-folds ()
+  (with-eval-after-load 'dash
+    (let ((dash-sym ?-)
+          (eq-sym ?=)
+          (added-dash-syms '(?− ?‐)))
+      (add-char-fold-chars dash-sym added-dash-syms)
+      (-if-let*
+          ((dash-fold (char-table-range char-fold-table dash-sym))
+           (dash-matched (string-match "\\`\\[\\([^]]+?\\)\\]\\'" dash-fold))
+           (dash-chars (append (match-string 1 dash-fold) nil)))
+          (add-char-fold-chars eq-sym dash-chars)
+        (throw 'init-fail "char fold customizations failed!")))))
+(add-minus-eq-char-folds)
 
 (with-eval-after-load 'misearch
   (remove-hook 'isearch-mode-hook #'multi-isearch-setup))
