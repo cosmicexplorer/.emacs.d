@@ -209,9 +209,9 @@ Check out your .emacs."))
 (switch-to-buffer "*scratch*")
 (delete-other-windows)
 
-(garbage-collect)
-
 (setq visible-bell nil)
+
+(garbage-collect)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
