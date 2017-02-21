@@ -29,8 +29,10 @@
 ;;; assembly before S
 (push '("\\.[sS]\\'" . asm-mode) auto-mode-alist)
 
-;;; more highlight warnings
+;;; more ess-mode nonsense
 (add-hook 'ess-mode-hook #'warning-highlights-mode)
+(add-hook 'ess-mode-hook #'auto-fill-mode)
+(add-hook 'ess-mode-hook #'highlight-80+-mode)
 
 ;;; knitr support
 (require 'poly-R)
