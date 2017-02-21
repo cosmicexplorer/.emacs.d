@@ -34,6 +34,11 @@
 (add-hook 'ess-mode-hook #'auto-fill-mode)
 (add-hook 'ess-mode-hook #'highlight-80+-mode)
 
+(let* ((ess-s-l-loc (locate-library "ess-s-l"))
+       (ess-s-l-not-elc
+        (replace-regexp-in-string "\\.elc\\'" ".el" ess-s-l-loc)))
+  (byte-compile-file ess-s-l-not-elc t))
+
 ;;; knitr support
 (require 'poly-R)
 (require 'poly-markdown)
