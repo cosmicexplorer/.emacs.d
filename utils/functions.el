@@ -3140,11 +3140,13 @@ at the end of the buffer."
           (cdr (assoc (plist-get info :lang) rmd-switch-shell-alist))))
     (funcall switch-fun)))
 
-(defun count-chars-words-lines-buffer ()
-  (interactive)
-  (let ((chars (- (point-max) (point-min)))
-        (words (count-words (point-min) (point-max)))
-        (lines (count-lines (point-min) (point-max))))
+(defun count-chars-words-lines-buffer (beg end)
+  (interactive
+   (if current-prefix-arg (list (point-min) (point-max))
+     (list (region-beginning) (region-end))))
+  (let ((chars (- end beg))
+        (words (count-words beg end))
+        (lines (count-lines beg end)))
     (message "chars: %d, words: %d, lines: %d"
              chars words lines)))
 
