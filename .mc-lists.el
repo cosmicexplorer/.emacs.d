@@ -39,6 +39,7 @@
         end-of-buffer
         end-of-maybe-visual-line
         end-of-visual-line
+        ess-smart-S-assign
         ess-smart-comma
         eval-last-sexp
         forward-sexp

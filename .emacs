@@ -296,6 +296,7 @@ Check out your .emacs."))
  '(erc-stamp-mode t)
  '(erc-track-minor-mode t)
  '(erc-track-mode t)
+ '(ess-S-assign "_")
  '(fill-column 80)
  '(git-gutter:update-hooks
    (quote
