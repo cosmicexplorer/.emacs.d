@@ -302,6 +302,8 @@ lowercase, and Initial Caps versions."
      (add-hook 'comint-output-filter-functions
                #'shell-send-output-to-history nil t))))
 
+;;; TODO: would be nice if we could split these cases off into an alist -- this
+;;; seems to be a lot easier to follow for now
 ;;; same for info and help
 (defun help-rename-buffer ()
   (when-let ((name
@@ -310,21 +312,22 @@ lowercase, and Initial Caps versions."
                  (let ((buf-mode (with-current-buffer buf major-mode)))
                    (format "help(describe-bindings): %s<%S>"
                            (buffer-name buf) buf-mode)))
+                ;; multiple types of help use this stack structure
                 ((and `(,_ ,item . ,_)
-                      (or
-                       ;; (let (and (p)))
-                       (and (guard (and (symbolp item)
-                                        (fboundp item)))
-                            (let desc "function")
-                            (let name item))
-                       (and (guard (and (symbolp item)
-                                        (boundp item)))
-                            (let desc "variable")
-                            (let name item))
-                       (and (let (cl-struct package-desc (name name))
-                              item)
-                            (let desc "package-desc"))
-                       (let desc "something")))
+                      ;; set `name' and `desc' for each case and use in format
+                      ;; string below
+                      (or (and (guard (and (symbolp item)
+                                           (fboundp item)))
+                               (let desc "function")
+                               (let name item))
+                          (and (guard (and (symbolp item)
+                                           (boundp item)))
+                               (let desc "variable")
+                               (let name item))
+                          (and (let (cl-struct package-desc (name name))
+                                 item)
+                               (let desc "elisp-package"))
+                          (let desc "something")))
                  (format "help(describe-%s): %s" desc name))
                 (`(,x)
                  (format "help(%s)" x)))))
