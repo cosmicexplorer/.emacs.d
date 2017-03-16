@@ -719,8 +719,8 @@
 (global-set-key (kbd "<end>") #'end-of-maybe-visual-line)
 (global-set-key (kbd "C-a") #'beg-of-line-text)
 (global-set-key (kbd "C-e") #'end-of-maybe-visual-line)
-(global-set-key (kbd "C-M-S-a") #'beg-of-maybe-visual-line)
-(global-set-key (kbd "C-M-S-e") #'end-of-maybe-visual-line)
+(global-set-key (kbd "C-M-S-a") #'beginning-of-line)
+(global-set-key (kbd "C-M-S-e") #'end-of-line)
 
 (global-set-key (kbd "C-c C-v") #'delete-whole-line)
 (global-set-key (kbd "C-x C-r") #'revert-buffer-no-confirm)
@@ -848,7 +848,7 @@
 (with-eval-after-load 'git-rebase-mode
   (define-key git-rebase-mode-map (kbd "C-z") #'git-rebase-undo))
 
-(global-set-key (kbd "C-M-h i") #'helm-info-elisp)
+(global-set-key (kbd "C-M-h i") #'helm-info)
 (global-set-key (kbd "<M-home>") #'beginning-of-buffer)
 (global-set-key (kbd "<M-end>") #'end-of-buffer)
 (global-set-key (kbd "C-c R") #'resurrect-buffer-from-file)
@@ -859,6 +859,8 @@
 (define-key emacs-lisp-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
 (define-key lisp-interaction-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
 (global-set-key (kbd "C-x C-M-h") #'run-shell)
+
+(define-key shell-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby)
 
 (defun slime-eval-buffer-or-region ()
   (interactive)

@@ -245,13 +245,16 @@ lowercase, and Initial Caps versions."
 (define-minor-mode warning-highlights-mode
   "Highlight words of warning."
   :lighter " !!"
-  (progn
-    (if (not warning-highlights-mode)
-        (warning-highlights-turn-off)
-      (warning-highlights-turn-on)
-      (font-lock-mode 1))))
+  (if (not warning-highlights-mode)
+      (warning-highlights-turn-off)
+    (warning-highlights-turn-on)
+    (font-lock-mode 1)))
+
+(defun warning-highlights-mode-activate ()
+  (warning-highlights-mode 1))
+
 ;;; add it to programming modes!
-(add-hook 'prog-mode-hook #'warning-highlights-mode)
+(add-hook 'prog-mode-hook #'warning-highlights-mode-activate)
 
 (defun find-warning-words (pfx)
   (interactive "P")
@@ -307,12 +310,22 @@ lowercase, and Initial Caps versions."
                  (let ((buf-mode (with-current-buffer buf major-mode)))
                    (format "help(describe-bindings): %s<%S>"
                            (buffer-name buf) buf-mode)))
-                (`(,_ ,item . ,_)
-                 (let ((desc-type
-                        (cond ((fboundp item) "function")
-                              ((boundp item) "variable")
-                              (t "something"))))
-                   (format "help(describe-%s): %s" desc-type item)))
+                ((and `(,_ ,item . ,_)
+                      (or
+                       ;; (let (and (p)))
+                       (and (guard (and (symbolp item)
+                                        (fboundp item)))
+                            (let desc "function")
+                            (let name item))
+                       (and (guard (and (symbolp item)
+                                        (boundp item)))
+                            (let desc "variable")
+                            (let name item))
+                       (and (let (cl-struct package-desc (name name))
+                              item)
+                            (let desc "package-desc"))
+                       (let desc "something")))
+                 (format "help(describe-%s): %s" desc name))
                 (`(,x)
                  (format "help(%s)" x)))))
     (rename-buffer name t)))

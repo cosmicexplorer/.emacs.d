@@ -64,6 +64,7 @@
         markdown-exdent-or-delete
         markdown-promote
         newline-and-indent-fix-cc-mode
+        org-end-of-line
         org-force-self-insert
         org-forward-paragraph
         org-return

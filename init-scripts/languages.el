@@ -347,9 +347,10 @@
 
 ;;; shell
 (defun setup-sh-indentation ()
+  (warning-highlights-mode-activate)
   (setq sh-basic-offset 2)
   (setq sh-indentation 2))
-(add-hook 'sh-mode-hook 'setup-sh-indentation)
+(add-hook 'sh-mode-hook #'setup-sh-indentation)
 (defun zsh-mode ()
   (interactive)
   (set (make-local-variable 'sh-shell) 'zsh)
