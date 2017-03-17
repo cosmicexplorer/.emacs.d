@@ -859,6 +859,7 @@
 (define-key emacs-lisp-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
 (define-key lisp-interaction-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
 (global-set-key (kbd "C-x C-M-h") #'run-shell)
+(global-set-key (kbd "C-x C-p") #'restart-shell)
 
 (define-key shell-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby)
 

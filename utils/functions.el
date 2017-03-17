@@ -3150,4 +3150,10 @@ at the end of the buffer."
     (message "chars: %d, words: %d, lines: %d"
              chars words lines)))
 
+(defun restart-shell (pfx)
+  (interactive "P")
+  (when (derived-mode-p 'shell-mode)
+    (kill-buffer))
+  (run-shell pfx))
+
 (provide 'functions)

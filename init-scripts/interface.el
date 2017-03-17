@@ -427,8 +427,13 @@ lowercase, and Initial Caps versions."
   (add-hook 'comint-output-filter-functions
             (lambda (&rest args) (rename-shell-buffer))
             nil t)
+  (ansi-color-for-comint-mode-on)
+  (add-hook 'comint-output-filter-functions
+            #'ansi-color-process-output nil t)
   (rename-shell-buffer))
 (add-hook 'shell-mode-hook #'setup-shell-mode)
+
+(add-hook 'comint-preoutput-filter-functions #'xterm-color-filter)
 
 ;; (add-hook 'help-mode-hook (lambda () (help-info-get-buffer-name 'help-mode)))
 
