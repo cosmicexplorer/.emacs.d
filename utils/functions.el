@@ -3156,4 +3156,61 @@ at the end of the buffer."
     (kill-buffer))
   (run-shell pfx))
 
+(defconst paired-delimiters
+  '(("double quotes" . ("\"" . "\""))
+    ("single quotes" . ("'" . "'"))
+    ("parentheses" . ("(" . ")"))
+    ("curly braces" . ("{" . "}"))
+    ("square brackets" . ("[" . "]"))))
+
+(defvar paired-delimiter-history nil)
+
+(defun read-paired-delim ()
+  (when-let ((delim (completing-read "delimiter type: " paired-delimiters nil t
+                                     nil 'paired-delimiter-history)))
+    (cdr (assoc delim paired-delimiters))))
+
+(defun search-fix-quotes (pair &optional pfx)
+  (interactive (list (read-paired-delim) current-prefix-arg))
+  (when pair
+    (let ((char-fold-search t)
+          (left (car pair))
+          (right (cdr pair)))
+      (when pfx (goto-char (point-min)))
+      (cl-loop
+       with lq = nil
+       with rq = nil
+       while (and (prog1 (re-search-forward left nil t)
+                    (setq lq (match-beginning 0)))
+                  (progn
+                    (prog1 (re-search-forward right nil t)
+                      (setq rq (match-end 0)))))
+       do (let* ((str (buffer-substring lq rq))
+                 (name (format "pair:\n%s\n" str)))
+            (unless (x-popup-dialog t `(,name ("ok" . t) ("nah" . nil)))
+              (error (format "bad pair:\n%s\n" str))))))))
+
+(defconst remove-smart-map
+  '(("\"" . (?“ ?”))
+    ("'" . (?‘ ?’)))
+  "maps replacement strings to dumb unicode characters they should replace")
+
+(defun invert-alist (map)
+  (cl-reduce #'append
+   (cl-loop with out = nil
+            for entry in map
+            for str = (car entry)
+            collecting (cl-loop for ch in (cdr entry) collect (cons ch str)))
+   :initial-value nil))
+
+(defun remove-smart-chars ()
+  (interactive)
+  (save-excursion
+    (cl-loop for (str . chs) in remove-smart-map
+             for re = (regexp-opt (cl-mapcar #'char-to-string chs))
+             do (progn
+                  (goto-char (point-min))
+                  (while (re-search-forward re nil t)
+                    (replace-match str nil t nil 0))))))
+
 (provide 'functions)

@@ -542,6 +542,7 @@ Check out your .emacs."))
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(cperl-no-trailing-whitespace-face ((t (:underline nil))))
+ '(font-latex-script-char-face ((t (:foreground "burlywood"))))
  '(italic ((t (:foreground "magenta" :slant italic))))
  '(underline ((t (:foreground "yellow" :underline t))))
  '(woman-unknown ((t (:background "#333333" :foreground "#ff0000")))))
