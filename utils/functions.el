@@ -3190,6 +3190,23 @@ at the end of the buffer."
             (unless (x-popup-dialog t `(,name ("ok" . t) ("nah" . nil)))
               (error (format "bad pair:\n%s\n" str))))))))
 
+;;; TODO: make this check pairs using stack!!! and also allow selections of!!!
+(defun count-lines-even-char (char &optional pfx)
+  (interactive (list (read-char "char to count on lines: ") current-prefix-arg))
+  (let ((rx (rx-to-string char)))
+    (when pfx (goto-char (point-min)))
+    (while (re-search-forward rx nil t)
+      (let ((nq (cl-count-if (lambda (ch) (char-equal ch char))
+                             (buffer-substring
+                              (line-beginning-position)
+                              (line-end-position)))))
+        (if (oddp nq)
+            (user-error
+             (format "%d instances of of '%c' at line %d."
+                     nq char (line-number-at-pos)))
+          (forward-line 1)
+          (beginning-of-line))))))
+
 (defconst remove-smart-map
   '(("\"" . (?“ ?”))
     ("'" . (?‘ ?’)))
