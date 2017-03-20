@@ -733,3 +733,6 @@ See URL `https://github.com/ndmitchell/hlint'."
 
 ;;; elisp
 (add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-padding " ")))
+
+;;; jq
+(add-to-list 'auto-mode-alist '("\\.jq\\'" . jq-mode))
