@@ -797,8 +797,11 @@ Check out your .emacs.\n")))))
 (defun do-complete-char-word-fold (re)
   (word-boundary-fold (char-fold-non-special re)))
 
+(defun do-normal-isearch (str &optional bound noerror count)
+  (do-isearch str str bound noerror count))
+
 (defun do-isearch (real-regexp string bound noerror count)
-  (let* ((fun (if isearch-forward #'re-search-forward #'re-search-backward)))
+  (let ((fun (if isearch-forward #'re-search-forward #'re-search-backward)))
     (condition-case er
         (funcall fun real-regexp bound noerror count)
       (search-failed
@@ -824,7 +827,8 @@ Turning on normal search turns off fast-and-loose mode."
 
 (defcustom my-isearch-search-fun #'isearch-fast-and-loose
   "`defcustom' because it deserves one."
-  :type 'function)
+  :type 'function
+  :group 'isearch)
 (defun isearch-get-fun () (symbol-function my-isearch-search-fun))
 (setq isearch-search-fun-function #'isearch-get-fun)
 
