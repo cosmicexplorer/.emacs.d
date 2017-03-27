@@ -484,10 +484,7 @@ Lisp code." t)
 
 (defun set-gfm-markdown-command ()
   (set (make-local-variable 'markdown-command)
-       (concat
-         (unless (executable-find "grip-no-header")
-           "/usr/local/bin/")
-         "grip-no-header --export -")))
+       "pandoc -f markdown_github -t html -"))
 
 (add-hook 'gfm-mode-hook #'set-gfm-markdown-command)
 
