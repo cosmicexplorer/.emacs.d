@@ -139,8 +139,10 @@
           (lambda ()
             (when (derived-mode-p 'doc-view-mode)
               (linum-mode 0))))
-(add-hook 'help-mode-hook 'turn-off-linum)
-(add-hook 'Info-mode-hook 'turn-off-linum)
+(add-hook 'help-mode-hook #'turn-off-linum)
+(add-hook 'Info-mode-hook #'turn-off-linum)
+(add-hook 'Man-mode-hook #'turn-off-linum)
+(add-hook 'org-mode-hook #'turn-off-linum)
 
 (defadvice dired-do-shell-command (after refresh activate)
   (revert-buffer))
