@@ -111,6 +111,10 @@ can also be a file name, in case that file does not provide any feature."
 (defvar use-omnisharp t "C#!!!!!!!")
 (defvar use-https t)
 
+(defcustom my-files-to-open-xdg nil
+  "files to open on startup"
+  :type '(list string))
+
 ;;; load custom values for these variables (this file is .gitignored)
 (let ((custom-var-file
        (concat
@@ -170,6 +174,8 @@ Check out your .emacs."))
 (load-my-init-script "languages")
 ;;; cause what else is emacs for
 (load-my-init-script "keybindings")
+
+(cl-mapcan #'open-if-not-already my-files-to-open-xdg)
 
 ;;; byte-compile everything: slow on first startup, but /significantly/ faster
 ;;; during normal usage

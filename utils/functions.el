@@ -3230,4 +3230,14 @@ at the end of the buffer."
                   (while (re-search-forward re nil t)
                     (replace-match str nil t nil 0))))))
 
+(defun open-if-not-already (file &optional already-progs)
+  (when (file-exists-p file)
+    (let* ((progs (-flatten (cl-loop for prog in already-progs
+                                     collect (list "-c" prog))))
+           (lsof-args (if progs (append progs (list "-a" file)) file)))
+      (with-temp-buffer
+        (call-process "lsof" nil t nil lsof-args)
+        (when (zerop (buffer-size))
+          (call-process "xdg-open" nil t nil file))))))
+
 (provide 'functions)
