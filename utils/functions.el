@@ -1287,6 +1287,16 @@ way I prefer, and regards `comment-padding', unlike the standard version."
          (kill-buffer git-submodule-buf-name)))))
   (when cb (funcall cb)))
 
+(defun make-submod-sentinel (proc ev)
+  (if (or (and (stringp ev) (string= ev "finished\n"))
+          (and (with-current-buffer (process-buffer proc)
+                 process-should-be-killed)
+               (not (process-live-p proc))))
+      (kill-buffer (process-buffer proc))
+    (when (process-live-p proc) (kill-process proc))
+    (switch-to-buffer (process-buffer proc))
+    (throw 'submodule-make-failure ev)))
+
 (defvar submodules-to-make nil)
 (defun make-submodule (folder-name make-cmd onfinish timeout &rest make-args)
   (add-to-list 'submodules-to-make
@@ -1298,27 +1308,15 @@ way I prefer, and regards `comment-padding', unlike the standard version."
       (if (not (executable-find make-cmd))
           (with-current-buffer "*scratch*"
             (insert "couldn't find " make-cmd " to build " folder-name "!"))
-        (let ((make-output-buf (get-buffer-create
-                                (concat "*" folder-name "-make-errors*")))
-              (prev-wd default-directory))
+        (let ((prev-wd default-directory))
           (cd (concat init-home-folder-dir folder-name))
           (let ((proc
-                 (apply #'start-process
-                        (append
-                         (list (concat "make-" folder-name)
-                               (buffer-name make-output-buf) make-cmd)
-                         make-args))))
-            (set-process-sentinel
-             proc
-             (lambda (proc ev)
-               (if (or (and (stringp ev) (string= ev "finished\n"))
-                       (and (with-current-buffer (process-buffer proc)
-                              process-should-be-killed)
-                            (not (process-live-p proc))))
-                   (kill-buffer (process-buffer proc))
-                 (when (process-live-p proc) (kill-process proc))
-                 (switch-to-buffer (process-buffer proc))
-                 (throw 'submodule-make-failure ev))))
+                 (make-process
+                  :name (concat "make-" folder-name)
+                  :buffer (get-buffer-create
+                           (concat "*" folder-name "-make-errors*"))
+                  :command (cons make-cmd make-args)
+                  :sentinel #'make-submod-sentinel)))
             (when timeout
               (run-at-time
                timeout nil
@@ -3230,14 +3228,34 @@ at the end of the buffer."
                   (while (re-search-forward re nil t)
                     (replace-match str nil t nil 0))))))
 
-(defun open-if-not-already (file &optional already-progs)
-  (when (file-exists-p file)
-    (let* ((progs (-flatten (cl-loop for prog in already-progs
-                                     collect (list "-c" prog))))
-           (lsof-args (if progs (append progs (list "-a" file)) file)))
-      (with-temp-buffer
-        (call-process "lsof" nil t nil lsof-args)
-        (when (zerop (buffer-size))
-          (call-process "xdg-open" nil t nil file))))))
+(defun open-if-not-already (file-unexpanded &optional already-progs)
+  (let ((file (expand-file-name file-unexpanded)))
+    (when (file-exists-p file)
+      (let* ((progs (-flatten (cl-loop for prog in already-progs
+                                       collect (list "-c" prog))))
+             (lsof-args (if progs (append progs (list "-a" file)) file)))
+        (with-temp-buffer
+          (call-process "lsof" nil t nil lsof-args)
+          (when (zerop (buffer-size))
+            (call-process "xdg-open" nil t nil file)))))))
+
+;;; TODO: use call-process for this instead???
+(defmacro with-shell-command (cmd catch-error &rest body)
+  (declare (indent 2))
+  (let ((buf (cl-gensym)))
+    `(with-temp-buffer
+       ,(if catch-error
+            `(let ((,buf (current-buffer)))
+               (with-temp-buffer
+                 (unless (zerop (shell-command ,cmd ,buf (current-buffer)))
+                   (throw 'with-shell-command-error
+                          (list :command ,cmd
+                                :output (with-current-buffer ,buf
+                                          (buffer-string))
+                                :error (buffer-string))))))
+          `(shell-command ,cmd t))
+       (goto-char (point-min))
+       ,@body)))
+
 
 (provide 'functions)
