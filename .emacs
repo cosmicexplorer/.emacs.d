@@ -543,6 +543,8 @@ Check out your .emacs."))
  '(smart-tab-disabled-major-modes nil)
  '(smart-tab-using-hippie-expand t)
  '(warning-suppress-types (quote ((undo discard-info))))
+ '(woman-fill-frame nil)
+ '(woman-imenu t)
  '(yank-pop-change-selection t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
