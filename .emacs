@@ -175,7 +175,7 @@ Check out your .emacs."))
 ;;; cause what else is emacs for
 (load-my-init-script "keybindings")
 
-(cl-mapcan #'open-if-not-already my-files-to-open-xdg)
+(cl-mapc #'open-if-not-already my-files-to-open-xdg)
 
 ;;; byte-compile everything: slow on first startup, but /significantly/ faster
 ;;; during normal usage
