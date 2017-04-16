@@ -251,7 +251,8 @@ Check out your .emacs."))
  '(dired-clean-up-buffers-too nil)
  '(dired-guess-shell-alist-user
    (quote
-    (("\\.tar\\.xz\\'" "tar xpf" "sudo pacman -U")
+    (("\\.zip\\'" "unzip")
+     ("\\.tar\\.xz\\'" "tar xpf" "sudo pacman -U")
      ("\\.exe\\'" "wine")
      ("\\.\\(?:jpe?g\\|png\\|gif\\|bmp\\)\\'" "display" "gimp")
      ("\\.\\(?:pdf\\|ps\\)\\'" "evince")
