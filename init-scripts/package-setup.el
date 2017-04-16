@@ -241,10 +241,9 @@
   :group 'magit
   :safe #'booleanp)
 (defadvice magit-list-refnames (around only-list-locals activate)
-  (if args ad-do-it
-    (if magit-only-list-locals
-        (setq ad-return-value (magit-list-local-branch-names))
-      ad-do-it)))
+  (if magit-only-list-locals
+      (setq ad-return-value (magit-list-local-branch-names))
+    ad-do-it))
 
 ;;; git-gutter
 (defconst git-gutter-fringe-hack-hooks git-gutter:update-hooks)

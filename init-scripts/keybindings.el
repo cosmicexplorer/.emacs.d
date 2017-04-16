@@ -768,7 +768,8 @@
      (define-key ess-mode-map (kbd "C-x C-e") #'ess-eval-paragraph)
      (define-key ess-mode-map (kbd "C-h f") #'ess-display-help-on-object)
      (define-key ess-mode-map (kbd "<C-return>") #'newline-and-indent)
-     (define-key ess-mode-map (kbd "_") #'self-insert-command)))
+     (define-key ess-mode-map (kbd "_") #'self-insert-command)
+     (define-key ess-mode-map (kbd "M-RET") nil)))
 
 (eval-after-load 'helm
   '(progn
@@ -800,6 +801,8 @@
 
 (global-set-key (kbd "C-c k") #'do-keys-for-line)
 (global-set-key (kbd "C-c f") #'do-for-line)
+
+(global-set-key (kbd "M-RET") #'newline-continue-comment)
 
 (eval-after-load 'cc-mode
   '(progn
@@ -917,9 +920,3 @@
 (define-key Info-mode-map (kbd "f") #'Info-history-forward)
 
 (global-set-key (kbd "M-=") #'count-chars-words-lines-buffer)
-
-(global-set-key (kbd "C-M-;")
-                (lambda ()
-                  (interactive)
-                  (newline)
-                  (comment-dwim nil)))

@@ -143,6 +143,8 @@
 (add-hook 'Info-mode-hook #'turn-off-linum)
 (add-hook 'Man-mode-hook #'turn-off-linum)
 (add-hook 'org-mode-hook #'turn-off-linum)
+(defvar image-mode-hook nil)
+(add-hook 'image-mode-hook #'turn-off-linum)
 
 (defadvice dired-do-shell-command (after refresh activate)
   (revert-buffer))
@@ -294,15 +296,15 @@ lowercase, and Initial Caps versions."
   (add-hook 'eshell-pre-command-hook #'eshell-send-input-to-history)
   (add-hook 'eshell-post-command-hook #'eshell-send-output-to-history))
 
+(defun shell-record-history-filters ()
+  (add-hook 'comint-input-filter-functions
+            #'shell-send-input-to-history nil t)
+  (add-hook 'comint-output-filter-functions
+            #'shell-send-output-to-history nil t))
+
 (when save-shell-history
   (defvar shell-user-output-file (concat init-home-folder-dir "shell-output"))
-  (add-hook
-   'shell-mode-hook
-   (lambda ()
-     (add-hook 'comint-input-filter-functions
-               #'shell-send-input-to-history nil t)
-     (add-hook 'comint-output-filter-functions
-               #'shell-send-output-to-history nil t))))
+  (add-hook 'shell-mode-hook #'shell-record-history-filters))
 
 ;;; TODO: would be nice if we could split these cases off into an alist -- this
 ;;; seems to be a lot easier to follow for now
@@ -429,6 +431,7 @@ lowercase, and Initial Caps versions."
   (add-hook 'comint-output-filter-functions
             (lambda (&rest args) (rename-shell-buffer))
             nil t)
+  (linum-mode -1)
   (rename-shell-buffer))
 
 (add-hook 'shell-mode-hook #'setup-shell-mode)
