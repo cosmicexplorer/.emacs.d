@@ -479,8 +479,10 @@ Lisp code." t)
            (zerop (call-process
                    "git" nil nil nil "rev-parse" "--git-dir")))
       (gfm-mode)
-    (set (make-local-variable 'markdown-command)
-         "pandoc -f markdown -t html -")))
+    (let ((cmd (format
+                "pandoc -f markdown%s -t html -"
+                (if markdown-enable-math "+tex_math_dollars" ""))))
+      (setq-local markdown-command cmd))))
 
 (defun set-gfm-markdown-command ()
   (set (make-local-variable 'markdown-command)
