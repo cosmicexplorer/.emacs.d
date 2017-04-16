@@ -236,6 +236,7 @@ Check out your .emacs."))
  '(coffee-indent-like-python-mode t)
  '(coffee-switch-to-compile-buffer t)
  '(coffee-tab-width 2)
+ '(comint-prompt-read-only t)
  '(company-dabbrev-code-modes
    (quote
     (prog-mode batch-file-mode csharp-mode css-mode erlang-mode haskell-mode jde-mode lua-mode python-mode)))
