@@ -676,6 +676,17 @@
 (define-key paredit-mode-map (kbd "M-S-<up>") #'paredit-backward-up)
 (define-key paredit-mode-map (kbd "M-S-<down>") #'paredit-forward-up)
 
+;;; comint!
+(defun my-comint-move-prompt-region (fn)
+  (lambda (N)
+    (interactive "^p")
+    (funcall-interactively fn N)))
+
+(define-key comint-mode-map (kbd "M-a")
+  (my-comint-move-prompt-region #'comint-previous-prompt))
+(define-key comint-mode-map (kbd "M-m")
+  (my-comint-move-prompt-region #'comint-next-prompt))
+
 ;;; clojure
 (defun mc/mark-next-not-cider ()
   (interactive)
