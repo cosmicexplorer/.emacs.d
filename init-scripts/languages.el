@@ -34,6 +34,11 @@
 (add-hook 'ess-mode-hook #'auto-fill-mode)
 (add-hook 'ess-mode-hook #'highlight-80+-mode)
 
+(defun my-inf-ess-end-send-input ()
+  (interactive)
+  (goto-char (point-max))
+  (funcall-interactively #'inferior-ess-send-input))
+
 (let* ((ess-s-l-loc (locate-library "ess-s-l"))
        (ess-s-l-not-elc
         (replace-regexp-in-string "\\.elc\\'" ".el" ess-s-l-loc)))
