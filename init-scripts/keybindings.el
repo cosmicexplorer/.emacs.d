@@ -769,7 +769,9 @@
      (define-key ess-mode-map (kbd "C-h f") #'ess-display-help-on-object)
      (define-key ess-mode-map (kbd "<C-return>") #'newline-and-indent)
      (define-key ess-mode-map (kbd "_") #'self-insert-command)
-     (define-key ess-mode-map (kbd "M-RET") nil)))
+     (define-key ess-mode-map (kbd "M-RET") nil)
+     (define-key inferior-ess-mode-map (kbd "C-h f")
+       #'ess-display-help-on-object)))
 
 (eval-after-load 'helm
   '(progn
