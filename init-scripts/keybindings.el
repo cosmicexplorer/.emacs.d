@@ -772,6 +772,7 @@
      (define-key ess-mode-map (kbd "M-RET") nil)
      (define-key inferior-ess-mode-map (kbd "C-h f")
        #'ess-display-help-on-object)
+     (define-key inferior-ess-mode-map (kbd "C-c C-w") nil)
      (define-key ess-help-mode-map (kbd "C-h f") #'ess-display-help-on-object)))
 
 (eval-after-load 'helm
