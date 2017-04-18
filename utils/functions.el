@@ -3257,5 +3257,144 @@ at the end of the buffer."
        (goto-char (point-min))
        ,@body)))
 
+(defcustom bind-do-throw nil
+  "Whether to throw errors in `bind' (this is dereferenced at macro
+expansion time!). If this is nil, `bind' will generate a sexp that
+returns nil on error. Can be temporarily `let'-bound.")
+(defcustom bind-extra-vars nil
+  "Whether to bind the `:extra' variables in `bind' (this is
+dereferenced at macro expansion time!). If this is nil, additional variables are
+not bound. Can be temporarily `let'-bound.")
+
+(defun bind-validate-plist (pl &optional pred)
+  (cl-loop
+   with pred = (cond ((functionp pred) pred)
+                     (pred #'symbolp)
+                     (t #'keywordp))
+   for (k v .) on pl by cddr
+   unless (funcall pred k) return nil
+   finally return t))
+
+(cl-defmacro bind-in-error (args &rest sexps)
+  `(bind-in ,@args ,@sexps))
+
+(defun bind-error-subprocess (&rest args)
+  (bind-in-error args
+   ;; $ before with only name assigns it to that key
+   ($stdout> $standard-output (buffer-string))
+   ($stderr> $standard-error (buffer-string))
+   ;; can also access assignments by their index (0 and 3 have no names, but
+   ;; can say '$@1 to get $stdout, for example)
+
+   ;; any names you assign are the default output expression, unless final expr
+   ;; has no assignments (just a single sexp), as here
+   (!subprocess cmd:cmd $stdout $stderr)
+   ;; (throw 'bind-subprocess-error
+   ;;  (list :cmd <cmd used> :stdout $stdout :stderr $stderr))
+   ;; $stdout and $stderr are dereferenced
+   ))
+
+(defvar bind-in--cur-arg nil)
+(defvar bind-in--cur-sym-name-arg nil)
+
+(cl-defmacro bind-in--concat-symbols ((&rest symbols) result &rest body)
+  (let ((sym (make-symbol
+              (mapconcat
+               #'identity (cl-mapcar #'symbol-name symbols) ""))))
+    `(bind-in--deconstruct-expr (,sym ,@result) ,@body)))
+
+(cl-defmacro bind-in--deconstruct-symbol (sym &rest reduced)
+  (pcase sym
+    ))
+
+(cl-defmacro bind-in--deconstruct-expr (clause &rest reduced)
+  (pcase clause
+    (`(,first . ,others)
+     `(bind-in--deconstruct-expr
+       first ,@`(bind-in--deconstruct-expr ,@others)))
+    ((pred symbolp)
+     `(bind-in--deconstruct-symbol ,clause ,@reduced))
+    (_ (error "???"))))
+
+(defun bind-in-accept (&rest _) t)
+
+(defconst bind-in-basic-type-alist
+  ;; see above usage of $@ (which grows as we traverse every argspec or sexp --
+  ;; we can use $* to get the index of the current and $% for all the
+  ;; unevaluated argspecs the macro receieved at once, and $- for the rest of
+  ;; the bindings!). make sure we only bind these variables if the user uses
+  ;; them, though, and also make a macro that turns off or changes the way those
+  ;; are denoted temporarily. can refer to vars as =buf, even if that buf was
+  ;; assigned a name (e.g. =buf$this-buf), but if has multiple layered
+  ;; assignments in macro, will only have the most recent
+  `(('> (,bind-in--cur-sym-name-arg ,@bind-in--cur-arg))
+    ('~ (bind-in ,@))
+    (~and =list)
+    (~or . =plist-car)
+    (=buf . (and ?buffer-live-p (>with-current-buffer =.  ,@$-)))
+    (=proc . (and ?process-live-p =buf^process-buffer))
+    (=mark . (and ?markerp =buf^mark-buffer))
+    (=sym . ?symbolp)
+    (=interned . =sym?intern-soft)
+    (=fsym . =interned?fboundp =fun^symbol-function)
+    (=fun . ?functionp)
+    (=var . =interned?boundp =val^symbol-value)
+    (=val . ?@accept)
+    (=int . ?integerp)
+    (=str . ?stringp)
+    (=list . ?listp)
+    (=expr . (or ^@deconstruct-expr
+                 (and =list (^))))
+    (=key . =sym?keywordp)
+    (=bool . ?booleanp)
+    (=plist . (and =list
+                   +bool$colon
+                   (?@validate-plist =plist +colon)))
+    (=plist-car . (and =sym$head
+                       =plist+colon^cdr))
+    (=file . (and =str?file-exists-p
+                  =file$expanded^expand-file-name
+                  =file$relative^file-relative-name))
+    (=directory . =file?file-directory-p)
+    (=cmd . (and ~with-temp-buffer<
+                 =str!<
+                 $cmd
+                 =buf$stdout
+                 =buf$stderr
+                 =int<$exit-code^call-process-shell-command?zerop!@subprocess
+                  (! (?zerop =.$exit-code)
+                     ())
+                 $validate (($expr (zerop exit-code)
+                                   $if-error ($output (buffer-string buf)
+                                                      $error )))))
+    (=exe $parent str
+          $validate (or
+
+                    file-executable-p))
+    (=argv $validate (($priority before $pred listp)
+                     ($type exe! $get car)
+                     ($type bool $name +sync)
+                     ()))))
+
+(defcustom bind-in-user-type-alist nil
+  "Alist that `bind-in' uses to build its output sexp.")
+
+(defvar-local bind-in-local-type-overrides nil)
+
+(defun bind-in-get-table ()
+  (append
+   bind-basic-type-alist bind-in-user-type-alist bind-in-local-type-overrides))
+
+(defmacro bind-in (&rest sexps)
+  (declare (indent 2))
+  `())
+
+(defun get-nth-commit-from (n commit-hash)
+  "N can be negative (or 0)."
+  (with-temp-buffer
+    (shell-command t)))
+
+(defun my-magit-next-commit ()
+  (interactive))
 
 (provide 'functions)

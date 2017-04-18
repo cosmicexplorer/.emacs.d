@@ -785,7 +785,17 @@
        #'ess-display-help-on-object)
      (define-key inferior-ess-mode-map (kbd "C-c C-w") nil)
      (define-key inferior-ess-mode-map (kbd "RET") #'my-inf-ess-end-send-input)
-     (define-key ess-help-mode-map (kbd "C-h f") #'ess-display-help-on-object)))
+     (define-key ess-help-mode-map (kbd "C-h f") #'ess-display-help-on-object)
+     (define-key ess-mode-map (kbd "C-c '") #'ess-show-traceback)
+     (define-key ess-tracebug-map  (kbd "C-c '") #'ess-show-traceback)
+     (define-key inferior-ess-mode-map  (kbd "C-c '") #'ess-show-traceback)
+     (define-key ess-mode-map (kbd "M-:") #'my-ess-eval-this)
+     (define-key ess-mode-map (kbd "C-M-h") nil)))
+
+(global-set-key (kbd "C-:") #'eval-expression)
+(global-set-key (kbd "C-S-h f") #'describe-function)
+(global-set-key (kbd "C-S-h v") #'describe-variable)
+(global-set-key (kbd "C-S-h d") #'describe-function-or-variable)
 
 (eval-after-load 'helm
   '(progn

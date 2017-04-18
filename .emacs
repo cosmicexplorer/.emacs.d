@@ -417,7 +417,8 @@ Check out your .emacs."))
  '(rainbow-x-colors t)
  '(safe-local-variable-values
    (quote
-    ((c-offsets-alist
+    ((markdown-enable-math . t)
+     (c-offsets-alist
       (inexpr-class . +)
       (inexpr-statement . +)
       (lambda-intro-cont . +)

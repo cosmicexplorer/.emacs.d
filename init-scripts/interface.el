@@ -838,3 +838,173 @@ Turning on normal search turns off fast-and-loose mode."
 (defface cperl-no-trailing-whitespace-face
   '((((class color))))
   "NO" :group 'cperl-mode)
+
+
+;;; TODO: make this into a MELPA package
+(defvar my-rw-process nil)
+(defvar my-rw-process-tmp-dir nil)
+(defvar my-rw-process-fifo nil)
+(defvar my-rw-process-output-buf nil)
+(defvar my-rw-process-err-buf nil)
+
+(defconst my-rw-process-output-actions-alist
+  '((nil . #'current-buffer)
+    (discard . )))
+
+(defcustom my-rw-process-only-me t
+  "If non-nil, `my-rw-process-tmp-dir' and `my-rw-process-fifo' are only
+accessible to the user who started the current emacs process."
+  :type 'boolean)
+(defcustom my-rw-process-dir-prefix "emacs-rw-process"
+  "Prefix for `my-rw-process-tmp-dir'."
+  :type 'string)
+(defcustom my-rw-process-dir-suffix ""
+  "Suffix for `my-rw-process-tmp-dir'."
+  :type 'string)
+(defcustom my-rw-named-pipe-filename "emacs-rw-pipe"
+  "Filename used when creating `my-rw-process-fifo'."
+  :type 'string)
+(defcustom my-rw-process-base-name "emacs-rw-proc"
+  "Process name to use when creating `my-rw-process'."
+  :type 'string)
+(defcustom my-rw-process-buffer-base-name "emacs-rw-proc-buf"
+  "Buffer name to use when creating `my-rw-process'."
+  :type 'string)
+(defcustom my-rw-process-query-on-exit nil
+  "Whether to ask before killing `my-rw-process'."
+  :type 'boolean)
+
+(defconst all-rw-mode-bits (file-modes-symbolic-to-number "a=rw"))
+(defconst user-rw-mode-bits (file-modes-symbolic-to-number "u=rw"))
+
+(defun make-named-pipe (path mode)
+  (unless (stringp path)
+    (error "PATH must be a string: ('%S')" path))
+  (with-temp-buffer
+    (let ((code
+           (cl-case system-type
+             (windows-nt
+              (error "%s" "`make-named-pipe' must be implemented for windows!"))
+             (t (call-process "mkfifo" nil t nil
+                              "-m" (number-to-string mode) path)))))
+      (unless (zerop code)
+        (error "making pipe failed with code '%d'. stdout/stderr:\n%s"
+               code (buffer-string))
+        path))))
+
+(defun make-rw-proc-dir ()
+  (let* ((new-dir (make-temp-file
+                   my-rw-process-dir-prefix my-rw-process-dir-suffix))
+         (new-fifo
+          (let ((default-directory new-dir))
+            (make-named-pipe
+             (expand-file-name my-rw-named-pipe-filename) user-rw-mode-bits))))
+    (unless my-rw-process-only-me
+      (set-file-modes new-dir all-rw-mode-bits)
+      (set-file-modes new-fifo))
+    (list :dir new-dir :fifo new-fifo)))
+
+(defconst my-rw-process-dead-proc-base-name "*dead-rw-proc*")
+(defconst my-rw-process-dead-buf-base-name "*dead-rw-proc-buf*")
+
+(defun clear-old-rw-proc ()
+  (let* ((old-proc (and (processp my-rw-process) my-rw-process))
+         (old-buf (and old-proc (process-buffer old-proc)))
+         (ret ))
+    ;; TODO: make all literal strings into constants
+    (list
+     :new-buf (generate-new-buffer
+               (format "*%s*" my-rw-process-buffer-base-name))
+     :new-err-buf (generate-new-buffer
+                   (format "*%s-errors*" my-rw-process-buffer-base-name))
+     :old-proc (and (process-live-p old-proc) old-proc)
+     :old-buf (and (buffer-live-p old-buf) old-buf))))
+
+(defun read-pipe-filter (proc msg)
+  (with-current-buffer (process-buffer proc)
+    (let* ((win (get-buffer-window (current-buffer) t))
+           (at-end (= (window-point win) (point-max))))
+      (save-excursion
+        (goto-char (point-max))
+        (insert msg))
+      (when at-end
+        (with-selected-window win
+          (goto-char (point-max)))))))
+
+(defun read-from-pipe (fname)
+  (let ((path (expand-file-name fname)))
+    (unless (file-exists-p (expand-file-name fname))
+      (throw 'pipe-does-not-exist
+             (format "the named pipe at '%s' does not exist"
+                     fname)))
+    (let* ((buf (generate-new-buffer (format "pipe@%s" path)))
+           (cat-proc (make-process
+                      :name (format "pipe-read@%s" path)
+                      :buffer buf
+                      :command (list "cat" path)
+                      :connection-type 'pipe
+                      :filter #'read-pipe-filter
+                      :sentinel #'ignore)))
+      (switch-to-buffer buf))))
+
+(defun my-rw-pipe-write (str &optional wait)
+  (process-send-string my-rw-process str)
+  (when wait
+    (accept-process-output my-rw-process wait nil t)))
+
+(defun my-rw-process-sentinel (proc ev)
+  (when (buffer-live-p my-rw-process-err-buf)
+    (with-current-buffer))
+  (with-current-buffer
+      (process-e))
+  (-when-let* ((code (and (process-live-p proc) (process-exit-status proc))))))
+
+(defun make-rw-process (name buf err-buf inp)
+  (make-process
+   :name name
+   :buffer buf
+   :command (list "cat" inp)
+   :connection-type 'pipe
+   :noquery my-rw-process-query-on-exit
+   :stderr err-buf))
+
+;;; TODO: clean up least-recent/largest nonvisiting buffers once number gets too
+;;; high! (keep track of nonvisiting buffers and remove duplicate bufs too)
+
+(defun create-my-rw-process (&optional force-restart)
+  "Set up `my-rw-process' communicating with `my-rw-process-fifo'. If
+FORCE-RESTART is non-nil, then kill the current process if it already
+exists. Returns (list :proc RW-PROCESS :fifo RW-PROC-FIFO :started WAS-STARTED),
+where RW-PROCESS is a process object, RW-PROC-FIFO is a path, and WAS-STARTED
+indicates whether this function created a new asynchronous process.
+
+Note: do NOT rely on the name of the created process's buffer to stay the same!
+Use (process-buffer `my-rw-process') instead."
+  (pcase (append (clear-old-rw-proc)
+                 (make-rw-proc-dir))
+    (`(:new-buf ,new-buf :new-err-buf ,err-buf
+       :old-proc ,old-proc :old-buf ,old-buf
+       :dir ,dir :fifo ,fifo)
+     (let* ((send-name (format "*send-%s*" my-rw-process-base-name))
+            (recv-name (format "*recv-%s*" my-rw-process-base-name))
+            (send-proc
+             (make-process
+              :name send-name
+              :buffer nil
+              :command (list "dd" (format "of=%s" fifo))
+              :connection-type 'pipe
+              :noquery my-rw-process-query-on-exit
+              :stderr err-buf))
+            (recv-proc
+             (make-process
+              :name recv-name
+              :buffer new-buf
+              :command (list "dd" (format "if=%s" fifo))
+              :connection-type 'pipe
+              :noquery my-rw-process-query-on-exit
+              :stderr err-buf))))
+     (async-start
+      (lambda ()
+        ()))
+     )
+    (_ (error "%s" "unknown error!"))))

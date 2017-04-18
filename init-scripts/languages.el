@@ -45,6 +45,41 @@
   (when (file-exists-p ess-s-l-not-elc)
     (byte-compile-file ess-s-l-not-elc t)))
 
+(defvar my-ess-eval-history nil)
+(defvar my-ess-switch-to-process nil)
+
+(defun set-ess-switch-process ()
+  (interactive)
+  (setq my-ess-switch-to-process t))
+
+(defconst my-ess-minibuf-keymap
+  (let ((map (make-sparse-keymap)))
+    (easy-mmode-set-keymap-parents map (list minibuffer-local-map ess-mode-map))
+    (define-key map (kbd "C-RET") #'set-ess-switch-process)))
+
+;; (let ((ess-proc (ess-command--normalise-proc proc no-prompt-check)))
+;;   (insert
+;;    (with-temp-buffer
+;;      (setq-local ess-local-process-name (process-name ess-proc))
+;;      (ess-string-command "2 + 4\n" (current-buffer) .2) (buffer-string))))
+
+(defun my-ess-eval-this (inp)
+  (interactive
+   (progn
+     (setq my-ess-switch-to-process nil)
+     (list
+      (read-from-minibuffer
+       "ESS expression: " nil my-ess-minibuf-keymap nil 'my-ess-eval-history))))
+  (if (not current-prefix-arg)
+      ;; just put it in process buffer
+      (ess-execute inp 'buffer)
+    (with-temp-buffer
+      (setq prefix-arg nil)
+      (funcall-interactively #'ess-execute inp nil )))
+
+  (when my-ess-switch-to-process (ess-switch-to-end-of-ESS))
+  (when current-prefix-arg ))
+
 ;;; knitr support
 (require 'poly-R)
 (require 'poly-markdown)
