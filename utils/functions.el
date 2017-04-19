@@ -3308,74 +3308,17 @@ not bound. Can be temporarily `let'-bound.")
 
 (defconst bind-in--symbol-regex "[[:alnum:]\\-]+")
 
-(defun bind-in--merge-list-vars (&rest list-vars)
-  (apply #'append (cl-mapcar #'symbol-value list-vars)))
-
-(defvar bind-in--lazy-vars nil)
-
-(defun bind-in--unbind (symbol)
-  (when (boundp symbol) (makunbound symbol))
-  (when (fboundp symbol) (fmakunbound symbol))
-  (fset symbol nil)
-  (setplist symbol nil)
-  )
-
-(cl-defmacro bind-in--once-only ((&rest names) &body body)
-  (declare (indent 1))
-  (let ((gensyms (cl-loop for n in names collect (cl-gensym))))
-    `(let (,@(cl-loop for g in gensyms collect `(,g (cl-gensym))))
-       `(let (,,@(cl-loop for g in gensyms for n in names collect ``(,,g ,,n)))
-          ,(let (,@(cl-loop for n in names for g in gensyms collect `(,n ,g)))
-             ,@body)))))
-
-(cl-defmacro bind-in--with-gensyms ((&rest names) &body body)
-  (declare (indent 1))
-  `(let ,(cl-loop for n in names collect `(,n (cl-gensym)))
-     ,@body))
-
-(defun add-quote (sym)
-  (eval sym))
-
-(cl-defmacro bind-in--lazy-var (symbol basic desc)
-  (declare (indent 1))
-  (let* ((merged-var
-          (bind-in--format-sym "bind-in--lazy-%s-alist" symbol))
-         (orig-var
-          (bind-in--format-sym "bind-in--lazy-%s-basic-alist" symbol))
-         (custom-var
-          (bind-in--format-sym "bind-in--lazy-%s-alist-user" symbol))
-         (sexps
-          `((defvar ,merged-var nil ,desc)
-            (defconst ,orig-var ,basic
-              (format "Built-in base for `%S'." ',merged-var))
-            (defcustom ,custom-var nil
-              (format "User-customizable additions to `%S'." ',merged-var)
-              :type '(alist :key-type symbol :value-type sexp))
-            (defun ,merged-var (&optional force)
-              (if (or force (not ',merged-var))
-                  (bind-in--merge-list-vars ',orig-var ',custom-var)
-                ',merged-var))))
-         (add-var `(add-to-list 'bind-in--lazy-vars
-                                (intern (symbol-name ',merged-var)))))
-    `(progn
-       ,@sexps
-       ,add-var)))
-
-(cl-defmacro bind-in--lazy-let (&rest body)
-  `(let (,@(cl-loop for var in bind-in--lazy-vars
-                    collect (list var `(,var))))
-     ,@body))
-
 (defun bind-in--build-metacharacters-regex ()
   (or bind-in--metacharacters-regex
       (format "\\(%s\\)\\(%s\\)?"
               (regexp-opt-charset
-               (cl-loop for e in (bind-in-metacharacters-alists)
-                        if (not (and (symbolp (car e))
-                                     (= 1 (length (symbol-name (car e))))))
-                        do (bind-in--alist-error
-                              entry alist "invalid metacharacter")
-                        collect (string-to-char (symbol-name (car e)))))
+               (cl-loop for e in (append bind-in-basic-metacharacters-alist
+                                         bind-in-user-metacharacters-alist)
+                        for sn = (symbol-name (car e))
+                        if (not (= 1 (length sn))) do
+                        (error "invalid metachar '%s'; should be one character"
+                               sn)
+                        collect (string-to-char sn)))
               bind-in--symbol-regex)))
 
 (cl-defmacro bind-in--deconstruct-symbol (sym &rest reduced)
