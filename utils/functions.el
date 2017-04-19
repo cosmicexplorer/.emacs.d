@@ -3276,10 +3276,10 @@ not bound. Can be temporarily `let'-bound.")
    finally return t))
 
 (cl-defmacro bind-in-error (args &rest sexps)
-  `(bind-in ,@args ,@sexps))
+  nil)
 
-(defun bind-error-subprocess (&rest args)
-  (bind-in-error args
+(cl-defmacro bind-error-subprocess (&rest args)
+  `(bind-in-error ,args
    ;; $ before with only name assigns it to that key
    ($stdout> $standard-output (buffer-string))
    ($stderr> $standard-error (buffer-string))
@@ -3296,16 +3296,90 @@ not bound. Can be temporarily `let'-bound.")
 
 (defvar bind-in--cur-arg nil)
 (defvar bind-in--cur-sym-name-arg nil)
+(defvar bind-in--cur-$-var-alist nil)
 
-(cl-defmacro bind-in--concat-symbols ((&rest symbols) result &rest body)
-  (let ((sym (make-symbol
-              (mapconcat
-               #'identity (cl-mapcar #'symbol-name symbols) ""))))
-    `(bind-in--deconstruct-expr (,sym ,@result) ,@body)))
+(defun bind-in--format-sym (fmt &rest args)
+  (make-symbol (apply #'format (cons fmt args))))
+
+(defun bind-in--concat-symbols (&rest symbols)
+  (make-symbol
+   (mapconcat
+    #'identity (cl-mapcar #'symbol-name symbols) "")))
+
+(defconst bind-in--symbol-regex "[[:alnum:]\\-]+")
+
+(defun bind-in--merge-list-vars (&rest list-vars)
+  (apply #'append (cl-mapcar #'symbol-value list-vars)))
+
+(defvar bind-in--lazy-vars nil)
+
+(defun bind-in--unbind (symbol)
+  (when (boundp symbol) (makunbound symbol))
+  (when (fboundp symbol) (fmakunbound symbol))
+  (fset symbol nil)
+  (setplist symbol nil)
+  )
+
+(cl-defmacro bind-in--once-only ((&rest names) &body body)
+  (declare (indent 1))
+  (let ((gensyms (cl-loop for n in names collect (cl-gensym))))
+    `(let (,@(cl-loop for g in gensyms collect `(,g (cl-gensym))))
+       `(let (,,@(cl-loop for g in gensyms for n in names collect ``(,,g ,,n)))
+          ,(let (,@(cl-loop for n in names for g in gensyms collect `(,n ,g)))
+             ,@body)))))
+
+(cl-defmacro bind-in--with-gensyms ((&rest names) &body body)
+  (declare (indent 1))
+  `(let ,(cl-loop for n in names collect `(,n (cl-gensym)))
+     ,@body))
+
+(defun add-quote (sym)
+  (eval sym))
+
+(cl-defmacro bind-in--lazy-var (symbol basic desc)
+  (declare (indent 1))
+  (let* ((merged-var
+          (bind-in--format-sym "bind-in--lazy-%s-alist" symbol))
+         (orig-var
+          (bind-in--format-sym "bind-in--lazy-%s-basic-alist" symbol))
+         (custom-var
+          (bind-in--format-sym "bind-in--lazy-%s-alist-user" symbol))
+         (sexps
+          `((defvar ,merged-var nil ,desc)
+            (defconst ,orig-var ,basic
+              (format "Built-in base for `%S'." ',merged-var))
+            (defcustom ,custom-var nil
+              (format "User-customizable additions to `%S'." ',merged-var)
+              :type '(alist :key-type symbol :value-type sexp))
+            (defun ,merged-var (&optional force)
+              (if (or force (not ',merged-var))
+                  (bind-in--merge-list-vars ',orig-var ',custom-var)
+                ',merged-var))))
+         (add-var `(add-to-list 'bind-in--lazy-vars
+                                (intern (symbol-name ',merged-var)))))
+    `(progn
+       ,@sexps
+       ,add-var)))
+
+(cl-defmacro bind-in--lazy-let (&rest body)
+  `(let (,@(cl-loop for var in bind-in--lazy-vars
+                    collect (list var `(,var))))
+     ,@body))
+
+(defun bind-in--build-metacharacters-regex ()
+  (or bind-in--metacharacters-regex
+      (format "\\(%s\\)\\(%s\\)?"
+              (regexp-opt-charset
+               (cl-loop for e in (bind-in-metacharacters-alists)
+                        if (not (and (symbolp (car e))
+                                     (= 1 (length (symbol-name (car e))))))
+                        do (bind-in--alist-error
+                              entry alist "invalid metacharacter")
+                        collect (string-to-char (symbol-name (car e)))))
+              bind-in--symbol-regex)))
 
 (cl-defmacro bind-in--deconstruct-symbol (sym &rest reduced)
-  (pcase sym
-    ))
+  )
 
 (cl-defmacro bind-in--deconstruct-expr (clause &rest reduced)
   (pcase clause
@@ -3318,6 +3392,27 @@ not bound. Can be temporarily `let'-bound.")
 
 (defun bind-in-accept (&rest _) t)
 
+(defconst bind-in-basic-metacharacters-alist
+  '((>)
+    (<)
+    (|)
+    (~)
+    (/ . bind-in--cur-sym-name-arg)
+    (:)
+    (~)
+    ($)
+    (=)
+    (^)
+    (@))
+  "Any alphanumeric or hyphen characters ([[:alnum:]\\-]+) will be substituted
+for the value of `bind-in--cur-sym-name-arg', which is represented by (???)!")
+
+(defvar bind-in--metacharacters-regex nil)
+
+(defcustom bind-in-user-metacharacters-alist nil
+  "Any metacharacters to add to types for `bind-in'."
+  :type '(alist :key-type symbol :value-type list))
+
 (defconst bind-in-basic-type-alist
   ;; see above usage of $@ (which grows as we traverse every argspec or sexp --
   ;; we can use $* to get the index of the current and $% for all the
@@ -3327,46 +3422,43 @@ not bound. Can be temporarily `let'-bound.")
   ;; are denoted temporarily. can refer to vars as =buf, even if that buf was
   ;; assigned a name (e.g. =buf$this-buf), but if has multiple layered
   ;; assignments in macro, will only have the most recent
-  `(('> (,bind-in--cur-sym-name-arg ,@bind-in--cur-arg))
-    ('~ (bind-in ,@))
-    (~and =list)
-    (~or . =plist-car)
-    (=buf . (and ?buffer-live-p (>with-current-buffer =.  ,@$-)))
-    (=proc . (and ?process-live-p =buf^process-buffer))
-    (=mark . (and ?markerp =buf^mark-buffer))
-    (=sym . ?symbolp)
-    (=interned . =sym?intern-soft)
-    (=fsym . =interned?fboundp =fun^symbol-function)
-    (=fun . ?functionp)
-    (=var . =interned?boundp =val^symbol-value)
-    (=val . ?@accept)
-    (=int . ?integerp)
-    (=str . ?stringp)
-    (=list . ?listp)
-    (=expr . (or ^@deconstruct-expr
-                 (and =list (^))))
-    (=key . =sym?keywordp)
-    (=bool . ?booleanp)
-    (=plist . (and =list
-                   +bool$colon
-                   (?@validate-plist =plist +colon)))
-    (=plist-car . (and =sym$head
-                       =plist+colon^cdr))
-    (=file . (and =str?file-exists-p
-                  =file$expanded^expand-file-name
-                  =file$relative^file-relative-name))
-    (=directory . =file?file-directory-p)
-    (=cmd . (and ~with-temp-buffer<
-                 =str!<
-                 $cmd
-                 =buf$stdout
-                 =buf$stderr
-                 =int<$exit-code^call-process-shell-command?zerop!@subprocess
-                  (! (?zerop =.$exit-code)
-                     ())
-                 $validate (($expr (zerop exit-code)
-                                   $if-error ($output (buffer-string buf)
-                                                      $error )))))
+  `((~and =list)
+    (~or =plist-car)
+    (=buf |buffer-live-p (> with-current-buffer =. /body))
+    (=proc |process-live-p =buf<process-buffer)
+    (=mark |markerp =buf<mark-buffer)
+    (=sym |symbolp)
+    (=interned =sym|intern-soft)
+    (=fsym =interned|fboundp
+           +fun<symbol-function)
+    (=fun |functionp)
+    (=var =interned|boundp =val<symbol-value)
+    (=val |@accept)
+    (=int |integerp)
+    (=str |stringp)
+    (=list |listp)
+    (=expr <@deconstruct-expr)
+    (=key =sym|keywordp)
+    (=bool |booleanp)
+    (=plist =list
+            +bool$colon
+            (@validate-plist =. $colon))
+    (=plist-car =sym$head<car
+                =plist+colon<cdr)
+    (=file =str|file-exists-p
+           =file$expanded<expand-file-name
+           =file$relative<file-relative-name)
+    (=directory =file|file-directory-p)
+    (=cmd =str!
+          >with-temp-buffer
+          =buf$stdout
+          =buf$stderr
+          =int<$exit-code^call-process-shell-command^zerop!@subprocess
+          (! (zerop =.$exit-code)
+             ())
+          $validate (($expr (zerop exit-code)
+                                     $if-error ($output (buffer-string buf)
+                                                        $error ))))
     (=exe $parent str
           $validate (or
 
@@ -3385,9 +3477,11 @@ not bound. Can be temporarily `let'-bound.")
   (append
    bind-basic-type-alist bind-in-user-type-alist bind-in-local-type-overrides))
 
-(defmacro bind-in (&rest sexps)
-  (declare (indent 2))
-  `())
+(cl-defmacro bind-in (&rest sexps)
+  (declare (indent 0))
+  (let ((bind-in--metacharacters-regex
+         (or bind-in--metacharacters-regex ))))
+  nil)
 
 (defun get-nth-commit-from (n commit-hash)
   "N can be negative (or 0)."

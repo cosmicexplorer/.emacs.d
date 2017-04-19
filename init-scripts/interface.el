@@ -848,8 +848,8 @@ Turning on normal search turns off fast-and-loose mode."
 (defvar my-rw-process-err-buf nil)
 
 (defconst my-rw-process-output-actions-alist
-  '((nil . #'current-buffer)
-    (discard . )))
+  '((nil #'current-buffer)
+    (discard)))
 
 (defcustom my-rw-process-only-me t
   "If non-nil, `my-rw-process-tmp-dir' and `my-rw-process-fifo' are only
@@ -953,11 +953,15 @@ accessible to the user who started the current emacs process."
     (accept-process-output my-rw-process wait nil t)))
 
 (defun my-rw-process-sentinel (proc ev)
-  (when (buffer-live-p my-rw-process-err-buf)
-    (with-current-buffer))
-  (with-current-buffer
-      (process-e))
-  (-when-let* ((code (and (process-live-p proc) (process-exit-status proc))))))
+  nil
+  ;; (when (buffer-live-p my-rw-process-err-buf)
+  ;;   (with-current-buffer))
+  ;; (with-current-buffer
+  ;;     (process-e))
+  ;; (-when-let*
+  ;;     ((code (and (process-live-p proc) (process-exit-status proc))))
+  ;;   3)
+  )
 
 (defun make-rw-process (name buf err-buf inp)
   (make-process
