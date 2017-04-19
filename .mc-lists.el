@@ -86,6 +86,7 @@
         paredit-kill
         paredit-open-round
         paredit-open-square
+        paredit-raise-sexp
         racket--paredit-open-square
         sgml-slash
         smart-tab
