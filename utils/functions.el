@@ -3295,6 +3295,32 @@ at the end of the buffer."
 (defun my-magit-next-commit ()
   (interactive))
 
+(defun clean-init-screen ()
+  ;;; if everything loaded correctly, clear the last message from minibuf
+  (message "")
+  (switch-to-buffer "*scratch*")
+  (delete-other-windows)
+  (setq init-loaded-fully t)
+  (garbage-collect))
+
+
+(defgroup my-errors nil
+  "`defcustom' group for error handling in my own emacs lisp code.")
+(define-error 'my-errors "Errors in my own emacs lisp code.")
+(define-error
+  'my-init-error "Error in my personal emacs initialization." 'my-errors)
+
+(defun message-my-errors (err-type msg buf)
+  (display-warning 'my-errors msg :debug buf))
+
+(defconst my-error-fmt-str
+  "error[%1]: %2
+
+%3
+data:
+%3
+%4")
+
 (cl-defun check-var-expected-val
     (var expected-val &key (test #'equal))
   (let ((val (symbol-value var))
