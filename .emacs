@@ -99,12 +99,7 @@ init-scripts/interface.el.")
           (unless err ,@body)))
       nil t t)))
 
-(unless (fboundp 'with-eval-after-load)
-  (defmacro with-eval-after-load (file &rest body)
-    "Execute BODY after FILE is loaded.  FILE is normally a feature name, but it
-can also be a file name, in case that file does not provide any feature."
-    (declare (indent 1) (debug t))
-    `(eval-after-load ,file ,`'(progn ,@body))))
+;;; TODO: make shorthand for val being matched within BODY-FORMS of pcase
 
 (defvar after-load-init-hook nil
   "Hook to run whatever after loading packages n functions n whatever.")
@@ -190,34 +185,15 @@ Check out your .emacs."))
 
 (when do-ssh-agent-command-on-start (setup-ssh-agent))
 
-;;; let's do it
-(run-hooks 'after-load-init-hook)
-;;; reload org from submodule
-(require 'org-loaddefs)
-(require 'org)
-(require 'ox)
-(require 'ox-latex)
-(require 'ox-html)
-(require 'ox-publish)
-
 ;;; save visited files to buffer
 (when save-visited-files
   (add-hook 'after-init-hook #'reread-visited-files-from-disk)
   (add-hook 'kill-emacs-hook #'save-visiting-files-to-buffer))
 
-;;; if everything loaded correctly, clear that last message
-(message "")
-(setq init-loaded-fully t)
-(put 'upcase-region 'disabled nil)
+(add-hook 'after-init-hook #'clean-init-screen)
 
-(setq prolog-program-name (if (executable-find "swipl") "swipl" "prolog"))
-
-(switch-to-buffer "*scratch*")
-(delete-other-windows)
-
-(setq visible-bell nil)
-
-(garbage-collect)
+;;; let's do it
+(run-hooks 'after-load-init-hook)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -348,7 +324,7 @@ Check out your .emacs."))
  '(hl-paren-background-colors (quote ("light goldenrod")))
  '(hl-paren-colors (quote ("chocolate" "magenta" "tomato" "yellow")))
  '(initial-buffer-choice t)
- '(js2-global-externs (quote ("history")))
+ '(js2-global-externs (quote ("history" "getComputedStyle")))
  '(js2-include-node-externs t)
  '(kill-buffer-trash-alist
    (quote
@@ -394,6 +370,7 @@ Check out your .emacs."))
  '(markdown-live-preview-do-sync nil)
  '(multi-isearch-search nil)
  '(my-isearch-search-fun (quote do-normal-isearch))
+ '(my-loc-lib-do-on-result (quote (find-file)))
  '(nxml-slash-auto-complete-flag t)
  '(org-agenda-files nil)
  '(org-catch-invisible-edits (quote smart))

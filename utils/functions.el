@@ -826,8 +826,8 @@ scope of the command's precision.")
   (interactive "P")
   ;; used so that init failures (which do not load any files from the
   ;; saved-files file) do not delete all history
-  (when init-loaded-fully
-    (unless no-clean-bufs (clean-nonvisiting-buffers))
+  (or (check-var-expected-val 'init-loaded-fully t :test #'eq)
+      (unless no-clean-bufs (clean-nonvisiting-buffers))
     ;; TODO: make this more error-resistant, somehow. having to send emacs a
     ;; sigterm because this function fails on quit is annoying.
     (with-current-buffer (find-file saved-files)
@@ -3436,5 +3436,73 @@ for the value of `bind-in--cur-sym-name-arg', which is represented by (???)!")
 
 (defun my-magit-next-commit ()
   (interactive))
+
+(cl-defun check-var-expected-val
+    (var expected-val &key (test #'equal))
+  (let ((val (symbol-value var))
+        (debug-on-error nil)
+        (debug-on-signal nil))
+    (condition-case err
+        (if (funcall test val expected-val) t
+          (signal 'my-init-error
+                  (list (format "`%s' is not set to '%s' (value is '%s')!"
+                                'init-loaded-fully expected-val val))))
+      (my-init-error
+       (pcase err
+         (`(,err-sym . ,msg)
+          (apply #'debug msg)))))))
+
+;;; debugging macros!!!
+(cl-defmacro msg-eval (sexp &key (pre "") (format "%S => %s") name)
+  (declare (indent 1))
+  (let ((res (cl-gensym))
+        (fmt (cl-gensym)))
+    `(let* ((,fmt (concat ,pre ,format))
+            (,res ,sexp))
+       (message ,fmt ,(or name `',sexp) ,res)
+       ,res)))
+
+(defun sym-or-key (spec)
+  (pcase spec
+    (`(,sexp ,name) (list sexp name))
+    (_ (list spec spec))))
+
+(cl-defmacro msg-evals
+    ;; see `sym-or-key' to understand each SPEC
+    ((&rest specs)
+     &key (before "group") (format "%S => %s") (sep ": "))
+  (declare (indent 1))
+  (let ((bef (cl-gensym))
+        (lead-spc (cl-gensym))
+        (fmt (cl-gensym))
+        (sp (cl-gensym)))
+    `(let* ((,sp ,sep)
+            (,bef (concat ,before ,sep))
+            (,lead-spc (make-string (length ,bef) ?\ ))
+            (,fmt ,format))
+       ,@(cl-loop for (sexp name) in (cl-mapcar #'sym-or-key specs)
+                  for b-str = bef then lead-spc
+                  collect `(msg-eval ,sexp
+                             :pre ,b-str :format ,fmt :name ',name)))))
+
+(cl-defmacro with-eval-after-spec ((&rest feature-spec) &rest body)
+  "Execute BODY after emacs loads features as specified with FEATURE-SPEC. BODY
+is executed after loading each feature in the order provided in FEATURE-SPEC.
+
+FEATURE-SPEC can be either a feature name (as an unquoted symbol or a string), a
+file path (as a string), or a sexp which evaluates to either of the above. If a
+file does not `provide' a feature, then its path can be used instead."
+  (declare (indent 1))
+  (msg-evals (feature-spec body))
+  (pcase feature-spec
+    ((pred null)
+     (msg-evals (feature-spec (`'(progn ,@body) res)) :before "1"))
+    (`(,ft . ,others)
+     (let ((feat (cl-gensym))
+           (next (cl-gensym)))
+       `(let* ((,feat ,(if (listp ft) ft `',ft))
+               (,next (with-eval-after-spec ,others ,@body)))
+          ,(msg-evals (feature-spec next (`(eval-after-load ,feat ,next) res))
+             :before "2"))))))
 
 (provide 'functions)
