@@ -757,56 +757,67 @@ scope of the command's precision.")
     ;; (the actual buffer can be found from the process)
     arg-proc))
 
+(defconst saved-files-format-regexp
+  (concat
+   ;; action to perform
+   ;; (the \" is so that windows paths with C: are parsed correctly)
+   "^\\([^:]+\\):\""
+   ;; file path
+   "\\([^\"]+\\)\":"
+   ;; point in file
+   "\\([[:digit:]]+\\)$"
+   ;; report parsing errors!
+   "\\|^.+$"))
+
+(defconst saved-files-action-alist
+  `(("visit" . find-file-noselect)))
+
+(defcustom saved-files-no-read-regexps
+  (list (rx bos (eval (expand-file-name saved-files)) eos))
+  "Regexps matching files not to load in `reread-visited-files-from-disk'."
+  :type `(repeat string))
+
+(cl-defun pos-in-bounds (&optional (buf (current-buffer)) (pos (point)))
+  (condition-case err
+      (with-current-buffer buf
+        (when (and (>= pos (point-min)) (<= pos (point-max)))
+          (goto-char pos)
+          buf))
+    (error nil)))
+
+(defcustom pop-up-failed-reread-files t
+  "Whether to pop up a buffer displaying the errors which occurred while running
+`reread-visited-files-from-disk'."
+  :type 'boolean)
 
 ;;; save buffers to disk and get them back
 (defun reread-visited-files-from-disk ()
-  (with-current-buffer (find-file-noselect saved-files)
-    (goto-char (point-min))
-    (loop while (not (eobp))
-          do (let ((cur-line (buffer-substring-no-properties
-                              (line-beginning-position)
-                              (line-end-position))))
-               ;; the \" is so that windows paths with C: are parsed correctly
-               (if (and (string-match-p "[^[:space:]]" cur-line)
-                        (string-match
-                         "^\\([^:]+\\):\"\\([^\"]+\\)\":\\([[:digit:]]+\\)$"
-                         cur-line))
-                   (let ((active-filetype
-                          (match-string 1 cur-line))
-                         (active-filename
-                          (match-string 2 cur-line))
-                         (active-point
-                          (match-string 3 cur-line)))
-                     (unless (or (string= cur-line "")
-                                 (string= active-filename saved-files))
-                       (cond ((string= active-filetype "visit")
-                              (when (file-exists-p
-                                     (file-truename active-filename))
-                                (with-demoted-errors "save-session: %S"
-                                  (with-current-buffer
-                                      (find-file-noselect
-                                       (file-truename active-filename))
-                                    (goto-char
-                                     (string-to-number active-point))))))
-                             ((string= active-filetype "directory")
-                              (with-demoted-errors "save-session: %S"
-                                (with-current-buffer
-                                    (find-file-noselect
-                                     (file-truename active-filename))
-                                  (goto-char (string-to-number active-point))
-                                  (message
-                                   "%s" (concat "Opened " (buffer-name))))))
-                             (t (throw 'no-such-active-filetype
-                                       (concat "i don't recognize "
-                                               active-filetype "!"))))
-                       (message "")))
-                 (unless (string= cur-line "")
-                   (with-current-buffer "*scratch*"
-                     (insert (concat "couldn't parse this line of "
-                                     saved-files ": \"" cur-line "\""))
-                     (newline))))
-               (forward-line)))
-    (kill-buffer))
+  (save-window-excursion
+    (with-current-buffer (find-file-noselect saved-files)
+      (goto-char (point-min))
+      (-let* (((lines types files pts)
+               (cl-loop
+                while (re-search-forward saved-files-format-regexp nil t)
+                collect (-map #'match-string (number-sequence 0 3))
+                into matches finally return (-unzip matches)))
+              (actions (--map
+                        (assoc-default it saved-files-action-alist) types))
+              (realpaths (-map #'file-truename files))
+              (bufs (-map (-lambda ((a . r))
+                            (and (functionp a)
+                                 (file-exists-p r)
+                                 (funcall a r)))
+                          (-zip actions realpaths)))
+              (final-bufs (-map (-lambda ((b live? p))
+                                  (and live? (pos-in-bounds b p)))
+                                (-zip bufs
+                                      (-map #'buffer-live-p bufs)
+                                      (--map (when (not (string-empty-p it))
+                                               (string-to-number it))
+                                             pts))))
+              ((success failure)
+               (--map (-drop 1 it) (--group-by (not (null it)) final-bufs))))
+        (kill-buffer))))
   (clean-nonvisiting-buffers))
 
 (defun compose-helper (arg quoted-funs)
@@ -818,42 +829,59 @@ scope of the command's precision.")
 
 ;;; TODO: make better macro for anonymous functions which doesn't require
 ;;; writing out `lambda' a million times
-
 (defvar init-loaded-fully nil
   "Set to t after init loads fully.")
-(defun save-visiting-files-to-buffer (&optional no-clean-bufs)
-  (interactive "P")
-  ;; used so that init failures (which do not load any files from the
-  ;; saved-files file) do not delete all history
-  (or (check-var-expected-val 'init-loaded-fully t :test #'eq)
-      (unless no-clean-bufs (clean-nonvisiting-buffers))
+
+(defcustom save-visiting-files-reject-regexps (list (rx bos (in space)))
+  "Regexps used to reject files to save on shutdown."
+  :type '(repeat string))
+
+(defun get-sorted-visiting-file-buffers ()
+  (cl-sort
+   (cl-remove-if
+    (lambda (buf)
+      (let ((fname (buffer-file-name buf)))
+        (if (not fname) t
+          (cl-some (lambda (reg) (string-match-p reg fname))
+                   save-visiting-files-reject-regexps))))
+    (buffer-list))
+   #'string-lessp :key #'buffer-file-name))
+
+(defcustom save-visiting-files-alist
+  `((buffer-file-name . "visit"))
+  "Alist of functions to call to determine what filetype will be recorded within
+`save-visiting-files-to-buffer'."
+  :type '(alist :key-type function
+                :value-type string))
+
+(defun format-visiting-file-line (type path pt)
+  (when (and type (stringp type)
+             path (file-exists-p path)
+             pt (wholenump pt))
+    (format "%s:\"%s\":%d" type path pt)))
+
+(defun save-visiting-files-to-buffer ()
+  (interactive)
+  (when (check-var-expected-val 'init-loaded-fully t :test #'eq)
+    (clean-nonvisiting-buffers)
     ;; TODO: make this more error-resistant, somehow. having to send emacs a
     ;; sigterm because this function fails on quit is annoying.
-    (with-current-buffer (find-file saved-files)
-      (erase-buffer)
-      (loop for buf in
-            (sort (buffer-list)
-                  (lambda (a b) (string-lessp (buffer-name a) (buffer-name b))))
-            do (let ((bufname (and (buffer-file-name buf)
-                                   (file-truename (buffer-file-name buf))))
-                     (dired-dir (with-current-buffer buf
-                                  (and (eq major-mode 'dired-mode)
-                                       dired-directory)))
-                     (buf-pt (with-current-buffer buf (point))))
-                 (if dired-dir (message "dired-dir: %s" dired-dir))
-                 (cond ((not (or (not bufname)
-                                 (string-equal bufname saved-files)))
-                        (insert (concat "visit" ":\""
-                                        bufname "\":"
-                                        (number-to-string buf-pt)))
-                        (newline))
-                       (dired-dir
-                        (insert (concat "directory" ":\""
-                                        (expand-file-name dired-dir) "\":"
-                                        (number-to-string buf-pt)))
-                        (newline)))))
-      (save-buffer)
-      (kill-buffer))))
+    (let ((saved-buf (find-file saved-files)))
+      (with-current-buffer saved-buf
+        (erase-buffer)
+        (-let* ((visiting (get-sorted-visiting-file-buffers))
+                (tupled
+                 (--keep
+                  (format-visiting-file-line
+                   (cdr (-first (-lambda (e) (funcall (car e) it))
+                                save-visiting-files-alist))
+                   (file-truename (buffer-file-name it))
+                   (with-current-buffer it (point)))
+                  visiting))
+                (str (--reduce-from (format "%s\n%s" acc it) "" tupled)))
+          (insert (replace-regexp-in-string "\\`\\s-+" "" str))
+          (save-buffer)))
+      (kill-buffer saved-buf))))
 
 ;;; checking for features
 (defmacro with-feature (feature-sym &rest body)
