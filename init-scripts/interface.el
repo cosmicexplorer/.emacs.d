@@ -17,9 +17,6 @@
 (setq inhibit-startup-echo-area-message t)
 (setq inhibit-startup-message t)
 
-;;; c-h a -> apropos
-(define-key help-map "a" 'apropos)      ; get useful help for once
-
 ;;; the mark is stupid as a ui concept even if it's great in scripts
 (transient-mark-mode 1)
 (setq shift-select-mode t)
@@ -396,7 +393,9 @@ lowercase, and Initial Caps versions."
   (lambda ()
     (interactive)
     (call-interactively help-fn)
-    (switch-to-buffer prev-help-buf)))
+    (if (buffer-live-p prev-help-buf)
+        (switch-to-buffer prev-help-buf)
+      (error "help kbd failed: buffer '%s' is dead" prev-help-buf))))
 
 (defvar info-prev-file nil)
 (defvar info-prev-node nil)
@@ -1012,3 +1011,7 @@ Use (process-buffer `my-rw-process') instead."
         ()))
      )
     (_ (error "%s" "unknown error!"))))
+
+(put 'upcase-region 'disabled nil)
+
+(setq visible-bell nil)

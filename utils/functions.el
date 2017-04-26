@@ -21,12 +21,12 @@
           "/" filename))
 
 ;;; helper function often used in keybinding mappings
-(defun add-keybinding-to-mode-maps (keys-pressed func-to-call-quoted
-                                                 &rest mode-maps-list)
+(defun add-keybinding-to-mode-maps
+    (keys-pressed func-to-call-quoted mode-maps-list)
   "Adds function to a given list of mode maps upon pressing a given key."
   (interactive)
-  (loop for mode-map in mode-maps-list
-        do (define-key mode-map (kbd keys-pressed) func-to-call-quoted)))
+  (cl-loop for mode-map in mode-maps-list
+           do (define-key mode-map (kbd keys-pressed) func-to-call-quoted)))
 
 ;;; so that there's a space after inline comments in coffeescript
 (defun coffeescript-comment-do-what-i-really-mean (arg)
@@ -816,6 +816,9 @@ scope of the command's precision.")
 
 (defmacro compose (&rest args)
   `(lambda (&rest args) ,(apply #'compose-helper (list 'arg args))))
+
+;;; TODO: make better macro for anonymous functions which doesn't require
+;;; writing out `lambda' a million times
 
 (defvar init-loaded-fully nil
   "Set to t after init loads fully.")
@@ -3011,11 +3014,11 @@ at the end of the buffer."
                        (switch-to-buffer orig-buf)
                        (selected-window))
                    (display-buffer-other-window final-buf))
-               (display-buffer-same-window final-buf nil)
-               (selected-window))))
+               (display-buffer-same-window final-buf nil))))
         (with-selected-window win
           (set-window-point (selected-window) win-pt)
-          (set-window-start (selected-window) win-st))))))
+          (set-window-start (selected-window) win-st))
+        (list win final-buf)))))
 
 (defun operate-on-non-regexp-special (fn str)
   (with-temp-buffer

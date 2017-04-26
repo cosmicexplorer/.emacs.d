@@ -12,6 +12,7 @@
 ;;; 4. remember that M-= gets word counts!
 
 ;;; globally usable basic text insertion or command-running shortcuts
+(global-set-key (kbd "C-M-;") #'newline-and-comment)
 (global-set-key (kbd "C-x d") #'dired)
 (global-set-key (kbd "C-x C-d") #'dired)
 (define-key dired-mode-map (kbd "M-f") #'find-dired)
@@ -187,23 +188,19 @@
      (define-key coffee-mode-map (kbd "C-M-g") #'restart-coffee)))
 
 ;;; js
-(eval-after-load 'js2-mode
-  '(progn
-     (define-key js2-mode-map (kbd "C-c C-w") nil)
-     (eval-after-load 'skewer-mode
-        (progn
-          (define-key js2-mode-map (kbd "C-M-x")
-            #'skewer-eval-buffer-or-region)))
-     (eval-after-load 'js-mode
-        (progn
-          (define-key js-mode-map (kbd "C-<tab>") #'web-beautify-js)
-          (define-key js2-mode-map (kbd "C-<tab>") #'web-beautify-js)
-          (add-keybinding-to-mode-maps "RET" #'js-newline-indent-for-real
-                                       js-mode-map js2-mode-map)))))
+(defconst js-mode-maps (list js-mode-map js2-mode-map))
+(with-eval-after-spec (js-mode js2-mode)
+  (define-key js2-mode-map (kbd "C-c C-w") nil)
+  (add-keybinding-to-mode-maps "C-<tab>" #'web-beautify-js js-mode-maps)
+  (add-keybinding-to-mode-maps
+   "RET" #'js-newline-indent-for-real js-mode-maps))
+
+(with-eval-after-spec (skewer-mode)
+  (define-key js2-mode-map (kbd "C-M-x") #'skewer-eval-buffer-or-region))
 
 ;;; css
-(eval-after-load 'css-mode
-  '(define-key css-mode-map (kbd "C-<tab>") #'web-beautify-css))
+(with-eval-after-spec (css-mode)
+  (define-key css-mode-map (kbd "C-<tab>") #'web-beautify-css))
 
 ;;; CPerl-mode
 (add-hook 'cperl-mode-hook
@@ -216,23 +213,21 @@
 
 ;;; lisp
 ;;; so it's all emacsy
-(eval-after-load 'slime
-  '(progn
-     (add-hook 'slime-repl-mode-hook #'enable-paredit-mode)
-     (define-key lisp-mode-map (kbd "C-h f") 'slime-documentation)
-     (define-key lisp-mode-map (kbd "C-h v") 'slime-documentation)
-     (define-key lisp-mode-map (kbd "C-h h") 'slime-hyperspec-lookup)
-     (when (boundp 'slime-mode-indirect-map)
-       (define-key slime-mode-indirect-map (kbd "M-p")
-         #'mc/mark-previous-like-this)
-       (define-key slime-mode-indirect-map (kbd "M-n")
-         #'mc/mark-next-like-this))))
+(with-eval-after-spec (slime)
+  (add-hook 'slime-repl-mode-hook #'enable-paredit-mode)
+  (define-key lisp-mode-map (kbd "C-h f") 'slime-documentation)
+  (define-key lisp-mode-map (kbd "C-h v") 'slime-documentation)
+  (define-key lisp-mode-map (kbd "C-h h") 'slime-hyperspec-lookup)
+  (when (boundp 'slime-mode-indirect-map)
+    (define-key slime-mode-indirect-map (kbd "M-p")
+      #'mc/mark-previous-like-this)
+    (define-key slime-mode-indirect-map (kbd "M-n")
+      #'mc/mark-next-like-this)))
 
 ;;; makefile
-(eval-after-load "make-mode"
-  '(progn
-     (define-key makefile-gmake-mode-map (kbd "M-n") nil)
-     (define-key makefile-gmake-mode-map (kbd "M-p") nil)))
+(with-eval-after-spec (make-mode)
+  (define-key makefile-gmake-mode-map (kbd "M-n") nil)
+  (define-key makefile-gmake-mode-map (kbd "M-p") nil))
 
 ;;; erc
 (global-set-key (kbd "C-c C-e") 'message-erc-modded-chans)
@@ -427,37 +422,48 @@
 (eval-after-load 'grep
   '(define-key grep-mode-map (kbd "G") #'refind-or-grep))
 
-(defun find-function-switch-pfx (cmd &optional invert use-prefix nomark)
-  (lambda (pfx)
-    (interactive "P")
-    (switch-window-prep-fn
-     pfx
-     (lambda ()
-       (let ((current-prefix-arg use-prefix))
-         (call-interactively cmd)))
-     invert
-     nomark)))
+;;; help/info/etc
+;;; TODO: add option to split current window instead of poppping to new!
+(cl-defun find-function-switch-pfx (cmd &key invert pfx nomark then-do)
+  (declare (indent 1))
+  (let ((call-fun (lambda ()
+                    (let ((prefix-arg pfx))
+                      (call-interactively cmd)))))
+    (lambda (pfx)
+      (interactive "P")
+      (let ((result (switch-window-prep-fn pfx call-fun invert nomark)))
+        (msg-evals (result))
+        (pcase result
+          (`(,window ,buffer)
+           (when (functionp then-do)
+             (funcall then-do window buffer)))
+          (_ nil))))))
 
 (global-set-key
  (kbd "C-h f")
- (find-function-switch-pfx (make-new-help #'describe-function) t))
+ (find-function-switch-pfx (make-new-help #'describe-function)
+   :invert t))
 (global-set-key
  (kbd "C-h v")
- (find-function-switch-pfx (make-new-help #'describe-variable) t))
+ (find-function-switch-pfx (make-new-help #'describe-variable)
+   :invert t))
 (global-set-key
  (kbd "C-h k")
- (find-function-switch-pfx (make-new-help #'describe-key) t))
+ (find-function-switch-pfx (make-new-help #'describe-key)
+   :invert t))
 (global-set-key
  (kbd "C-h C-k")
- (find-function-switch-pfx (make-new-help #'describe-key) t))
+ (find-function-switch-pfx (make-new-help #'describe-key)
+   :invert t))
 (global-set-key
  (kbd "C-h d")
- (find-function-switch-pfx (make-new-help #'describe-function-or-variable) t))
+ (find-function-switch-pfx (make-new-help #'describe-function-or-variable)
+   :invert t))
 (global-set-key (kbd "C-M-h") nil)
 (global-set-key
  (kbd "C-M-h d")
  (find-function-switch-pfx
-  (make-new-help #'describe-function-or-variable-at-point) t))
+     (make-new-help #'describe-function-or-variable-at-point) :invert t))
 (global-set-key
  (kbd "C-h C-d")
  (find-function-switch-pfx #'find-function-or-variable))
@@ -486,10 +492,21 @@
  (find-function-switch-pfx #'find-variable-at-point))
 (global-set-key
  (kbd "C-h b")
- (find-function-switch-pfx (make-new-help #'describe-bindings) t))
+ (find-function-switch-pfx (make-new-help #'describe-bindings)
+   :invert t))
 (global-set-key
  (kbd "C-h l")
- (find-function-switch-pfx (make-new-help #'view-lossage) t))
+ (find-function-switch-pfx (make-new-help #'view-lossage)
+   :invert t))
+;;; c-h a -> apropos
+(define-key help-map "a"
+  (find-function-switch-pfx #'apropos
+    :then-do (lambda (win buf)
+               (msg-evals (win buf))
+               (with-selected-window win
+                 (with-current-buffer buf
+                   (set-window-buffer win buf)
+                   (set-window-point win (point-min)))))))
 
 ;;; now for c
 (eval-after-load 'cc-mode
@@ -570,7 +587,7 @@
 (eval-after-load "magit"
   '(progn
      (global-set-key (kbd "C-c g")
-                     (find-function-switch-pfx #'magit-status t))
+                     (find-function-switch-pfx #'magit-status :invert t))
      (global-set-key (kbd "C-c b") #'magit-blame)
      (define-key magit-mode-map (kbd "<tab>") #'magit-tab-dwim)
      (define-key magit-mode-map (kbd "<backtab>") #'magit-section-cycle-global)
