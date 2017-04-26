@@ -447,12 +447,12 @@ Lisp code." t)
 (add-to-list 'auto-mode-alist '("\\.gyp\\'" . js-mode))
 (add-to-list 'auto-mode-alist '("\\.json\\'" . js-mode))
 (add-to-list 'auto-mode-alist '("\\.babelrc" . js-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(?:js\\)?beautifyrc\\'" . js-mode))
 (add-to-list 'auto-mode-alist '("\\.cshtml\\'" . html-mode))
 
 (add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode))
 
 ;;; config files
-(add-to-list 'auto-mode-alist '("\\.jsbeautifyrc\\'" . js-mode))
 (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . conf-mode))
 
 (defun html-eldoc-function ()
@@ -760,6 +760,10 @@ See URL `https://github.com/ndmitchell/hlint'."
 
 ;;; prolog
 (add-to-list 'auto-mode-alist '("\\.pro$" . prolog-mode))
+(defvar prolog-program-name nil
+  "Because `prolog-mode' doesn't like defining its variables.")
+(setq prolog-program-name
+      (cl-find-if #'executable-find '("swipl" "prolog")))
 
 ;;; pdf-tools rox
 (add-to-list 'auto-mode-alist '("\\.pdf$" . pdf-view-mode))
