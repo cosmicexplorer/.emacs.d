@@ -24,7 +24,6 @@
 (defun add-keybinding-to-mode-maps
     (keys-pressed func-to-call-quoted mode-maps-list)
   "Adds function to a given list of mode maps upon pressing a given key."
-  (interactive)
   (cl-loop for mode-map in mode-maps-list
            do (define-key mode-map (kbd keys-pressed) func-to-call-quoted)))
 
@@ -3300,8 +3299,7 @@ at the end of the buffer."
 
 (cl-defmacro msg-evals
     ;; see `sym-or-key' to understand each SPEC
-    ((&rest specs)
-     &key (before "group") (format "%S => %s") (sep ": "))
+    ((&rest specs) &key (before "group") (format "%S => %s") (sep ": "))
   (declare (indent 1))
   (let ((bef (cl-gensym))
         (lead-spc (cl-gensym))
@@ -3326,14 +3324,12 @@ file does not `provide' a feature, then its path can be used instead."
   (declare (indent 1))
   (msg-evals (feature-spec body))
   (pcase feature-spec
-    ((pred null)
-     (msg-evals (feature-spec (`'(progn ,@body) res)) :before "1"))
+    ((pred null) `'(progn ,@body))
     (`(,ft . ,others)
      (let ((feat (cl-gensym))
            (next (cl-gensym)))
        `(let* ((,feat ,(if (listp ft) ft `',ft))
                (,next (with-eval-after-spec ,others ,@body)))
-          ,(msg-evals (feature-spec next (`(eval-after-load ,feat ,next) res))
-             :before "2"))))))
+          ,`(eval-after-load ,feat ,next))))))
 
 (provide 'functions)

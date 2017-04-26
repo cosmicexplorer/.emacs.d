@@ -384,16 +384,49 @@ lowercase, and Initial Caps versions."
 (defadvice help-buffer (around use-prev activate)
   (setq ad-return-value prev-help-buf))
 
-(defadvice help-button-action (around stop-window-motion activate)
-  (let (buf (pfx current-prefix-arg))
-    (save-window-excursion
-      ad-do-it
-      (setq buf (current-buffer)))
-    (if pfx (pop-to-buffer buf)
-      (display-buffer-same-window buf nil))))
+(defvar set-watched-help-buf nil)
+(defvar watched-help-buf nil)
 
-(defun set-help-prev-buf ()
-  (push (current-buffer) prev-help-bufs))
+(defun buffer-list-update-watcher ()
+  (let ((top (car (buffer-list))))
+    (when (and set-watched-help-buf
+               (not (eq top set-watched-help-buf)))
+      (setq set-watched-help-buf nil
+            watched-help-buf top))))
+
+(add-hook 'buffer-list-update-hook #'buffer-list-update-watcher)
+
+(defcustom clean-sampling-period 20
+  "Number of times `buffer-list-clean-many-versions' will skip before attempting
+to clean up.")
+(defvar clean-sample-index 0)
+(defun buffer-list-clean-many-versions ()
+  (cond
+   ((not (wholenump clean-sample-index))
+    (setq clean-sample-index 0))
+   ((< clean-sample-index clean-sampling-period)
+    (incf clean-sample-index))
+   ((>= clean-sample-index clean-sampling-period)
+    (let* ((buffer-basename-parted
+            (--partition-by
+             (replace-regexp-in-string "<[0-9]+>\\'" "" (buffer-name it))
+             (buffer-list)))
+           (repeated-versions
+            ;; only need one version of all these
+            (--mapcat (-drop 1 it) buffer-basename-parted)))
+      (-each repeated-versions #'kill-buffer)))))
+
+(add-hook 'buffer-list-update-hook #'buffer-list-clean-many-versions)
+
+(defun help-do-button (pos &optional pfx)
+  (interactive (list (point) current-prefix-arg))
+  (let ((prefix-arg nil))
+    (save-window-excursion
+      (setq set-watched-help-buf (car (buffer-list)))
+      (push-button pos)))
+  (if pfx (pop-to-buffer watched-help-buf)
+    (display-buffer-same-window watched-help-buf nil))
+  (setq watched-help-buf nil))
 
 (add-hook 'help-mode-hook #'help-rename-buffer)
 

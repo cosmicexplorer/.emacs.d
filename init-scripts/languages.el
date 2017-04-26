@@ -254,14 +254,12 @@
 ;;; doesn't work, hence camel-case-{left,right}-word in functions.el
 (subword-mode)
 (setq c-electric-flag nil)
+(defconst cc-mode-maps (list c-mode-map c++-mode-map java-mode-map))
 (add-hook
  'c-initialization-hook
  '(lambda ()
     (add-keybinding-to-mode-maps
-     "RET" 'newline-and-indent-fix-cc-mode
-     c-mode-map
-     c++-mode-map
-     java-mode-map)))
+     "RET" #'newline-and-indent-fix-cc-mode cc-mode-maps)))
 (defconst c-namespace-style
   '("cc-mode"
     (c-offsets-alist . ((innamespace . [0])))))

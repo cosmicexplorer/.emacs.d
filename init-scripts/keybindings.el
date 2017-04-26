@@ -507,6 +507,9 @@
                    (set-window-buffer win buf)
                    (set-window-point win (point-min)))))))
 
+(with-eval-after-spec (help)
+  (define-key help-mode-map [remap help-follow] #'help-do-button))
+
 ;;; now for c
 (eval-after-load 'cc-mode
   '(progn
