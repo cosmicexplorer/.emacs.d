@@ -384,6 +384,14 @@ lowercase, and Initial Caps versions."
 (defadvice help-buffer (around use-prev activate)
   (setq ad-return-value prev-help-buf))
 
+(defadvice help-button-action (around stop-window-motion activate)
+  (let (buf (pfx current-prefix-arg))
+    (save-window-excursion
+      ad-do-it
+      (setq buf (current-buffer)))
+    (if pfx (pop-to-buffer buf)
+      (display-buffer-same-window buf nil))))
+
 (defun set-help-prev-buf ()
   (push (current-buffer) prev-help-bufs))
 
