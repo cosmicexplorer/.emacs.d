@@ -502,7 +502,6 @@
 (define-key help-map "a"
   (find-function-switch-pfx #'apropos
     :then-do (lambda (win buf)
-               (msg-evals (win buf))
                (with-selected-window win
                  (with-current-buffer buf
                    (set-window-buffer win buf)
