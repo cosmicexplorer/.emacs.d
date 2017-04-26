@@ -847,7 +847,10 @@ Turning on normal search turns off fast-and-loose mode."
   "NO" :group 'cperl-mode)
 
 
-;;; TODO: make this into a MELPA package
+;;; TODO: make `my-rw-process'-* into a MELPA package!
+;;; - create two processes implementing bidirectional communication over named
+;;; pipe!
+;;;   - why? who knows!
 (defvar my-rw-process nil)
 (defvar my-rw-process-tmp-dir nil)
 (defvar my-rw-process-fifo nil)
