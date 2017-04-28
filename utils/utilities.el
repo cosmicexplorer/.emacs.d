@@ -203,6 +203,7 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
           finally (return (reverse out)))))
 
 (defmacro other-window-prefix-wrapper (fun name)
+  "DON'T USE THIS! Use `find-function-switch-pfx' instead."
   (let ((pfx (gensym))
         (res-buf (gensym)))
     `(defun ,name (,pfx)
