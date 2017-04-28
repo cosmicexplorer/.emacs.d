@@ -27,6 +27,21 @@
   (cl-loop for mode-map in mode-maps-list
            do (define-key mode-map (kbd keys-pressed) func-to-call-quoted)))
 
+(defun add-keys-to-modes (cmd maps-spec &rest kbds)
+  "Map KBDS to CMD in MAPS-SPEC.
+
+MAPS-SPEC can be t, nil, a map, a symbol, or a list.
+
+nil:	map KBDS with `global-set-key'.
+t:	map KBDS with `define-key' in the `major-mode' of the `current-buffer'.
+map:	map KBDS with `define-key' in the given map.
+symbol:	if the `symbol-value' is a map, map KBDS with `define-key' in that map.
+list:	map KBDS over all elements of the list as described above."
+  (let ((handle
+         (pcase maps-spec
+           (`nil (apply-partially #'global-set-key kbd) (cl-mapc (lambda (kbd) (global-set-key kbd cmd)) kbds))
+           (`t ))))))
+
 ;;; so that there's a space after inline comments in coffeescript
 (defun coffeescript-comment-do-what-i-really-mean (arg)
   (interactive "*P")
@@ -820,15 +835,19 @@ scope of the command's precision.")
         (kill-buffer))))
   (clean-nonvisiting-buffers))
 
-(defun compose-helper (arg quoted-funs)
-  (if (null quoted-funs) arg
-    (compose-helper (list #'funcall (car quoted-funs) arg) (cdr quoted-funs))))
-
-(defmacro compose (&rest args)
-  `(lambda (&rest args) ,(apply #'compose-helper (list 'arg args))))
-
 ;;; TODO: make better macro for anonymous functions which doesn't require
 ;;; writing out `lambda' a million times
+(defun o (&rest funs)
+  (lambda (&rest args)
+    (reduce 'funcall (cl-rest funs)
+            :from-end t
+            :initial-value (apply (car funs) args))))
+
+(cl-defmacro l (expr)
+  (let ((arg (cl-gensym)))
+    `(lambda (,arg)
+       ,(cl-subst arg '_ expr :test #'eq))))
+
 (defvar init-loaded-fully nil
   "Set to t after init loads fully.")
 
@@ -948,11 +967,33 @@ prompt the user for a coding system."
                 (concat ", at " (buffer-file-name))
               ""))))
 
-(defun kill-message-buffer-id (&optional buf)
-  ;; unless is emacs-internal buffer or markdown-live-preview buffer
-  (unless (or (char-equal (aref (buffer-name) 0) ? )
-              (string= (buffer-name) "*markdown-live-preview-output*"))
-    (message "%s" (concat "killed " (get-buffer-id buf)))))
+(defconst temp-buffer-name-regexp
+  "\\` \\*temp\\*-[0-9]+\\'")
+(defun no-msg-temp-buffers (buf)
+  (not (string-match-p temp-buffer-name-regexp (buffer-name buf))))
+
+(defvar last-killed-buf nil)
+(defcustom do-message-on-kill #'no-msg-temp-buffers
+  "Whether to send a `message' every time a buffer is killed within
+`kill-message-buffer-id'.
+
+Can be a boolean, string, or function. If boolean and non-nil, a message is
+sent. If a string, it uses that as a regex to match against the buffer's
+`buffer-name'; if the match succeeds, the the message is sent. If a function,
+the function is called with the buffer as a single argument, and a message is
+sent if it returns non-nil."
+  :type '(choice boolean regexp function))
+
+(defun kill-message-buffer-id ()
+  (let ((buf (current-buffer)))
+    (setq last-killed-buf buf)
+    (-when-let*
+        ((do-kill (pcase do-message-on-kill
+                    ((pred booleanp) do-message-on-kill)
+                    ((pred stringp)
+                     (string-match-p do-message-on-kill (buffer-name)))
+                    ((pred functionp) (funcall do-message-on-kill buf)))))
+      (message "%s" (concat "killed " (get-buffer-id buf))))))
 
 ;;; allow for searchable names of w3m buffers
 ;;; TODO: make this work
@@ -1562,8 +1603,8 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (interactive "P")
   (let* ((reg (region-active-p))
          (res (if reg (eval-region (region-beginning) (region-end)
-                                   (when prefix-given (current-buffer)))
-                (eval-buffer nil (when prefix-given (current-buffer))))))
+                                   (when current-prefix-arg (current-buffer)))
+                (eval-buffer nil (when current-prefix-arg (current-buffer))))))
     (message "%s %s" "evaluated" (if reg "region" (buffer-name)))))
 
 ;;; html functions
@@ -2534,9 +2575,6 @@ by another percent."
     (recompile)
     (setq ag-args args)))
 
-(other-window-prefix-wrapper #'ag my-ag)
-(other-window-prefix-wrapper #'ag-regexp my-ag-regexp)
-
 (defun git-gutter:diff-and-switch ()
   (interactive)
   (select-window
@@ -2762,20 +2800,74 @@ by another percent."
       (goto-line line)
       (recenter))))
 
-(defconst important-buffer-names '("*Messages*" "*scratch*"))
-(defconst important-buffer-names-regexp (regexp-opt important-buffer-names))
+(defun make-pred-regexp (reg)
+  (apply-partially #'string-match-p reg))
+
+(defconst my-scratch-buffer-name "*scratch*")
+(defun get-my-scratch-buffer ()
+  (get-buffer-create my-scratch-buffer-name))
+
+(defconst basic-important-buffers ())
+
+(defcustom important-buffers
+  (list
+   #'messages-buffer
+   #'get-my-scratch-buffer
+   'helm-buffer)
+  "A list of regexps matching names of buffers that shouldn't be killed in `clean-all-buffers-to-deleted-files'.
+
+Can be specified as a regexp, a function which produces a regexp, or a symbol which evaluates to a regexp."
+  :type '(repeat (choice (regexp function variable))))
+
+(require 'rx)
+(require 'dash)
+
+(defun neg (fn &optional double-neg)
+  (if double-neg
+      (lambda (arg) (logify (fn arg)))
+    (lambda (arg) (not (fn arg)))))
+(defmacro logify (expr) `(not (not ,expr)))
+
+(defun thick-rx-pred (arg)
+  `(pcase arg
+     (`(thick-rx ,str)
+      (condition-case nil
+          (logify (string-match-p str ""))
+        (invalid-regexp nil)))
+     (_ nil)))
+
+;;; TODO: maybe accept some argument explaining how to interpret the regexp?
+(cl-deftype thick-rx ()
+  `(and list
+        (satisfies thick-rx-pred)))
+
+(defun eval-buf-spec (spec)
+  (cl-etypecase spec
+    (function (eval-buf-spec (funcall spec)))
+    (symbol (eval-buf-spec (symbol-value spec)))
+    (buffer (eval-buf-spec (buffer-name spec)))
+    (string (eval-buf-spec `(thick-rx ,(rx-to-string spec t))))
+    (thick-rx spec)))
+
+(defconst important-buffer-names-regexp
+  (let ((rxs (cl-mapcar (o #'eval-buf-spec #'cl-second) important-buffers)))
+    (rx-to-string `(: bos (| ,@rxs) eos) t)))
+
+(defcustom on-clean-buffers-hook nil
+  "Functions to run after `clean-all-buffers-to-deleted-files' for packages who
+misbehave (e.g. `helm')."
+  :type '(repeat function))
 
 (defun clean-all-buffers-to-deleted-files ()
   (interactive)
-  (loop for buf in (buffer-list)
-        unless (or (and (buffer-name buf)
-                        (string-match-p
-                         important-buffer-names-regexp (buffer-name buf)))
-                   (when-let ((proc (get-buffer-process buf)))
-                     (process-live-p proc))
+  (cl-loop for buf in (buffer-list)
+           for name = (buffer-name buf)
+           unless (or
+                   (string-match-p important-buffer-names-regexp name)
+                   (process-live-p (get-buffer-process buf))
                    (when-let ((fname (buffer-file-name buf)))
                      (file-exists-p fname)))
-        do (kill-buffer buf)))
+           do (kill-buffer buf)))
 
 (defun clean-nonvisiting-buffers ()
   (interactive)
@@ -3017,7 +3109,7 @@ at the end of the buffer."
                     (and (equal a b) a))
                   els)))
 
-(defun switch-window-prep-fn (other fn &optional invert nomark)
+(defun switch-window-prep-fn (other fn pfx-spec invert nomark)
   (let (failure final-buf (orig-buf (current-buffer))
                 win-pt win-st (start-pt (point)))
     (unless nomark
@@ -3026,7 +3118,14 @@ at the end of the buffer."
           (push-mark start-pt))))
     (save-excursion
       (save-window-excursion
-        (funcall fn)
+        (let ((prefix-arg
+               (pcase pfx-spec
+                 (`same other)
+                 (`invert (not other))
+                 (`t t)
+                 (`nil nil)
+                 (_ (user-error "invalid pfx-spec '%s'" pfx-spec)))))
+          (funcall-interactively fn))
         (setq final-buf (current-buffer)
               win-pt (window-point)
               win-st (window-start)
@@ -3292,8 +3391,72 @@ at the end of the buffer."
   (with-temp-buffer
     (shell-command t)))
 
-(defun my-magit-next-commit ()
-  (interactive))
+;; (defun my-magit-next-commit ()
+;;   (interactive))
+
+(defgroup my-loc-lib ()
+  "Customization for the `my-loc-lib' command.")
+
+(defvar my-loc-lib-choose-on-exit nil)
+
+(defconst my-loc-lib-result-fun #'find-file)
+
+(defcustom my-loc-lib-result-alternatives nil
+  "List of functions to call on the result of `my-loc-lib'.
+
+If minibuffer is exited normally, the first element of the list is called, but
+if \\[universal-argument] is non-nil on exit, the user can choose among these
+alternatives.
+
+If this list is empty, the value of `my-loc-lib-result-fun' is called."
+  :group 'my-loc-lib
+  :type '(repeat function))
+
+(defun my-loc-lib-exit-choose (pfx)
+  (interactive "P")
+  (setq my-loc-lib-choose-on-exit pfx)
+  (let ((prefix-arg nil))
+    (funcall-interactively #'minibuffer-complete-and-exit)))
+
+(cl-defun make-keymap-from-bindings (alist &key compose parent)
+  (let ((m (make-sparse-keymap)))
+    (cl-loop for (key . binding) in alist
+             do (define-key m key binding)
+             finally return (make-composed-keymap (cons m compose) parent))))
+
+(defconst my-loc-lib-keymap
+  (make-keymap-from-bindings
+   '(([remap minibuffer-complete-and-exit] . #'my-loc-lib-choose-on-exit))))
+
+(cl-defmacro append-keymaps-to (orig-map (&rest keymaps) &rest body)
+  (declare (indent 2))
+  (unless (symbolp orig-map)
+    (user-error "orig-map '%S' should be a symbol!"))
+  `(let ((,orig-map (make-composed-keymap '(,@keymaps) ,orig-map)))
+     ,@body))
+
+(defun my-loc-lib-get-libraries ()
+  (apply-partially 'locate-file-completion-table load-path (get-load-suffixes)))
+
+(defvar my-loc-lib-hist nil
+  "History for inputs to `my-loc-lib'.")
+
+(defun my-loc-lib (library)
+  (interactive
+   (append-keymaps-to minibuffer-local-must-match-map (my-loc-lib-keymap)
+     (completing-read
+      "locate library named: " (my-loc-lib-get-libraries) nil t nil
+      'my-loc-lib-hist))))
+
+;; (cl-defun my-cl--transform-args (&rest args)
+;;   "See `cl--transform-lambda'."
+;;   (let ((arg (car args))
+;;         (others (cdr args)))
+;;     (pcase arg
+;;       ())))
+
+;; (cl-defmacro my-cl-defun (name args &rest body)
+;;   )
 
 (defun clean-init-screen ()
   ;;; if everything loaded correctly, clear the last message from minibuf
@@ -3368,7 +3531,8 @@ data:
                   collect `(msg-eval ,sexp
                              :pre ,b-str :format ,fmt :name ',name)))))
 
-(cl-defmacro with-eval-after-spec ((&rest feature-spec) &rest body)
+
+(cl-defmacro with-eval-after-spec (feature-spec &rest body)
   "Execute BODY after emacs loads features as specified with FEATURE-SPEC. BODY
 is executed after loading each feature in the order provided in FEATURE-SPEC.
 

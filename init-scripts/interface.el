@@ -1058,4 +1058,10 @@ Use (process-buffer `my-rw-process') instead."
 
 (put 'upcase-region 'disabled nil)
 
+(defcustom ag-default-search-fn #'ag
+  "Which function to use for searching by default when calling `ag'."
+  :type 'function)
+(defvar-local ag-local-search-fn ag-default-search-fn
+  "Buffer-local binding for function to use to search with `ag'.")
+
 (setq visible-bell nil)
