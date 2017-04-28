@@ -60,6 +60,8 @@
 (when (featurep 'scala-mode2) (unload-feature 'scala-mode2))
 (require 'scala-mode)
 (require 'haskell)
+(require 'rx)
+(require 'widget)
 
 ;;; my stuff
 (require 'utilities)

@@ -83,22 +83,6 @@ init-scripts/interface.el.")
 (defvar dont-ask-about-git nil
   "If git not installed, don't worry about it.")
 
-;;; used in user customizations
-(defmacro with-internet-connection (&rest body)
-  "Perform BODY only if we can grab a url in a short period of time."
-  `(progn
-     (unless (featurep 'url-queue) (require 'url-queue))
-     ;; url-queue-retrieve used because of built-in timeout
-     (url-queue-retrieve
-      ;; arbitrary url, chosen because github's uptime is ridiculous (remember
-      ;; when all of china ddos'd them? incredible) and they probably aren't
-      ;; tracking my browsing info
-      "https://github.com"
-      (lambda (status)
-        (let ((err (plist-get status :error)))
-          (unless err ,@body)))
-      nil t t)))
-
 ;;; TODO: make shorthand for val being matched within BODY-FORMS of pcase
 
 (defvar after-load-init-hook nil
@@ -202,6 +186,7 @@ Check out your .emacs."))
  ;; If there is more than one, they won't work right.
  '(TeX-engine (quote luatex))
  '(TeX-newline-function (quote reindent-then-newline-and-indent))
+ '(ag-default-search-fn (quote ag-regexp))
  '(ag-highlight-search t)
  '(asm-comment-char 35)
  '(async-shell-command-buffer (quote new-buffer))

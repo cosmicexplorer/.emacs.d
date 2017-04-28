@@ -30,6 +30,7 @@
         camel-case-right-word
         coffee-dedent-line-backspace
         compile-goto-error
+        completion-at-point
         cperl-electric-terminator
         delete-whole-line
         destroy-all-whitespace-nearby
