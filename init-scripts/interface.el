@@ -1065,6 +1065,7 @@ Use (process-buffer `my-rw-process') instead."
   "Buffer-local binding for function to use to search with `ag'.")
 
 (defun stop-adaptive-fill ()
+  (setq adaptive-fill-mode nil)
   (setq adaptive-fill-function nil))
 
 (add-hook 'lisp-mode-hook #'stop-adaptive-fill)

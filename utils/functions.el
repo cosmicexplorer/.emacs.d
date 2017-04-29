@@ -810,28 +810,29 @@ scope of the command's precision.")
   (save-window-excursion
     (with-current-buffer (find-file-noselect saved-files)
       (goto-char (point-min))
-      (-let* (((lines types files pts)
-               (cl-loop
-                while (re-search-forward saved-files-format-regexp nil t)
-                collect (-map #'match-string (number-sequence 0 3))
-                into matches finally return (-unzip matches)))
-              (actions (--map
-                        (assoc-default it saved-files-action-alist) types))
-              (realpaths (-map #'file-truename files))
-              (bufs (-map (-lambda ((a . r))
-                            (and (functionp a)
-                                 (file-exists-p r)
-                                 (funcall a r)))
-                          (-zip actions realpaths)))
-              (final-bufs (-map (-lambda ((b live? p))
-                                  (and live? (pos-in-bounds b p)))
-                                (-zip bufs
-                                      (-map #'buffer-live-p bufs)
-                                      (--map (when (not (string-empty-p it))
-                                               (string-to-number it))
-                                             pts))))
-              ((success failure)
-               (--map (-drop 1 it) (--group-by (not (null it)) final-bufs))))
+      (-when-let*
+          (((lines types files pts)
+            (cl-loop
+             while (re-search-forward saved-files-format-regexp nil t)
+             collect (-map #'match-string (number-sequence 0 3)) into ms
+             finally return (when ms (-unzip ms))))
+           (actions (--map
+                     (assoc-default it saved-files-action-alist) types))
+           (realpaths (-map #'file-truename files))
+           (bufs (-map (-lambda ((a . r))
+                         (and (functionp a)
+                              (file-exists-p r)
+                              (funcall a r)))
+                       (-zip actions realpaths)))
+           (final-bufs (-map (-lambda ((b live? p))
+                               (and live? (pos-in-bounds b p)))
+                             (-zip bufs
+                                   (-map #'buffer-live-p bufs)
+                                   (--map (when (not (string-empty-p it))
+                                            (string-to-number it))
+                                          pts))))
+           ((success failure)
+            (--map (-drop 1 it) (--group-by (not (null it)) final-bufs))))
         (kill-buffer))))
   (clean-nonvisiting-buffers))
 
@@ -959,18 +960,18 @@ prompt the user for a coding system."
     (and found (goto-char (car found)))
     found))
 
-;;; get name of buffer and other info as required
-(defun get-buffer-id (&optional buf)
-  (with-current-buffer (if buf buf (current-buffer))
-    (concat (buffer-name)
-            (if (buffer-file-name)
-                (concat ", at " (buffer-file-name))
-              ""))))
-
 (defconst temp-buffer-name-regexp
-  "\\` \\*temp\\*-[0-9]+\\'")
-(defun no-msg-temp-buffers (buf)
-  (not (string-match-p temp-buffer-name-regexp (buffer-name buf))))
+  "\\`\\s-*\\*[a-zA-Z0-9-_]*\\*?[a-zA-Z0-9-_]*\\*\\s-*\\'")
+
+(defun buf-info ()
+  (list (current-buffer) (buffer-name) (buffer-file-name)))
+
+(cl-defun print-buf-path-on-kill (name fname)
+  (message "killed '%s', at '%s'"
+           name (or fname "<no path>")))
+
+(cl-defun no-msg-temp-buffers (name fname)
+  (and fname (not (string-match-p temp-buffer-name-regexp name))))
 
 (defvar last-killed-buf nil)
 (defcustom do-message-on-kill #'no-msg-temp-buffers
@@ -980,20 +981,18 @@ prompt the user for a coding system."
 Can be a boolean, string, or function. If boolean and non-nil, a message is
 sent. If a string, it uses that as a regex to match against the buffer's
 `buffer-name'; if the match succeeds, the the message is sent. If a function,
-the function is called with the buffer as a single argument, and a message is
-sent if it returns non-nil."
+the function is called with a list of three elements: the buffer, its name, and its filename, and a message is sent if the predicate returns non-nil."
   :type '(choice boolean regexp function))
 
 (defun kill-message-buffer-id ()
-  (let ((buf (current-buffer)))
+  (-let* (((buf name fname) (buf-info))
+          (msg do-message-on-kill))
     (setq last-killed-buf buf)
-    (-when-let*
-        ((do-kill (pcase do-message-on-kill
-                    ((pred booleanp) do-message-on-kill)
-                    ((pred stringp)
-                     (string-match-p do-message-on-kill (buffer-name)))
-                    ((pred functionp) (funcall do-message-on-kill buf)))))
-      (message "%s" (concat "killed " (get-buffer-id buf))))))
+    (when (cl-typecase msg
+            (boolean (logify msg))
+            (string (string-match-p msg name))
+            (function (funcall msg name fname)))
+      (print-buf-path-on-kill name fname))))
 
 ;;; allow for searchable names of w3m buffers
 ;;; TODO: make this work
@@ -2814,9 +2813,11 @@ by another percent."
    #'messages-buffer
    #'get-my-scratch-buffer
    'helm-buffer)
-  "A list of regexps matching names of buffers that shouldn't be killed in `clean-all-buffers-to-deleted-files'.
+  "A list of regexps matching names of buffers that shouldn't be killed in
+`clean-all-buffers-to-deleted-files'.
 
-Can be specified as a regexp, a function which produces a regexp, or a symbol which evaluates to a regexp."
+Can be specified as a regexp, a function which produces a regexp, or a symbol
+which evaluates to a regexp."
   :type '(repeat (choice (regexp function variable))))
 
 (require 'rx)
@@ -2851,7 +2852,7 @@ Can be specified as a regexp, a function which produces a regexp, or a symbol wh
 
 (defconst important-buffer-names-regexp
   (let ((rxs (cl-mapcar (o #'eval-buf-spec #'cl-second) important-buffers)))
-    (rx-to-string `(: bos (| ,@rxs) eos) t)))
+    (rx-to-string `(: bos (| ,@(--map `(regexp ,it) rxs)) eos) t)))
 
 (defcustom on-clean-buffers-hook nil
   "Functions to run after `clean-all-buffers-to-deleted-files' for packages who
@@ -3125,7 +3126,7 @@ at the end of the buffer."
                  (`t t)
                  (`nil nil)
                  (_ (user-error "invalid pfx-spec '%s'" pfx-spec)))))
-          (funcall-interactively fn))
+          (call-interactively fn))
         (setq final-buf (current-buffer)
               win-pt (window-point)
               win-st (window-start)
@@ -3540,7 +3541,6 @@ FEATURE-SPEC can be either a feature name (as an unquoted symbol or a string), a
 file path (as a string), or a sexp which evaluates to either of the above. If a
 file does not `provide' a feature, then its path can be used instead."
   (declare (indent 1))
-  (msg-evals (feature-spec body))
   (pcase feature-spec
     ((pred null) `'(progn ,@body))
     (`(,ft . ,others)

@@ -211,6 +211,22 @@
             (define-key cperl-mode-map (kbd "C-c C-v") nil)
             (define-key cperl-mode-map (kbd "C-c <tab>") #'cperl-linefeed)))
 
+(define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
+(define-key emacs-lisp-mode-map (kbd "C-M-x") #'eval-buffer-and-message)
+(define-key emacs-lisp-mode-map (kbd "<return>") #'newline)
+(define-key paredit-mode-map (kbd "M-q") #'comment-fill-paragraph)
+(define-key emacs-lisp-mode-map (kbd "C-c C-e") #'view-macro-expansion)
+(define-key emacs-lisp-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
+(define-key lisp-interaction-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
+(define-key emacs-lisp-mode-map (kbd "C-M-d") #'eval-defun)
+(define-key paredit-mode-map (kbd "C-M-d") nil)
+(with-eval-after-spec edebug
+  (define-key emacs-lisp-mode-map (kbd "C-S-d") #'edebug-defun)
+  (define-key edebug-mode-map (kbd "e")))
+(define-key paredit-mode-map (kbd "C-S-d") nil)
+
+
+
 ;;; lisp
 ;;; so it's all emacsy
 (with-eval-after-spec (slime)
@@ -409,34 +425,29 @@
 (global-set-key (kbd "<insert>") nil)
 
 ;;; markdown
-(eval-after-load "markdown-mode"
-  '(progn
-     (define-key markdown-mode-map (kbd "M-n") #'mc/mark-next-like-this)
-     (define-key markdown-mode-map (kbd "M-p") #'mc/mark-previous-like-this)
-     (define-key markdown-mode-map (kbd "`") #'markdown-literal-region-too)
-     (define-key markdown-mode-map (kbd "C-k") #'kill-line-or-region)
-     (define-key markdown-mode-map (kbd "C-c C-c") #'markdown-send-to-shell)
-     (define-key markdown-mode-map (kbd "C-c C-z") #'markdown-switch-shell)
-     (define-key markdown-mode-map (kbd "C-c C-b") #'rmd-export-pdf)))
+(with-eval-after-spec markdown-mode
+  (define-key markdown-mode-map (kbd "M-n") #'mc/mark-next-like-this)
+  (define-key markdown-mode-map (kbd "M-p") #'mc/mark-previous-like-this)
+  (define-key markdown-mode-map (kbd "`") #'markdown-literal-region-too)
+  (define-key markdown-mode-map (kbd "C-k") #'kill-line-or-region)
+  (define-key markdown-mode-map (kbd "C-c C-c") #'markdown-send-to-shell)
+  (define-key markdown-mode-map (kbd "C-c C-z") #'markdown-switch-shell)
+  (define-key markdown-mode-map (kbd "C-c C-b") #'rmd-export-pdf))
 
-(eval-after-load 'grep
-  '(define-key grep-mode-map (kbd "G") #'refind-or-grep))
+(with-eval-after-spec grep
+  (define-key grep-mode-map (kbd "G") #'refind-or-grep))
 
 ;;; help/info/etc
 ;;; TODO: add option to split current window instead of poppping to new!
-(cl-defun find-function-switch-pfx (cmd &key invert pfx nomark then-do)
+(cl-defun find-function-switch-pfx (cmd &key invert pfx-spec nomark then-do)
   (declare (indent 1))
-  (let ((call-fun (lambda ()
-                    (let ((prefix-arg pfx))
-                      (call-interactively cmd)))))
-    (lambda (pfx)
-      (interactive "P")
-      (let ((result (switch-window-prep-fn pfx call-fun invert nomark)))
-        (msg-evals (result))
+  (lambda (&optional pfx)
+    (interactive "P")
+    (let ((result (switch-window-prep-fn pfx cmd pfx-spec invert nomark)))
+      (when (functionp then-do)
         (pcase result
           (`(,window ,buffer)
-           (when (functionp then-do)
-             (funcall then-do window buffer)))
+           (funcall then-do window buffer))
           (_ nil))))))
 
 (global-set-key
@@ -508,7 +519,7 @@
                    (set-window-point win (point-min)))))))
 
 (with-eval-after-spec (help)
-  (define-key help-mode-map [remap help-follow] #'help-do-button))
+  (define-key help-mode-map [remap push-button] #'help-do-button))
 
 ;;; now for c
 (eval-after-load 'cc-mode
@@ -540,13 +551,6 @@
 (global-set-key (kbd "C-x M-h") #'unpop-to-mark-command)
 (global-set-key (kbd "C-x C-p") #'previous-buffer)
 (global-set-key (kbd "C-x M-p") #'next-buffer)
-
-;;; more emacs lisp stuff
-(define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
-(define-key emacs-lisp-mode-map (kbd "C-M-x") #'eval-buffer-and-message)
-(define-key emacs-lisp-mode-map (kbd "<return>") #'newline)
-(define-key paredit-mode-map (kbd "M-q") #'comment-fill-paragraph)
-(define-key emacs-lisp-mode-map (kbd "C-c C-e") #'view-macro-expansion)
 
 ;;; erc stuff
 (global-set-key (kbd "C-c M-e") #'message-erc-modded-chans)
@@ -792,33 +796,45 @@
 ;;; this is annoying
 (global-set-key (kbd "C-x C-x") nil)
 
-(eval-after-load 'ess
-  '(progn
-     (define-key ess-mode-map (kbd "C-c C-v") nil)
-     (define-key ess-mode-map (kbd "C-x C-e") #'ess-eval-paragraph)
-     (define-key ess-mode-map (kbd "C-h f") #'ess-display-help-on-object)
-     (define-key ess-mode-map (kbd "<C-return>") #'newline-and-indent)
-     (define-key ess-mode-map (kbd "_") #'self-insert-command)
-     (define-key ess-mode-map (kbd "M-RET") nil)
-     (define-key inferior-ess-mode-map (kbd "C-h f")
-       #'ess-display-help-on-object)
-     (define-key inferior-ess-mode-map (kbd "C-c C-w") nil)
-     (define-key inferior-ess-mode-map (kbd "RET") #'my-inf-ess-end-send-input)
-     (define-key ess-help-mode-map (kbd "C-h f") #'ess-display-help-on-object)
-     (define-key ess-mode-map (kbd "C-c '") #'ess-show-traceback)
-     (define-key ess-tracebug-map  (kbd "C-c '") #'ess-show-traceback)
-     (define-key inferior-ess-mode-map  (kbd "C-c '") #'ess-show-traceback)
-     (define-key ess-mode-map (kbd "M-:") #'my-ess-eval-this)
-     (define-key ess-mode-map (kbd "C-M-h") nil)))
+(with-eval-after-spec (ess)
+  (define-key ess-mode-map (kbd "C-c C-v") nil)
+  (define-key ess-mode-map (kbd "C-x C-e") #'ess-eval-paragraph)
+  (define-key ess-mode-map (kbd "C-h f") #'ess-display-help-on-object)
+  (define-key ess-mode-map (kbd "<C-return>") #'newline-and-indent)
+  (define-key ess-mode-map (kbd "_") #'self-insert-command)
+  (define-key ess-mode-map (kbd "M-RET") nil)
+  (define-key inferior-ess-mode-map (kbd "C-h f")
+    #'ess-display-help-on-object)
+  (define-key inferior-ess-mode-map (kbd "C-c C-w") nil)
+  (define-key inferior-ess-mode-map (kbd "RET") #'my-inf-ess-end-send-input)
+  (define-key ess-help-mode-map (kbd "C-h f") #'ess-display-help-on-object)
+  (define-key ess-mode-map (kbd "C-c '") #'ess-show-traceback)
+  (define-key ess-tracebug-map  (kbd "C-c '") #'ess-show-traceback)
+  (define-key inferior-ess-mode-map  (kbd "C-c '") #'ess-show-traceback)
+  (define-key ess-mode-map (kbd "M-:") #'my-ess-eval-this)
+  (define-key ess-mode-map (kbd "C-M-h") nil))
 
 (global-set-key (kbd "C-:") #'eval-expression)
 (global-set-key (kbd "C-S-h f") #'describe-function)
 (global-set-key (kbd "C-S-h v") #'describe-variable)
 (global-set-key (kbd "C-S-h d") #'describe-function-or-variable)
 
-(eval-after-load 'helm
-  '(progn
-     (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)))
+(with-eval-after-spec (helm)
+  (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)
+  (define-key helm-map (kbd "C-z") nil)
+  (define-key helm-map (kbd "C-k") nil)
+  (defun helm-cycle-down ()
+    (interactive)
+    (let ((helm-move-to-line-cycle-in-source t))
+      (call-interactively #'helm-next-line)))
+  (defun helm-cycle-up ()
+    (interactive)
+    (let ((helm-move-to-line-cycle-in-source t))
+      (call-interactively #'helm-previous-line)))
+  (define-key helm-map (kbd "<down>") #'helm-cycle-down)
+  (define-key helm-map (kbd "C-n") #'helm-cycle-down)
+  (define-key helm-map (kbd "<up>") #'helm-cycle-up)
+  (define-key helm-map (kbd "C-p") #'helm-cycle-up))
 
 (eval-after-load 'org-plot
   '(progn (define-key org-mode-map (kbd "C-M-g") #'org-plot/gnuplot)))
@@ -849,45 +865,25 @@
 
 (global-set-key (kbd "M-RET") #'newline-continue-comment)
 
-(eval-after-load 'cc-mode
-  '(progn
-     (define-key c-mode-base-map (kbd "C-c C-a") #'my-ag)
-     (define-key c-mode-base-map (kbd "C-c C-r") #'my-ag-regexp)
-     (define-key c-mode-base-map (kbd "C-M-;") #'newline-and-comment)))
+(with-eval-after-spec (cc-mode)
+  (define-key c-mode-base-map (kbd "C-c C-a") nil)
+  (define-key c-mode-base-map (kbd "C-c C-r") nil)
+  (define-key c-mode-base-map (kbd "C-M-;") #'newline-and-comment))
 
-(eval-after-load 'ag
-  '(progn
-     (define-key ag-mode-map (kbd "g") #'re-ag-reset-args-and-recompile)
-     (define-key ag-mode-map (kbd "G") #'re-ag)))
+(with-eval-after-spec ag
+  (define-key ag-mode-map (kbd "g") #'re-ag-reset-args-and-recompile)
+  (define-key ag-mode-map (kbd "G") #'re-ag))
 
-(defun my-helm-ag ()
-  (interactive)
-  (helm-do-ag default-directory))
-(eval-after-load 'helm-ag
-  '(progn
-     (global-set-key (kbd "C-c a") #'my-helm-ag)
-     (global-set-key (kbd "C-c C-a") #'my-helm-ag)))
+(with-eval-after-spec helm-ag
+  (global-set-key (kbd "C-c a") #'my-helm-ag)
+  (global-set-key
+   (kbd "C-c C-a")
+   (find-function-switch-pfx #'my-ag :invert t)))
 
 (global-set-key (kbd "M-y") #'yank-pop)
 (global-set-key (kbd "C-M-y") #'helm-show-kill-ring)
 (define-key paredit-mode-map (kbd "C-M-y") #'helm-show-kill-ring)
 
-(eval-after-load 'helm-ag
-  '(progn
-     (defun helm-cycle-down ()
-       (interactive)
-       (let ((helm-move-to-line-cycle-in-source t))
-         (call-interactively #'helm-next-line)))
-     (defun helm-cycle-up ()
-       (interactive)
-       (let ((helm-move-to-line-cycle-in-source t))
-         (call-interactively #'helm-previous-line)))
-     (define-key helm-map (kbd "<down>") #'helm-cycle-down)
-     (define-key helm-map (kbd "C-n") #'helm-cycle-down)
-     (define-key helm-map (kbd "<up>") #'helm-cycle-up)
-     (define-key helm-map (kbd "C-p") #'helm-cycle-up)))
-
-(define-key helm-map (kbd "C-z") #'undo-tree-undo)
 (global-set-key (kbd "C-w b") #'push-buffer-to-kill-ring)
 
 (define-key diff-mode-map (kbd "M-w") #'diff-mode-copy)
@@ -905,12 +901,12 @@
 (eval-after-load 'nxml-mode
   '(define-key nxml-mode-map (kbd "C-c C-v") nil))
 
-(define-key emacs-lisp-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
-(define-key lisp-interaction-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
 (global-set-key (kbd "C-x C-M-h") #'run-shell)
 (global-set-key (kbd "C-x C-p") #'restart-shell)
 
 (define-key shell-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby)
+(define-key shell-mode-map (kbd "<C-up>") nil)
+(define-key shell-mode-map (kbd "<C-down>") nil)
 
 (defun slime-eval-buffer-or-region ()
   (interactive)
