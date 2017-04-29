@@ -808,33 +808,36 @@ scope of the command's precision.")
 ;;; save buffers to disk and get them back
 (defun reread-visited-files-from-disk ()
   (save-window-excursion
-    (with-current-buffer (find-file-noselect saved-files)
-      (goto-char (point-min))
-      (-when-let*
-          (((lines types files pts)
-            (cl-loop
-             while (re-search-forward saved-files-format-regexp nil t)
-             collect (-map #'match-string (number-sequence 0 3)) into ms
-             finally return (when ms (-unzip ms))))
-           (actions (--map
-                     (assoc-default it saved-files-action-alist) types))
-           (realpaths (-map #'file-truename files))
-           (bufs (-map (-lambda ((a . r))
-                         (and (functionp a)
-                              (file-exists-p r)
-                              (funcall a r)))
-                       (-zip actions realpaths)))
-           (final-bufs (-map (-lambda ((b live? p))
-                               (and live? (pos-in-bounds b p)))
-                             (-zip bufs
-                                   (-map #'buffer-live-p bufs)
-                                   (--map (when (not (string-empty-p it))
-                                            (string-to-number it))
-                                          pts))))
-           ((success failure)
-            (--map (-drop 1 it) (--group-by (not (null it)) final-bufs))))
-        (kill-buffer))))
-  (clean-nonvisiting-buffers))
+    (let ((saved-buf (find-file-noselect saved-files)))
+      (unwind-protect
+          (with-current-buffer saved-buf
+            (goto-char (point-min))
+            (-when-let*
+                (((lines types files pts)
+                  (cl-loop
+                   while (re-search-forward saved-files-format-regexp nil t)
+                   collect (-map #'match-string (number-sequence 0 3)) into ms
+                   finally return (when ms (-unzip ms))))
+                 (actions (--map
+                           (assoc-default it saved-files-action-alist) types))
+                 (realpaths (-map #'file-truename files))
+                 (bufs (-map (-lambda ((a . r))
+                               (and (functionp a)
+                                    (file-exists-p r)
+                                    (funcall a r)))
+                             (-zip actions realpaths)))
+                 (final-bufs (-map (-lambda ((b live? p))
+                                     (and live? (pos-in-bounds b p)))
+                                   (-zip bufs
+                                         (-map #'buffer-live-p bufs)
+                                         (--map (when (not (string-empty-p it))
+                                                  (string-to-number it))
+                                                pts))))
+                 ((success failure)
+                  (--map (-drop 1 it) (--group-by (not (null it))
+                                                  final-bufs))))))
+        (kill-buffer saved-buf)
+        (clean-nonvisiting-buffers)))))
 
 ;;; TODO: make better macro for anonymous functions which doesn't require
 ;;; writing out `lambda' a million times
