@@ -834,10 +834,11 @@ scope of the command's precision.")
                                                   (string-to-number it))
                                                 pts))))
                  ((success failure)
-                  (--map (-drop 1 it) (--group-by (not (null it))
-                                                  final-bufs))))))
-        (kill-buffer saved-buf)
-        (clean-nonvisiting-buffers)))))
+                  (-map
+                   (apply-partially #'-drop 1)
+                   (-group-by (neg #'null) final-bufs))))))
+        (kill-buffer saved-buf))))
+  (clean-nonvisiting-buffers))
 
 ;;; TODO: make better macro for anonymous functions which doesn't require
 ;;; writing out `lambda' a million times
@@ -2828,8 +2829,8 @@ which evaluates to a regexp."
 
 (defun neg (fn &optional double-neg)
   (if double-neg
-      (lambda (arg) (logify (fn arg)))
-    (lambda (arg) (not (fn arg)))))
+      (lambda (arg) (not (funcall fn arg)))
+    (lambda (arg) (logify (funcall fn arg)))))
 (defmacro logify (expr) `(not (not ,expr)))
 
 (defun thick-rx-pred (arg)
