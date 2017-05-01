@@ -105,6 +105,7 @@
         delete-other-windows-maybe-save
         describe-key
         describe-variable
+        edebug-continue-mode
         ess-eval-buffer
         ess-load-file
         eval-buffer-and-message
