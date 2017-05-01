@@ -2812,13 +2812,10 @@ by another percent."
 (defun get-my-scratch-buffer ()
   (get-buffer-create my-scratch-buffer-name))
 
-(defconst basic-important-buffers ())
-
 (defcustom important-buffers
-  (list
-   #'messages-buffer
-   #'get-my-scratch-buffer
-   'helm-buffer)
+  '(messages-buffer
+    get-my-scratch-buffer
+    helm-buffer)
   "A list of regexps matching names of buffers that shouldn't be killed in
 `clean-all-buffers-to-deleted-files'.
 
@@ -3559,7 +3556,7 @@ file does not `provide' a feature, then its path can be used instead."
           ,`(eval-after-load ,feat ,next))))
     (_ `(with-eval-after-spec (,feature-spec) ,@body))))
 
-(cl-defmacro expand-insert-macro (&optional (form (sexp-at-point)))
+(cl-defmacro expand-insert-macro (&optional (form (sexp-at-point)) full)
   `(cl-prettyexpand ',form ,full))
 
 (cl-defmacro with-gensyms (syms &body body)

@@ -900,9 +900,7 @@
 
 (with-eval-after-spec helm-ag
   (global-set-key (kbd "C-c a") #'my-helm-ag)
-  (global-set-key
-   (kbd "C-c C-a")
-   (find-function-switch-pfx #'my-ag :invert t)))
+  (global-set-key (kbd "C-c C-a") #'my-helm-ag))
 
 (global-set-key (kbd "M-y") #'yank-pop)
 (global-set-key (kbd "C-M-y") #'helm-show-kill-ring)

@@ -1068,6 +1068,11 @@ Use (process-buffer `my-rw-process') instead."
 (defvar-local ag-local-search-fn ag-default-search-fn
   "Buffer-local binding for function to use to search with `ag'.")
 
+(with-eval-after-spec helm-ag
+  (defun my-helm-ag ()
+    (interactive)
+    (helm-do-ag default-directory)))
+
 (defun stop-adaptive-fill ()
   (setq adaptive-fill-mode nil)
   (setq adaptive-fill-function nil))
