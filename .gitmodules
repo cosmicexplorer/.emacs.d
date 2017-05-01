@@ -1,25 +1,25 @@
 [submodule "ESS"]
-	path = ESS
-	url = https://github.com/emacs-ess/ESS.git
-	ignore = dirty
+        path = ESS
+        url = https://github.com/emacs-ess/ESS.git
+        ignore = dirty
         branch = master
 [submodule "OmniSharpServer"]
-	path = OmniSharpServer
+        path = OmniSharpServer
         url = https://github.com/nosami/OmniSharpServer.git
         ignore = dirty
         branch = master
 [submodule "emacs-color-themes"]
-	path = emacs-color-themes
-	url = https://github.com/cosmicexplorer/emacs-color-themes.git
+        path = emacs-color-themes
+        url = https://github.com/cosmicexplorer/emacs-color-themes.git
         ignore = dirty
         branch = master
 [submodule "org-mode"]
-	path = org-mode
-	url = git://orgmode.org/org-mode.git
+        path = org-mode
+        url = git://orgmode.org/org-mode.git
         ignore = dirty
         branch = master
 [submodule "emacs-helm-ag"]
-	path = emacs-helm-ag
-	url = https://github.com:/osmicexplorer/emacs-helm-ag.git
+        path = emacs-helm-ag
+        url = https://github.com:/cosmicexplorer/emacs-helm-ag.git
         ignore = dirty
         branch = play

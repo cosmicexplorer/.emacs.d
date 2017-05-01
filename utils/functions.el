@@ -1331,37 +1331,57 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 ;;; for initialization
 (defun run-git-updates (submodule-out-buf)
-  (and (zerop
-        (call-process
-         "git" nil submodule-out-buf nil
-         "submodule" "update" "--init" "--recursive"))
-       (zerop
-        (call-process
-         "git" nil submodule-out-buf nil
-         "submodule" "foreach" "git" "checkout" "master"))
-       (zerop
-        (call-process
-         "git" nil submodule-out-buf nil
-         "submodule" "foreach" "git" "pull" "origin"
-         "master"))))
+  (unless (and (zerop
+                (call-process
+                 "git" nil submodule-out-buf nil
+                 "submodule" "init"))
+               (zerop
+                (call-process
+                 "git" nil submodule-out-buf nil
+                 "submodule" "foreach" "git" "checkout" "master"))
+               (zerop
+                (call-process
+                 "git" nil submodule-out-buf nil
+                 "submodule" "foreach" "git" "fetch")))
+    (display-buffer-same-window submodule-out-buf nil)
+    (error "submodule failure: %s"
+           (with-current-buffer
+               submodule-out-buf (buffer-string))))
+  (with-current-buffer submodule-out-buf
+    (erase-buffer)
+    (unless
+        (zerop
+         (call-process
+          "git" nil t nil
+          "submodule" "--quiet" "foreach"
+          "printf \"%s:%s:%s\\n\" $path $(git rev-parse --sq HEAD @{u})"))
+      (display-buffer-same-window submodule-out-buf nil)
+      (error "submodule failure: %s" (buffer-string)))
+    (goto-char (point-min))
+    (cl-loop
+     while (re-search-forward
+            "^\\([^:]*\\):'\\([^']*\\)':'\\([^']*\\)'$"
+            nil t)
+     for (dir sha1 sha2) = (cl-mapcar #'match-string (number-sequence 1 3))
+     collect dir into all-dirs
+     unless (string= sha1 sha2)
+     collect dir into failed
+     finally return (list all-dirs failed))))
 
-(defun actual-setup-submodules (&optional cb)
+(defun actual-setup-submodules ()
   (unless dont-ask-about-git
     (with-internet-connection
      (if (not (executable-find "git"))
          (send-message-to-scratch
           "git not installed! some features will be unavailable.")
-       (let ((git-submodule-buf-name "*git-submodule-errors*")
-             (prev-wd default-directory))
-         (cd init-home-folder-dir)
-         (unwind-protect
-             (let ((submodule-out-buf
-                    (get-buffer-create git-submodule-buf-name)))
-               (unless (run-git-updates submodule-out-buf)
-                 (throw 'submodule-failure "init failed")))
-           (cd prev-wd))
-         (kill-buffer git-submodule-buf-name)))))
-  (when cb (funcall cb)))
+       (let* ((git-submodule-buf-name "*git-submodule-errors*")
+              (default-directory init-home-folder-dir)
+              (submodule-out-buf
+               (get-buffer-create git-submodule-buf-name))
+              (dirs-to-make
+               (run-git-updates submodule-out-buf)))
+         (kill-buffer git-submodule-buf-name)
+         dirs-to-make)))))
 
 (defun make-submod-sentinel (proc ev)
   (if (or (and (stringp ev) (string= ev "finished\n"))
@@ -1374,39 +1394,34 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (throw 'submodule-make-failure ev)))
 
 (defvar submodules-to-make nil)
-(defun make-submodule (folder-name make-cmd onfinish timeout &rest make-args)
-  (add-to-list 'submodules-to-make
-               (list folder-name make-cmd onfinish timeout make-args)))
-(defvar-local process-should-be-killed nil)
-(defun actual-make-submodule (submodule-args)
-  (destructuring-bind (folder-name make-cmd cb timeout make-args) submodule-args
-    (unless (member folder-name submodule-makes-to-ignore)
-      (if (not (executable-find make-cmd))
-          (with-current-buffer "*scratch*"
-            (insert "couldn't find " make-cmd " to build " folder-name "!"))
-        (let ((prev-wd default-directory))
-          (cd (concat init-home-folder-dir folder-name))
-          (let ((proc
-                 (make-process
-                  :name (concat "make-" folder-name)
-                  :buffer (get-buffer-create
-                           (concat "*" folder-name "-make-errors*"))
-                  :command (cons make-cmd make-args)
-                  :sentinel #'make-submod-sentinel)))
-            (when timeout
-              (run-at-time
-               timeout nil
-               (lambda (proc)
-                 (when (process-live-p proc)
-                   (with-current-buffer (process-buffer proc)
-                     (setq process-should-be-killed t))
-                   (delete-process proc)))
-               proc)))
-          (cd prev-wd)
-          (if cb (funcall cb)))))))
-(defun actual-make-all-submodules (&optional cb)
-  (mapcar #'actual-make-submodule submodules-to-make)
-  (if cb (funcall cb)))
+(defun make-submodule (folder-name make-cmd &rest make-args)
+  (add-to-list 'submodules-to-make (list folder-name make-cmd make-args)))
+
+(defun actual-make-submodule (submodule-args dirs-to-make)
+  (destructuring-bind (folder-name make-cmd make-args) submodule-args
+    (cond
+     ((member folder-name submodule-makes-to-ignore) nil)
+     ((not (executable-find make-cmd))
+      (with-current-buffer (get-my-scratch-buffer)
+        (insert "couldn't find " make-cmd " to build " folder-name "!")))
+     ((member folder-name dirs-to-make)
+      (let* ((default-directory
+               (expand-file-name folder-name init-home-folder-dir))
+             (buf (get-buffer-create
+                   (format "*%s-make-errors*" folder-name))))
+        (if (zerop (apply #'call-process
+                          (append (list make-cmd nil buf nil) make-args)))
+            (kill-buffer buf)
+          (display-buffer-same-window buf nil)
+          (error "submodule make failure: %s"
+                 (with-current-buffer buf
+                   (buffer-string)))))))))
+
+(defun actual-make-all-submodules (dirs-to-make)
+  (cl-mapc
+   (lambda (sub)
+     (actual-make-submodule sub dirs-to-make))
+   submodules-to-make))
 
 ;;; TODO: make this work lol
 (defun update-packages-in-list ()
@@ -1556,28 +1571,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (when (null (mark t)) (ding))
     (setq mark-ring (nbutlast mark-ring))
     (goto-char (marker-position (car (last mark-ring))))))
-
-(eval-after-load 'helm
-  '(defun cleanup-helm-buffers ()
-     (interactive)
-     (loop for buf in (buffer-list)
-           do (with-current-buffer buf
-                (when (string-match-p "^\\*[hH]elm[[:space:]\\-]" (buffer-name))
-                  (kill-buffer))))))
-(eval-after-load 'magit
-  '(defun cleanup-magit-buffers ()
-     (interactive)
-     (loop for buf in (buffer-list)
-           do (with-current-buffer buf
-                (when (string-match-p "^magit\\-" (symbol-name major-mode))
-                  (kill-buffer))))))
-(eval-after-load 'dired
-  '(defun cleanup-dired-buffers ()
-     (interactive)
-     (loop for buf in (buffer-list)
-           do (with-current-buffer buf
-                (when (eq major-mode 'dired-mode)
-                  (kill-buffer))))))
 
 (defun kill-buf-and-all-visiting (pfx)
   (interactive "P")
@@ -3556,8 +3549,9 @@ file does not `provide' a feature, then its path can be used instead."
           ,`(eval-after-load ,feat ,next))))
     (_ `(with-eval-after-spec (,feature-spec) ,@body))))
 
-(cl-defmacro expand-insert-macro (&optional (form (sexp-at-point)) full)
-  `(cl-prettyexpand ',form ,full))
+(cl-defun expand-insert-macro (&optional (form (sexp-at-point)) full)
+  (cl-prettyexpand form full))
+
 
 (cl-defmacro with-gensyms (syms &body body)
   (declare (indent 1))

@@ -404,7 +404,8 @@ to clean up.")
            (repeated-versions
             ;; only need one version of all these
             (--mapcat (-drop 1 it) buffer-basename-parted)))
-      (-each repeated-versions #'kill-buffer)))))
+      (-each repeated-versions #'kill-buffer)
+      (setq clean-sample-index 0)))))
 
 (add-hook 'buffer-list-update-hook #'buffer-list-clean-many-versions)
 
@@ -633,14 +634,22 @@ Check out your .emacs.\n")))))
 (setenv "EDITOR" "emacsclient")
 
 ;;; setup submodules and make them
-(add-hook 'after-load-init-hook
-          (lambda ()
-            (actual-setup-submodules
-             (lambda ()
-               (add-to-list
-                'load-path (concat init-home-folder-dir "emacs-color-themes"))
-               (require 'color-theme-danny)))
-            (actual-make-all-submodules)))
+(defun on-load-submodules ()
+  (unwind-protect
+      (cl-destructuring-bind (all-dirs dirs-to-make)
+          (actual-setup-submodules)
+        (actual-make-all-submodules dirs-to-make)
+        (cl-mapc
+         (lambda (dir)
+           (add-to-list
+            'load-path (expand-file-name dir init-home-folder-dir))))
+        (add-to-list 'load-path
+                     (expand-file-name "org-mode/lisp/" init-home-folder-dir))
+        (autoload #'org-element-update-syntax "org-element.el")
+        (autoload #'org-define-error "org-compat.el")
+        (require 'org)
+        (require 'color-theme-danny))))
+(add-hook 'after-load-init-hook #'on-load-submodules)
 
 ;;; ibuffer moves things around when i mark things and this scares me
 (defadvice ibuffer-mark-interactive (after re-recenter activate) (recenter))
@@ -674,14 +683,7 @@ Check out your .emacs.\n")))))
            explicit-shell-file-name)))
     ad-do-it))
 
-(make-submodule
- "org-mode" "make"
- (lambda ()
-   (add-to-list 'load-path (concat init-home-folder-dir "org-mode/lisp/"))
-   (autoload #'org-element-update-syntax "org-element.el")
-   (autoload #'org-define-error "org-compat.el")
-   (require 'org))
- nil)
+(make-submodule "org-mode" "make")
 
 (defadvice eww-follow-link (after revis activate) (refresh-visual-line-mode))
 
@@ -780,22 +782,26 @@ Check out your .emacs.\n")))))
 ;;; char folding
 ;; add minus sign − to equivalence for - (hyphen)
 (require 'char-fold)
-(defvar orig-char-fold-table (let ((tab (make-char-table 'backup)))
-                               (set-char-table-parent tab char-fold-table)
-                               tab))
+(defvar orig-char-fold-table
+  (let ((tab (make-char-table 'backup)))
+    (set-char-table-parent tab char-fold-table)
+    tab))
 
-(defun add-char-fold-chars (base added)
-  (let* ((entry (char-table-range orig-char-fold-table base))
+(cl-defun add-char-fold-chars
+    (range equiv &optional (spread-range t)
+           (target-tbl char-fold-table) (source-tbl target-tbl))
+  (let* ((entry (char-table-range source-tbl range))
          (chars (cl-loop for i from 0 upto (- (length entry) 1)
                          for s = (substring entry i (1+ i))
                          when (string-match-p
-                               (char-fold-to-regexp (char-to-string base))
+                               (char-fold-to-regexp (char-to-string range))
                                s)
                          collect s))
          (opt-reg
           (regexp-opt (append chars (cl-mapcar #'char-to-string added)))))
-    (set-char-table-range orig-char-fold-table base entry)
-    (set-char-table-range char-fold-table base opt-reg)))
+    (set-char-table-range source-tbl range entry)
+    (set-char-table-range target-tbl range opt-reg)))
+
 
 ;;; minus signs
 (defun add-minus-eq-char-folds ()
@@ -811,7 +817,7 @@ Check out your .emacs.\n")))))
           (add-char-fold-chars eq-sym dash-chars)
         (throw 'init-fail "char fold customizations failed!")))))
 
-(add-minus-eq-char-folds)
+;; (add-minus-eq-char-folds)
 ;; FIXME! make smart quotes equiv to quotes
 ;; (add-)
 
