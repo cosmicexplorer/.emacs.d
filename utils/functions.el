@@ -844,9 +844,9 @@ scope of the command's precision.")
 ;;; writing out `lambda' a million times
 (defun o (&rest funs)
   (lambda (&rest args)
-    (reduce 'funcall (cl-rest funs)
-            :from-end t
-            :initial-value (apply (car funs) args))))
+    (cl-reduce 'funcall (cl-rest funs)
+               :from-end t
+               :initial-value (apply (car funs) args))))
 
 (cl-defmacro l (expr)
   (let ((arg (cl-gensym)))
@@ -970,33 +970,35 @@ prompt the user for a coding system."
 (defun buf-info ()
   (list (current-buffer) (buffer-name) (buffer-file-name)))
 
-(cl-defun print-buf-path-on-kill (name fname)
-  (message "killed '%s', at '%s'"
-           name (or fname "<no path>")))
+(cl-defun print-buf-path-on-kill (op name fname)
+  (message "%s '%s', at '%s'"
+           op name (or fname "<no path>")))
 
 (cl-defun no-msg-temp-buffers (name fname)
   (and fname (not (string-match-p temp-buffer-name-regexp name))))
 
 (defvar last-killed-buf nil)
-(defcustom do-message-on-kill #'no-msg-temp-buffers
+(defcustom do-message-on-op #'no-msg-temp-buffers
   "Whether to send a `message' every time a buffer is killed within
-`kill-message-buffer-id'.
+`message-buffer-id'.
 
 Can be a boolean, string, or function. If boolean and non-nil, a message is
 sent. If a string, it uses that as a regex to match against the buffer's
 `buffer-name'; if the match succeeds, the the message is sent. If a function,
-the function is called with a list of three elements: the buffer, its name, and its filename, and a message is sent if the predicate returns non-nil."
+the function is called with a list of three elements: the buffer, its name, and
+its filename, and a message is sent if the predicate returns non-nil."
   :type '(choice boolean regexp function))
 
-(defun kill-message-buffer-id ()
-  (-let* (((buf name fname) (buf-info))
-          (msg do-message-on-kill))
-    (setq last-killed-buf buf)
-    (when (cl-typecase msg
-            (boolean (logify msg))
-            (string (string-match-p msg name))
-            (function (funcall msg name fname)))
-      (print-buf-path-on-kill name fname))))
+(defun message-buffer-id (op)
+  (lambda ()
+    (-let* (((buf name fname) (buf-info))
+            (msg do-message-on-op))
+      (setq last-killed-buf buf)
+      (when (cl-typecase msg
+              (boolean (logify msg))
+              (string (string-match-p msg name))
+              (function (funcall msg name fname)))
+        (print-buf-path-on-kill op name fname)))))
 
 ;;; allow for searchable names of w3m buffers
 ;;; TODO: make this work
@@ -3552,6 +3554,15 @@ file does not `provide' a feature, then its path can be used instead."
            (next (cl-gensym)))
        `(let* ((,feat ,(if (listp ft) ft `',ft))
                (,next (with-eval-after-spec ,others ,@body)))
-          ,`(eval-after-load ,feat ,next))))))
+          ,`(eval-after-load ,feat ,next))))
+    (_ `(with-eval-after-spec (,feature-spec) ,@body))))
+
+(cl-defmacro expand-insert-macro (&optional (form (sexp-at-point)))
+  `(cl-prettyexpand ',form ,full))
+
+(cl-defmacro with-gensyms (syms &body body)
+  (declare (indent 1))
+  `(let ,(cl-loop for s in syms collect `(,s (cl-gensym)))
+    ,@body))
 
 (provide 'functions)

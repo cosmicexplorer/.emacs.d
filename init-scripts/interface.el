@@ -334,6 +334,8 @@ lowercase, and Initial Caps versions."
                  (format "help(%s)" x)))))
     (rename-buffer name t)))
 
+(add-hook 'help-mode-hook #'help-rename-buffer)
+
 (defun info-rename-buffer ()
   (when-let ((file Info-current-file)
              (node Info-current-node))
@@ -384,18 +386,6 @@ lowercase, and Initial Caps versions."
 (defadvice help-buffer (around use-prev activate)
   (setq ad-return-value prev-help-buf))
 
-(defvar set-watched-help-buf nil)
-(defvar watched-help-buf nil)
-
-(defun buffer-list-update-watcher ()
-  (let ((top (car (buffer-list))))
-    (when (and set-watched-help-buf
-               (not (eq top set-watched-help-buf)))
-      (setq set-watched-help-buf nil
-            watched-help-buf top))))
-
-(add-hook 'buffer-list-update-hook #'buffer-list-update-watcher)
-
 (defcustom clean-sampling-period 20
   "Number of times `buffer-list-clean-many-versions' will skip before attempting
 to clean up.")
@@ -418,6 +408,18 @@ to clean up.")
 
 (add-hook 'buffer-list-update-hook #'buffer-list-clean-many-versions)
 
+(defvar set-watched-help-buf nil)
+(defvar watched-help-buf nil)
+
+(defun buffer-list-update-watcher ()
+  (let ((top (car (buffer-list))))
+    (when (and set-watched-help-buf
+               (not (eq top set-watched-help-buf)))
+      (setq set-watched-help-buf nil
+            watched-help-buf top))))
+
+(add-hook 'buffer-list-update-hook #'buffer-list-update-watcher)
+
 (defun help-do-button (pos &optional pfx)
   (interactive (list (point) current-prefix-arg))
   (let ((prefix-arg nil))
@@ -427,8 +429,6 @@ to clean up.")
   (if pfx (pop-to-buffer watched-help-buf)
     (display-buffer-same-window watched-help-buf nil))
   (setq watched-help-buf nil))
-
-(add-hook 'help-mode-hook #'help-rename-buffer)
 
 (defun make-new-help (help-fn)
   (lambda ()
@@ -618,7 +618,8 @@ Check out your .emacs.\n")))))
     (set-window-configuration prev-win-conf)))
 
 ;;; see what i just killed
-(add-hook 'kill-buffer-hook #'kill-message-buffer-id)
+(add-hook 'find-file-hook (message-buffer-id "found"))
+(add-hook 'kill-buffer-hook (message-buffer-id "killed"))
 
 ;;; don't like seeing wraparound
 (add-hook 'text-mode-hook #'visual-line-mode)
@@ -809,7 +810,10 @@ Check out your .emacs.\n")))))
            (dash-chars (append (match-string 1 dash-fold) nil)))
           (add-char-fold-chars eq-sym dash-chars)
         (throw 'init-fail "char fold customizations failed!")))))
+
 (add-minus-eq-char-folds)
+;; FIXME! make smart quotes equiv to quotes
+;; (add-)
 
 (with-eval-after-load 'misearch
   (remove-hook 'isearch-mode-hook #'multi-isearch-setup))
