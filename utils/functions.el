@@ -3125,13 +3125,15 @@ at the end of the buffer."
           (push-mark start-pt))))
     (save-excursion
       (save-window-excursion
-        (let ((prefix-arg
-               (pcase pfx-spec
-                 (`same other)
-                 (`invert (not other))
-                 (`t t)
-                 (`nil nil)
-                 (_ (user-error "invalid pfx-spec '%s'" pfx-spec)))))
+        (let* ((prefix-arg
+                (pcase pfx-spec
+                  (`same other)
+                  (`invert (not other))
+                  (`t t)
+                  (`nil nil)
+                  (_ (user-error "invalid pfx-spec '%s'" pfx-spec))))
+               ;; should only have to do one, but oh well
+               (current-prefix-arg prefix-arg))
           (call-interactively fn))
         (setq final-buf (current-buffer)
               win-pt (window-point)
