@@ -11,6 +11,30 @@
 ;;; 3. C-Spc to start selection (set mark) in terminal!
 ;;; 4. remember that M-= gets word counts!
 
+(defvar prev-keymaps nil)
+
+(defun set-keys-helper (map kill assign)
+  (when (symbolp map) (setq map (symbol-value map)))
+  (cl-assert (and (keymapp map) (listp kill) (listp assign)) t)
+  (cl-loop for to-kill in kill
+           do (cl-assert (stringp to-kill) t)
+           do (define-key map (kbd to-kill) nil))
+  (cl-loop for (key cmd) in assign
+           do (cl-assert (and (stringp key) (commandp cmd)) t)
+           do (define-key map (kbd key) cmd)))
+
+(defun set-keys-in (keys-alist)
+  (cl-assert (and keys-alist (listp keys-alist)) t)
+  (cl-destructuring-bind (ft &rest others) keys-alist
+    (cl-destructuring-bind (&key load map kill assign) ft
+      (cl-assert (and (not (null load))
+                      (listp kill)
+                      (listp assign)) t)
+      (let* ((cur `(set-keys-helper ,map ',kill ',assign)))
+        (eval-after-load load
+          (if others `(progn ,cur (set-keys-in others))
+            cur))))))
+
 ;;; globally usable basic text insertion or command-running shortcuts
 (global-set-key (kbd "C-M-;") #'newline-and-comment)
 (global-set-key (kbd "C-x d") #'dired)
@@ -203,13 +227,13 @@
   (define-key css-mode-map (kbd "C-<tab>") #'web-beautify-css))
 
 ;;; CPerl-mode
-(add-hook 'cperl-mode-hook
-          (lambda ()
-            (define-key cperl-mode-map (kbd "C-c C-k") nil)
-            (define-key cperl-mode-map (kbd "C-h f") #'cperl-perldoc)
-            (define-key cperl-mode-map (kbd "C-c C-w") nil)
-            (define-key cperl-mode-map (kbd "C-c C-v") nil)
-            (define-key cperl-mode-map (kbd "C-c <tab>") #'cperl-linefeed)))
+(defconst cperl-keys-alist
+  '((:load cperl-mode
+     :map cperl-mode-map
+     :kill ("C-c C-k" "C-c C-w" "C-c C-v")
+     :assign (("C-h f" cperl-perldoc)
+              ("C-c <tab>" cperl-linefeed)))))
+(set-keys-in cperl-keys-alist)
 
 (define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
 (define-key emacs-lisp-mode-map (kbd "C-M-x") #'eval-buffer-and-message)
@@ -435,7 +459,8 @@
   (define-key markdown-mode-map (kbd "C-c C-b") #'rmd-export-pdf))
 
 (with-eval-after-spec grep
-  (define-key grep-mode-map (kbd "G") #'refind-or-grep))
+  (define-key grep-mode-map (kbd "G") #'refind-or-grep)
+  (define-key grep-mode-map (kbd "k") #'kill-grep))
 
 ;;; help/info/etc
 ;;; TODO: add option to split current window instead of poppping to new!
@@ -604,9 +629,8 @@
 ;;; LOL MAIL
 (global-set-key (kbd "C-x m") nil)
 
-(eval-after-load 'literate-coffee-mode
-  '(define-key litcoffee-mode-map (kbd "C-c C-v")
-     #'litcoffee-toggle-code-prose))
+(with-eval-after-spec literate-coffee-mode
+  (define-key litcoffee-mode-map (kbd "C-c C-v") #'litcoffee-toggle-code-prose))
 
 ;;; haskell
 (defconst hoogle-base-url "https://www.haskell.org/hoogle/")
