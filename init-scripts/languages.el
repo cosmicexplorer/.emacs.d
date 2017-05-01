@@ -128,12 +128,12 @@
   (car
    (let ((cperl-message-on-help-error nil))
      (cperl-get-help))))
-(add-hook
- 'cperl-mode-hook
- (lambda ()
-   (turn-on-eldoc-mode)
-   (set (make-local-variable 'eldoc-documentation-function)
-        'my-cperl-eldoc-documentation-function)))
+(defun setup-cperl-mode ()
+  (turn-on-eldoc-mode)
+  (set (make-local-variable 'eldoc-documentation-function)
+       'my-cperl-eldoc-documentation-function)
+  (electric-pair-mode 1))
+(add-hook 'cperl-mode-hook #'setup-cperl-mode)
 
 ;;; yes, this perl re.pl business is a massive hack. i claim none of it would be
 ;;; required if re.pl wasn't also a massive hack (who doesn't put newlines after
