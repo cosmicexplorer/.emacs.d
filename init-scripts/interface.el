@@ -642,7 +642,8 @@ Check out your .emacs.\n")))))
         (cl-mapc
          (lambda (dir)
            (add-to-list
-            'load-path (expand-file-name dir init-home-folder-dir))))
+            'load-path (expand-file-name dir init-home-folder-dir)))
+         all-dirs)
         (add-to-list 'load-path
                      (expand-file-name "org-mode/lisp/" init-home-folder-dir))
         (autoload #'org-element-update-syntax "org-element.el")

@@ -1383,16 +1383,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
          (kill-buffer git-submodule-buf-name)
          dirs-to-make)))))
 
-(defun make-submod-sentinel (proc ev)
-  (if (or (and (stringp ev) (string= ev "finished\n"))
-          (and (with-current-buffer (process-buffer proc)
-                 process-should-be-killed)
-               (not (process-live-p proc))))
-      (kill-buffer (process-buffer proc))
-    (when (process-live-p proc) (kill-process proc))
-    (switch-to-buffer (process-buffer proc))
-    (throw 'submodule-make-failure ev)))
-
 (defvar submodules-to-make nil)
 (defun make-submodule (folder-name make-cmd &rest make-args)
   (add-to-list 'submodules-to-make (list folder-name make-cmd make-args)))
