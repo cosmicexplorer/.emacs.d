@@ -2881,6 +2881,15 @@ misbehave (e.g. `helm')."
   (let ((current-prefix-arg nil))
     (delete-other-windows)))
 
+(cl-defun make-keymap-from-bindings (alist &key compose parent)
+  (let ((m (make-sparse-keymap)))
+    (cl-loop for (key-seq . binding) in alist
+             for key = (cl-typecase key-seq
+                         (string (kbd key-seq))
+                         (otherwise key-seq))
+             do (define-key m key binding)
+             finally return (make-composed-keymap (cons m compose) parent))))
+
 (defcustom set-mark-end-delay 0.5
   "Delay for `set-mark-end-process-output-mode' to process with an idle timer."
   :type 'float)
@@ -3419,15 +3428,6 @@ If this list is empty, the value of `my-loc-lib-result-fun' is called."
   (setq my-loc-lib-choose-on-exit pfx)
   (let ((prefix-arg nil))
     (funcall-interactively #'minibuffer-complete-and-exit)))
-
-(cl-defun make-keymap-from-bindings (alist &key compose parent)
-  (let ((m (make-sparse-keymap)))
-    (cl-loop for (key-seq . binding) in alist
-             for key = (cl-typecase key-seq
-                         (string (kbd key-seq))
-                         (otherwise key-seq))
-             do (define-key m key binding)
-             finally return (make-composed-keymap (cons m compose) parent))))
 
 (defconst my-loc-lib-keymap
   (make-keymap-from-bindings
