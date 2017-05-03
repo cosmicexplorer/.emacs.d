@@ -788,8 +788,8 @@ scope of the command's precision.")
   `(("visit" . find-file-noselect)))
 
 (defcustom saved-files-no-read-regexps
-  (list (rx bos (eval (expand-file-name saved-files)) eos))
-  "Regexps matching files not to load in `reread-visited-files-from-disk'."
+  (list (rx bos (eval (expand-file-name saved-files))))
+  "Regexps matching file paths not to load in `reread-visited-files-from-disk'."
   :type `(repeat string))
 
 (cl-defun pos-in-bounds (&optional (buf (current-buffer)) (pos (point)))
@@ -2184,10 +2184,6 @@ by another percent."
      (list (concat grep-cmd " " (mapconcat #'shell-quote-argument files " ")))))
   (grep cmd))
 
-(defun test-fun (a)
-  (interactive (list current-prefix-arg))
-  (message "%S" a))
-
 (defun clean-certain-buffers (reg)
   (interactive
    (list
@@ -2886,36 +2882,53 @@ misbehave (e.g. `helm')."
     (delete-other-windows)))
 
 (defcustom set-mark-end-delay 0.5
-  "Delay for `set-mark-end-process-output-mode' to process with an idle timer.")
+  "Delay for `set-mark-end-process-output-mode' to process with an idle timer."
+  :type 'float)
+(defcustom set-mark-end-quiet nil
+  "Whether to message when changing the value of `set-mark-end-do-set'."
+  :type 'boolean)
 (defvar-local set-mark-end-do-set nil)
 (defvar-local set-mark-end-idle-timer nil)
 (defvar-local set-mark-end-process-output-mode nil)
-(defun set-mark-end-when-at-end ()
-  (with-temp-message ""
-    (when set-mark-end-do-set
-      (let ((inhibit-message t))
-        (call-interactively #'end-of-buffer)
-        (redisplay)))))
-(defun set-mark-end-set-do-set ()
-  (interactive)
-  (call-interactively #'end-of-buffer)
-  (setq set-mark-end-do-set t))
+(defun set-mark-end-flag (val)
+  (setq set-mark-end-do-set val)
+  (unless set-mark-end-quiet
+    (message "flag `%s' set to '%S'"
+             'set-mark-end-do-set set-mark-end-do-set)))
+(defun set-mark-end-move (pt)
+  (goto-char pt)
+  (when (get-buffer-window nil t)
+    (redisplay)))
+(defun set-mark-end-when-on ()
+  (when set-mark-end-do-set
+    (set-mark-end-move (point-max))))
+(defun set-mark-end-eob (&optional pfx)
+  (interactive "P")
+  (set-mark-end-flag t)
+  (unless pfx
+    (set-mark-end-move (point-max))))
+(defun set-mark-end-bob (&optional pfx)
+  (interactive "P")
+  (set-mark-end-flag nil)
+  (unless pfx
+    (set-mark-end-move (point-min))))
 (defun set-mark-end-unset-do-set ()
   (interactive)
-  (call-interactively #'beginning-of-buffer)
-  (setq set-mark-end-do-set nil))
+  (set-mark-end-flag nil))
+(defconst set-mark-end-keymap
+  (make-keymap-from-bindings
+   '(([remap end-of-buffer] . set-mark-end-eob)
+     ("C-x C-x" . set-mark-end-unset-do-set)
+     ([remap beginning-of-buffer] . set-mark-end-bob))))
 (define-minor-mode set-mark-end-process-output-mode
   "Set point and mark to the end of the buffer every half a second, if already
 at the end of the buffer."
   :lighter "M->"
-  :keymap (let ((map (make-sparse-keymap)))
-            (define-key map (kbd "M->") #'set-mark-end-set-do-set)
-            (define-key map (kbd "M-<") #'set-mark-end-unset-do-set)
-            map)
+  :keymap set-mark-end-keymap
   (if set-mark-end-process-output-mode
       (setq set-mark-end-idle-timer
             (run-with-idle-timer
-             set-mark-end-delay t #'set-mark-end-when-at-end))
+             set-mark-end-delay t #'set-mark-end-when-on))
     (cancel-timer set-mark-end-idle-timer)
     (setq set-mark-end-idle-timer nil)))
 
@@ -3409,7 +3422,10 @@ If this list is empty, the value of `my-loc-lib-result-fun' is called."
 
 (cl-defun make-keymap-from-bindings (alist &key compose parent)
   (let ((m (make-sparse-keymap)))
-    (cl-loop for (key . binding) in alist
+    (cl-loop for (key-seq . binding) in alist
+             for key = (cl-typecase key-seq
+                         (string (kbd key-seq))
+                         (otherwise key-seq))
              do (define-key m key binding)
              finally return (make-composed-keymap (cons m compose) parent))))
 
@@ -3547,5 +3563,15 @@ file does not `provide' a feature, then its path can be used instead."
   (declare (indent 1))
   `(let ,(cl-loop for s in syms collect `(,s (cl-gensym)))
     ,@body))
+(defun add-transient-keys (keys-or-map)
+  (let ((new-map
+         (make-composed-keymap
+          (pcase keys-or-map
+            ((pred keymapp) keys-or-map)
+            ((pred symbolp) (symbol-value keys-or-map))
+            ((pred listp)
+             (make-keymap-from-bindings keys-or-map))))))
+    (set-transient-map
+     new-map t (lambda () (message "unset")))))
 
 (provide 'functions)
