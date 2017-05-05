@@ -3629,6 +3629,57 @@ with the symbol `'no-match'."
                   ,regexp ,str ,first-only ,split-alist ,omit-nulls)))
          ,if-true
        ,@if-false)))
+(defconst make-stage-empty-symbol 'empty
+  "Used in `make-stage-for-lists' to signify that a list has ended.")
+
+(defun make-stage-fill-value (val cars cdrs)
+  (cl-loop for car in cars
+           for cdr in cdrs
+           if (eq cdr make-stage-empty-symbol)
+           collect val into new-cars
+           and collect nil into new-cdrs
+           else
+           collect car into new-cars
+           and collect cdr into new-cdrs
+           finally return (list new-cars new-cdrs)))
+
+(defun make-stage-for-lists (fill lists)
+  (-let* (((stage &as cars cdrs)
+           (cl-loop for list in lists
+                    if (consp list)
+                    collect (car list) into cars
+                    and collect (cdr list) into cdrs
+                    else
+                    collect nil into cars
+                    and collect make-stage-empty-symbol into cdrs
+                    finally return (list cars cdrs))))
+    (if (cl-every (l (eq _ make-stage-empty-symbol)) cdrs)
+        stage
+      (pcase-exhaustive fill
+        ('nil stage)
+        (`(value ,val)
+         (make-stage-fill-value val cars cdrs))
+        ((and (pred functionp) fn)
+         (list (funcall fn cars cdrs)
+               (cl-substitute nil make-stage-empty-symbol cdrs :test #'eq)))))))
+
+;; TODO: macro to make tiny let forms less annoying and push
+;; indentation in a little less
+(defun zip-safe (fill &rest lists)
+  (declare (indent 1))
+  (cl-loop
+   for (cars cdrs) = (make-stage-for-lists fill lists)
+   then (make-stage-for-lists fill cdrs)
+   if (cl-find make-stage-empty-symbol cdrs :test #'eq)
+   return stages
+   else
+   collect cars into stages
+   end
+   finally return stages))
+
+(defun unzip-list (list &optional fill)
+  (apply (apply-partially #'zip-safe fill) list))
+
 (defun iterate-from (init fn n)
   (cl-loop for i upto n
            for res = init then (funcall fn res)
