@@ -28,6 +28,7 @@
   (cl-destructuring-bind (ft &rest others) keys-alist
     (cl-destructuring-bind (&key load map kill assign) ft
       (cl-assert (and (not (null load))
+                      (symbolp load)
                       (listp kill)
                       (listp assign)) t)
       (let* ((cur `(set-keys-helper ,map ',kill ',assign)))
@@ -219,11 +220,11 @@
   (add-keybinding-to-mode-maps
    "RET" #'js-newline-indent-for-real js-mode-maps))
 
-(with-eval-after-spec (skewer-mode)
-  (define-key js2-mode-map (kbd "C-M-x") #'skewer-eval-buffer-or-region))
+(with-eval-after-spec skewer-mode
+  (define-key skewer-mode-map (kbd "C-M-x") #'skewer-eval-buffer-or-region))
 
 ;;; css
-(with-eval-after-spec (css-mode)
+(with-eval-after-spec css-mode
   (define-key css-mode-map (kbd "C-<tab>") #'web-beautify-css))
 
 ;;; CPerl-mode
@@ -245,15 +246,15 @@
 (define-key emacs-lisp-mode-map (kbd "C-M-d") #'eval-defun)
 (define-key paredit-mode-map (kbd "C-M-d") nil)
 (with-eval-after-spec edebug
+  ;; TODO
+  ;; (define-key edebug-mode-map (kbd "e") #'my-edebug-eval-nicely)
   (define-key emacs-lisp-mode-map (kbd "C-S-d") #'edebug-defun)
-  (define-key edebug-mode-map (kbd "e")))
-(define-key paredit-mode-map (kbd "C-S-d") nil)
-
-
+  (define-key paredit-mode-map (kbd "C-S-d") nil))
+(require 'edebug)
 
 ;;; lisp
 ;;; so it's all emacsy
-(with-eval-after-spec (slime)
+(with-eval-after-spec slime
   (add-hook 'slime-repl-mode-hook #'enable-paredit-mode)
   (define-key lisp-mode-map (kbd "C-h f") 'slime-documentation)
   (define-key lisp-mode-map (kbd "C-h v") 'slime-documentation)
@@ -265,7 +266,7 @@
       #'mc/mark-next-like-this)))
 
 ;;; makefile
-(with-eval-after-spec (make-mode)
+(with-eval-after-spec make-mode
   (define-key makefile-gmake-mode-map (kbd "M-n") nil)
   (define-key makefile-gmake-mode-map (kbd "M-p") nil))
 
@@ -543,7 +544,7 @@
                    (set-window-buffer win buf)
                    (set-window-point win (point-min)))))))
 
-(with-eval-after-spec (help)
+(with-eval-after-spec help
   (define-key help-mode-map [remap push-button] #'help-do-button))
 
 ;;; now for c
@@ -820,7 +821,7 @@
 ;;; this is annoying
 (global-set-key (kbd "C-x C-x") nil)
 
-(with-eval-after-spec (ess)
+(with-eval-after-spec ess
   (define-key ess-mode-map (kbd "C-c C-v") nil)
   (define-key ess-mode-map (kbd "C-x C-e") #'ess-eval-paragraph)
   (define-key ess-mode-map (kbd "C-h f") #'ess-display-help-on-object)
@@ -843,7 +844,7 @@
 (global-set-key (kbd "C-S-h v") #'describe-variable)
 (global-set-key (kbd "C-S-h d") #'describe-function-or-variable)
 
-(with-eval-after-spec (helm)
+(with-eval-after-spec helm
   (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)
   (define-key helm-map (kbd "C-z") nil)
   (define-key helm-map (kbd "C-k") nil)
@@ -889,7 +890,7 @@
 
 (global-set-key (kbd "M-RET") #'newline-continue-comment)
 
-(with-eval-after-spec (cc-mode)
+(with-eval-after-spec cc-mode
   (define-key c-mode-base-map (kbd "C-c C-a") nil)
   (define-key c-mode-base-map (kbd "C-c C-r") nil)
   (define-key c-mode-base-map (kbd "C-M-;") #'newline-and-comment))

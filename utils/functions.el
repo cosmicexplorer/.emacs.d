@@ -5,6 +5,22 @@
 
 (require 'utilities)
 
+(cl-defmacro once-only ((&rest names) form)
+  (declare (indent 1))
+  (if (not names) form
+    (let ((gensyms (--map (cl-gensym) names)))
+      `(let (,@(--map `(,it (cl-gensym)) gensyms))
+         `(let (,@(list ,@(-map (-lambda ((g n)) `(list ,g ,n))
+                                (zip-safe nil gensyms names))))
+            ,(let (,@(-map (-lambda ((n g)) `(,n ,g))
+                           (zip-safe nil names gensyms)))
+               ,form))))))
+
+(cl-defmacro with-gensyms ((&rest syms) &rest body)
+  (declare (indent 1))
+  `(let ,(--map `(,it (cl-gensym)) syms)
+     ,@body))
+
 (defun send-message-to-scratch (&rest msg-args)
   (with-current-buffer (get-buffer-create "*scratch*")
     (goto-char (point-max))
