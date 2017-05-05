@@ -3586,44 +3586,106 @@ can be used instead."
       it
       ,@clauses)))
 
-(defun get-rx-match (regexp str &optional first-only split-alist omit-nulls)
-  (let* ((matches (s-match-strings-all regexp str))
-         (on-split
-          (if (not split-alist) matches
-            (--map
-             (-map-indexed
-              (lambda (i s)
-                (a-cl-typecase ((assoc-default i split-alist) t)
-                  (regexp (s-split it s omit-nulls))
-                  (null s)))
-              it)
-             matches)))
-         (processed
-          (--map
-           (--map
-            (or it 'no-match)
-            it)
-           on-split)))
-    (if first-only (car processed) processed)))
+(defun get-rx-match-all (regexp str groups)
+  (and (string-match regexp str)
+       (cl-mapcar (l (match-string _ str)) groups)))
 
-(cl-defmacro if-rx-match
-    ((regexp (&rest names) str &key (first-only t) split-alist (omit-nulls t))
-     if-true &rest if-false)
+(defconst rx-match-no-match-sym 'no-match
+  "Used in `get-rx-match' to indicate no matches were found.")
+
+(defun get-rx-match (regexp str groups)
+  (let ((matches (get-rx-match-all regexp str groups)))
+    (--map
+     (or it rx-match-no-match-sym)
+     matches)))
+
+(cl-defmacro if-rx-match (regexp (&rest names) str if-true &rest if-false)
   "Match REGEXP against STR. If match succeeds, bind NAMES to the matched groups
 and evaluate IF-TRUE. Evaluate IF-FALSE (implicit progn) if match fails.
 
 Notes:
 - Group 0 is included in matches! Use the underscore `_' to avoid
-binding a name.
-- If a match result is empty and OMIT-NULLS is `t', it is replaced
-with the symbol `'no-match'."
-  (declare (indent 2))
-  (once-only (regexp str first-only split-alist omit-nulls)
+binding a name."
+  (declare (indent 4))
+  (once-only (regexp str)
     `(-if-let* (((,@names)
                  (get-rx-match
-                  ,regexp ,str ,first-only ,split-alist ,omit-nulls)))
+                  ,regexp ,str ',(range 0 (1- (length names))))))
          ,if-true
        ,@if-false)))
+
+(cl-defun list-fmt (fmt args)
+  (declare (indent 2))
+  (--tree-map
+   (cl-typecase it
+     (symbol
+      (if-rx-match list-fmt-special-vars-regexp
+          (_ idx-s suffix) (symbol-name it)
+          (let* ((idx (unless (string-empty-p idx-s)
+                        (cl-parse-integer idx-s)))
+                 (arg (when (wholenump idx)
+                        (if (< idx (length args))
+                            (nth idx args)
+                          (user-error
+                           "argument at index %d was not provided" idx)))))
+            (pcase suffix
+              (`no-match arg)
+              ((pred stringp)
+               (let* ((sym (intern-soft
+                            (replace-regexp-in-string "\\`%" "" suffix)))
+                      (res (assoc-default sym list-fmt-suffix-actions-alist))
+                      (pred (plist-get res :pred))
+                      (fun (plist-get res :fun)))
+                 (when (and pred (not (funcall pred arg)))
+                   (user-error
+                    "suffix '%s' cannot be used on argument %d: '%S'"
+                    suffix idx arg))
+                 (funcall fun arg)))
+              (_ (user-error "suffix '%s' could not be parsed" suffix))))
+        it))
+     (otherwise it))
+   fmt))
+
+;; TODO: this!
+;; (cl-defun pcase-opt-transform (spec &rest others)
+;;   (let ((after (and others (apply #'pcase-opt-transform others))))
+;;     (pcase spec
+;;       ;; literal
+;;       ((pred symbolp) (list 'quote spec))
+;;       (`('\, ,(and (pred symbolp) sym) .
+;;          ,(or `(,init . ,(or `(,(and (pred symbolp) svar) . ,_)
+;;                              (let svar nil)))
+;;               (let init nil)))
+;;        `(or `('\, ,sym . ))))))
+
+;; TODO: this!
+;; (pcase-defmacro \? (&rest specs)
+;;   ""
+;;   (pcase specs
+;;     ((pred null))
+;;     (`(,ft) `(or ,()))))
+
+;; (defun pcase-plist-sym-transform (sym)
+;;   (let* ((name (symbol-name it)))
+;;     (list (make-symbol (replace-regexp-in-string "\\`:" ":" name))
+;;           (make-symbol (replace-regexp-in-string "\\`:" "" name)))))
+
+;; (defun pcase-plist-match (spec)
+;;   (pcase spec
+;;     ((pred symbolp)
+;;      (pcase-plist-match (pcase-plist-sym-transform spec)))
+;;     (`(,keyw ,var . ,(or `(,initform ,svar))))))
+
+;; TODO: this!
+;; (pcase-defmacro \: (&rest args)
+;;   ""
+;;   (let ((clauses
+;;          (--map (pcase it
+;;                   ((pred symbolp)
+;;                    `(let )))
+;;                 args))))
+;;   `(and ,@((let ))))
+
 (defconst make-stage-empty-symbol 'empty
   "Used in `make-stage-for-lists' to signify that a list has ended.")
 
@@ -3672,7 +3734,7 @@ with the symbol `'no-match'."
    end
    finally return stages))
 
-(defun unzip-list (list &optional fill)
+(defun unzip-list (fill list)
   (apply (apply-partially #'zip-safe fill) list))
 
 (defun iterate-from (init fn n)

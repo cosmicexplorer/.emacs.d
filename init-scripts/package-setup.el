@@ -35,8 +35,6 @@
 ;;; because it's not detecting this variable correctly on windows fsr
 (setq ess-lisp-directory (concat init-home-folder-dir "ESS/lisp"))
 
-(make-submodule "ESS" "make")
-
 ;;; now let's load it
 (when (file-directory-p (concat init-home-folder-dir "/ESS/lisp"))
   (add-to-list 'load-path (concat init-home-folder-dir "/ESS/lisp"))
