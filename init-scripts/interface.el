@@ -634,23 +634,21 @@ Check out your .emacs.\n")))))
 (setenv "EDITOR" "emacsclient")
 
 ;;; setup submodules and make them
-(defun on-load-submodules ()
-  (unwind-protect
-      (cl-destructuring-bind (all-dirs dirs-to-make)
-          (actual-setup-submodules)
-        (actual-make-all-submodules dirs-to-make)
-        (cl-mapc
-         (lambda (dir)
-           (add-to-list
-            'load-path (expand-file-name dir init-home-folder-dir)))
-         all-dirs)
-        (add-to-list 'load-path
-                     (expand-file-name "org-mode/lisp/" init-home-folder-dir))
-        (autoload #'org-element-update-syntax "org-element.el")
-        (autoload #'org-define-error "org-compat.el")
-        (require 'org)
-        (require 'color-theme-danny))))
-(add-hook 'after-load-init-hook #'on-load-submodules)
+(defun setup-submodules-load ()
+  (let ((all-dirs (actual-setup-submodules)))
+    (cl-mapc
+     (lambda (dir)
+       (add-to-list
+        'load-path (expand-file-name dir init-home-folder-dir)))
+     all-dirs)
+    (add-to-list 'load-path
+                 (expand-file-name "org-mode/lisp/" init-home-folder-dir))
+    (autoload #'org-element-update-syntax "org-element.el")
+    (autoload #'org-define-error "org-compat.el")
+    (require 'org)
+    (require 'color-theme-danny)))
+
+(add-hook 'after-load-init-hook #'setup-submodules-load)
 
 ;;; ibuffer moves things around when i mark things and this scares me
 (defadvice ibuffer-mark-interactive (after re-recenter activate) (recenter))
@@ -683,8 +681,6 @@ Check out your .emacs.\n")))))
          (if (string-match-p "^/ssh:" default-directory) "/bin/bash"
            explicit-shell-file-name)))
     ad-do-it))
-
-(make-submodule "org-mode" "make")
 
 (defadvice eww-follow-link (after revis activate) (refresh-visual-line-mode))
 

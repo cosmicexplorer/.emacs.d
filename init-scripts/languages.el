@@ -344,11 +344,6 @@
   (insert "()")
   (backward-char))
 
-
-(make-submodule
- "OmniSharpServer"
- (if (eq system-type 'windows-nt) "msbuild.exe" "xbuild"))
-
 (eval-after-load 'csharp-mode
   '(progn
      (c-add-style "csharp-mode-style" csharp-cc-style)

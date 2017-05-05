@@ -1361,42 +1361,50 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 ;;; for initialization
 (defun run-git-updates (submodule-out-buf)
-  (unless (and (zerop
-                (call-process
-                 "git" nil submodule-out-buf nil
-                 "submodule" "init"))
-               (zerop
-                (call-process
-                 "git" nil submodule-out-buf nil
-                 "submodule" "foreach" "git" "checkout" "master"))
-               (zerop
-                (call-process
-                 "git" nil submodule-out-buf nil
-                 "submodule" "foreach" "git" "fetch")))
-    (display-buffer-same-window submodule-out-buf nil)
-    (error "submodule failure: %s"
-           (with-current-buffer
-               submodule-out-buf (buffer-string))))
-  (with-current-buffer submodule-out-buf
-    (erase-buffer)
-    (unless
-        (zerop
-         (call-process
-          "git" nil t nil
-          "submodule" "--quiet" "foreach"
-          "printf \"%s:%s:%s\\n\" $path $(git rev-parse --sq HEAD @{u})"))
+  (or (and (zerop
+            (call-process
+             "git" nil submodule-out-buf nil
+             "submodule" "init"))
+           (zerop
+            (call-process
+             "git" nil submodule-out-buf nil
+             "submodule" "foreach" "git" "checkout" "master"))
+           (zerop
+            (call-process
+             "git" nil submodule-out-buf nil
+             "submodule" "foreach" "git" "fetch"))
+           (progn
+             (with-current-buffer submodule-out-buf
+               (erase-buffer))
+             (zerop
+              (call-process
+               "git" nil submodule-out-buf nil
+               "submodule" "--quiet" "foreach"
+               "printf \"%s:%s:%s\\n\" $path $(git rev-parse --sq HEAD @{u})")))
+           (-let* (((all-dirs failed)
+                    (with-current-buffer submodule-out-buf
+                      (goto-char (point-min))
+                      (cl-loop
+                       while (re-search-forward
+                              "^\\([^:]*\\):'\\([^']*\\)':'\\([^']*\\)'$"
+                              nil t)
+                       for (dir sha1 sha2) = (-map #'match-string (range 1 3))
+                       collect dir into all-dirs
+                       unless (string= sha1 sha2)
+                       collect dir into failed
+                       finally return (list all-dirs failed)))))
+             (and
+              (cl-every
+               (lambda (dir)
+                 (let ((default-directory (expand-file-name dir)))
+                   (zerop
+                    (call-process
+                     "git" nil submodule-out-buf nil
+                     "pull" "origin" "master"))))
+               failed)
+              (list all-dirs failed))))
       (display-buffer-same-window submodule-out-buf nil)
-      (error "submodule failure: %s" (buffer-string)))
-    (goto-char (point-min))
-    (cl-loop
-     while (re-search-forward
-            "^\\([^:]*\\):'\\([^']*\\)':'\\([^']*\\)'$"
-            nil t)
-     for (dir sha1 sha2) = (cl-mapcar #'match-string (number-sequence 1 3))
-     collect dir into all-dirs
-     unless (string= sha1 sha2)
-     collect dir into failed
-     finally return (list all-dirs failed))))
+      (error "submodule failure: %s" (buffer-string))))
 
 (defun actual-setup-submodules ()
   (unless dont-ask-about-git
@@ -1404,44 +1412,16 @@ way I prefer, and regards `comment-padding', unlike the standard version."
      (if (not (executable-find "git"))
          (send-message-to-scratch
           "git not installed! some features will be unavailable.")
-       (let* ((git-submodule-buf-name "*git-submodule-errors*")
-              (default-directory init-home-folder-dir)
-              (submodule-out-buf
-               (get-buffer-create git-submodule-buf-name))
-              (dirs-to-make
-               (run-git-updates submodule-out-buf)))
-         (kill-buffer git-submodule-buf-name)
-         dirs-to-make)))))
-
-(defvar submodules-to-make nil)
-(defun make-submodule (folder-name make-cmd &rest make-args)
-  (add-to-list 'submodules-to-make (list folder-name make-cmd make-args)))
-
-(defun actual-make-submodule (submodule-args dirs-to-make)
-  (destructuring-bind (folder-name make-cmd make-args) submodule-args
-    (cond
-     ((member folder-name submodule-makes-to-ignore) nil)
-     ((not (executable-find make-cmd))
-      (with-current-buffer (get-my-scratch-buffer)
-        (insert "couldn't find " make-cmd " to build " folder-name "!")))
-     ((member folder-name dirs-to-make)
-      (let* ((default-directory
-               (expand-file-name folder-name init-home-folder-dir))
-             (buf (get-buffer-create
-                   (format "*%s-make-errors*" folder-name))))
-        (if (zerop (apply #'call-process
-                          (append (list make-cmd nil buf nil) make-args)))
-            (kill-buffer buf)
-          (display-buffer-same-window buf nil)
-          (error "submodule make failure: %s"
-                 (with-current-buffer buf
-                   (buffer-string)))))))))
-
-(defun actual-make-all-submodules (dirs-to-make)
-  (cl-mapc
-   (lambda (sub)
-     (actual-make-submodule sub dirs-to-make))
-   submodules-to-make))
+       (-let* ((git-submodule-buf-name "*git-submodule-errors*")
+               (default-directory init-home-folder-dir)
+               (submodule-out-buf
+                (get-buffer-create git-submodule-buf-name))
+               ((all-dirs failed)
+                (run-git-updates submodule-out-buf)))
+         (if failed
+             (display-buffer-same-window submodule-out-buf nil)
+           (kill-buffer git-submodule-buf-name))
+         all-dirs)))))
 
 ;;; TODO: make this work lol
 (defun update-packages-in-list ()
@@ -3573,14 +3553,14 @@ data:
   "Execute BODY after emacs loads features as specified with FEATURE-SPEC. BODY
 is executed after loading each feature in the order provided in FEATURE-SPEC.
 
-FEATURE-SPEC can be either a feature name (as an unquoted symbol or a string), a
-file path (as a string), or a sexp which evaluates to either of the above. If a
-file does not `provide' a feature, then its path can be used instead."
+FEATURE-SPEC can be either a feature name (as an unquoted symbol or a string) or
+a file path (as a string). If a file does not `provide' a feature, then its path
+can be used instead."
   (declare (indent 1))
   (pcase feature-spec
     ((pred null) `'(progn ,@body))
     (`(,ft . ,others)
-     `(eval-after-load ,(if (listp ft) ft `',ft)
+     `(eval-after-load (quote ,ft)
         (with-eval-after-spec ,others ,@body)))
     (_ `(with-eval-after-spec (,feature-spec) ,@body))))
 
@@ -3613,7 +3593,6 @@ file does not `provide' a feature, then its path can be used instead."
             (--map
              (-map-indexed
               (lambda (i s)
-                (msg-evals (i s ((type-of s) s-type)) :before "huh")
                 (a-cl-typecase ((assoc-default i split-alist) t)
                   (regexp (s-split it s omit-nulls))
                   (null s)))
@@ -3639,7 +3618,7 @@ binding a name.
 - If a match result is empty and OMIT-NULLS is `t', it is replaced
 with the symbol `'no-match'."
   (declare (indent 2))
-  (other-once-only (regexp str first-only split-alist omit-nulls)
+  (once-only (regexp str first-only split-alist omit-nulls)
     `(-if-let* (((,@names)
                  (get-rx-match
                   ,regexp ,str ,first-only ,split-alist ,omit-nulls)))
