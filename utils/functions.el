@@ -3,7 +3,6 @@
 ;;; some of these are mine, some are heavily adapted from emacswiki, some are
 ;;; copy/paste from emacswiki
 
-(eval-when-compile (require 'cl))
 (require 'utilities)
 
 (defun send-message-to-scratch (&rest msg-args)
@@ -776,11 +775,11 @@ scope of the command's precision.")
   (concat
    ;; action to perform
    ;; (the \" is so that windows paths with C: are parsed correctly)
-   "^\\([^:]+\\):\""
+   "\\(?:^\\([^:]+\\)"
    ;; file path
-   "\\([^\"]+\\)\":"
+   ":\"\\([^\"]+\\)\":"
    ;; point in file
-   "\\([[:digit:]]+\\)$"
+   "\\([[:digit:]]+\\)$\\)"
    ;; report parsing errors!
    "\\|^.+$"))
 
@@ -788,7 +787,7 @@ scope of the command's precision.")
   `(("visit" . find-file-noselect)))
 
 (defcustom saved-files-no-read-regexps
-  (list (rx bos (eval (expand-file-name saved-files))))
+  (list (rx bos (eval (file-truename saved-files)) eos))
   "Regexps matching file paths not to load in `reread-visited-files-from-disk'."
   :type `(repeat string))
 
@@ -805,40 +804,55 @@ scope of the command's precision.")
 `reread-visited-files-from-disk'."
   :type 'boolean)
 
+(defalias 'range 'number-sequence)
+
 ;;; save buffers to disk and get them back
 (defun reread-visited-files-from-disk ()
   (save-window-excursion
-    (let ((saved-buf (find-file-noselect saved-files)))
-      (unwind-protect
+    (unwind-protect
+        (let* ((saved-buf (when (file-readable-p saved-files)
+                            (find-file-noselect saved-files)))
+               (no-read-re
+                (rx-to-string
+                 `(| ,@(--map `(regexp ,it) saved-files-no-read-regexps)) t)))
+          ;; TODO: macro for with-current-buffer then common action, e.g. going
+          ;; to the beginning, and check if buffer exists/is live, and option to
+          ;; kill at end
           (with-current-buffer saved-buf
             (goto-char (point-min))
-            (-when-let*
-                (((lines types files pts)
-                  (cl-loop
-                   while (re-search-forward saved-files-format-regexp nil t)
-                   collect (-map #'match-string (number-sequence 0 3)) into ms
-                   finally return (when ms (-unzip ms))))
-                 (actions (--map
-                           (assoc-default it saved-files-action-alist) types))
-                 (realpaths (-map #'file-truename files))
-                 (bufs (-map (-lambda ((a . r))
-                               (and (functionp a)
-                                    (file-exists-p r)
-                                    (funcall a r)))
-                             (-zip actions realpaths)))
-                 (final-bufs (-map (-lambda ((b live? p))
-                                     (and live? (pos-in-bounds b p)))
-                                   (-zip bufs
-                                         (-map #'buffer-live-p bufs)
-                                         (--map (when (not (string-empty-p it))
-                                                  (string-to-number it))
-                                                pts))))
-                 ((success failure)
-                  (-map
-                   (apply-partially #'-drop 1)
-                   (-group-by (neg #'null) final-bufs))))))
-        (kill-buffer saved-buf))))
-  (clean-nonvisiting-buffers))
+            (cl-loop
+             while (re-search-forward saved-files-format-regexp nil t)
+             for (line type fname pt-str) = (-map #'match-string (range 0 3))
+             ;; TODO: macro to zip lists and then destructure ordered args
+             ;; of each element (mapping a zip with destructure)
+             for act = (assoc-default type saved-files-action-alist)
+             ;; TODO: macro/function to do dash stuff, but with func as
+             ;; last (or any other) argument (configurable); consider
+             ;; something generic like haskell's flip to streamline
+             for path = (and (stringp fname)
+                             (file-truename fname))
+             for pt = (and (stringp pt-str)
+                           (cl-parse-integer pt-str :junk-allowed t))
+             ;; TODO: macro to do "intermediate" checking in middle of
+             ;; when-let*, as well as nested "when" clauses in cl-loop
+             for buf = (and (functionp act)
+                            ;; TODO: macro to do this check-then-do stuff
+                            ;; (along with do-then-check, or other combos)
+                            (file-readable-p path)
+                            (not (string-match-p no-read-re path))
+                            (funcall act path))
+             ;; TODO: macro to apply functions to args in list,
+             ;; something like `l' which uses a placeholder, and which
+             ;; can be used in a cl-defun or lambda (kinda like --map then
+             ;; -let)
+             if (and (buffer-live-p buf)
+                     (wholenump pt))
+             collect (pos-in-bounds buf pt) into successes
+             else collect line into failures
+             finally (message "successes = '%S',\nfailures = '%S'"
+                              successes failures)))
+          (kill-buffer saved-buf)))
+  (clean-nonvisiting-buffers)))
 
 ;;; TODO: make better macro for anonymous functions which doesn't require
 ;;; writing out `lambda' a million times
@@ -2814,9 +2828,7 @@ which evaluates to a regexp."
 (defun thick-rx-pred (arg)
   `(pcase arg
      (`(thick-rx ,str)
-      (condition-case nil
-          (logify (string-match-p str ""))
-        (invalid-regexp nil)))
+      (cl-typep str 'regexp))
      (_ nil)))
 
 ;;; TODO: maybe accept some argument explaining how to interpret the regexp?
@@ -2845,11 +2857,14 @@ misbehave (e.g. `helm')."
   (interactive)
   (cl-loop for buf in (buffer-list)
            for name = (buffer-name buf)
+           for fname = (buffer-file-name buf)
+           when (and (stringp name)
+                     (buffer-live-p buf))
            unless (or
                    (string-match-p important-buffer-names-regexp name)
-                   (process-live-p (get-buffer-process buf))
-                   (when-let ((fname (buffer-file-name buf)))
-                     (file-exists-p fname)))
+                   (process-live-p (get-buffer-process buf)))
+           unless (and (stringp fname)
+                     (file-exists-p fname))
            do (kill-buffer buf)))
 
 (defun clean-nonvisiting-buffers ()
@@ -3505,7 +3520,7 @@ data:
           (apply #'debug msg)))))))
 
 ;;; debugging macros!!!
-(cl-defmacro msg-eval (sexp &key (pre "") (format "%S => %s") name)
+(cl-defmacro msg-eval (sexp &key (pre "") (format "%S => '%s'") name)
   (declare (indent 1))
   (let ((res (cl-gensym))
         (fmt (cl-gensym)))
@@ -3521,7 +3536,7 @@ data:
 
 (cl-defmacro msg-evals
     ;; see `sym-or-key' to understand each SPEC
-    ((&rest specs) &key (before "group") (format "%S => %s") (sep ": "))
+    ((&rest specs) &key (before "group") (format nil f?) (sep ": "))
   (declare (indent 1))
   (let ((bef (cl-gensym))
         (lead-spc (cl-gensym))
@@ -3534,7 +3549,8 @@ data:
        ,@(cl-loop for (sexp name) in (cl-mapcar #'sym-or-key specs)
                   for b-str = bef then lead-spc
                   collect `(msg-eval ,sexp
-                             :pre ,b-str :format ,fmt :name ',name)))))
+                             ,@(append `(:pre ,b-str :name ',name)
+                                       (when f? `(:format ,fmt))))))))
 
 
 (cl-defmacro with-eval-after-spec (feature-spec &rest body)
@@ -3548,21 +3564,76 @@ file does not `provide' a feature, then its path can be used instead."
   (pcase feature-spec
     ((pred null) `'(progn ,@body))
     (`(,ft . ,others)
-     (let ((feat (cl-gensym))
-           (next (cl-gensym)))
-       `(let* ((,feat ,(if (listp ft) ft `',ft))
-               (,next (with-eval-after-spec ,others ,@body)))
-          ,`(eval-after-load ,feat ,next))))
+     `(eval-after-load ,(if (listp ft) ft `',ft)
+        (with-eval-after-spec ,others ,@body)))
     (_ `(with-eval-after-spec (,feature-spec) ,@body))))
 
 (cl-defun expand-insert-macro (&optional (form (sexp-at-point)) full)
   (cl-prettyexpand form full))
 
+(defun valid-regexp-p (str)
+  (and (stringp str)
+       (condition-case nil
+           (prog1 t
+             (string-match-p str ""))
+         (invalid-regexp nil))))
 
-(cl-defmacro with-gensyms (syms &body body)
+(cl-deftype regexp ()
+  `(and string (satisfies valid-regexp-p)))
+
+(cl-defmacro a-cl-typecase ((keyform &optional do-error) &rest clauses)
   (declare (indent 1))
-  `(let ,(cl-loop for s in syms collect `(,s (cl-gensym)))
-    ,@body))
+  `(let ((it ,keyform))
+     (,(if do-error
+           'cl-etypecase
+         'cl-typecase)
+      it
+      ,@clauses)))
+
+(defun get-rx-match (regexp str &optional first-only split-alist omit-nulls)
+  (let* ((matches (s-match-strings-all regexp str))
+         (on-split
+          (if (not split-alist) matches
+            (--map
+             (-map-indexed
+              (lambda (i s)
+                (msg-evals (i s ((type-of s) s-type)) :before "huh")
+                (a-cl-typecase ((assoc-default i split-alist) t)
+                  (regexp (s-split it s omit-nulls))
+                  (null s)))
+              it)
+             matches)))
+         (processed
+          (--map
+           (--map
+            (or it 'no-match)
+            it)
+           on-split)))
+    (if first-only (car processed) processed)))
+
+(cl-defmacro if-rx-match
+    ((regexp (&rest names) str &key (first-only t) split-alist (omit-nulls t))
+     if-true &rest if-false)
+  "Match REGEXP against STR. If match succeeds, bind NAMES to the matched groups
+and evaluate IF-TRUE. Evaluate IF-FALSE (implicit progn) if match fails.
+
+Notes:
+- Group 0 is included in matches! Use the underscore `_' to avoid
+binding a name.
+- If a match result is empty and OMIT-NULLS is `t', it is replaced
+with the symbol `'no-match'."
+  (declare (indent 2))
+  (other-once-only (regexp str first-only split-alist omit-nulls)
+    `(-if-let* (((,@names)
+                 (get-rx-match
+                  ,regexp ,str ,first-only ,split-alist ,omit-nulls)))
+         ,if-true
+       ,@if-false)))
+(defun iterate-from (init fn n)
+  (cl-loop for i upto n
+           for res = init then (funcall fn res)
+           finally return res))
+
 (defun add-transient-keys (keys-or-map)
   (let ((new-map
          (make-composed-keymap

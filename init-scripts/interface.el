@@ -1088,7 +1088,8 @@ Use (process-buffer `my-rw-process') instead."
 (add-hook 'emacs-lisp-mode-hook #'stop-adaptive-fill)
 
 (defun turn-on-set-mark-end-mode ()
-  (set-mark-end-process-output-mode 1))
+  (set-mark-end-process-output-mode 1)
+  (set-mark-end-eob))
 
 (add-hook #'messages-buffer-mode-hook #'turn-on-set-mark-end-mode)
 (with-current-buffer (messages-buffer)
