@@ -5,15 +5,21 @@
 
 (require 'utilities)
 
+(cl-defmacro escape-list (form)
+  `(cons #'list ,form))
+
 (cl-defmacro once-only ((&rest names) form)
   (declare (indent 1))
   (if (not names) form
     (let ((gensyms (--map (cl-gensym) names)))
       `(let (,@(--map `(,it (cl-gensym)) gensyms))
-         `(let (,@(list ,@(-map (-lambda ((g n)) `(list ,g ,n))
-                                (zip-safe nil gensyms names))))
-            ,(let (,@(-map (-lambda ((n g)) `(,n ,g))
-                           (zip-safe nil names gensyms)))
+         `(let (,@(-map (-lambda ((g n)) `(,g ',n))
+                        ,(escape-list
+                          (-map (-lambda ((g n))
+                                  (escape-list `(,g ,n)))
+                                (zip-safe nil gensyms names)))))
+            ,(let (,@(escape-list (-map (-lambda ((n g)) `(,n ,g))
+                                        (zip-safe nil names gensyms))))
                ,form))))))
 
 (cl-defmacro with-gensyms ((&rest syms) &rest body)
@@ -868,7 +874,42 @@ scope of the command's precision.")
              finally (message "successes = '%S',\nfailures = '%S'"
                               successes failures)))
           (kill-buffer saved-buf)))
-  (clean-nonvisiting-buffers)))
+    (clean-nonvisiting-buffers)))
+
+(defun new-buffer-with (basename contents &optional major-mode)
+  (with-current-buffer (generate-new-buffer basename)
+    (insert contents)
+    (when major-mode (funcall major-mode))
+    (current-buffer)))
+
+(define-error 'subproc-error "A subprocess exited with a non-zero status."
+  'error)
+
+(defun json-pp (&optional use-new-buf)
+  (let* ((json (buffer-string))
+         (buf (if use-new-buf
+                  (new-buffer-with json-fmt-buf-basename json 'json-mode)
+                (current-buffer))))
+    (with-current-buffer buf
+      (let ((code
+             (call-process-region (point-min) (point-max) "jq" t t nil ".")))
+        (if (and (integerp code)
+                 (/= code 0))
+            (let ((errstr (buffer-string)))
+              (erase-buffer)
+              (insert json)
+              (pop-to-buffer buf)
+              (signal 'subproc-error
+                      (list (format "jq failed with status %d" code)
+                            errstr)))
+          (when use-new-buf
+            (pop-to-buffer buf)))))))
+
+(defconst json-fmt-buf-basename "*json-formatted*")
+
+(defun json-fmt (&optional pfx)
+  (interactive "P")
+  (json-pp pfx))
 
 ;;; TODO: make better macro for anonymous functions which doesn't require
 ;;; writing out `lambda' a million times
