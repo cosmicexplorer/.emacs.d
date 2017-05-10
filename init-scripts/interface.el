@@ -487,54 +487,6 @@ to clean up.")
   "List of saved window configurations; only stays present within a session.")
 
 
-;;; do ssh-agent stuff
-(defun setup-ssh-agent ()
-  (interactive)
-  (when (and (eq system-type 'gnu/linux))
-    (if (and id-rsa-path (file-exists-p id-rsa-path))
-        (when (and (executable-find "ssh-agent")
-                   (executable-find "ssh-add"))
-          (let ((command-results (shell-command-to-string "ssh-agent -s"))
-                (ssh-auth-sock-regex "SSH_AUTH_SOCK=\\([^;]+\\);")
-                (ssh-agent-pid-regex "SSH_AGENT_PID=\\([^;]+\\);"))
-            ;; setup required environment vars
-            (if (string-match ssh-auth-sock-regex command-results)
-                (setenv "SSH_AUTH_SOCK" (match-string 1 command-results))
-              (throw 'ssh-agent-err "SOCK output can't be parsed!"))
-            (if (string-match ssh-agent-pid-regex command-results)
-                (setenv "SSH_AGENT_PID" (match-string 1 command-results))
-              (throw 'ssh-agent-err "PID output can't be parsed!"))
-            (setenv "DISPLAY" ":0")
-            (setenv "SSH_ASKPASS"
-                    (expand-file-name
-                     (concat init-home-folder-dir
-                             "init-scripts/read-ssh-pass.sh")))
-            (with-temp-buffer
-              (loop with ssh-add-success = nil
-                    with ssh-did-fail = nil
-                    while (not ssh-add-success)
-                    do (progn
-                         (insert
-                          (or (and (not ssh-did-fail) ssh-pass)
-                              (read-passwd
-                               (if ssh-did-fail
-                                   "incorrect password. ssh password: "
-                                 "ssh password: "))))
-                         (if (zerop (shell-command-on-region
-                                     (point-min) (point-max)
-                                     (concat "ssh-add \"" id-rsa-path "\"")))
-                             (setq ssh-add-success t)
-                           (erase-buffer)
-                           (setq ssh-did-fail t)))))
-            (add-hook 'kill-emacs-hook
-                      (lambda ()
-                        (call-process "kill" nil nil nil
-                                      (getenv "SSH_AGENT_PID"))))))
-      (with-current-buffer "*scratch*"
-        (insert "Set up an id-rsa-path! Only if you want to, though.
-Check out your .emacs.\n")))))
-
-
 ;;; TODO: persist buffers not visiting files to disk as well because apparently
 ;;; sublime does this by default and we can't let sublime beat us; let's also do
 ;;; the same for tramp buffers (this requires logging in; "luckily" emacs is
@@ -676,11 +628,12 @@ Check out your .emacs.\n")))))
   (let ((res (ignore-errors ad-do-it)))
     (ignore-errors (setq ad-return-value (or res (ad-get-arg 0))))))
 
-(defadvice shell (around choose-shell activate)
-  (let ((explicit-shell-file-name
-         (if (string-match-p "^/ssh:" default-directory) "/bin/bash"
-           explicit-shell-file-name)))
-    ad-do-it))
+;;; TODO: figure out a workaround for this
+;; (defadvice shell (around choose-shell activate)
+;;   (let ((explicit-shell-file-name
+;;          (if (string-match-p "^/ssh:" default-directory) "/bin/bash"
+;;            explicit-shell-file-name)))
+;;     ad-do-it))
 
 (defadvice eww-follow-link (after revis activate) (refresh-visual-line-mode))
 

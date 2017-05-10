@@ -436,13 +436,19 @@ Lisp code." t)
 (setq js-indent-level 2)
 (setq css-indent-offset 2)
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-(add-to-list 'auto-mode-alist '("\\.gyp\\'" . js-mode))
-(add-to-list 'auto-mode-alist '("\\.json\\'" . js-mode))
-(add-to-list 'auto-mode-alist '("\\.babelrc" . js-mode))
-(add-to-list 'auto-mode-alist '("\\.\\(?:js\\)?beautifyrc\\'" . js-mode))
 (add-to-list 'auto-mode-alist '("\\.cshtml\\'" . html-mode))
-
 (add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode))
+
+(defconst json-mode-map
+  (make-keymap-from-bindings
+   '(("<C-tab>" . json-fmt))))
+
+(define-derived-mode json-mode javascript-mode "JSON"
+  "Major mode for editing json documents.")
+(add-to-list 'auto-mode-alist '("\\.json\\'" . json-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(?:js\\)?beautifyrc\\'" . json-mode))
+(add-to-list 'auto-mode-alist '("\\.gyp\\'" . json-mode))
+(add-to-list 'auto-mode-alist '("\\.babelrc" . json-mode))
 
 ;;; config files
 (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . conf-mode))

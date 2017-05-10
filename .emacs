@@ -47,14 +47,6 @@ Set in custom-vars.el, and used in init-scripts/interface.el.")
 (defvar sbcl-special-command nil
   "Sometimes required because some versions of sbcl are difficult to wire up
 correctly. Set in custom-vars.el")
-(defvar do-ssh-agent-command-on-start t
-  "Whether or not to run an ssh-agent command on starting up emacs.")
-(defvar id-rsa-path (let ((id-rsa-path (concat (getenv "HOME") "/.ssh/id_rsa")))
-                      (if (file-exists-p id-rsa-path) id-rsa-path nil))
-  "Path to desired id_rsa file for ssh. Used in init-scripts/interface.el to
-stop ssh from prompting you every time you run git.")
-(defvar ssh-pass nil
-  "Default password to use for ssh-agent. Keep this secure.")
 (defvar save-visited-files t
   "Whether or not to restore all files that were visited during the previous
 session. Used later in this file.")
@@ -126,7 +118,6 @@ Check out your .emacs."))
 (when (fboundp 'server-running-p)
   (if (not (eq (server-running-p) t))
       (server-start)
-    (setq do-ssh-agent-command-on-start nil)
     (setq save-visited-files nil)))
 
 (defun load-my-init-script (file-name)
@@ -166,8 +157,6 @@ Check out your .emacs."))
 ;;; sometimes fails on 'require call
 (load-file (expand-file-name
             (concat user-emacs-directory "lisp/smart-compile.el")))
-
-(when do-ssh-agent-command-on-start (setup-ssh-agent))
 
 ;;; save visited files to buffer
 (when save-visited-files

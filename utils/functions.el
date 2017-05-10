@@ -5,6 +5,64 @@
 
 (require 'utilities)
 
+(defun xor (&rest args)
+  (cl-reduce
+   (lambda (cur next)
+     (if cur (not next) next))
+   args
+   :initial-value nil))
+
+(defconst make-stage-empty-symbol 'empty
+  "Used in `make-stage-for-lists' to signify that a list has ended.")
+
+(defun make-stage-fill-value (val cars cdrs)
+  (cl-loop for car in cars
+           for cdr in cdrs
+           if (eq cdr make-stage-empty-symbol)
+           collect val into new-cars
+           and collect nil into new-cdrs
+           else
+           collect car into new-cars
+           and collect cdr into new-cdrs
+           finally return (list new-cars new-cdrs)))
+
+(defun make-stage-for-lists (fill lists)
+  (-let* (((stage &as cars cdrs)
+           (cl-loop for list in lists
+                    if (consp list)
+                    collect (car list) into cars
+                    and collect (cdr list) into cdrs
+                    else
+                    collect nil into cars
+                    and collect make-stage-empty-symbol into cdrs
+                    finally return (list cars cdrs))))
+    (if (cl-every (l (eq _ make-stage-empty-symbol)) cdrs)
+        stage
+      (pcase-exhaustive fill
+        ('nil stage)
+        (`(value ,val)
+         (make-stage-fill-value val cars cdrs))
+        ((and (pred functionp) fn)
+         (list (funcall fn cars cdrs)
+               (cl-substitute nil make-stage-empty-symbol cdrs :test #'eq)))))))
+
+;; TODO: macro to make tiny let forms less annoying and push
+;; indentation in a little less
+(defun zip-safe (fill &rest lists)
+  (declare (indent 1))
+  (cl-loop
+   for (cars cdrs) = (make-stage-for-lists fill lists)
+   then (make-stage-for-lists fill cdrs)
+   if (cl-find make-stage-empty-symbol cdrs :test #'eq)
+   return stages
+   else
+   collect cars into stages
+   end
+   finally return stages))
+
+(defun unzip-list (fill list)
+  (apply (apply-partially #'zip-safe fill) list))
+
 (cl-defmacro escape-list (form)
   `(cons #'list ,form))
 
@@ -1479,50 +1537,51 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 ;;; for initialization
 (defun run-git-updates (submodule-out-buf)
-  (or (and (zerop
-            (call-process
-             "git" nil submodule-out-buf nil
-             "submodule" "init"))
-           (zerop
-            (call-process
-             "git" nil submodule-out-buf nil
-             "submodule" "foreach" "git" "checkout" "master"))
-           (zerop
-            (call-process
-             "git" nil submodule-out-buf nil
-             "submodule" "foreach" "git" "fetch"))
-           (progn
-             (with-current-buffer submodule-out-buf
-               (erase-buffer))
-             (zerop
-              (call-process
-               "git" nil submodule-out-buf nil
-               "submodule" "--quiet" "foreach"
-               "printf \"%s:%s:%s\\n\" $path $(git rev-parse --sq HEAD @{u})")))
-           (-let* (((all-dirs failed)
-                    (with-current-buffer submodule-out-buf
-                      (goto-char (point-min))
-                      (cl-loop
-                       while (re-search-forward
-                              "^\\([^:]*\\):'\\([^']*\\)':'\\([^']*\\)'$"
-                              nil t)
-                       for (dir sha1 sha2) = (-map #'match-string (range 1 3))
-                       collect dir into all-dirs
-                       unless (string= sha1 sha2)
-                       collect dir into failed
-                       finally return (list all-dirs failed)))))
-             (and
-              (cl-every
-               (lambda (dir)
-                 (let ((default-directory (expand-file-name dir)))
-                   (zerop
-                    (call-process
-                     "git" nil submodule-out-buf nil
-                     "pull" "origin" "master"))))
-               failed)
-              (list all-dirs failed))))
-      (display-buffer-same-window submodule-out-buf nil)
-      (error "submodule failure: %s" (buffer-string))))
+  (unless (and (zerop
+                (call-process
+                 "git" nil submodule-out-buf nil
+                 "submodule" "init"))
+               (zerop
+                (call-process
+                 "git" nil submodule-out-buf nil
+                 "submodule" "foreach" "git" "checkout" "master"))
+               (zerop
+                (call-process-shell-command
+                 "timeout -k 1 4 git submodule foreach git fetch"
+                 nil submodule-out-buf nil))
+               (progn
+                 (with-current-buffer submodule-out-buf
+                   (erase-buffer))
+                 (zerop
+                  (call-process
+                   "git" nil submodule-out-buf nil
+                   "submodule" "--quiet" "foreach"
+                   "printf \"%s:%s:%s\\n\" $path $(git rev-parse --sq HEAD @{u})")))
+               (-let* (((all-dirs failed)
+                        (with-current-buffer submodule-out-buf
+                          (goto-char (point-min))
+                          (cl-loop
+                           while (re-search-forward
+                                  "^\\([^:]*\\):'\\([^']*\\)':'\\([^']*\\)'$"
+                                  nil t)
+                           for (dir sha1 sha2) = (-map #'match-string (range 1 3))
+                           collect dir into all-dirs
+                           unless (string= sha1 sha2)
+                           collect dir into failed
+                           finally return (list all-dirs failed)))))
+                 (and
+                  (cl-every
+                   (lambda (dir)
+                     (let ((default-directory (expand-file-name dir)))
+                       (zerop
+                        (call-process-shell-command
+                         "timeout -k 1 4 git pull origin master"
+                         nil submodule-out-buf nil))))
+                   failed)
+                  (list all-dirs failed))))
+    (with-current-buffer submodule-out-buf
+      (insert "submodule failure!"))
+    (error "submodule failure")))
 
 (defun actual-setup-submodules ()
   (unless dont-ask-about-git
@@ -1535,9 +1594,24 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                (submodule-out-buf
                 (get-buffer-create git-submodule-buf-name))
                ((all-dirs failed)
-                (run-git-updates submodule-out-buf)))
+                (let ((debug-on-error nil))
+                  (condition-case err
+                      (run-git-updates submodule-out-buf)
+                    (error
+                     (with-temp-buffer
+                       (cl-assert
+                        (zerop
+                         (call-process
+                          "git" nil t nil
+                          "submodule" "--quiet" "foreach" "echo $path")))
+                       (let* ((out (buffer-string))
+                              (processed
+                               (replace-regexp-in-string "\n\\'" "" out)))
+                         (list (split-string processed "\n") t))))))))
          (if failed
-             (display-buffer-same-window submodule-out-buf nil)
+             (progn
+               (pop-to-buffer submodule-out-buf)
+               (goto-char (point-max)))
            (kill-buffer git-submodule-buf-name))
          all-dirs)))))
 
@@ -3273,7 +3347,7 @@ at the end of the buffer."
                            (= start-pt win-pt)))))
     (unless failure
       (let ((win
-             (if (org-xor invert other)
+             (if (xor invert other)
                  (if (eq orig-buf final-buf)
                      (progn
                        (other-window 1)
@@ -3803,57 +3877,6 @@ binding a name."
 ;;                    `(let )))
 ;;                 args))))
 ;;   `(and ,@((let ))))
-
-(defconst make-stage-empty-symbol 'empty
-  "Used in `make-stage-for-lists' to signify that a list has ended.")
-
-(defun make-stage-fill-value (val cars cdrs)
-  (cl-loop for car in cars
-           for cdr in cdrs
-           if (eq cdr make-stage-empty-symbol)
-           collect val into new-cars
-           and collect nil into new-cdrs
-           else
-           collect car into new-cars
-           and collect cdr into new-cdrs
-           finally return (list new-cars new-cdrs)))
-
-(defun make-stage-for-lists (fill lists)
-  (-let* (((stage &as cars cdrs)
-           (cl-loop for list in lists
-                    if (consp list)
-                    collect (car list) into cars
-                    and collect (cdr list) into cdrs
-                    else
-                    collect nil into cars
-                    and collect make-stage-empty-symbol into cdrs
-                    finally return (list cars cdrs))))
-    (if (cl-every (l (eq _ make-stage-empty-symbol)) cdrs)
-        stage
-      (pcase-exhaustive fill
-        ('nil stage)
-        (`(value ,val)
-         (make-stage-fill-value val cars cdrs))
-        ((and (pred functionp) fn)
-         (list (funcall fn cars cdrs)
-               (cl-substitute nil make-stage-empty-symbol cdrs :test #'eq)))))))
-
-;; TODO: macro to make tiny let forms less annoying and push
-;; indentation in a little less
-(defun zip-safe (fill &rest lists)
-  (declare (indent 1))
-  (cl-loop
-   for (cars cdrs) = (make-stage-for-lists fill lists)
-   then (make-stage-for-lists fill cdrs)
-   if (cl-find make-stage-empty-symbol cdrs :test #'eq)
-   return stages
-   else
-   collect cars into stages
-   end
-   finally return stages))
-
-(defun unzip-list (fill list)
-  (apply (apply-partially #'zip-safe fill) list))
 
 (defun iterate-from (init fn n)
   (cl-loop for i upto n

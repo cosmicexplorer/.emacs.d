@@ -616,16 +616,17 @@
 (global-set-key (kbd "C-c C-w") #'destroy-all-whitespace-nearby)
 
 ;;; magit
-(eval-after-load "magit"
-  '(progn
-     (global-set-key (kbd "C-c g")
-                     (find-function-switch-pfx #'magit-status :invert t))
-     (global-set-key (kbd "C-c b") #'magit-blame)
-     (define-key magit-mode-map (kbd "<tab>") #'magit-tab-dwim)
-     (define-key magit-mode-map (kbd "<backtab>") #'magit-section-cycle-global)
-     (define-key magit-status-mode-map (kbd "C-w") nil)))
-(eval-after-load 'magit-blame
-  '(progn (define-key magit-blame-mode-map (kbd "c") #'magit-show-commit)))
+(with-eval-after-spec magit
+  (global-set-key (kbd "C-c g")
+                  (find-function-switch-pfx #'magit-status :invert t))
+  (global-set-key (kbd "C-c b") #'magit-blame)
+  (define-key magit-mode-map (kbd "<tab>") #'magit-tab-dwim)
+  (define-key magit-mode-map (kbd "<backtab>") #'magit-section-cycle-global)
+  (define-key magit-status-mode-map (kbd "C-w") nil))
+(with-eval-after-spec magit-blame
+  (define-key magit-blame-mode-map (kbd "c") #'magit-show-commit))
+(with-eval-after-spec magit-process
+  (define-key magit-process-mode-map (kbd "k") #'magit-process-kill))
 
 ;;; LOL MAIL
 (global-set-key (kbd "C-x m") nil)
