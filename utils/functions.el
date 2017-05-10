@@ -876,6 +876,83 @@ scope of the command's precision.")
           (kill-buffer saved-buf)))
     (clean-nonvisiting-buffers)))
 
+(defun alist-process-modify-result (op result)
+  (-let* (((kv-used kv-left matched unmatched) result)
+          (real-matched (cl-ecase op
+                          (swap
+                           (cl-assert (null matched))
+                           kv-used)
+                          (keep matched)
+                          ((nil remove)
+                           (cl-assert (null matched))
+                           nil))))
+    (list kv-used kv-left real-matched unmatched)))
+
+(cl-defun alist-modify-range
+    (k-v-alist alist &key (test #'eq) op max-changes keep-kv)
+  ;; (op = nil) => 'remove
+  (cl-check-type k-v-alist list)
+  (cl-check-type alist list)
+  (cl-check-type test function)
+  (cl-check-type max-changes (or null wholenum))
+  (cl-check-type keep-kv boolean)
+  (cond
+   ((or
+     ;; if either is empty
+     (not (and k-v-alist alist))
+     ;; if no changes allowed
+     (eql max-changes 0))
+    (alist-process-modify-result op (list nil k-v-alist nil alist)))
+   ;; if both have 1 element
+   ((not (or (cdr alist) (cdr k-v-alist)))
+    (-let* ((((k . v)) alist)
+            (((key . val)) k-v-alist)
+            (res
+             (if (funcall test k key)
+                 (append
+                  (list k-v-alist nil)
+                  (cl-ecase op
+                    ((nil remove swap) (list nil nil))
+                    (keep (list (list (cons k v)) nil))))
+               (list nil k-v-alist nil alist))))
+      (alist-process-modify-result op res)))
+   (t
+    (cl-loop
+     for cells on alist
+     for (cur . _) = cells
+     with k-v-used = nil
+     with k-v-left = k-v-alist
+     for kv-to-use = (if keep-kv k-v-alist k-v-left)
+     with matched = nil
+     with unmatched = nil
+     with changes-made = 0
+     until (or (and max-changes (>= changes-made max-changes))
+               (not kv-to-use))
+     do (-let* (((_ cur-unmatched kv-matched _)
+                 (alist-modify-range `(,cur) kv-to-use :test test :op 'keep)))
+          (if cur-unmatched
+              (push cur unmatched)
+            (cl-assert (and kv-matched
+                            (= 1 (length kv-matched))))
+            (incf changes-made)
+            (-let* (((_ new-kv matching-used nonmatching-used)
+                     (alist-modify-range
+                      kv-matched k-v-used :test test :op 'keep))
+                    ((_ _ _ still-left)
+                     (alist-modify-range
+                      kv-matched k-v-left :test test :op 'remove)))
+              (setq k-v-used (append new-kv matching-used nonmatching-used)
+                    k-v-left still-left))
+            (cl-ecase op
+              ((nil remove swap))
+              (keep
+               (push cur matched)))))
+     ;; if we quit early, consider the untouched cells as "unmatched"
+     finally return
+     (let* ((all-unmatched (append unmatched cells))
+            (real-kv-used (reverse k-v-used)))
+       (alist-process-modify-result
+        op (list real-kv-used k-v-left matched all-unmatched)))))))
 (defun new-buffer-with (basename contents &optional major-mode)
   (with-current-buffer (generate-new-buffer basename)
     (insert contents)
