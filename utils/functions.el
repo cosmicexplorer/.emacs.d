@@ -1011,40 +1011,55 @@ scope of the command's precision.")
             (real-kv-used (reverse k-v-used)))
        (alist-process-modify-result
         op (list real-kv-used k-v-left matched all-unmatched)))))))
-(defun new-buffer-with (basename contents &optional major-mode)
-  (with-current-buffer (generate-new-buffer basename)
-    (insert contents)
-    (when major-mode (funcall major-mode))
-    (current-buffer)))
+
+(defconst new-buffer-with-basename "*formatted-code*")
+
+(defun new-buffer-with (basename contents &optional mode-or-func)
+  (let ((mode
+         (if (functionp mode-or-func) mode-or-func major-mode)))
+    (with-current-buffer (generate-new-buffer
+                          (or basename new-buffer-with-basename))
+      (insert contents)
+      (funcall mode)
+      (current-buffer))))
 
 (define-error 'subproc-error "A subprocess exited with a non-zero status."
   'error)
 
-(defun json-pp (&optional use-new-buf)
-  (let* ((json (buffer-string))
-         (buf (if use-new-buf
-                  (new-buffer-with json-fmt-buf-basename json 'json-mode)
-                (current-buffer))))
-    (with-current-buffer buf
-      (let ((code
-             (call-process-region (point-min) (point-max) "jq" t t nil ".")))
-        (if (and (integerp code)
-                 (/= code 0))
-            (let ((errstr (buffer-string)))
-              (erase-buffer)
-              (insert json)
-              (pop-to-buffer buf)
-              (signal 'subproc-error
-                      (list (format "jq failed with status %d" code)
-                            errstr)))
-          (when use-new-buf
-            (pop-to-buffer buf)))))))
+(defun pp-code-subproc (cmd args &optional basename new-buf-mode)
+  (let* ((contents (buffer-string))
+         (buf (if new-buf-mode
+                  (new-buffer-with basename contents new-buf-mode)
+                (current-buffer)))
+         (code
+          (with-current-buffer buf
+            (apply #'call-process-region
+                   (append (list (point-min) (point-max) cmd t t nil) args)))))
+    (if (and (integerp code)
+             (/= code 0))
+        (with-current-buffer buf
+          (let ((errstr (buffer-string)))
+            (erase-buffer)
+            (insert contents)
+            (pop-to-buffer buf)
+            (signal 'subproc-error
+                    (list (format "jq failed with status %d" code)
+                          errstr))))
+      (unless (eq (current-buffer) buf)
+        (pop-to-buffer buf)))))
 
 (defconst json-fmt-buf-basename "*json-formatted*")
 
 (defun json-fmt (&optional pfx)
   (interactive "P")
-  (json-pp pfx))
+  (pp-code-subproc "jq" (list ".") json-fmt-buf-basename (when pfx 'json-mode)))
+
+(defconst xml-fmt-buf-basename "*xml-formatted*")
+
+(defun xml-fmt (&optional pfx)
+  (interactive "P")
+  (pp-code-subproc "xmllint" (list "--pretty" "2" "-") xml-fmt-buf-basename
+                   (when pfx 'nxml-mode)))
 
 ;;; TODO: make better macro for anonymous functions which doesn't require
 ;;; writing out `lambda' a million times

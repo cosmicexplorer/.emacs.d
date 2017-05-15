@@ -922,8 +922,9 @@
 (global-set-key (kbd "<M-end>") #'end-of-buffer)
 (global-set-key (kbd "C-c R") #'resurrect-buffer-from-file)
 
-(eval-after-load 'nxml-mode
-  '(define-key nxml-mode-map (kbd "C-c C-v") nil))
+(with-eval-after-spec nxml-mode
+  (define-key nxml-mode-map (kbd "C-c C-v") nil)
+  (define-key nxml-mode-map (kbd "C-<tab>") #'xml-fmt))
 
 (global-set-key (kbd "C-x C-M-h") #'run-shell)
 (global-set-key (kbd "C-x C-p") #'restart-shell)
