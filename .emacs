@@ -332,6 +332,7 @@ Check out your .emacs."))
  '(linum-relative-format "%4s")
  '(linum-relative-plusp-offset 1)
  '(lua-indent-level 2)
+ '(magit-auto-revert-mode t)
  '(magit-display-buffer-function (quote magit-display-buffer-traditional))
  '(magit-no-confirm
    (quote
