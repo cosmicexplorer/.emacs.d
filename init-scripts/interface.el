@@ -588,7 +588,7 @@ to clean up.")
 ;;; setup submodules and make them
 (defun setup-submodules-load ()
   (let ((all-dirs (actual-setup-submodules)))
-    (msg-evals (all-dirs))
+    (msg-evals (all-dirs) :before "setup-submodules-load")
     (cl-mapc
      (lambda (dir)
        (add-to-list

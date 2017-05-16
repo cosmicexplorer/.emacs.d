@@ -1552,53 +1552,59 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 ;;; for initialization
 (defun run-git-updates (submodule-out-buf)
-  (unless (and (zerop
-                (call-process
-                 "git" nil submodule-out-buf nil
-                 "submodule" "init"))
-               (zerop
-                (call-process
-                 "git" nil submodule-out-buf nil
-                 "submodule" "foreach" "git" "checkout" "master"))
-               (zerop
-                (call-process-shell-command
-                 "timeout -k 1 4 git submodule foreach git fetch"
-                 nil submodule-out-buf nil))
-               (progn
-                 (with-current-buffer submodule-out-buf
-                   (erase-buffer))
-                 (zerop
-                  (call-process
-                   "git" nil submodule-out-buf nil
-                   "submodule" "--quiet" "foreach"
-                   "printf \"%s:%s:%s\\n\" $path $(git rev-parse --sq HEAD @{u})")))
-               (msg-evals (((buffer-string) bstr)))
-               (-let* (((all-dirs failed)
-                        (with-current-buffer submodule-out-buf
-                          (goto-char (point-min))
-                          (cl-loop
-                           while (re-search-forward
-                                  "^\\([^:]*\\):'\\([^']*\\)':'\\([^']*\\)'$"
-                                  nil t)
-                           for (dir sha1 sha2) = (-map #'match-string (range 1 3))
-                           collect dir into all-dirs
-                           unless (string= sha1 sha2)
-                           collect dir into failed
-                           finally return (list all-dirs failed)))))
-                 (msg-evals (all-dirs failed))
-                 (and
-                  (cl-every
-                   (lambda (dir)
-                     (let ((default-directory (expand-file-name dir)))
-                       (zerop
-                        (call-process-shell-command
-                         "timeout -k 1 4 git pull origin master"
-                         nil submodule-out-buf nil))))
-                   failed)
-                  (list all-dirs failed))))
-    (with-current-buffer submodule-out-buf
-      (insert "submodule failure!"))
-    (error "submodule failure")))
+  (or (with-current-buffer submodule-out-buf
+        (and
+         (msg-evals (((buffer-string) bstr)) :before "init")
+         (zerop
+          (call-process
+           "git" nil t nil
+           "submodule" "init"))
+         (msg-evals (((buffer-string) bstr)) :before "checkout")
+         (zerop
+          (call-process
+           "git" nil t nil
+           "submodule" "foreach" "git" "checkout" "master"))
+         (msg-evals (((buffer-string) bstr)) :before "fetch")
+         (zerop
+          (call-process-shell-command
+           "timeout -k 1 4 git submodule foreach git fetch"
+           nil t nil))
+         (msg-evals (((buffer-string) bstr)) :before "rev-parse")
+         (progn
+           (erase-buffer)
+           (zerop
+            (call-process
+             "git" nil t nil
+             "submodule" "--quiet" "foreach"
+             "printf \"%s:%s:%s\\n\" $path $(git rev-parse --sq HEAD @{u})")))
+         (msg-evals (((buffer-string) bstr)) :before "hashes")
+         (-let* (((all-dirs failed)
+                  (progn
+                    (goto-char (point-min))
+                    (cl-loop
+                     while (re-search-forward
+                            "^\\([^:]*\\):'\\([^']*\\)':'\\([^']*\\)'$"
+                            nil t)
+                     for (dir sha1 sha2) = (-map #'match-string (range 1 3))
+                     collect dir into all-dirs
+                     unless (string= sha1 sha2)
+                     collect dir into failed
+                     finally return (list all-dirs failed)))))
+           (msg-evals (all-dirs failed) :before "run-git-updates end")
+           (cl-every
+            (lambda (dir)
+              (let ((default-directory (expand-file-name dir)))
+                (zerop
+                 (call-process-shell-command
+                  "timeout -k 1 4 git pull origin master"
+                  nil t nil))))
+            failed)
+           (list all-dirs failed))))
+      (progn
+        (with-current-buffer submodule-out-buf
+          (goto-char (point-max))
+          (insert "submodule failure!"))
+        (error "submodule failure"))))
 
 (defun actual-setup-submodules ()
   (unless dont-ask-about-git
@@ -1625,6 +1631,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                               (processed
                                (replace-regexp-in-string "\n\\'" "" out)))
                          (list (split-string processed "\n") t))))))))
+         (msg-evals (all-dirs failed) :before "actual-setup-submodules")
          (if failed
              (progn
                (pop-to-buffer submodule-out-buf)
