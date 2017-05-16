@@ -1572,6 +1572,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                    "git" nil submodule-out-buf nil
                    "submodule" "--quiet" "foreach"
                    "printf \"%s:%s:%s\\n\" $path $(git rev-parse --sq HEAD @{u})")))
+               (msg-evals (((buffer-string) bstr)))
                (-let* (((all-dirs failed)
                         (with-current-buffer submodule-out-buf
                           (goto-char (point-min))
@@ -1584,6 +1585,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                            unless (string= sha1 sha2)
                            collect dir into failed
                            finally return (list all-dirs failed)))))
+                 (msg-evals (all-dirs failed))
                  (and
                   (cl-every
                    (lambda (dir)

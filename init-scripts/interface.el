@@ -588,6 +588,7 @@ to clean up.")
 ;;; setup submodules and make them
 (defun setup-submodules-load ()
   (let ((all-dirs (actual-setup-submodules)))
+    (msg-evals (all-dirs))
     (cl-mapc
      (lambda (dir)
        (add-to-list
@@ -598,6 +599,7 @@ to clean up.")
     (autoload #'org-element-update-syntax "org-element.el")
     (autoload #'org-define-error "org-compat.el")
     (require 'org)
+    (require 'helm-ag)
     (require 'color-theme-danny)))
 
 (add-hook 'after-load-init-hook #'setup-submodules-load)

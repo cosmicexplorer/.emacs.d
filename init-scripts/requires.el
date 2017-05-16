@@ -3,7 +3,6 @@
 ;;; my own stuff matters too
 (add-to-list 'load-path (concat init-home-folder-dir "utils"))
 (add-to-list 'load-path (concat init-home-folder-dir "integrations"))
-(add-to-list 'load-path (concat init-home-folder-dir "emacs-helm-ag"))
 
 ;;; add packages that don't exist on melpa; typically from emacswiki, but some
 ;;; are from more dubious sources
@@ -62,7 +61,6 @@
 (require 'haskell)
 (require 'rx)
 (require 'widget)
-(require 'helm-ag)
 
 ;;; my stuff
 (require 'utilities)

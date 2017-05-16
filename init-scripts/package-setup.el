@@ -32,23 +32,19 @@
 (global-smart-tab-mode 1)               ; put it EVERYWHERE
 
 ;; julia/R from ESS
-;;; because it's not detecting this variable correctly on windows fsr
-(setq ess-lisp-directory (concat init-home-folder-dir "ESS/lisp"))
-
-;;; now let's load it
-(when (file-directory-p (concat init-home-folder-dir "/ESS/lisp"))
-  (add-to-list 'load-path (concat init-home-folder-dir "/ESS/lisp"))
-  (require 'ess-site)
-  (when (executable-find "julia-basic")
-    (setq inferior-julia-program-name (executable-find "julia-basic"))
-    (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/"))
-  (ess-toggle-underscore nil))
+(let ((ess-lisp (expand-file-name "ESS/lisp" init-home-folder-dir)))
+  (when (file-directory-p ess-lisp)
+    (add-to-list 'load-path ess-lisp)
+    (require 'ess-site)
+    (when (executable-find "julia-basic")
+      (setq inferior-julia-program-name (executable-find "julia-basic"))
+      (add-to-list 'ess-tracebug-search-path "/usr/share/julia/base/"))
+    (ess-toggle-underscore nil)
+    ;;; because it's not detecting this variable correctly on windows fsr
+    (setq ess-lisp-directory ess-lisp)))
 
 ;;; magit
 (setq magit-last-seen-setup-instructions "1.4.0")
-;; automatically revert unmodified (saved) buffers that magit changes through
-;; e.g. pull, merge
-(setq magit-auto-revert-mode t)
 ;;; this is pretty brittle to internal changes in magit, hopefully it stays
 ;;; relatively stable
 (defvar magit-header-section-args '((diffstat) (headers)))
