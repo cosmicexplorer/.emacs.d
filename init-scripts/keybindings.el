@@ -430,7 +430,7 @@
      (define-key org-mode-map (kbd "M-a M-<left>") #'my-org-up-section)
      (define-key org-mode-map (kbd "M-a M-<right>") #'my-org-down-section)
      (define-key org-mode-map (kbd "M-a M-a") #'my-org-beginning-of-section)
-     (define-key org-mode-map (kbd "M-a M-s") #'my-org-end-of-section)
+     (define-key org-mode-map (kbd "M-a M-e") #'my-org-end-of-section)
      (define-key org-mode-map (kbd "M-a M-n") #'my-org-next-element)
      (define-key org-mode-map (kbd "M-a M-p") #'my-org-previous-element)))
 
