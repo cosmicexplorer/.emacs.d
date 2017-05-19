@@ -1047,3 +1047,7 @@ Use (process-buffer `my-rw-process') instead."
   (turn-on-set-mark-end-mode))
 
 (setq visible-bell nil)
+
+(require 'book-txt-view)
+
+(add-hook 'book-txt-view-hook (z (rainbow-mode -1)))
