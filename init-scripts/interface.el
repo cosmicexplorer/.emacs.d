@@ -148,7 +148,7 @@
 
 
 ;;; misc
-(add-hook 'after-load-init-hook #'load-display-time)
+(add-hook 'after-init-hook #'load-display-time)
 (put 'downcase-region 'disabled nil)
 (put 'erase-buffer 'disabled nil)
 (setq auto-save-interval 600)     ; half as often as default
@@ -602,7 +602,7 @@ to clean up.")
     (require 'helm-ag)
     (require 'color-theme-danny)))
 
-(add-hook 'after-load-init-hook #'setup-submodules-load)
+(add-hook 'after-init-hook #'setup-submodules-load)
 
 ;;; ibuffer moves things around when i mark things and this scares me
 (defadvice ibuffer-mark-interactive (after re-recenter activate) (recenter))

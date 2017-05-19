@@ -86,6 +86,12 @@ init-scripts/interface.el.")
   "files to open on startup"
   :type '(list string))
 
+(defgroup my-errors nil
+  "`defcustom' group for error handling in my own emacs lisp code.")
+(define-error 'my-errors "Errors in my own emacs lisp code.")
+(define-error
+  'my-init-error "Error in my personal emacs initialization." 'my-errors)
+
 ;;; load custom values for these variables (this file is .gitignored)
 (let ((custom-var-file
        (concat
@@ -122,10 +128,11 @@ Check out your .emacs."))
 
 (defun load-my-init-script (file-name)
   "Loads script located in init-scripts directory."
-  (load-file (concat init-home-folder-dir "init-scripts/" file-name ".el")))
+  (load-file (expand-file-name (format "%s/%s.el" "init-scripts" file-name) init-home-folder-dir)))
 
-(add-hook 'after-load-init-hook
-          (lambda () (load-my-init-script "visuals")))
+(defun load-my-util-script (file-name)
+  "Loads script located in utils directory."
+  (load-file (expand-file-name (format "%s/%s.el" "utils" file-name) init-home-folder-dir)))
 
 ;;; load the packages i like
 (load-my-init-script "packages")
@@ -134,8 +141,12 @@ Check out your .emacs."))
 ;;; should be /after/ byte-recompilation
 (load-my-init-script "requires")
 
+;;; load all my cool functions!!!
+(load-my-util-script "functions")
+
 ;;; for compatibility between different operating environments
 (load-my-init-script "compat")
+
 ;;; enforce my strong opinions on the default emacs ui
 (load-my-init-script "interface")
 ;;; do some additional work to setup packages
@@ -144,6 +155,8 @@ Check out your .emacs."))
 (load-my-init-script "languages")
 ;;; cause what else is emacs for
 (load-my-init-script "keybindings")
+
+(add-hook 'after-init-hook (z (load-my-init-script "visuals")))
 
 (cl-mapc #'open-if-not-already my-files-to-open-xdg)
 
@@ -166,7 +179,18 @@ Check out your .emacs."))
 (add-hook 'after-init-hook #'clean-init-screen)
 
 ;;; let's do it
-(run-hooks 'after-load-init-hook)
+(add-hook
+ 'after-init-hook
+ (z
+  (progn
+    (when check-internet-connection
+      (setup-internet-connection-check 'check))
+    (when monitor-internet-connection
+      (setup-internet-connection-check 'both)))))
+
+;;; deprecated
+(unless (null after-load-init-hook)
+  (user-error "%s" "`after-load-init-hook' is deprecated!"))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

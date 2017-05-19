@@ -489,10 +489,10 @@ Lisp code." t)
             (load "dired-x")))
 
 ;;; slime
-(load-my-init-script "slime-setup")
+(load-my-script "slime-setup" "init-scripts")
 
 ;;; clojure
-(load-my-init-script "cider-setup")
+(load-my-script "cider-setup" "init-scripts")
 
 (defcustom no-gfm nil "Turn off gfm mode."
   :type 'boolean

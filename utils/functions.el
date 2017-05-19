@@ -5,6 +5,25 @@
 
 (require 'utilities)
 
+(defmacro logify (expr) `(not (not ,expr)))
+
+(defconst sentinel-successful-exit-msg "finished\n")
+
+(defcustom pop-on-error-display-function #'pop-to-buffer
+  "What function to call to display the buffer in `pop-to-buffer-on-error'.
+Should accept a single argument, which is the buffer to display."
+  :type 'function)
+
+(defun pop-to-buffer-on-error (buffer-or-name sig data)
+  (declare (indent 2))
+  (cl-check-type buffer-or-name (or buffer string))
+  (cl-check-type sig symbol)
+  (cl-check-type data list)
+  (let* ((buffer (get-buffer buffer-or-name)))
+    (when (buffer-live-p buffer)
+      (funcall pop-on-error-display-function buffer))
+    (signal sig data)))
+
 (defun xor (&rest args)
   (cl-reduce
    (lambda (cur next)
@@ -840,7 +859,7 @@ scope of the command's precision.")
          (setq async-load-buffer "")
          (normal-mode)
          (set-buffer-modified-p nil))
-       (unless (and (stringp ev) (string= ev "finished\n"))
+       (unless (and (stringp ev) (string= ev sentinel-successful-exit-msg))
          ;; alert the user that SOMETHING BAD HAS HAPPENED!!!!
          (switch-to-buffer (process-buffer proc))
          (goto-char (point-max))
@@ -1023,8 +1042,11 @@ scope of the command's precision.")
       (funcall mode)
       (current-buffer))))
 
-(define-error 'subproc-error "A subprocess exited with a non-zero status."
-  'error)
+(defun message-my-errors (err-type msg buf)
+  (display-warning 'my-errors msg :debug buf))
+
+(define-error 'subproc-error "A subprocess exited with a non-zero status"
+  'my-errors)
 
 (defun pp-code-subproc (cmd args &optional basename new-buf-mode)
   (let* ((contents (buffer-string))
@@ -1033,17 +1055,25 @@ scope of the command's precision.")
                 (current-buffer)))
          (code
           (with-current-buffer buf
-            (apply #'call-process-region
-                   (append (list (point-min) (point-max) cmd t t nil) args)))))
-    (if (and (integerp code)
-             (/= code 0))
+            (let ((debug-on-error nil)
+                  (debug-on-signal nil))
+              (condition-case err
+                  (apply
+                   #'call-process-region
+                   (append (list (point-min) (point-max) cmd t t nil) args))
+                (error (error-message-string err)))))))
+    (if (or (not (integerp code))
+            (/= code 0))
         (with-current-buffer buf
           (let ((errstr (buffer-string)))
             (erase-buffer)
             (insert contents)
             (pop-to-buffer buf)
             (signal 'subproc-error
-                    (list (format "jq failed with status %d" code)
+                    (list (format "command %s failed: %s" cmd
+                                  (if (integerp code)
+                                      (format "exited with status %d" code)
+                                    code))
                           errstr))))
       (unless (eq (current-buffer) buf)
         (pop-to-buffer buf)))))
@@ -1069,7 +1099,10 @@ scope of the command's precision.")
                :from-end t
                :initial-value (apply (car funs) args))))
 
-(cl-defmacro l (expr)
+(defmacro z (expr)
+  `(lambda () ,expr))
+
+(defmacro l (expr)
   (let ((arg (cl-gensym)))
     `(lambda (,arg)
        ,(cl-subst arg '_ expr :test #'eq))))
@@ -1567,7 +1600,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
          (msg-evals (((buffer-string) bstr)) :before "fetch")
          (zerop
           (call-process-shell-command
-           "timeout -k 1 4 git submodule foreach git fetch"
+           "timeout -k 1 10 git submodule foreach git fetch"
            nil t nil))
          (msg-evals (((buffer-string) bstr)) :before "rev-parse")
          (progn
@@ -1596,7 +1629,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
               (let ((default-directory (expand-file-name dir)))
                 (zerop
                  (call-process-shell-command
-                  "timeout -k 1 4 git pull origin master"
+                  "timeout -k 1 10 git pull origin master"
                   nil t nil))))
             failed)
            (list all-dirs failed))))
@@ -1608,36 +1641,36 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 (defun actual-setup-submodules ()
   (unless dont-ask-about-git
-    (with-internet-connection
-     (if (not (executable-find "git"))
-         (send-message-to-scratch
-          "git not installed! some features will be unavailable.")
-       (-let* ((git-submodule-buf-name "*git-submodule-errors*")
-               (default-directory init-home-folder-dir)
-               (submodule-out-buf
-                (get-buffer-create git-submodule-buf-name))
-               ((all-dirs failed)
-                (let ((debug-on-error nil))
-                  (condition-case err
-                      (run-git-updates submodule-out-buf)
-                    (error
-                     (with-temp-buffer
-                       (cl-assert
-                        (zerop
-                         (call-process
-                          "git" nil t nil
-                          "submodule" "--quiet" "foreach" "echo $path")))
-                       (let* ((out (buffer-string))
-                              (processed
-                               (replace-regexp-in-string "\n\\'" "" out)))
-                         (list (split-string processed "\n") t))))))))
-         (msg-evals (all-dirs failed) :before "actual-setup-submodules")
-         (if failed
-             (progn
-               (pop-to-buffer submodule-out-buf)
-               (goto-char (point-max)))
-           (kill-buffer git-submodule-buf-name))
-         all-dirs)))))
+    (when (setup-internet-connection-check 'check)
+      (if (not (executable-find "git"))
+          (send-message-to-scratch
+           "git not installed! some features will be unavailable.")
+        (-let* ((git-submodule-buf-name "*git-submodule-errors*")
+                (default-directory init-home-folder-dir)
+                (submodule-out-buf
+                 (get-buffer-create git-submodule-buf-name))
+                ((all-dirs failed)
+                 (let ((debug-on-error nil))
+                   (condition-case err
+                       (run-git-updates submodule-out-buf)
+                     (error
+                      (with-temp-buffer
+                        (cl-assert
+                         (zerop
+                          (call-process
+                           "git" nil t nil
+                           "submodule" "--quiet" "foreach" "echo $path")))
+                        (let* ((out (buffer-string))
+                               (processed
+                                (replace-regexp-in-string "\n\\'" "" out)))
+                          (list (split-string processed "\n") t))))))))
+          (msg-evals (all-dirs failed) :before "actual-setup-submodules")
+          (if failed
+              (progn
+                (pop-to-buffer submodule-out-buf)
+                (goto-char (point-max)))
+            (kill-buffer git-submodule-buf-name))
+          all-dirs)))))
 
 ;;; TODO: make this work lol
 (defun update-packages-in-list ()
@@ -3035,7 +3068,6 @@ which evaluates to a regexp."
   (if double-neg
       (lambda (arg) (not (funcall fn arg)))
     (lambda (arg) (logify (funcall fn arg)))))
-(defmacro logify (expr) `(not (not ,expr)))
 
 (defun thick-rx-pred (arg)
   `(pcase arg
@@ -3697,16 +3729,6 @@ If this list is empty, the value of `my-loc-lib-result-fun' is called."
   (delete-other-windows)
   (setq init-loaded-fully t)
   (garbage-collect))
-
-
-(defgroup my-errors nil
-  "`defcustom' group for error handling in my own emacs lisp code.")
-(define-error 'my-errors "Errors in my own emacs lisp code.")
-(define-error
-  'my-init-error "Error in my personal emacs initialization." 'my-errors)
-
-(defun message-my-errors (err-type msg buf)
-  (display-warning 'my-errors msg :debug buf))
 
 (defconst my-error-fmt-str
   "error[%1]: %2
