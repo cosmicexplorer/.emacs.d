@@ -1,4 +1,4 @@
-;;; setup packages for emacs
+;;; -*- lexical-binding: t -*-
 
 (require 'package)
 (require 'cl-lib)
