@@ -9,11 +9,20 @@
 (defvar-local book-txt-view-left nil)
 (defvar-local book-txt-view-right nil)
 (defvar-local book-txt-view-last-end nil)
+(defvar-local book-txt-view-prev-font nil)
 
 (defcustom book-txt-view-buffer-contents 'fill
   "How to fill each buffer displayed with `book-txt-view'. Used in
 `book-txt-view-move-page'."
   :type '(radio (const fill) (const page)))
+
+(defcustom book-txt-view-font "Times New Roman"
+  "Which font to use when displaying a book with `book-txt-view'."
+  :type 'string)
+
+(defcustom book-txt-view-font-size 16
+  "Font size to use when displaying a book with `book-txt-view'."
+  :type 'integer)
 
 (defun book-txt-get-percent-done ()
   (with-current-buffer book-txt-view-underlying
@@ -25,6 +34,7 @@
   (-let* ((name (buffer-name))
           (underlying (current-buffer))
           (mode major-mode)
+          (prev-font (face-attribute 'default :font))
           (cfg (current-window-configuration))
           (left-buf (generate-new-buffer
                      (format "*%s<left>*" name)))
@@ -32,6 +42,7 @@
                       (format "*%s<right>*" name))))
     (cl-mapc (l (with-current-buffer _
                   (funcall mode)
+                  (visual-line-mode 1)
                   ;; this ensures we go back the same number of lines as we did
                   ;; before when `book-txt-view-buffer-contents' is 'fill
                   (setq mode-line-format
@@ -46,6 +57,7 @@
                 book-txt-view-left left-buf
                 book-txt-view-right right-buf
                 book-txt-view-last-end (line-beginning-position)
+                book-txt-view-prev-font prev-font
                 ;; don't display a cursor in this mode
                 cursor-type nil
                 cursor-in-non-selected-windows nil)
@@ -57,7 +69,9 @@
   (kill-buffer book-txt-view-left)
   (kill-buffer book-txt-view-right)
   (let ((underlying book-txt-view-underlying)
-        (cfg book-txt-view-previous-window-cfg))
+        (cfg book-txt-view-previous-window-cfg)
+        (font book-txt-view-prev-font))
+    (set-frame-font font)
     (when (buffer-live-p underlying)
       (with-current-buffer underlying
         (setq book-txt-view nil
@@ -66,6 +80,7 @@
               book-txt-view-left nil
               book-txt-view-right nil
               book-txt-view-last-end nil
+              book-txt-view-prev-font nil
               cursor-type t
               cursor-in-non-selected-windows t
               mode-line-format (default-toplevel-value 'mode-line-format))))
@@ -90,6 +105,9 @@
 (defun book-txt-view-move-page (count &optional no-double)
   (cl-check-type count integer)
   (delete-other-windows)
+  (when (member book-txt-view-font (font-family-list))
+    (set-frame-font
+     (format "%s %d" book-txt-view-font book-txt-view-font-size)))
   ;; display left and right buffers in two windows, filling the frame
   (-let* ((to-move (1- count))
           (left-win (selected-window))
