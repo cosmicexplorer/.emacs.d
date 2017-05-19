@@ -1050,4 +1050,10 @@ Use (process-buffer `my-rw-process') instead."
 
 (require 'book-txt-view)
 
-(add-hook 'book-txt-view-hook (z (rainbow-mode -1)))
+(defun stop-book-txt-view-hook ()
+  (when (and book-txt-view book-txt-view-underlying
+             (not (eq book-txt-view-underlying (current-buffer))))
+    (rainbow-mode -1)
+    (linum-mode -1)))
+
+(add-hook 'book-txt-view-hook #'stop-book-txt-view-hook)
