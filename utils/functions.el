@@ -1086,10 +1086,20 @@ scope of the command's precision.")
 
 (defconst xml-fmt-buf-basename "*xml-formatted*")
 
+(defcustom xmllint-pretty-level 1
+  "Value for the \"--pretty\" argument used in xmllint. See `xml-fmt' for
+details."
+  :type '(radio (const 0)
+                (const 1)
+                (const 2)))
+
 (defun xml-fmt (&optional pfx)
   (interactive "P")
-  (pp-code-subproc "xmllint" (list "--pretty" "2" "-") xml-fmt-buf-basename
-                   (when pfx 'nxml-mode)))
+  (let ((prog "xmllint")
+        (args (list "--pretty" (number-to-string xmllint-pretty-level) "-"))
+        (buf-name xml-fmt-buf-basename)
+        (mode (when pfx 'nxml-mode)))
+    (pp-code-subproc prog args buf-name mode)))
 
 ;;; TODO: make better macro for anonymous functions which doesn't require
 ;;; writing out `lambda' a million times
