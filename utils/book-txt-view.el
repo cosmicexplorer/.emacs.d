@@ -17,22 +17,26 @@
 
 (defun book-txt-get-percent-done ()
   (with-current-buffer book-txt-view-underlying
-    (let* ((pt (point))
+    (let* ((pt book-txt-view-last-end)
            (pcnt (/ (float (- pt (point-min))) (- (point-max) (point-min)))))
-      (format "  <book: %d%%%%>" (car (cl-round (* 100 pcnt)))))))
+      (car (cl-round (* 100 pcnt))))))
 
 (defun book-txt-view-setup-locals ()
   (-let* ((name (buffer-name))
           (underlying (current-buffer))
           (mode major-mode)
-          (pt (point))
           (cfg (current-window-configuration))
           (left-buf (generate-new-buffer
                      (format "*%s<left>*" name)))
           (right-buf (generate-new-buffer
                       (format "*%s<right>*" name))))
     (cl-mapc (l (with-current-buffer _
-                  (funcall mode)))
+                  (funcall mode)
+                  ;; this ensures we go back the same number of lines as we did
+                  ;; before when `book-txt-view-buffer-contents' is 'fill
+                  (setq mode-line-format
+                        '((:eval
+                           (format "  %d%%%%" (book-txt-get-percent-done)))))))
              (list left-buf right-buf))
     (cl-mapc
      (l (with-current-buffer _
@@ -41,13 +45,10 @@
                 book-txt-view-underlying underlying
                 book-txt-view-left left-buf
                 book-txt-view-right right-buf
-                book-txt-view-last-end pt
+                book-txt-view-last-end (line-beginning-position)
                 ;; don't display a cursor in this mode
                 cursor-type nil
-                cursor-in-non-selected-windows nil
-                ;; show percent done in mode line on left
-                mode-line-format `((:eval (book-txt-get-percent-done))
-                                   ,@mode-line-format))
+                cursor-in-non-selected-windows nil)
           (run-hooks 'book-txt-view-hook)))
      (list left-buf right-buf underlying))
     (book-txt-view-move-page 1)))
@@ -70,7 +71,7 @@
               mode-line-format (default-toplevel-value 'mode-line-format))))
     (set-window-configuration cfg)))
 
-(defun book-txt-view-next-point (window &optional count)
+(defun book-txt-view-next-point (window-lines &optional count)
   ;; TODO: some way to avoid reliance on `cl-ecase', `pcase', and other
   ;; conditional constructs that don't rely on a config
   ;; variable. `book-txt-view-buffer-contents' ALREADY specifies which values
@@ -80,12 +81,8 @@
   (let ((num (or count 1)))
     (cl-ecase book-txt-view-buffer-contents
       (fill
-       (let* ((screen-lines
-               (with-selected-window window
-                 (window-screen-lines)))
-              (lines (car (cl-round screen-lines))))
-         (forward-line (* num lines))
-         (line-beginning-position)))
+       (forward-line (* num window-lines))
+       (line-beginning-position))
       (page
        (forward-page num)
        (line-beginning-position)))))
@@ -94,21 +91,29 @@
   (cl-check-type count integer)
   (delete-other-windows)
   ;; display left and right buffers in two windows, filling the frame
-  (let* ((to-move (1- count))
-         (left-win (selected-window))
-         (right-win (split-window-horizontally))
-         (left-buf book-txt-view-left)
-         (right-buf book-txt-view-right)
-         (underlying book-txt-view-underlying))
+  (-let* ((to-move (1- count))
+          (left-win (selected-window))
+          (right-win (split-window-horizontally))
+          ((left-lines right-lines)
+           (--map
+            (with-selected-window it
+              (car (cl-round (window-screen-lines))))
+            (list left-win right-win)))
+          (left-buf book-txt-view-left)
+          (right-buf book-txt-view-right)
+          (underlying book-txt-view-underlying))
+    (cl-mapc (l (with-current-buffer _
+                  (read-only-mode -1)))
+             (list left-buf right-buf))
     ;; give left and right buffers the current and next page
     (with-current-buffer underlying
       (save-excursion
         (goto-char book-txt-view-last-end)
-        (book-txt-view-next-point left-win to-move)
-        (book-txt-view-next-point right-win to-move)
+        (book-txt-view-next-point left-lines to-move)
+        (book-txt-view-next-point right-lines to-move)
         (let* ((st-1 (point))
-               (st-2 (book-txt-view-next-point left-win))
-               (st-3 (book-txt-view-next-point right-win))
+               (st-2 (book-txt-view-next-point left-lines))
+               (st-3 (book-txt-view-next-point right-lines))
                (txt-1
                 (buffer-substring st-1 st-2))
                (txt-2
@@ -127,7 +132,9 @@
     ;; move point to beginning
     (cl-mapc
      (-lambda ((buf win))
-       (set-window-buffer-start-and-point win buf 1 1))
+       (set-window-buffer-start-and-point win buf 1 1)
+       (with-current-buffer buf
+         (read-only-mode 1)))
      `((,left-buf ,left-win)
        (,right-buf ,right-win)))
     ;; select the left buffer's window
@@ -142,11 +149,16 @@
   (interactive "p")
   (book-txt-view-move-page (- count)))
 
+(defun book-txt-view-show-percent-done ()
+  (interactive)
+  (message "percent done: %d%%" (book-txt-get-percent-done)))
+
 (defconst book-txt-view-keymap
   (make-keymap-from-bindings
    `(("n" . book-txt-view-next-page)
      ("p" . book-txt-view-previous-page)
-     ("q" . book-txt-view))))
+     ("q" . book-txt-view)
+     ("?" . book-txt-view-show-percent-done))))
 
 (define-minor-mode book-txt-view
   "Minor mode for reading text files with two side-by-side windows."
