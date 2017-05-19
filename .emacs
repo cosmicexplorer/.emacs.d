@@ -126,37 +126,34 @@ Check out your .emacs."))
       (server-start)
     (setq save-visited-files nil)))
 
-(defun load-my-init-script (file-name)
-  "Loads script located in init-scripts directory."
-  (load-file (expand-file-name (format "%s/%s.el" "init-scripts" file-name) init-home-folder-dir)))
-
-(defun load-my-util-script (file-name)
-  "Loads script located in utils directory."
-  (load-file (expand-file-name (format "%s/%s.el" "utils" file-name) init-home-folder-dir)))
+(defun load-my-script (fname &optional dir)
+  (load-file (expand-file-name
+              (format "%s/%s.el" (or dir ".") fname)
+              init-home-folder-dir)))
 
 ;;; load the packages i like
-(load-my-init-script "packages")
+(load-my-script "packages" "init-scripts")
 
 ;;; load elisp
 ;;; should be /after/ byte-recompilation
-(load-my-init-script "requires")
+(load-my-script "requires" "init-scripts")
 
 ;;; load all my cool functions!!!
-(load-my-util-script "functions")
+(load-my-script "functions" "utils")
 
 ;;; for compatibility between different operating environments
-(load-my-init-script "compat")
+(load-my-script "compat" "init-scripts")
 
 ;;; enforce my strong opinions on the default emacs ui
-(load-my-init-script "interface")
+(load-my-script "interface" "init-scripts")
 ;;; do some additional work to setup packages
-(load-my-init-script "package-setup")
+(load-my-script "package-setup" "init-scripts")
 ;;; load (programming) language-specific settings
-(load-my-init-script "languages")
+(load-my-script "languages" "init-scripts")
 ;;; cause what else is emacs for
-(load-my-init-script "keybindings")
+(load-my-script "keybindings" "init-scripts")
 
-(add-hook 'after-init-hook (z (load-my-init-script "visuals")))
+(add-hook 'after-init-hook (z (load-my-script "visuals" "init-scripts")))
 
 (cl-mapc #'open-if-not-already my-files-to-open-xdg)
 
@@ -168,15 +165,16 @@ Check out your .emacs."))
  'ignore)
 
 ;;; sometimes fails on 'require call
-(load-file (expand-file-name
-            (concat user-emacs-directory "lisp/smart-compile.el")))
+(load-my-script "smart-compile" "lisp")
 
 ;;; save visited files to buffer
 (when save-visited-files
   (add-hook 'after-init-hook #'reread-visited-files-from-disk)
   (add-hook 'kill-emacs-hook #'save-visiting-files-to-buffer))
 
-(add-hook 'after-init-hook #'clean-init-screen)
+(add-hook 'after-init-hook #'clean-init-screen t)
+(add-hook 'after-init-hook #'redisplay)
+(add-hook 'after-init-hook #'redisplay t)
 
 ;;; let's do it
 (add-hook
@@ -186,11 +184,14 @@ Check out your .emacs."))
     (when check-internet-connection
       (setup-internet-connection-check 'check))
     (when monitor-internet-connection
-      (setup-internet-connection-check 'both)))))
+      (setup-internet-connection-check 'monitor)))))
 
 ;;; deprecated
 (unless (null after-load-init-hook)
   (user-error "%s" "`after-load-init-hook' is deprecated!"))
+
+(add-hook 'after-init-hook #'garbage-collect)
+(add-hook 'after-init-hook #'garbage-collect t)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
