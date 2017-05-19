@@ -1349,6 +1349,20 @@ its filename, and a message is sent if the predicate returns non-nil."
       (indent-region (region-beginning) (region-end))
     (funcall indent-line-function)))
 
+(defconst fix-linum-relative-default-sym ">")
+
+(defun nonzerop (arg) (not (zerop arg)))
+
+(cl-deftype natural-num ()
+  `(and wholenum (satisfies nonzerop)))
+
+(defun squish-number-to-width (width num)
+  (cl-check-type width natural-num)
+  (cl-check-type num number)
+  (let ((rep (format "%d" num)))
+    (if (<= (length rep) width) rep
+      (substring rep 0 width))))
+
 ;;; linum-relative does the same thing as this, except the first line of the
 ;;; let* has (diff1 (abs (- line-number linum-relative-last-pos))) and for the
 ;;; life of me i will never understand why the abs is there
@@ -1359,11 +1373,11 @@ also affects negative line numbers, even though it says it doesn't."
   (let* ((diff1 (- line-number linum-relative-last-pos))
          (diff (if (minusp diff1) diff1 (+ diff1 linum-relative-plusp-offset)))
          (current-p (= diff linum-relative-plusp-offset))
-         (current-symbol (if (and linum-relative-current-symbol current-p)
-                             (if (string= "" linum-relative-current-symbol)
-                                 (number-to-string line-number)
+         (current-symbol (if current-p
+                             (if (string-empty-p linum-relative-current-symbol)
+                                 fix-linum-relative-default-sym
                                linum-relative-current-symbol)
-                           (number-to-string diff)))
+                           (format "%d" diff)))
          (face (if current-p 'linum-relative-current-face 'linum)))
     (propertize (format linum-relative-format current-symbol) 'face face)))
 
