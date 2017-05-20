@@ -43,12 +43,7 @@
                       (format "*%s<right>*" name))))
     (cl-mapc (l (with-current-buffer _
                   (funcall mode)
-                  (visual-line-mode 1)
-                  ;; this ensures we go back the same number of lines as we did
-                  ;; before when `book-txt-view-buffer-contents' is 'fill
-                  (setq mode-line-format
-                        '((:eval
-                           (format "  %d%%%%" (book-txt-get-percent-done)))))))
+                  (visual-line-mode 1)))
              (list left-buf right-buf))
     (cl-mapc
      (l (with-current-buffer _
@@ -62,10 +57,12 @@
                 book-txt-view-prev-font prev-font
                 ;; don't display a cursor in this mode
                 cursor-type nil
-                cursor-in-non-selected-windows nil)
+                cursor-in-non-selected-windows nil
+                mode-line-format nil)
           (run-hooks 'book-txt-view-hook)))
      (list left-buf right-buf underlying))
-    (book-txt-view-move-page 1)))
+    (book-txt-view-move-page 2)
+    (book-txt-view-move-page -1)))
 
 (defun book-txt-view-kill-locals ()
   (kill-buffer book-txt-view-left)
