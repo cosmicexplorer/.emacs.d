@@ -8,6 +8,7 @@
 (defvar-local book-txt-view-underlying nil)
 (defvar-local book-txt-view-left nil)
 (defvar-local book-txt-view-right nil)
+(defvar-local book-txt-view-last-start nil)
 (defvar-local book-txt-view-last-end nil)
 (defvar-local book-txt-view-prev-font nil)
 
@@ -56,6 +57,7 @@
                 book-txt-view-underlying underlying
                 book-txt-view-left left-buf
                 book-txt-view-right right-buf
+                book-txt-view-last-start (line-beginning-position)
                 book-txt-view-last-end (line-beginning-position)
                 book-txt-view-prev-font prev-font
                 ;; don't display a cursor in this mode
@@ -74,11 +76,13 @@
     (set-frame-font font)
     (when (buffer-live-p underlying)
       (with-current-buffer underlying
+        (goto-char book-txt-view-last-start)
         (setq book-txt-view nil
               book-txt-view-previous-window-cfg nil
               book-txt-view-underlying nil
               book-txt-view-left nil
               book-txt-view-right nil
+              book-txt-view-last-start nil
               book-txt-view-last-end nil
               book-txt-view-prev-font nil
               cursor-type t
@@ -145,7 +149,8 @@
              (,right-buf ,txt-2)))
           (cl-mapc
            (l (with-current-buffer _
-                (setq book-txt-view-last-end st-3)))
+                (setq book-txt-view-last-start st-1
+                      book-txt-view-last-end st-3)))
            (list left-buf right-buf underlying)))))
     ;; move point to beginning
     (cl-mapc
