@@ -512,26 +512,23 @@ Lisp code." t)
    "https://github.com/cosmicexplorer/grip"))
 
 (defun setup-markdown-mode ()
-  (if (and (not no-gfm)
-           (not (derived-mode-p 'gfm-mode))
-           (zerop (call-process
-                   "git" nil nil nil "rev-parse" "--git-dir")))
-      (gfm-mode)
-    (let ((cmd (format
-                "pandoc -f markdown%s -t html -"
-                (if markdown-enable-math "+tex_math_dollars" ""))))
-      (setq-local markdown-command cmd))))
+  (cond
+   ((derived-mode-p 'gfm-mode))
+   ((and (not no-gfm)
+         (zerop (call-process
+                 "git" nil nil nil "rev-parse" "--git-dir")))
+    (gfm-mode))
+   (t (let ((cmd (format
+                  "pandoc -f markdown%s -t html -"
+                  (if markdown-enable-math "+tex_math_dollars" ""))))
+        (setq-local markdown-command cmd)))))
+
+(add-hook 'markdown-mode-hook #'setup-markdown-mode)
 
 (defun set-gfm-markdown-command ()
-  (set (make-local-variable 'markdown-command)
-       "pandoc -f markdown_github -t html -"))
+  (setq-local markdown-command "pandoc -f markdown_github -t html -"))
 
 (add-hook 'gfm-mode-hook #'set-gfm-markdown-command)
-
-(defun set-markdown-local-vars-hook ()
-  (add-hook 'hack-local-variables-hook #'setup-markdown-mode t t))
-
-(add-hook 'markdown-mode-hook #'set-markdown-local-vars-hook)
 
 ;;; coffeescript
 (eval-after-load "coffee-mode"
