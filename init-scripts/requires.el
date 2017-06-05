@@ -61,6 +61,7 @@
 (require 'haskell)
 (require 'rx)
 (require 'widget)
+(require 'epa-file)
 
 ;;; my stuff
 (require 'utilities)

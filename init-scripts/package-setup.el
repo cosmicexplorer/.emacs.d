@@ -562,3 +562,9 @@ If SUBMODE is not provided, use `LANG-mode' by default."
 (defun ess-save-excursion-when-nil (_))
 
 (put 'highlight-80+-columns 'safe-local-variable (lambda (_) t))
+
+;;; encrypted files
+(epa-file-enable)
+
+;;; ensime
+(setq ensime-startup-snapshot-notification nil)
