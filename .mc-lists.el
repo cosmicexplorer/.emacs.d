@@ -36,6 +36,7 @@
         destroy-all-whitespace-nearby
         dired-next-line
         dired-previous-line
+        electric-newline-and-maybe-indent
         electric-pair-delete-pair
         end-of-buffer
         end-of-maybe-visual-line

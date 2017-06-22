@@ -283,6 +283,21 @@ Check out your .emacs."))
  '(erc-track-minor-mode t)
  '(erc-track-mode t)
  '(ess-S-assign "_")
+ '(ess-default-style (quote OWN))
+ '(ess-own-style-list
+   (quote
+    ((ess-indent-offset . 4)
+     (ess-offset-arguments . open-delim)
+     (ess-offset-arguments-newline . prev-line)
+     (ess-offset-block . prev-line)
+     (ess-offset-continued . straight)
+     (ess-align-nested-calls "ifelse")
+     (ess-align-arguments-in-calls "function[[:space:]]*(")
+     (ess-align-continuations-in-calls . t)
+     (ess-align-blocks control-flow)
+     (ess-indent-from-lhs arguments fun-decl-opening)
+     (ess-indent-from-chain-start . t)
+     (ess-indent-with-fancy-comments . t))))
  '(fill-column 80)
  '(git-gutter:update-hooks
    (quote
