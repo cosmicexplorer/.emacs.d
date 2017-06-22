@@ -31,7 +31,7 @@
 ;;; smart-tab
 (global-smart-tab-mode 1)               ; put it EVERYWHERE
 
-;; julia/R from ESS
+;; ESS
 (let ((ess-lisp (expand-file-name "ESS/lisp" init-home-folder-dir)))
   (when (file-directory-p ess-lisp)
     (add-to-list 'load-path ess-lisp)
@@ -558,8 +558,6 @@ If SUBMODE is not provided, use `LANG-mode' by default."
 (my-mmm-markdown-auto-class "fortran" 'f90-mode)
 (my-mmm-markdown-auto-class "perl" 'cperl-mode)
 (my-mmm-markdown-auto-class "shell" 'shell-script-mode)
-
-(defun ess-save-excursion-when-nil (_))
 
 (put 'highlight-80+-columns 'safe-local-variable (lambda (_) t))
 

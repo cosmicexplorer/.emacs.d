@@ -43,8 +43,24 @@
 (add-hook 'after-change-major-mode-hook #'set-correct-trailing-whitespace)
 
 ;; do backups well and put them into a separate folder
-(setq backup-directory-alist
-      `(("." . ,(concat init-home-folder-dir "autosaved-files"))))
+(defconst my-backup-dir (expand-file-name "backup-files" init-home-folder-dir))
+(setq backup-directory-alist `(("." . ,my-backup-dir)))
+(setq auto-save-file-name-transforms nil)
+
+(defconst my-autosave-dir
+  (expand-file-name "auto-save-files" init-home-folder-dir))
+
+(defconst dir-sep
+  (if (memq system-type '(windows-nt ms-dos)) "\\" "/"))
+
+(defun make-auto-save-file-name ()
+  (let* ((fname (buffer-file-name))
+         (out-fname (replace-regexp-in-string dir-sep "!" fname)))
+    (expand-file-name out-fname my-autosave-dir)))
+
+(defun auto-save-file-name-p (file-basename)
+  (file-exists-p (expand-file-name file-basename my-autosave-dir)))
+
 (setq backup-by-copying t)
 (setq delete-old-versions t
       kept-new-versions 6
@@ -151,7 +167,8 @@
 (add-hook 'after-init-hook #'load-display-time)
 (put 'downcase-region 'disabled nil)
 (put 'erase-buffer 'disabled nil)
-(setq auto-save-interval 600)     ; half as often as default
+(setq auto-save-interval 200)
+(setq auto-save-timeout 10)
 (setq gc-cons-threshold 2000000)
 (setq lpr-switches '("-Pps"))
 (setq default-truncate-lines nil)

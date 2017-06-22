@@ -11,17 +11,13 @@ saved-files
 no-beautify
 eshell-output
 shell-output
-undo-tree-history/
 games/
-autosaved-files/
-auto-save-list/
 # melpa/elpa/etc
 elpa/
 # tramp file
 tramp
 # compiled files
 *.elc
-backups/
 # request folder, not sure why this exists at all lol but whatever
 request/
 # user-customizable variables
@@ -37,3 +33,4 @@ abbrev_defs
 network-security.data
 .cask
 srecode-map.el
+package-lock.json

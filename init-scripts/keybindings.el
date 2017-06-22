@@ -245,6 +245,10 @@
 (define-key lisp-interaction-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
 (define-key emacs-lisp-mode-map (kbd "C-M-d") #'eval-defun)
 (define-key paredit-mode-map (kbd "C-M-d") nil)
+;;; TODO: make it use emacs-lisp-mode and other fun keybindings, along with
+;;; making `edebug-eval-expression' use its OWN history
+;; (define-key read-expression-map (kbd ""))
+
 (with-eval-after-spec edebug
   ;; TODO
   ;; (define-key edebug-mode-map (kbd "e") #'my-edebug-eval-nicely)
@@ -837,7 +841,11 @@
   (define-key ess-mode-map (kbd "C-c '") #'ess-show-traceback)
   (define-key ess-tracebug-map  (kbd "C-c '") #'ess-show-traceback)
   (define-key inferior-ess-mode-map  (kbd "C-c '") #'ess-show-traceback)
-  (define-key ess-mode-map (kbd "M-:") #'my-ess-eval-this)
+
+  ;; TODO: ess eval!!!
+  ;; (define-key ess-mode-map (kbd "M-:") #'my-ess-eval-this)
+  ;; TODO: use some r package functions, maybe?
+  (define-key ess-r-package-mode-map (kbd "C-c C-w") nil)
   (define-key ess-mode-map (kbd "C-M-h") nil))
 
 (global-set-key (kbd "C-:") #'eval-expression)
