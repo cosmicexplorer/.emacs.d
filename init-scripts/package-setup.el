@@ -282,10 +282,10 @@
 
 ;;; make git-gutter run on magit actions
 (defadvice magit-run-git (around run-git-gutter activate)
-  (let ((prev-mod-files (magit-modified-files)))
+  (let ((prev-mod-files (magit-unstaged-files)))
     ad-do-it
     (loop
-     for file in (union prev-mod-files (magit-modified-files)
+     for file in (union prev-mod-files (magit-unstaged-files)
                         :test #'equal)
      for buf = (get-file-buffer file) when buf
      do (with-current-buffer buf (git-gutter)))))
