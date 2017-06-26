@@ -73,15 +73,17 @@ connectivity."
       (setup-internet-connection-check 'both-test)))))
 
 (defun do-check-internet-connection (check-cmd check-rx)
-  (-let* (((ch-cmd . ch-args) check-cmd)
-          (check-proc-anon
+  (let* ((ch-cmd (car check-cmd))
+         (ch-args (cdr check-cmd))
+         (check-proc-anon
            (apply-partially #'call-process ch-cmd nil t nil))
-          ((ch-code output)
-           (with-temp-buffer
-             (let ((c (apply check-proc-anon ch-args)))
-               (list c (buffer-string)))))
-          (connected (and (zerop ch-code)
-                          (string-match-p check-rx output))))
+         (res (with-temp-buffer
+                (let ((c (apply check-proc-anon ch-args)))
+                  (list c (buffer-string)))))
+         (ch-code (car res))
+         (output (second res))
+         (connected (and (zerop ch-code)
+                         (string-match-p check-rx output))))
     (setq has-internet-connection (not (not connected)))
     ch-code))
 
