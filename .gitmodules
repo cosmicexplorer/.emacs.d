@@ -11,7 +11,6 @@
 [submodule "emacs-color-themes"]
         path = emacs-color-themes
         url = https://github.com/cosmicexplorer/emacs-color-themes.git
-        ignore = dirty
         branch = master
 [submodule "org-mode"]
         path = org-mode
@@ -21,5 +20,4 @@
 [submodule "emacs-helm-ag"]
         path = emacs-helm-ag
         url = https://github.com:/cosmicexplorer/emacs-helm-ag.git
-        ignore = dirty
         branch = play
