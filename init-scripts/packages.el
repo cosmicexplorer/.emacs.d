@@ -84,6 +84,7 @@ connectivity."
          (output (second res))
          (connected (and (zerop ch-code)
                          (string-match-p check-rx output))))
+
     (setq has-internet-connection (not (not connected)))
     ch-code))
 
