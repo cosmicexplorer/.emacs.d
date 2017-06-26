@@ -64,12 +64,6 @@ init-scripts/interface.el.")
 (defvar save-tramp-bufs t
   "Whether or not to revisit tramp buffers opened in a previous session. Used in
 init-scripts/interface.el.")
-(defvar erc-nick nil
-  "Nick to use for erc.")
-(defvar erc-port 6667
-  "Default port to use for erc.")
-(defvar erc-server-pass-alist nil
-  "Alist of passwords and ports for servers to connect with erc.")
 (defvar submodule-makes-to-ignore nil
   "List of submodule makes to ignore compilation for.")
 (defvar dont-ask-about-git nil
@@ -165,7 +159,6 @@ Check out your .emacs."))
  'ignore)
 
 ;;; sometimes fails on 'require call
-(load-my-script "smart-compile" "lisp")
 
 ;;; save visited files to buffer
 (when save-visited-files
@@ -263,26 +256,6 @@ Check out your .emacs."))
  '(edebug-save-windows nil)
  '(ediff-split-window-function (quote split-window-horizontally))
  '(enable-recursive-minibuffers t)
- '(erc-autojoin-mode t)
- '(erc-button-mode t)
- '(erc-fill-mode t)
- '(erc-highlight-nicknames-mode t)
- '(erc-irccontrols-mode t)
- '(erc-join-buffer (quote bury))
- '(erc-list-mode t)
- '(erc-match-mode t)
- '(erc-menu-mode nil)
- '(erc-move-to-prompt-mode t)
- '(erc-netsplit-mode t)
- '(erc-networks-mode t)
- '(erc-noncommands-mode t)
- '(erc-pcomplete-mode t)
- '(erc-prompt (quote get-erc-prompt))
- '(erc-readonly-mode t)
- '(erc-ring-mode t)
- '(erc-stamp-mode t)
- '(erc-track-minor-mode t)
- '(erc-track-mode t)
  '(ess-S-assign "_")
  '(ess-default-style (quote OWN))
  '(ess-own-style-list
@@ -405,7 +378,7 @@ Check out your .emacs."))
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (jq-mode vimrc-mode polymode intero shm nhexl-mode web-mode f3 scrooge projectile thrift cuda-mode visual-fill-column realgud mmm-mode pdf-tools font-lock-studio shut-up git-gutter-fringe yaml-mode sourcemap wgrep wgrep-ag wgrep-helm ag pacmacs slime-company enh-ruby-mode robe tuareg solarized-theme color-theme-solarized highlight-parentheses racket-mode sage-shell-mode gnuplot-mode gnuplot sml-mode skewer-mode csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode2 company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters paredit omnisharp misc-cmds minimap literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
+    (jq-mode vimrc-mode polymode intero shm nhexl-mode web-mode f3 scrooge projectile thrift cuda-mode visual-fill-column realgud mmm-mode pdf-tools font-lock-studio shut-up git-gutter-fringe yaml-mode sourcemap wgrep wgrep-ag wgrep-helm ag pacmacs slime-company enh-ruby-mode robe tuareg solarized-theme color-theme-solarized highlight-parentheses racket-mode sage-shell-mode gnuplot-mode gnuplot sml-mode skewer-mode csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters paredit omnisharp misc-cmds minimap literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game)))
  '(perl6-indent-offset 2)
  '(rainbow-ansi-colors t)
  '(rainbow-html-colors t)

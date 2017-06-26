@@ -81,10 +81,9 @@ connectivity."
                 (let ((c (apply check-proc-anon ch-args)))
                   (list c (buffer-string)))))
          (ch-code (car res))
-         (output (second res))
+         (output (car (cdr res)))
          (connected (and (zerop ch-code)
                          (string-match-p check-rx output))))
-
     (setq has-internet-connection (not (not connected)))
     ch-code))
 

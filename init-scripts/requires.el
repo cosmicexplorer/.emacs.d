@@ -18,9 +18,6 @@
 (require 'color-theme)
 (require 'comint)
 (require 'ensime)
-(require 'erc)
-(require 'erc-highlight-nicknames)      ; this file is in /lisp/
-(require 'erc-nicklist)                 ; this file is in /lisp/
 (require 'helm-config)
 (require 'helm-gtags)
 (require 'helm-swoop)
@@ -45,7 +42,6 @@
 (require 'web-beautify)
 (require 'js2-mode)
 (require 'highlight-parentheses)
-(when (featurep 'minimap) (unload-feature 'minimap))
 (require 'wgrep)
 (require 'sourcemap)
 (require 'eww)
@@ -56,7 +52,6 @@
 (require 'cuda-mode)
 (require 'llvm-stuff)
 (require 'llvm-mode)
-(when (featurep 'scala-mode2) (unload-feature 'scala-mode2))
 (require 'scala-mode)
 (require 'haskell)
 (require 'rx)

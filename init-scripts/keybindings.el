@@ -274,9 +274,6 @@
   (define-key makefile-gmake-mode-map (kbd "M-n") nil)
   (define-key makefile-gmake-mode-map (kbd "M-p") nil))
 
-;;; erc
-(global-set-key (kbd "C-c C-e") 'message-erc-modded-chans)
-
 ;;; replacing text
 (global-set-key (kbd "M-$") 'replace-string)
 (global-set-key (kbd "M-#") 'replace-regexp)
@@ -581,9 +578,6 @@
 (global-set-key (kbd "C-x M-h") #'unpop-to-mark-command)
 (global-set-key (kbd "C-x C-p") #'previous-buffer)
 (global-set-key (kbd "C-x M-p") #'next-buffer)
-
-;;; erc stuff
-(global-set-key (kbd "C-c M-e") #'message-erc-modded-chans)
 
 ;;; html stuff
 (define-key html-mode-map (kbd "C-c C-v") nil)

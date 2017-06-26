@@ -907,51 +907,51 @@ scope of the command's precision.")
 
 ;;; save buffers to disk and get them back
 (defun reread-visited-files-from-disk ()
-  (save-window-excursion
-    (unwind-protect
-        (let* ((saved-buf (when (file-readable-p saved-files)
-                            (find-file-noselect saved-files)))
-               (no-read-re
-                (rx-to-string
-                 `(| ,@(--map `(regexp ,it) saved-files-no-read-regexps)) t)))
-          ;; TODO: macro for with-current-buffer then common action, e.g. going
-          ;; to the beginning, and check if buffer exists/is live, and option to
-          ;; kill at end
-          (with-current-buffer saved-buf
-            (goto-char (point-min))
-            (cl-loop
-             while (re-search-forward saved-files-format-regexp nil t)
-             for (line type fname pt-str) = (-map #'match-string (range 0 3))
-             ;; TODO: macro to zip lists and then destructure ordered args
-             ;; of each element (mapping a zip with destructure)
-             for act = (assoc-default type saved-files-action-alist)
-             ;; TODO: macro/function to do dash stuff, but with func as
-             ;; last (or any other) argument (configurable); consider
-             ;; something generic like haskell's flip to streamline
-             for path = (and (stringp fname)
-                             (file-truename fname))
-             for pt = (and (stringp pt-str)
-                           (cl-parse-integer pt-str :junk-allowed t))
-             ;; TODO: macro to do "intermediate" checking in middle of
-             ;; when-let*, as well as nested "when" clauses in cl-loop
-             for buf = (and (functionp act)
-                            ;; TODO: macro to do this check-then-do stuff
-                            ;; (along with do-then-check, or other combos)
-                            (file-readable-p path)
-                            (not (string-match-p no-read-re path))
-                            (funcall act path))
-             ;; TODO: macro to apply functions to args in list,
-             ;; something like `l' which uses a placeholder, and which
-             ;; can be used in a cl-defun or lambda (kinda like --map then
-             ;; -let)
-             if (and (buffer-live-p buf)
-                     (wholenump pt))
-             collect (pos-in-bounds buf pt) into successes
-             else collect line into failures
-             finally (message "successes = '%S',\nfailures = '%S'"
-                              successes failures)))
-          (kill-buffer saved-buf)))
-    (clean-nonvisiting-buffers)))
+  (when (file-readable-p saved-files)
+    (save-window-excursion
+      (unwind-protect
+          (let* ((saved-buf (find-file-noselect saved-files))
+                 (no-read-re
+                  (rx-to-string
+                   `(| ,@(--map `(regexp ,it) saved-files-no-read-regexps)) t)))
+            ;; TODO: macro for with-current-buffer then common action, e.g. going
+            ;; to the beginning, and check if buffer exists/is live, and option to
+            ;; kill at end
+            (with-current-buffer saved-buf
+              (goto-char (point-min))
+              (cl-loop
+               while (re-search-forward saved-files-format-regexp nil t)
+               for (line type fname pt-str) = (-map #'match-string (range 0 3))
+               ;; TODO: macro to zip lists and then destructure ordered args
+               ;; of each element (mapping a zip with destructure)
+               for act = (assoc-default type saved-files-action-alist)
+               ;; TODO: macro/function to do dash stuff, but with func as
+               ;; last (or any other) argument (configurable); consider
+               ;; something generic like haskell's flip to streamline
+               for path = (and (stringp fname)
+                               (file-truename fname))
+               for pt = (and (stringp pt-str)
+                             (cl-parse-integer pt-str :junk-allowed t))
+               ;; TODO: macro to do "intermediate" checking in middle of
+               ;; when-let*, as well as nested "when" clauses in cl-loop
+               for buf = (and (functionp act)
+                              ;; TODO: macro to do this check-then-do stuff
+                              ;; (along with do-then-check, or other combos)
+                              (file-readable-p path)
+                              (not (string-match-p no-read-re path))
+                              (funcall act path))
+               ;; TODO: macro to apply functions to args in list,
+               ;; something like `l' which uses a placeholder, and which
+               ;; can be used in a cl-defun or lambda (kinda like --map then
+               ;; -let)
+               if (and (buffer-live-p buf)
+                       (wholenump pt))
+               collect (pos-in-bounds buf pt) into successes
+               else collect line into failures
+               finally (message "successes = '%S',\nfailures = '%S'"
+                                successes failures)))
+            (kill-buffer saved-buf)))
+      (clean-nonvisiting-buffers))))
 
 (defun alist-process-modify-result (op result)
   (-let* (((kv-used kv-left matched unmatched) result)
@@ -1175,19 +1175,6 @@ details."
 (defmacro with-feature (feature-sym &rest body)
   ,(when (featurep ,feature-sym) ,@body))
 (put 'with-feature 'lisp-indent-function 1)
-
-;;; erc prompt
-(defun get-erc-prompt ()
-  (concat (erc-current-nick) ">"))
-
-(defun rejoin-erc ()
-  (interactive)
-  (destroy-all-erc-stuff)
-  (loop for serv-tuple in erc-server-pass-alist
-        do (erc :server (first serv-tuple)
-                :port (or (second serv-tuple) erc-port)
-                :nick (or (third serv-tuple) erc-nick)
-                :password (fourth serv-tuple))))
 
 ;;; windows stuff
 (defun dewindowsify-path (path)
