@@ -37,10 +37,12 @@ less-css-mode
 linum-relative
 literate-coffee-mode
 lua-mode
+magit
 matlab-mode
 minimap
 misc-cmds
 mmm-mode
+multiple-cursors
 nhexl-mode
 omnisharp
 pacmacs

@@ -39,12 +39,6 @@
   (goto-char (point-max))
   (funcall-interactively #'inferior-ess-send-input))
 
-(let* ((ess-s-l-loc (locate-library "ess-s-l"))
-       (ess-s-l-not-elc
-        (replace-regexp-in-string "\\.elc\\'" ".el" ess-s-l-loc)))
-  (when (file-exists-p ess-s-l-not-elc)
-    (byte-compile-file ess-s-l-not-elc t)))
-
 (defvar my-ess-eval-history nil)
 (defvar my-ess-switch-to-process nil)
 
