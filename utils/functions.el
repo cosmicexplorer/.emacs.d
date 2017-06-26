@@ -3739,6 +3739,8 @@ If this list is empty, the value of `my-loc-lib-result-fun' is called."
   (switch-to-buffer "*scratch*")
   (delete-other-windows)
   (setq init-loaded-fully t)
+  (unless (frame-parameter (selected-frame) 'fullscreen)
+    (toggle-frame-fullscreen))
   (garbage-collect))
 
 (defconst my-error-fmt-str
