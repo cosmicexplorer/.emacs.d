@@ -997,7 +997,3 @@ Use (process-buffer `my-rw-process') instead."
     (linum-mode -1)))
 
 (add-hook 'book-txt-view-hook #'stop-book-txt-view-hook)
-
-(defcustom default-text-height 100
-  "Default size of text in Emacs buffers."
-  :type 'integer)

@@ -69,6 +69,9 @@ init-scripts/interface.el.")
 (defvar dont-ask-about-git nil
   "If git not installed, don't worry about it.")
 
+(defvar default-text-height 90
+  "Default size of text in Emacs buffers.")
+
 ;;; TODO: make shorthand for val being matched within BODY-FORMS of pcase
 
 (defvar after-load-init-hook nil
@@ -116,9 +119,8 @@ Check out your .emacs."))
 ;; but only if server isn't already started
 (require 'server)
 (when (fboundp 'server-running-p)
-  (if (not (eq (server-running-p) t))
-      (server-start)
-    (setq save-visited-files nil)))
+  (unless (server-running-p)
+    (server-start)))
 
 (defun load-my-script (fname &optional dir)
   (load-file (expand-file-name
@@ -218,7 +220,6 @@ Check out your .emacs."))
  '(cperl-invalid-face (quote cperl-no-trailing-whitespace-face))
  '(create-lockfiles nil)
  '(dabbrev-case-replace nil)
- '(default-text-height 90)
  '(dired-auto-revert-buffer t)
  '(dired-clean-up-buffers-too nil)
  '(dired-guess-shell-alist-user
