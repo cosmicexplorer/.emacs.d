@@ -38,6 +38,7 @@ linum-relative
 literate-coffee-mode
 lua-mode
 magit
+markdown-mode
 matlab-mode
 minimap
 misc-cmds

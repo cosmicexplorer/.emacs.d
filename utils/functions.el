@@ -229,6 +229,10 @@ also."
 
 (defalias 'small-text 'little-text)
 
+(defun even-littler-text ()
+  (interactive)
+  (set-face-attribute 'default nil :height 90))
+
 (defun increase-font-size ()
   (interactive)
   (let ((attr (face-attribute 'default :height)))

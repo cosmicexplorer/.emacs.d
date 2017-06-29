@@ -11,7 +11,7 @@
 (setq scroll-preserve-screen-position t)
 
 ;;; set font size and type
-(set-face-attribute 'default nil :height 100)
+(set-face-attribute 'default nil :height default-text-height)
 (when (member "Telegrama" (font-family-list))
   (add-to-list 'default-frame-alist '(font . "Telegrama 10"))
   (set-face-attribute 'default t :font "Telegrama 10")
