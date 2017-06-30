@@ -458,7 +458,12 @@
   (define-key markdown-mode-map (kbd "C-k") #'kill-line-or-region)
   (define-key markdown-mode-map (kbd "C-c C-c") #'markdown-send-to-shell)
   (define-key markdown-mode-map (kbd "C-c C-z") #'markdown-switch-shell)
-  (define-key markdown-mode-map (kbd "C-c C-b") #'rmd-export-pdf))
+  (define-key markdown-mode-map (kbd "C-c C-b") #'rmd-export-pdf)
+  (define-key markdown-mode-map (kbd "<M-right>") #'markdown-demote-list-item)
+  (define-key markdown-mode-map (kbd "<M-left>") #'markdown-promote-list-item)
+  (define-key markdown-mode-map (kbd "<M-up>") #'markdown-move-list-item-up)
+  (define-key markdown-mode-map (kbd "<M-down>")
+    #'markdown-move-list-item-down))
 
 (with-eval-after-spec grep
   (define-key grep-mode-map (kbd "G") #'refind-or-grep)
