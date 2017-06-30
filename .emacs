@@ -69,9 +69,6 @@ init-scripts/interface.el.")
 (defvar dont-ask-about-git nil
   "If git not installed, don't worry about it.")
 
-(defvar default-text-height 90
-  "Default size of text in Emacs buffers.")
-
 ;;; TODO: make shorthand for val being matched within BODY-FORMS of pcase
 
 (defvar after-load-init-hook nil
