@@ -13,8 +13,8 @@
 ;;; set font size and type
 (set-face-attribute 'default nil :height 90)
 (when (member "Telegrama" (font-family-list))
-  (add-to-list 'default-frame-alist '(font . "Telegrama 10"))
-  (set-face-attribute 'default t :font "Telegrama 10")
+  (add-to-list 'default-frame-alist '(font . "Telegrama 9"))
+  (set-face-attribute 'default t :font "Telegrama 9")
   (set-frame-font "Telegrama 9"))
 
 ;;; have normal delete/selection (type over selected text to delete)
