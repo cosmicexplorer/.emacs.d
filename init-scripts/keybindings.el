@@ -11,6 +11,9 @@
 ;;; 3. C-Spc to start selection (set mark) in terminal!
 ;;; 4. remember that M-= gets word counts!
 
+(global-set-key (kbd "C-s-f") #'forward-sexp)
+(global-set-key (kbd "C-s-b") #'backward-sexp)
+
 (defvar prev-keymaps nil)
 
 (defun set-keys-helper (map kill assign)
