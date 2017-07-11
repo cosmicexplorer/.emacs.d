@@ -50,8 +50,14 @@
 (defconst my-autosave-dir
   (expand-file-name "auto-save-files" init-home-folder-dir))
 
+;(defconst vars-by-system-type
+;  `((:types (windows-nt ms-dos) :vars ((sep . "\\")))
+;    ))
+;
 (defconst dir-sep
-  (if (memq system-type '(windows-nt ms-dos)) "\\" "/"))
+  (cond
+   ((memq system-type '(windows-nt ms-dos)) "\\")
+   (t "/")))
 
 (defun make-auto-save-file-name ()
   (let* ((fname (buffer-file-name))

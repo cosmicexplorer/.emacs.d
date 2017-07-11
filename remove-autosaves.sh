@@ -1,7 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
-WORKING_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd "$WORKING_DIR"
-rm -rf undo-tree-history
-rm -rf autosaved-files
-rm -rf auto-save-list
+set -euo pipefail
+
+dir='(expand-file-name user-emacs-directory)'
+sexp="(princ (format \"%s\\n\" $dir))"
+emacs_dir="$(emacs --batch --eval "$sexp")"
+cd "$emacs_dir"
+
+git_dir="$(git rev-parse --git-dir)"
+cd "$(dirname "$git_dir")"
+
+git ls-files -o --exclude-standard | parallel rm

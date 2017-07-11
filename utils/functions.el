@@ -1121,6 +1121,10 @@ details."
     `(lambda (,arg)
        ,(cl-subst arg '_ expr :test #'eq))))
 
+(defmacro |> (&rest exprs) `(l (-> _ ,@exprs)))
+
+(defun *> (arg fn) (cl-mapcar fn arg))
+
 (defvar init-loaded-fully nil
   "Set to t after init loads fully.")
 
