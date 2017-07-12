@@ -996,3 +996,4 @@
 (define-key Info-mode-map (kbd "f") #'Info-history-forward)
 
 (global-set-key (kbd "M-=") #'count-chars-words-lines-buffer)
+(global-set-key (kbd "M-T") #'transpose-lines)

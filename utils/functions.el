@@ -798,165 +798,6 @@ scope of the command's precision.")
   (setq window-configuration-ring nil
         cur-window-config nil))
 
-;;; load file into buffer asynchronously
-;;; this is unfortunately somewhat useless because emacs has to stop the world
-;;; to receive sentinel input from a process, so if anything it's just more
-;;; annoying than waiting for find-file to complete synchronously. i've forked
-;;; emacs at https://github.com/cosmicexplorer/emacs-async to provide true
-;;; asynchronous support variables used for communication between process and
-;;; emacs
-(defvar async-load-is-buffer-modified-outside nil)
-(make-variable-buffer-local 'async-load-is-buffer-modified-outside)
-(setq-default async-load-is-buffer-modified-outside nil)
-(defvar async-load-is-modifying-buffer nil)
-(make-variable-buffer-local 'async-load-is-modifying-buffer)
-(setq-default async-load-is-modifying-buffer nil)
-
-(defmacro with-async-load-modification (buffer &rest body)
-  `(with-current-buffer ,buffer
-     (let ((prev-pt (point)))
-       (goto-char (point-max))
-       ,@body
-       (goto-char prev-pt))))
-;;; makes it more aesthetically pleasing to use this
-(put 'with-async-load-modification 'lisp-indent-function 1)
-
-(defvar async-load-buffer-size 10000
-  "Size of string before string shoved into file.")
-(defvar async-load-buffer ""
-  "Per-file async loading buffer.")
-(make-variable-buffer-local 'async-load-buffer)
-(setq-default async-load-buffer "")
-(defun async-load-file (filepath)
-  (unless (and (file-exists-p filepath)
-               (not (file-directory-p filepath))
-               (file-readable-p filepath))
-    (throw 'file-not-found (concat "specified filepath " filepath
-                                   " could not be read.")))
-  (let* ((process-connection-type nil)   ; use pipe
-         ;; reimplementing part of the standard find-file function :(
-         (arg-buffer (get-buffer-create (generate-new-buffer-name
-                                         (file-name-nondirectory filepath))))
-         (arg-proc (start-process
-                    (concat "async-load-file: " filepath) arg-buffer
-                    "cat" filepath))
-         (arg-modify))
-    ;; see if we can setup appropriate mode hooks before loading contents
-    (with-current-buffer arg-buffer
-      (set-visited-file-name filepath t)
-      (normal-mode)
-      (add-hook 'after-change-functions #'async-load-after-change-function))
-    (set-process-filter
-     arg-proc
-     (lambda (proc str)
-       (with-async-load-modification (process-buffer proc)
-         (setq async-load-buffer (concat async-load-buffer str))
-         (when (> (length async-load-buffer) async-load-buffer-size)
-           (insert async-load-buffer)
-           (setq async-load-buffer "")))))
-    (set-process-sentinel
-     arg-proc
-     (lambda (proc ev)
-       ;; update modes again here after the whole file has loaded
-       (with-async-load-modification (process-buffer proc)
-         (insert async-load-buffer)
-         (setq async-load-buffer "")
-         (normal-mode)
-         (set-buffer-modified-p nil))
-       (unless (and (stringp ev) (string= ev sentinel-successful-exit-msg))
-         ;; alert the user that SOMETHING BAD HAS HAPPENED!!!!
-         (switch-to-buffer (process-buffer proc))
-         (goto-char (point-max))
-         (message ev))
-       (remove-hook #'after-change-functions
-                    #'async-load-after-change-function)))
-    ;; return the process used to fill the buffer
-    ;; (the actual buffer can be found from the process)
-    arg-proc))
-
-(defconst saved-files-format-regexp
-  (concat
-   ;; action to perform
-   ;; (the \" is so that windows paths with C: are parsed correctly)
-   "\\(?:^\\([^:]+\\)"
-   ;; file path
-   ":\"\\([^\"]+\\)\":"
-   ;; point in file
-   "\\([[:digit:]]+\\)$\\)"
-   ;; report parsing errors!
-   "\\|^.+$"))
-
-(defconst saved-files-action-alist
-  `(("visit" . find-file-noselect)))
-
-(defcustom saved-files-no-read-regexps
-  (list (rx bos (eval (file-truename saved-files)) eos))
-  "Regexps matching file paths not to load in `reread-visited-files-from-disk'."
-  :type `(repeat string))
-
-(cl-defun pos-in-bounds (&optional (buf (current-buffer)) (pos (point)))
-  (condition-case err
-      (with-current-buffer buf
-        (when (and (>= pos (point-min)) (<= pos (point-max)))
-          (goto-char pos)
-          buf))
-    (error nil)))
-
-(defcustom pop-up-failed-reread-files t
-  "Whether to pop up a buffer displaying the errors which occurred while running
-`reread-visited-files-from-disk'."
-  :type 'boolean)
-
-(defalias 'range 'number-sequence)
-
-;;; save buffers to disk and get them back
-(defun reread-visited-files-from-disk ()
-  (when (file-readable-p saved-files)
-    (save-window-excursion
-      (unwind-protect
-          (let* ((saved-buf (find-file-noselect saved-files))
-                 (no-read-re
-                  (rx-to-string
-                   `(| ,@(--map `(regexp ,it) saved-files-no-read-regexps)) t)))
-            ;; TODO: macro for with-current-buffer then common action, e.g. going
-            ;; to the beginning, and check if buffer exists/is live, and option to
-            ;; kill at end
-            (with-current-buffer saved-buf
-              (goto-char (point-min))
-              (cl-loop
-               while (re-search-forward saved-files-format-regexp nil t)
-               for (line type fname pt-str) = (-map #'match-string (range 0 3))
-               ;; TODO: macro to zip lists and then destructure ordered args
-               ;; of each element (mapping a zip with destructure)
-               for act = (assoc-default type saved-files-action-alist)
-               ;; TODO: macro/function to do dash stuff, but with func as
-               ;; last (or any other) argument (configurable); consider
-               ;; something generic like haskell's flip to streamline
-               for path = (and (stringp fname)
-                               (file-truename fname))
-               for pt = (and (stringp pt-str)
-                             (cl-parse-integer pt-str :junk-allowed t))
-               ;; TODO: macro to do "intermediate" checking in middle of
-               ;; when-let*, as well as nested "when" clauses in cl-loop
-               for buf = (and (functionp act)
-                              ;; TODO: macro to do this check-then-do stuff
-                              ;; (along with do-then-check, or other combos)
-                              (file-readable-p path)
-                              (not (string-match-p no-read-re path))
-                              (funcall act path))
-               ;; TODO: macro to apply functions to args in list,
-               ;; something like `l' which uses a placeholder, and which
-               ;; can be used in a cl-defun or lambda (kinda like --map then
-               ;; -let)
-               if (and (buffer-live-p buf)
-                       (wholenump pt))
-               collect (pos-in-bounds buf pt) into successes
-               else collect line into failures
-               finally (message "successes = '%S',\nfailures = '%S'"
-                                successes failures)))
-            (kill-buffer saved-buf)))
-      (clean-nonvisiting-buffers))))
-
 (defun alist-process-modify-result (op result)
   (-let* (((kv-used kv-left matched unmatched) result)
           (real-matched (cl-ecase op
@@ -1117,13 +958,16 @@ details."
   `(lambda () ,expr))
 
 (defmacro l (expr)
-  (let ((arg (cl-gensym)))
+  (with-gensyms (arg)
     `(lambda (,arg)
        ,(cl-subst arg '_ expr :test #'eq))))
 
 (defmacro |> (&rest exprs) `(l (-> _ ,@exprs)))
 
-(defun *> (arg fn) (cl-mapcar fn arg))
+(defmacro *> (expr)
+  (with-gensyms (e)
+    `(let ((,e (l ,expr)))
+       (l (cl-mapcar ,e _)))))
 
 (defvar init-loaded-fully nil
   "Set to t after init loads fully.")
@@ -1541,10 +1385,6 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 (defun in-comment-p ()
   (nth 4 (syntax-ppss)))
 
-;;; TODO: fix csharp-maybe-insert-codedoc and the indentation of attributes
-;;; (get/set) and methods in c# and see if there's a way to hook into
-;;; ido-find-file so that it doesn't fail completely???
-
 (defun just-electric-bracket ()
   (interactive) (insert "{}") (backward-char 1))
 
@@ -1659,37 +1499,35 @@ way I prefer, and regards `comment-padding', unlike the standard version."
         (error "submodule failure"))))
 
 (defun actual-setup-submodules ()
-  (unless dont-ask-about-git
-    (when (setup-internet-connection-check 'check)
-      (if (not (executable-find "git"))
-          (send-message-to-scratch
-           "git not installed! some features will be unavailable.")
-        (-let* ((git-submodule-buf-name "*git-submodule-errors*")
-                (default-directory init-home-folder-dir)
-                (submodule-out-buf
-                 (get-buffer-create git-submodule-buf-name))
-                ((all-dirs failed)
-                 (let ((debug-on-error nil))
-                   (condition-case err
-                       (run-git-updates submodule-out-buf)
-                     (error
-                      (with-temp-buffer
-                        (cl-assert
-                         (zerop
-                          (call-process
-                           "git" nil t nil
-                           "submodule" "--quiet" "foreach" "echo $path")))
-                        (let* ((out (buffer-string))
-                               (processed
-                                (replace-regexp-in-string "\n\\'" "" out)))
-                          (list (split-string processed "\n") t))))))))
-          (msg-evals (all-dirs failed) :before "actual-setup-submodules")
-          (if failed
-              (progn
-                (pop-to-buffer submodule-out-buf)
-                (goto-char (point-max)))
-            (kill-buffer git-submodule-buf-name))
-          all-dirs)))))
+  (when (setup-internet-connection-check 'check)
+    (if (not (executable-find "git"))
+        (send-message-to-scratch
+         "git not installed! some features will be unavailable.")
+      (-let* ((git-submodule-buf-name "*git-submodule-errors*")
+              (default-directory init-home-folder-dir)
+              (submodule-out-buf
+               (get-buffer-create git-submodule-buf-name))
+              ((all-dirs failed)
+               (let ((debug-on-error nil))
+                 (condition-case err
+                     (run-git-updates submodule-out-buf)
+                   (error
+                    (with-temp-buffer
+                      (cl-assert
+                       (zerop
+                        (call-process
+                         "git" nil t nil
+                         "submodule" "--quiet" "foreach" "echo $path")))
+                      (let* ((out (buffer-string))
+                             (processed
+                              (replace-regexp-in-string "\n\\'" "" out)))
+                        (list (split-string processed "\n") t))))))))
+        (if failed
+            (progn
+              (pop-to-buffer submodule-out-buf)
+              (goto-char (point-max)))
+          (kill-buffer git-submodule-buf-name))
+        all-dirs))))
 
 ;;; TODO: make this work lol
 (defun update-packages-in-list ()
@@ -3960,5 +3798,10 @@ binding a name."
              (make-keymap-from-bindings keys-or-map))))))
     (set-transient-map
      new-map t (lambda () (message "unset")))))
+
+(pcase-defmacro cl-type (&rest types)
+  `(and ,@(funcall (*> `(pred (pcase--flip cl-typep ',_))) types)))
+
+;;; TODO: override `eval-expression-print-format'!
 
 (provide 'functions)

@@ -1,116 +1,30 @@
 ;;; -* lexical-binding: t -*-
 
-;;; .....let's begin
 (package-initialize)
 
 (defgroup my-customizations nil "all `defcustom' forms in my own init scripts")
 
-;;; add wherever emacs was invoked from to path
-;;; done at top so we know we're not changing any directories
-(defvar emacs-start-command (car command-line-args)
-  "Command used to start emacs.")
-
 ;;; emacs config, aka the root node of a massively unbalanced configuration tree
 ;;; by Danny McClanahan, <danieldmcclanahan@gmail.com>, 2014-2015
+
+(defconst init-home-folder-dir (file-truename user-emacs-directory))
 
 ;;; IF YOU ARE HAVING CRASHES UPON OPENING A PARTICULAR FILE, TRY DELETING THAT
 ;;; FILE'S UNDO-TREE-HISTORY in ~/.emacs.d/undo-tree-history/!!!!!!!!!!!
 
-;;; let's not hardcode everything like back in 9th grade
-(defvar init-home-folder-dir (file-truename user-emacs-directory)
-  "Location of this home directory.")
-
-;;; CUSTOM VARS
-;;; the below variables should be defcustoms, but i don't enjoy that setup
-;;; because when you click "apply and save" on a "customize" prompt, it saves
-;;; the choice directly to your .emacs file. after every such operation, i would
-;;; have to then move the choice of defcustom from this .emacs file to a
-;;; separate file if i wanted it to be gitignored. as a result, I am creating
-;;; essentially my own more low-level version of defcustoms so that a single
-;;; file can be modified without affecting version control. this also allows for
-;;; storing personal information such as directory structure, or irc nicks,
-;;; which is not really great for sharing on github. this "custom-vars.el" file
-;;; is gitignored so that it may vary easily. meaningful defaults are provided
-;;; below with each variable. it should be noted that this file is especially
-;;; useful to store variables such as `org-agenda-files'.
-(defvar warning-words-file nil
-  "Path to file defining words to highlight specially. An example file would
-contain:
-
-todo
-fixme
-hack
-broken
-deprecated
-
-Set in custom-vars.el, and used in init-scripts/interface.el.")
-(defvar sbcl-special-command nil
-  "Sometimes required because some versions of sbcl are difficult to wire up
-correctly. Set in custom-vars.el")
-(defvar save-visited-files t
-  "Whether or not to restore all files that were visited during the previous
-session. Used later in this file.")
-(defvar saved-files (file-truename (concat init-home-folder-dir "saved-files"))
-  "File path to save visited-files. Used later in this file.")
-(defvar save-eshell-history t
-  "Whether or not to save eshell history to disk. Used in
-init-scripts/interface.el.")
-(defvar save-shell-history t
-  "Whether or not to save shell history to disk. Used in
-init-scripts/interface.el.")
-(defvar save-nonvisiting-files t
-  "Whether or not to persist all buffers not visiting files to disk. Used in
-init-scripts/interface.el.")
-(defvar save-tramp-bufs t
-  "Whether or not to revisit tramp buffers opened in a previous session. Used in
-init-scripts/interface.el.")
-(defvar submodule-makes-to-ignore nil
-  "List of submodule makes to ignore compilation for.")
-(defvar dont-ask-about-git nil
-  "If git not installed, don't worry about it.")
-
 ;;; TODO: make shorthand for val being matched within BODY-FORMS of pcase
-
-(defvar after-load-init-hook nil
-  "Hook to run whatever after loading packages n functions n whatever.")
-(defvar use-omnisharp t "C#!!!!!!!")
-(defvar use-https t)
 
 (defcustom my-files-to-open-xdg nil
   "files to open on startup"
   :type '(list string))
 
 (defgroup my-errors nil
-  "`defcustom' group for error handling in my own emacs lisp code.")
+  "`defcustom' group for error handling in my own emacs lisp code."
+  :group 'my-customizations)
+
 (define-error 'my-errors "Errors in my own emacs lisp code.")
 (define-error
   'my-init-error "Error in my personal emacs initialization." 'my-errors)
-
-;;; load custom values for these variables (this file is .gitignored)
-(let ((custom-var-file
-       (concat
-        (if load-file-name
-            (file-name-directory (file-truename load-file-name))
-          default-directory)
-        "custom-vars.el"))
-      (msg-string
-       "Make a custom-vars.el! Only if you want, though.
-Check out your .emacs."))
-  (unless (file-exists-p custom-var-file)
-    (with-temp-buffer
-      (insert (concat "(with-current-buffer \"*scratch*\"
-  (insert \"" msg-string "\")
-  (newline))"))
-      (write-region nil nil custom-var-file)))
-  (load-file custom-var-file))
-
-(unless (file-exists-p init-home-folder-dir)
-  (throw 'no-home-holder "no emacs home directory found (check your .emacs)!"))
-
-;;; added up here cause a lot of packages depend on it being defined without
-;;; defining it themselves
-(eval-when-compile (require 'cl))
-(require 'json)
 
 ;; starts emacs in server form so i can use emacsclient to add files
 ;; but only if server isn't already started
@@ -157,13 +71,6 @@ Check out your .emacs."))
    (byte-recompile-directory user-emacs-directory 0))
  'ignore)
 
-;;; sometimes fails on 'require call
-
-;;; save visited files to buffer
-(when save-visited-files
-  (add-hook 'after-init-hook #'reread-visited-files-from-disk)
-  (add-hook 'kill-emacs-hook #'save-visiting-files-to-buffer))
-
 (add-hook 'after-init-hook #'clean-init-screen t)
 (add-hook 'after-init-hook #'redisplay)
 (add-hook 'after-init-hook #'redisplay t)
@@ -177,10 +84,6 @@ Check out your .emacs."))
       (setup-internet-connection-check 'check))
     (when monitor-internet-connection
       (setup-internet-connection-check 'monitor)))))
-
-;;; deprecated
-(unless (null after-load-init-hook)
-  (user-error "%s" "`after-load-init-hook' is deprecated!"))
 
 (add-hook 'after-init-hook #'garbage-collect)
 (add-hook 'after-init-hook #'garbage-collect t)
@@ -276,6 +179,7 @@ Check out your .emacs."))
      (ess-indent-from-lhs arguments fun-decl-opening)
      (ess-indent-from-chain-start . t)
      (ess-indent-with-fancy-comments . t))))
+ '(eval-expression-print-level nil)
  '(fill-column 80)
  '(git-gutter:update-hooks
    (quote
@@ -388,7 +292,7 @@ Check out your .emacs."))
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (markdown-mode jq-mode vimrc-mode polymode intero shm nhexl-mode web-mode f3 scrooge projectile thrift cuda-mode visual-fill-column realgud mmm-mode pdf-tools font-lock-studio shut-up git-gutter-fringe yaml-mode sourcemap wgrep wgrep-ag wgrep-helm ag pacmacs slime-company enh-ruby-mode robe tuareg solarized-theme color-theme-solarized highlight-parentheses racket-mode sage-shell-mode gnuplot-mode gnuplot sml-mode skewer-mode csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters paredit omnisharp misc-cmds minimap literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game magit multiple-cursors)))
+    (markdown-mode jq-mode vimrc-mode polymode intero shm nhexl-mode web-mode f3 scrooge projectile thrift cuda-mode visual-fill-column realgud mmm-mode pdf-tools font-lock-studio shut-up git-gutter-fringe yaml-mode sourcemap wgrep wgrep-ag wgrep-helm ag pacmacs slime-company enh-ruby-mode robe tuareg solarized-theme color-theme-solarized highlight-parentheses racket-mode sage-shell-mode gnuplot-mode gnuplot sml-mode skewer-mode csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters paredit misc-cmds minimap literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game magit multiple-cursors)))
  '(perl6-indent-offset 2)
  '(rainbow-ansi-colors t)
  '(rainbow-html-colors t)

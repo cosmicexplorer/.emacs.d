@@ -1,6 +1,5 @@
 ;;; slime sux (jk)
-(let ((sbcl-binary (if sbcl-special-command sbcl-special-command
-                     (executable-find "sbcl")))
+(let ((sbcl-binary (executable-find "sbcl"))
       ;; yes, this assumes your quicklisp is installed in ~/quicklisp/
       (slime-helper-file
        (expand-file-name

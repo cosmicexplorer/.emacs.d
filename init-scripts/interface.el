@@ -39,7 +39,8 @@
 (defun set-correct-trailing-whitespace-all-buffers ()
   (loop for buf in (buffer-list)
         do (with-current-buffer buf (set-correct-trailing-whitespace))))
-(add-hook 'buffer-list-update-hook #'set-correct-trailing-whitespace-all-buffers)
+(add-hook
+ 'buffer-list-update-hook #'set-correct-trailing-whitespace-all-buffers)
 (add-hook 'after-change-major-mode-hook #'set-correct-trailing-whitespace)
 
 ;; do backups well and put them into a separate folder
@@ -50,14 +51,9 @@
 (defconst my-autosave-dir
   (expand-file-name "auto-save-files" init-home-folder-dir))
 
-;(defconst vars-by-system-type
-;  `((:types (windows-nt ms-dos) :vars ((sep . "\\")))
-;    ))
-;
 (defconst dir-sep
-  (cond
-   ((memq system-type '(windows-nt ms-dos)) "\\")
-   (t "/")))
+  (if (memq system-type '(windows-nt ms-dos)) "\\"
+    "/"))
 
 (defun make-auto-save-file-name ()
   (let* ((fname (buffer-file-name))
@@ -191,76 +187,70 @@
 
 
 ;;; setup syntax highlighting for keywords i care about
-(defvar warning-words
-  '("todo"
-    "fixme"
-    "fix"
-    "note"
-    "nb"
-    "n.b."
-    "deprecated"
-    "xxx"
-    "hack"
-    "iffy"
-    "changed"
-    "optimization"
-    "broken")
-  "Used if no warning_words file exists.")
+(defconst warning-highlights-regexp
+  (rx
+   (: bow
+      (: (| (: "to" (? (| space punct)) "do")
+            (: "fix" (? (| space punct)) (? "me"))
+            (: (+? (: alpha (| space punct))) alpha)
+            (: "dep" (? (: "end" (? (: "en" (| "t" "c"))))))
+            (: "deprecate")
+            (>= 3 "x")
+            "hack"
+            "iffy"
+            "change"
+            "modif"
+            (: "opt" (? "imiz"))
+            "broke"
+            "break"
+            "since"
+            "should"
+            (: "remov" (| "e" "al" "es" "ed" "er"))
+            (: "delet" (| "ed" "es" "er"))
+            "warn"
+            (: "err" (? "or"))
+            "only"
+            "review"
+            "must"
+            "note"
+            "need"
+            "asap"
+            (: "danger" (? "ous"))
+            "strict"
+            "race"
+            "experiment"
+            "arbitrary"
+            "require"
+            "consider"
+            "actual"
+            "usual"
+            "instead"
+            "expect"
+            "me"
+            "this"
+            "spec"
+            )
+         (? (| (: (? "i") (? "e") (? (| "s" "d" "r")))
+               "ing"
+               "age"
+               "ish"
+               (: (? "ific") "ally")
+               "ly"
+               "y"
+               "ic"
+               "al"
+               (: (? "e") "n")
+               (: (? "a") (? "t") "ion"))))
+      eow)))
 
-(defun only-upcase-first-char (str)
-  (let* ((res (downcase str))
-         (init (aref res 0)))
-    (setf (aref res 0) (upcase init))
-    res))
-
-(defun read-words-from-list-with-caps (list)
-  "Read words from list, transformed into ALLCAPS, lowercase, and Init Caps."
-  (let (final-word-list)
-    (loop for line in list
-          do (unless (string= "" line)
-               (add-to-list 'final-word-list (downcase line))
-               (add-to-list 'final-word-list (upcase line))
-               (add-to-list 'final-word-list (upcase-initials line))
-               (add-to-list 'final-word-list (only-upcase-first-char line))))
-    final-word-list))
-
-(defun read-words-from-file-as-list-with-caps (filename)
-  "Reads words from file, delimited by newlines, as a list. Reads in ALLCAPS,
-lowercase, and Initial Caps versions."
-  (if (or (not filename) (not (file-exists-p filename)))
-      (throw 'no-warning-words-file t)
-    (read-words-from-list-with-caps
-     (split-string
-      (with-temp-buffer
-        (insert-file-contents filename)
-        (buffer-string))
-      "\n"))))
-
-(defvar warning-words-list
-  (if (and warning-words-file (file-exists-p warning-words-file))
-      (read-words-from-file-as-list-with-caps warning-words-file)
-    (read-words-from-list-with-caps warning-words)))
-
-(defvar warning-highlights-regex
-  (concat
-   "\\(^\\|[^[:word:]]\\)"
-   "\\("
-   (regexp-opt warning-words-list)
-   "\\)"
-   "\\($\\|[^[:word:]]\\)"))
-
-(defvar warning-highlights-keywords
-  ;; the 'words option to regexp-opt surrounds the output with \<...\>, which
-  ;; doesn't work with "warning" words that have non-word characters in them
-  ;; (for example, n.b., or words with spaces). this is a workaround.
-  `((,warning-highlights-regex
-     ;; highlights the second subexpression: the warning-word expression
-     2 font-lock-warning-face t))
+(defconst warning-highlights-keywords
+  `((,warning-highlights-regexp 0 font-lock-warning-face t))
   "Keywords to apply extra highlights to.")
 
 (defun warning-highlights-turn-on ()
   "Turn on warning-highlights-mode."
-  (font-lock-add-keywords nil warning-highlights-keywords t))
+  (font-lock-add-keywords nil warning-highlights-keywords t)
+  (setq-local font-lock-keywords-case-fold-search t))
 
 (defun warning-highlights-turn-off ()
   "Turn off warning-highlights-mode."
@@ -282,11 +272,8 @@ lowercase, and Initial Caps versions."
 
 (defun find-warning-words (pfx)
   (interactive "P")
-  (if pfx (helm-multi-swoop-all warning-highlights-regex)
-    (helm-swoop :$query warning-highlights-regex)))
-
-(defvar warning-words-grep-regex
-  (reduce (lambda (a b) (concat a "|" b)) warning-words-list))
+  (if pfx (helm-multi-swoop-all warning-highlights-regexp)
+    (helm-swoop :$query warning-highlights-regexp)))
 
 (defun find-warnings-in-dir (dir)
   (interactive "Mdirectory: ")
@@ -310,11 +297,10 @@ lowercase, and Initial Caps versions."
    t))
 
 ;;; output eshell buffers to file
-(when save-eshell-history
-  (defvar eshell-user-output-file (concat init-home-folder-dir "eshell-output")
-    "File containing all eshell I/O from all eshell buffers.")
-  (add-hook 'eshell-pre-command-hook #'eshell-send-input-to-history)
-  (add-hook 'eshell-post-command-hook #'eshell-send-output-to-history))
+(defvar eshell-user-output-file (concat init-home-folder-dir "eshell-output")
+  "File containing all eshell I/O from all eshell buffers.")
+(add-hook 'eshell-pre-command-hook #'eshell-send-input-to-history)
+(add-hook 'eshell-post-command-hook #'eshell-send-output-to-history)
 
 (defun shell-record-history-filters ()
   (add-hook 'comint-input-filter-functions
@@ -322,9 +308,8 @@ lowercase, and Initial Caps versions."
   (add-hook 'comint-output-filter-functions
             #'shell-send-output-to-history nil t))
 
-(when save-shell-history
-  (defvar shell-user-output-file (concat init-home-folder-dir "shell-output"))
-  (add-hook 'shell-mode-hook #'shell-record-history-filters))
+(defvar shell-user-output-file (concat init-home-folder-dir "shell-output"))
+(add-hook 'shell-mode-hook #'shell-record-history-filters)
 
 ;;; TODO: would be nice if we could split these cases off into an alist -- this
 ;;; seems to be a lot easier to follow for now
