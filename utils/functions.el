@@ -125,6 +125,7 @@ Should accept a single argument, which is the buffer to display."
   (cl-loop for mode-map in mode-maps-list
            do (define-key mode-map (kbd keys-pressed) func-to-call-quoted)))
 
+;;; FIXME: this isn't used anywhere and it seems like it could be useful
 (defun add-keys-to-modes (cmd maps-spec &rest kbds)
   "Map KBDS to CMD in MAPS-SPEC.
 
@@ -135,10 +136,8 @@ t:	map KBDS with `define-key' in the `major-mode' of the `current-buffer'.
 map:	map KBDS with `define-key' in the given map.
 symbol:	if the `symbol-value' is a map, map KBDS with `define-key' in that map.
 list:	map KBDS over all elements of the list as described above."
-  (let ((handle
-         (pcase maps-spec
-           (`nil (apply-partially #'global-set-key kbd) (cl-mapc (lambda (kbd) (global-set-key kbd cmd)) kbds))
-           (`t ))))))
+  (unless maps-spec
+    (cl-mapc (lambda (kbd) (global-set-key kbd cmd)) kbds)))
 
 ;;; so that there's a space after inline comments in coffeescript
 (defun coffeescript-comment-do-what-i-really-mean (arg)
@@ -3799,9 +3798,10 @@ binding a name."
     (set-transient-map
      new-map t (lambda () (message "unset")))))
 
-(pcase-defmacro cl-type (&rest types)
-  `(and ,@(funcall (*> `(pred (pcase--flip cl-typep ',_))) types)))
+;;; TODO: override `eval-expression-print-format'! make its output more:
+;;; 1. interesting -- affects or is correlated with a dis behavior
+;;; 2. enlightening -- describe or hint at the "meaning" of an object
+;;; 3. customizable -- make it easy to change the output for a type of input
 
-;;; TODO: override `eval-expression-print-format'!
 
 (provide 'functions)

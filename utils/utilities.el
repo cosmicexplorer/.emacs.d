@@ -180,12 +180,6 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
                    collect str))
      (or final-sep ""))))
 
-(defun and-fun (a b)
-  (and a b))
-
-(defun or-fun (a b)
-  (or a b))
-
 (defun trim-whitespace (str)
   (replace-regexp-in-string
    "[[:space:]\r\n]+\\'" ""
@@ -213,5 +207,26 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
          (quit-windows-on ,res-buf)
          (if (not ,pfx) (display-buffer-same-window ,res-buf nil)
            (select-window (display-buffer ,res-buf)))))))
+
+(pcase-defmacro cl-type (&rest types)
+  `(and ,@(funcall (*> `(pred (pcase--flip cl-typep ',_))) types)))
+
+(defun at-lisp-splice-p (_endp _delimiter)
+  "Return non-nil when a lisp splice `,@' precedes point. See documentation for
+`paredit-space-for-delimiter-predicates'."
+  (not (looking-back ",@")))
+(add-to-list 'paredit-space-for-delimiter-predicates #'at-lisp-splice-p)
+
+(defun at-elisp-char-literal-p (_endp _delimiter)
+  "Return non-nil when a lisp char literal marker ‘?’ precedes point. See
+documentation for `paredit-space-for-delimiter-predicates'."
+  (not (looking-back "\\?")))
+(add-to-list 'paredit-space-for-delimiter-predicates #'at-elisp-char-literal-p)
+
+;;; FIXME: want some way to modify the value being matched! can't do that obv,
+;;; so find some way to simulate it. e.g. (app FUNCTION UPATTERN) could have
+;;; UPATTERN replaced with the rest of the match-forms -- this would work
+;; (pcase-defmacro coerce (to-bind &rest match-forms)
+;;   `(or ,@(cl-mapcar ,@)))
 
 (provide 'utilities)

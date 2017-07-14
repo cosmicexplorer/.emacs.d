@@ -16,28 +16,34 @@
 
 (defvar prev-keymaps nil)
 
+(defun set-key-dwim (map key cmd)
+  (cl-assert (stringp key))
+  (cl-assert (or (null cmd)
+                 (commandp cmd)))
+  (cl-etypecase map
+    (keymap (define-key map (kbd key) cmd))
+    (null (global-set-key (kbd key) cmd))))
+
 (defun set-keys-helper (map kill assign)
   (when (symbolp map) (setq map (symbol-value map)))
-  (cl-assert (and (keymapp map) (listp kill) (listp assign)) t)
+  (cl-assert (and (listp kill) (listp assign)))
   (cl-loop for to-kill in kill
-           do (cl-assert (stringp to-kill) t)
-           do (define-key map (kbd to-kill) nil))
+           do (set-key-dwim map to-kill nil))
   (cl-loop for (key cmd) in assign
-           do (cl-assert (and (stringp key) (commandp cmd)) t)
-           do (define-key map (kbd key) cmd)))
+           do (set-key-dwim map key cmd)))
 
 (defun set-keys-in (keys-alist)
   (cl-assert (and keys-alist (listp keys-alist)) t)
   (cl-destructuring-bind (ft &rest others) keys-alist
     (cl-destructuring-bind (&key load map kill assign) ft
-      (cl-assert (and (not (null load))
-                      (symbolp load)
+      (cl-assert (and (symbolp load)
                       (listp kill)
                       (listp assign)) t)
-      (let* ((cur `(set-keys-helper ,map ',kill ',assign)))
-        (eval-after-load load
-          (if others `(progn ,cur (set-keys-in others))
-            cur))))))
+      (let* ((cur `(set-keys-helper ,map ',kill ',assign))
+             (to-eval
+              (if others `(progn ,cur (set-keys-in others)) cur)))
+        (if load (eval-after-load load to-eval)
+          (eval to-eval))))))
 
 ;;; globally usable basic text insertion or command-running shortcuts
 (global-set-key (kbd "C-M-;") #'newline-and-comment)
@@ -485,66 +491,46 @@
            (funcall then-do window buffer))
           (_ nil))))))
 
-(global-set-key
- (kbd "C-h f")
- (find-function-switch-pfx (make-new-help #'describe-function)
-   :invert t))
-(global-set-key
- (kbd "C-h v")
- (find-function-switch-pfx (make-new-help #'describe-variable)
-   :invert t))
-(global-set-key
- (kbd "C-h k")
- (find-function-switch-pfx (make-new-help #'describe-key)
-   :invert t))
-(global-set-key
- (kbd "C-h C-k")
- (find-function-switch-pfx (make-new-help #'describe-key)
-   :invert t))
-(global-set-key
- (kbd "C-h d")
- (find-function-switch-pfx (make-new-help #'describe-function-or-variable)
-   :invert t))
-(global-set-key (kbd "C-M-h") nil)
-(global-set-key
- (kbd "C-M-h d")
- (find-function-switch-pfx
-     (make-new-help #'describe-function-or-variable-at-point) :invert t))
-(global-set-key
- (kbd "C-h C-d")
- (find-function-switch-pfx #'find-function-or-variable))
-(global-set-key
- (kbd "C-M-h C-d")
- (find-function-switch-pfx
-  #'find-function-or-variable-at-point))
-(global-set-key
- (kbd "C-M-h f")
- (find-function-switch-pfx
-  (make-new-help #'describe-function-at-point)))
-(global-set-key
- (kbd "C-M-h v")
- (find-function-switch-pfx
-  (make-new-help #'describe-variable-at-point)))
-(global-set-key
- (kbd "C-h C-f") (find-function-switch-pfx #'find-function))
-(global-set-key
- (kbd "C-M-h C-f")
- (find-function-switch-pfx #'find-function-at-point))
-(global-set-key
- (kbd "C-h C-v")
- (find-function-switch-pfx #'find-variable))
-(global-set-key
- (kbd "C-M-h C-v")
- (find-function-switch-pfx #'find-variable-at-point))
-(global-set-key
- (kbd "C-h b")
- (find-function-switch-pfx (make-new-help #'describe-bindings)
-   :invert t))
-(global-set-key
- (kbd "C-h l")
- (find-function-switch-pfx (make-new-help #'view-lossage)
-   :invert t))
-;;; c-h a -> apropos
+(defconst function-help-keys-alist
+  `((:kill ("C-M-h")
+     :assign
+     (("C-h f" ,(find-function-switch-pfx
+                    (make-new-help #'describe-function)
+                  :invert t))
+      ("C-h v" ,(find-function-switch-pfx
+                    (make-new-help #'describe-variable)
+                  :invert t))
+      ("C-h k" ,(find-function-switch-pfx
+                    (make-new-help #'describe-key)
+                  :invert t))
+      ("C-h C-k" ,(find-function-switch-pfx
+                      (make-new-help #'describe-key)
+                    :invert t))
+      ("C-h d" ,(find-function-switch-pfx
+                   (make-new-help #'describe-function-or-variable)
+                 :invert t))
+      ("C-M-h d" ,(find-function-switch-pfx
+                      (make-new-help #'describe-function-or-variable-at-point)
+                    :invert t))
+      ("C-h C-d" ,(find-function-switch-pfx #'find-function-or-variable))
+      ("C-M-h C-d" ,(find-function-switch-pfx
+#'                      find-function-or-variable-at-point))
+      ("C-M-h f"
+       ,(find-function-switch-pfx (make-new-help #'describe-function-at-point)))
+      ("C-M-h v"
+       ,(find-function-switch-pfx (make-new-help #'describe-variable-at-point)))
+      ("C-h C-f" ,(find-function-switch-pfx #'find-function))
+      ("C-M-h C-f" ,(find-function-switch-pfx #'find-function-at-point))
+      ("C-h C-v" ,(find-function-switch-pfx #'find-variable))
+      ("C-M-h C-v" ,(find-function-switch-pfx #'find-variable-at-point))
+      ("C-h b" ,(find-function-switch-pfx
+                    (make-new-help #'describe-bindings)
+                  :invert t))
+      ("C-h l"
+       ,(find-function-switch-pfx (make-new-help #'view-lossage) :invert t))))))
+(set-keys-in function-help-keys-alist)
+
+;;; c-h a -> apropos in help map
 (define-key help-map "a"
   (find-function-switch-pfx #'apropos
     :then-do (lambda (win buf)
@@ -553,6 +539,7 @@
                    (set-window-buffer win buf)
                    (set-window-point win (point-min)))))))
 
+;;; FIXME: this doesn't work at all and it's stupid
 (with-eval-after-spec help
   (define-key help-mode-map [remap push-button] #'help-do-button))
 
