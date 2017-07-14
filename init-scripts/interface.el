@@ -192,7 +192,7 @@
    (: bow
       (: (| (: "to" (? (| space punct)) "do")
             (: "fix" (? (| space punct)) (? "me"))
-            (: (+? (: alpha (| space punct))) alpha)
+            ;; (: (+? (: alpha (| space punct))) alpha)
             (: "dep" (? (: "end" (? (: "en" (| "t" "c"))))))
             (: "deprecate")
             (>= 3 "x")
