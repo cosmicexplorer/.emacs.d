@@ -302,6 +302,10 @@ Lisp code." t)
   lisp-mode-hook lisp-interaction-mode-hook scheme-mode-hook racket-mode-hook
   racket-repl-mode-hook clojure-mode-hook elisp-byte-code-mode-hook)
 
+(with-eval-after-spec paredit
+  (add-to-list 'paredit-space-for-delimiter-predicates #'at-lisp-splice-p)
+  (add-to-list 'paredit-space-for-delimiter-predicates #'at-elisp-char-literal-p))
+
 ;;; start scratch buffer in paredit mode
 (with-current-buffer (get-buffer "*scratch*")
   (enable-paredit-mode)

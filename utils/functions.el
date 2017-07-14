@@ -3644,7 +3644,6 @@ data:
                              ,@(append `(:pre ,b-str :name ',name)
                                        (when f? `(:format ,fmt))))))))
 
-
 (cl-defmacro with-eval-after-spec (feature-spec &rest body)
   "Execute BODY after emacs loads features as specified with FEATURE-SPEC. BODY
 is executed after loading each feature in the order provided in FEATURE-SPEC.
@@ -3706,7 +3705,7 @@ binding a name."
   (once-only (regexp str)
     `(-if-let* (((,@names)
                  (get-rx-match
-                  ,regexp ,str ',(range 0 (1- (length names))))))
+                  ,regexp ,str ',(number-sequence 0 (1- (length names))))))
          ,if-true
        ,@if-false)))
 
@@ -3803,5 +3802,25 @@ binding a name."
 ;;; 2. enlightening -- describe or hint at the "meaning" of an object
 ;;; 3. customizable -- make it easy to change the output for a type of input
 
+(defun at-lisp-splice-p (_endp _delimiter)
+  "Return non-nil when a lisp splice `,@' precedes point. See documentation for
+`paredit-space-for-delimiter-predicates'."
+  (not (looking-back ",@")))
+
+(defun at-elisp-char-literal-p (_endp _delimiter)
+  "Return non-nil when a lisp char literal marker ‘?’ precedes point. See
+documentation for `paredit-space-for-delimiter-predicates'."
+  (not (looking-back "\\?")))
+
+(defcustom rx-build-interactive-search #'helm-regexp
+  "Function to use to perform interactive regexp search."
+  :type 'function)
+
+(defun rx-build (expr)
+  "Input lisp expression EXPR, and evaluate it each time the input changes. If
+the input evaluates to a valid regexp, use that regexp to search the current
+buffer with `helm-regexp'."
+  (interactive
+   ()))
 
 (provide 'functions)
