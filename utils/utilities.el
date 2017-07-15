@@ -217,4 +217,17 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
 ;; (pcase-defmacro coerce (to-bind &rest match-forms)
 ;;   `(or ,@(cl-mapcar ,@)))
 
+;;; FIXME: make this work
+;; (pcase-defmacro vary (&rest elems)
+;;   (if (null elems) ``()
+;;     (with-gensyms (x xs)
+;;       `(pcase-exhaustive ,elems
+;;          (`(,x . ,xs)
+;;           `(`(,x . `(,@(or `nil (vary ,@xs))))))))))
+
+;; (let ((a '(nil)))
+;;   (pcase a
+;;     ((vary nil) t)
+;;     (_ nil)))
+
 (provide 'utilities)

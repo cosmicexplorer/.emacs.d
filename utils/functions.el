@@ -3797,7 +3797,7 @@ binding a name."
     (set-transient-map
      new-map t (lambda () (message "unset")))))
 
-;;; TODO: override `eval-expression-print-format'! make its output more:
+;;; FIXME: override `eval-expression-print-format'! make its output more:
 ;;; 1. interesting -- affects or is correlated with a dis behavior
 ;;; 2. enlightening -- describe or hint at the "meaning" of an object
 ;;; 3. customizable -- make it easy to change the output for a type of input
@@ -3812,15 +3812,16 @@ binding a name."
 documentation for `paredit-space-for-delimiter-predicates'."
   (not (looking-back "\\?")))
 
-(defcustom rx-build-interactive-search #'helm-regexp
-  "Function to use to perform interactive regexp search."
-  :type 'function)
+;;; FIXME: do this!!!
+;; (defcustom rx-build-interactive-search-fun #'helm-regexp
+;;   "Function to use to perform interactive regexp search."
+;;   :type 'function)
 
-(defun rx-build (expr)
-  "Input lisp expression EXPR, and evaluate it each time the input changes. If
-the input evaluates to a valid regexp, use that regexp to search the current
-buffer with `helm-regexp'."
-  (interactive
-   ()))
+;; (defun rx-build (expr)
+;;   "Input lisp expression EXPR, and evaluate it each time the input changes. If
+;; the input evaluates to a valid regexp, use that regexp to search the current
+;; buffer with `helm-regexp'."
+;;   (interactive
+;;    ()))
 
 (provide 'functions)
