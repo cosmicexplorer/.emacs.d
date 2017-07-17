@@ -35,3 +35,4 @@ network-security.data
 srecode-map.el
 package-lock.json
 /installed-packages~
+.emacs.desktop*

@@ -4,19 +4,7 @@
 
 (defgroup my-customizations nil "all `defcustom' forms in my own init scripts")
 
-;;; emacs config, aka the root node of a massively unbalanced configuration tree
-;;; by Danny McClanahan, <danieldmcclanahan@gmail.com>, 2014-2015
-
 (defconst init-home-folder-dir (file-truename user-emacs-directory))
-
-;;; IF YOU ARE HAVING CRASHES UPON OPENING A PARTICULAR FILE, TRY DELETING THAT
-;;; FILE'S UNDO-TREE-HISTORY in ~/.emacs.d/undo-tree-history/!!!!!!!!!!!
-
-;;; TODO: make shorthand for val being matched within BODY-FORMS of pcase
-
-(defcustom my-files-to-open-xdg nil
-  "files to open on startup"
-  :type '(list string))
 
 (defgroup my-errors nil
   "`defcustom' group for error handling in my own emacs lisp code."
@@ -60,20 +48,17 @@
 ;;; cause what else is emacs for
 (load-my-script "keybindings" "init-scripts")
 
-(add-hook 'after-init-hook (z (load-my-script "visuals" "init-scripts")))
+;;; load submodules!!!!
+(add-hook 'after-init-hook #'setup-submodules-load)
 
-(cl-mapc #'open-if-not-already my-files-to-open-xdg)
+;;; make it look nice
+(add-hook 'after-init-hook (z (load-my-script "visuals" "init-scripts")))
 
 ;;; byte-compile everything: slow on first startup, but /significantly/ faster
 ;;; during normal usage
-(async-start
- (lambda ()
-   (byte-recompile-directory user-emacs-directory 0))
- 'ignore)
-
-(add-hook 'after-init-hook #'clean-init-screen t)
-(add-hook 'after-init-hook #'redisplay)
-(add-hook 'after-init-hook #'redisplay t)
+(add-hook
+ 'after-init-hook
+ (z (byte-recompile-directory init-home-folder-dir 0)))
 
 ;;; let's do it
 (add-hook
@@ -85,6 +70,8 @@
     (when monitor-internet-connection
       (setup-internet-connection-check 'monitor)))))
 
+(add-hook 'after-init-hook #'redisplay)
+(add-hook 'after-init-hook #'redisplay t)
 (add-hook 'after-init-hook #'garbage-collect)
 (add-hook 'after-init-hook #'garbage-collect t)
 
@@ -124,6 +111,7 @@
  '(cperl-invalid-face (quote cperl-no-trailing-whitespace-face))
  '(create-lockfiles nil)
  '(dabbrev-case-replace nil)
+ '(desktop-save-mode t)
  '(dired-auto-revert-buffer t)
  '(dired-clean-up-buffers-too nil)
  '(dired-guess-shell-alist-user
@@ -186,6 +174,7 @@
     (after-save-hook after-revert-hook find-file-hook after-change-major-mode-hook text-scale-mode-hook magit-revert-buffer-hook magit-status-refresh-hook magit-run-git-hook)))
  '(git-gutter:update-interval 1)
  '(git-gutter:window-width 0)
+ '(global-company-mode t)
  '(grep-command "gr ")
  '(grep-highlight-matches (quote auto))
  '(grep-use-null-device nil)
@@ -222,7 +211,10 @@
     (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)))
  '(hl-paren-background-colors (quote ("light goldenrod")))
  '(hl-paren-colors (quote ("chocolate" "magenta" "tomato" "yellow")))
- '(initial-buffer-choice t)
+ '(inhibit-startup-buffer-menu t)
+ '(inhibit-startup-echo-area-message nil)
+ '(inhibit-startup-screen t)
+ '(initial-buffer-choice nil)
  '(js2-global-externs (quote ("history" "getComputedStyle")))
  '(js2-include-node-externs t)
  '(kill-buffer-trash-alist
@@ -292,7 +284,7 @@
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (markdown-mode jq-mode vimrc-mode polymode intero shm nhexl-mode web-mode f3 scrooge projectile thrift cuda-mode visual-fill-column realgud mmm-mode pdf-tools font-lock-studio shut-up git-gutter-fringe yaml-mode sourcemap wgrep wgrep-ag wgrep-helm ag pacmacs slime-company enh-ruby-mode robe tuareg solarized-theme color-theme-solarized highlight-parentheses racket-mode sage-shell-mode gnuplot-mode gnuplot sml-mode skewer-mode csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters paredit misc-cmds minimap literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game magit multiple-cursors)))
+    (racer rust-mode markdown-mode jq-mode vimrc-mode polymode intero shm nhexl-mode web-mode f3 scrooge projectile thrift cuda-mode visual-fill-column realgud mmm-mode pdf-tools font-lock-studio shut-up git-gutter-fringe yaml-mode sourcemap wgrep wgrep-ag wgrep-helm ag pacmacs slime-company enh-ruby-mode robe tuareg solarized-theme color-theme-solarized highlight-parentheses racket-mode sage-shell-mode gnuplot-mode gnuplot sml-mode skewer-mode csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters paredit misc-cmds minimap literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game magit multiple-cursors)))
  '(perl6-indent-offset 2)
  '(rainbow-ansi-colors t)
  '(rainbow-html-colors t)

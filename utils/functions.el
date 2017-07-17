@@ -659,11 +659,6 @@ that point."
     (message
      (concat "Moved to saved point (" (number-to-string saved-point) ")"))))
 
-(defun load-display-time ()
-  "load the display time upon invocation!"
-  (setq display-time-day-and-date t)
-  (display-time))
-
 ;;; macros
 ;;; http://stackoverflow.com/a/26137517/2518889
 (defmacro with-system (type &rest body)

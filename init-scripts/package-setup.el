@@ -479,9 +479,6 @@
                     (coffee-indent-shift-right start end (- count))))
         (t ad-do-it)))))
 
-;;; company
-(add-hook 'after-init-hook #'global-company-mode)
-
 ;;; ggtags is dumb lol
 (defadvice ggtags-find-tag-dwim (before advice-ggtags-set-mark activate)
   (push-mark))
