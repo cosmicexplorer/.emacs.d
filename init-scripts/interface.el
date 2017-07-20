@@ -986,11 +986,14 @@ Use (process-buffer `my-rw-process') instead."
     (helm-do-ag default-directory)))
 
 (defun stop-adaptive-fill ()
-  (setq adaptive-fill-mode nil)
-  (setq adaptive-fill-function nil))
+  (setq-local adaptive-fill-mode nil)
+  (setq-local adaptive-fill-function nil))
 
-(add-hook 'lisp-mode-hook #'stop-adaptive-fill)
-(add-hook 'emacs-lisp-mode-hook #'stop-adaptive-fill)
+(defconst no-adaptive-fill-modes
+  '(lisp-mode-hook
+    emacs-lisp-mode-hook))
+
+(cl-mapc (l (add-hook _ #'stop-adaptive-fill)) no-adaptive-fill-modes)
 
 (defun turn-on-set-mark-end-mode ()
   (set-mark-end-process-output-mode 1)

@@ -11,25 +11,12 @@
      (setq ein:use-smartrep t)))
 
 ;;; helm
-(helm-mode t)
 (add-hook 'eshell-mode-hook
           ;; add pcomplete with helm support to eshell
           (lambda ()
               (define-key eshell-mode-map
                 [remap eshell-pcomplete]
                 'helm-esh-pcomplete)))
-
-;;; undo-tree
-(global-undo-tree-mode)                 ; put it EVERYWHERE
-;;; persist across file saves
-(setq undo-tree-auto-save-history t)
-;;; show diffs in undo tree visualizer
-(setq undo-tree-visualizer-diff t)
-;;; large undos oh man
-(setq undo-outer-limit 50000000)
-
-;;; smart-tab
-(global-smart-tab-mode 1)               ; put it EVERYWHERE
 
 ;; ESS
 (let ((ess-lisp (expand-file-name "ESS/lisp" init-home-folder-dir)))
@@ -43,8 +30,6 @@
     ;;; because it's not detecting this variable correctly on windows fsr
     (setq ess-lisp-directory ess-lisp)))
 
-;;; magit
-(setq magit-last-seen-setup-instructions "1.4.0")
 ;;; this is pretty brittle to internal changes in magit, hopefully it stays
 ;;; relatively stable
 (defvar magit-header-section-args '((diffstat) (headers)))
@@ -290,27 +275,11 @@
      for buf = (get-file-buffer file) when buf
      do (with-current-buffer buf (git-gutter)))))
 
-;;; parenthesis matching and more
-;;; turn pair parens on
-(electric-pair-mode t)
-(add-to-list 'electric-pair-pairs '(?\{ . ?\}))
-;;; match parens when cursor on top
-(show-paren-mode t)
-
 ;;; rainbow delimiters!
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 (defvar rainbow-delims-modes '(LaTeX-mode-hook))
 (loop for mode-hook in rainbow-delims-modes
       do (add-hook mode-hook #'rainbow-delimiters-mode))
-
-(ido-mode t)
-;;; makes searching fuzzier
-(setq ido-enable-flex-matching t)
-
-;; when opening a file the cursor will be at the last saved position
-(setq save-place-file (concat init-home-folder-dir "saveplace"))
-(setq-default save-place t)
-(setq save-place t)
 
 ;;;;; ibuffer stuff
 ;;;; re: http://martinowen.net/blog/2010/02/03/tips-for-emacs-ibuffer.html
@@ -499,8 +468,6 @@
      (add-hook 'skewer-repl-mode-hook
                (lambda () (setq comint-process-echoes nil)))))
 
-(eval-after-load 'org-mode '(require 'org-plot))
-
 (eval-after-load 'ag
   '(progn
      (defadvice ag/search (after remember-stuff activate)
@@ -560,6 +527,3 @@ If SUBMODE is not provided, use `LANG-mode' by default."
 
 ;;; encrypted files
 (epa-file-enable)
-
-;;; ensime
-(setq ensime-startup-snapshot-notification nil)

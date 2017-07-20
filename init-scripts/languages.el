@@ -57,6 +57,7 @@
 ;;      (setq-local ess-local-process-name (process-name ess-proc))
 ;;      (ess-string-command "2 + 4\n" (current-buffer) .2) (buffer-string))))
 
+;;; FIXME: make this work!
 (defun my-ess-eval-this (inp)
   (interactive
    (progn

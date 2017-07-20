@@ -82,6 +82,7 @@
  ;; If there is more than one, they won't work right.
  '(TeX-engine (quote luatex))
  '(TeX-newline-function (quote reindent-then-newline-and-indent))
+ '(adaptive-fill-mode t)
  '(ag-default-search-fn (quote ag-regexp))
  '(ag-highlight-search t)
  '(asm-comment-char 35)
@@ -150,7 +151,26 @@
  '(edebug-eval-macro-args t)
  '(edebug-save-windows nil)
  '(ediff-split-window-function (quote split-window-horizontally))
+ '(electric-pair-mode t)
+ '(electric-pair-pairs
+   (quote
+    ((40 . 41)
+     (123 . 125)
+     (34 . 34)
+     ((nth 0 electric-quote-chars)
+      nth 1 electric-quote-chars)
+     ((nth 2 electric-quote-chars)
+      nth 3 electric-quote-chars))))
+ '(electric-pair-skip-self (quote electric-pair-default-skip-self))
+ '(electric-pair-text-pairs
+   (quote
+    ((34 . 34)
+     ((nth 0 electric-quote-chars)
+      nth 1 electric-quote-chars)
+     ((nth 2 electric-quote-chars)
+      nth 3 electric-quote-chars))))
  '(enable-recursive-minibuffers t)
+ '(ensime-startup-snapshot-notification nil)
  '(ess-S-assign "_")
  '(ess-default-style (quote OWN))
  '(ess-own-style-list
@@ -175,6 +195,8 @@
  '(git-gutter:update-interval 1)
  '(git-gutter:window-width 0)
  '(global-company-mode t)
+ '(global-smart-tab-mode t)
+ '(global-undo-tree-mode t)
  '(grep-command "gr ")
  '(grep-highlight-matches (quote auto))
  '(grep-use-null-device nil)
@@ -204,6 +226,7 @@
      (tmm-menubar)
      (load-file . ido))))
  '(helm-ff-fuzzy-matching nil)
+ '(helm-mode t)
  '(helm-move-to-line-cycle-in-source t)
  '(helm-swoop-pre-input-function (lambda nil (thing-at-point (quote symbol))))
  '(hippie-expand-try-functions-list
@@ -211,6 +234,8 @@
     (try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol)))
  '(hl-paren-background-colors (quote ("light goldenrod")))
  '(hl-paren-colors (quote ("chocolate" "magenta" "tomato" "yellow")))
+ '(ido-enable-flex-matching t)
+ '(ido-mode (quote both) nil (ido))
  '(inhibit-startup-buffer-menu t)
  '(inhibit-startup-echo-area-message nil)
  '(inhibit-startup-screen t)
@@ -412,7 +437,10 @@
      (destroy-whitespace)
      (nil)
      (flycheck-mode))))
+ '(save-place-file "(expand-file-name \"saveplace\" init-home-folder-dir)")
+ '(save-place-mode nil)
  '(search-default-mode (quote char-fold-to-regexp))
+ '(show-paren-mode t)
  '(smart-tab-completion-functions-alist
    (quote
     ((lisp-mode . slime-complete-symbol)
@@ -424,6 +452,9 @@
  '(smart-tab-disabled-major-modes nil)
  '(smart-tab-using-hippie-expand t)
  '(tool-bar-mode nil)
+ '(undo-outer-limit 5000000)
+ '(undo-tree-auto-save-history t)
+ '(undo-tree-visualizer-diff t)
  '(warning-suppress-types (quote ((undo discard-info))))
  '(woman-fill-frame nil)
  '(woman-imenu t)
