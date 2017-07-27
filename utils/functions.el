@@ -951,6 +951,11 @@ details."
 (defmacro z (expr)
   `(lambda () ,expr))
 
+(defmacro cmd (expr)
+  `(lambda ()
+     (interactive)
+     ,expr))
+
 (defmacro l (expr)
   (with-gensyms (arg)
     `(lambda (,arg)

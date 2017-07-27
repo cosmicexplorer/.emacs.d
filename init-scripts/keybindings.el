@@ -11,6 +11,7 @@
 ;;; 3. C-Spc to start selection (set mark) in terminal!
 ;;; 4. remember that M-= gets word counts!
 
+(global-set-key (kbd "M-Z") (cmd (insert " ")))
 (global-set-key (kbd "C-s-f") #'forward-sexp)
 (global-set-key (kbd "C-s-b") #'backward-sexp)
 
@@ -513,8 +514,8 @@
                       (make-new-help #'describe-function-or-variable-at-point)
                     :invert t))
       ("C-h C-d" ,(find-function-switch-pfx #'find-function-or-variable))
-      ("C-M-h C-d" ,(find-function-switch-pfx
-#'                      find-function-or-variable-at-point))
+      ("C-M-h C-d"
+       ,(find-function-switch-pfx #'find-function-or-variable-at-point))
       ("C-M-h f"
        ,(find-function-switch-pfx (make-new-help #'describe-function-at-point)))
       ("C-M-h v"
@@ -540,8 +541,9 @@
                    (set-window-point win (point-min)))))))
 
 ;;; FIXME: this doesn't work at all and it's stupid
-(with-eval-after-spec help
-  (define-key help-mode-map [remap push-button] #'help-do-button))
+;; (with-eval-after-spec help
+;;   (define-key help-mode-map [remap push-button] #'help-do-button))
+;;; FIXME: add link follow for ess help
 
 ;;; now for c
 (eval-after-load 'cc-mode
