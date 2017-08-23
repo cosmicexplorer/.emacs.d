@@ -5,6 +5,18 @@
 
 (require 'utilities)
 
+(defun path-split (str)
+  (cl-check-type str string)
+  (split-string str path-separator t "[[:space:]\n]+"))
+
+(defun get-exec-path ()
+  (--> (append exec-path
+               (path-split (getenv "PATH"))
+               (path-split (shell-command-to-string "echo -n $PATH")))
+       (cl-remove-if-not #'file-directory-p it)
+       (cl-mapcar #'file-truename it)
+       (cl-remove-duplicates it :test #'string-equal)))
+
 (defmacro logify (expr) `(not (not ,expr)))
 
 (defconst sentinel-successful-exit-msg "finished\n")
@@ -968,9 +980,6 @@ details."
     `(let ((,e (l ,expr)))
        (l (cl-mapcar ,e _)))))
 
-(defvar init-loaded-fully nil
-  "Set to t after init loads fully.")
-
 (defcustom save-visiting-files-reject-regexps (list (rx bos (in space)))
   "Regexps used to reject files to save on shutdown."
   :type '(repeat string))
@@ -1001,26 +1010,25 @@ details."
 
 (defun save-visiting-files-to-buffer ()
   (interactive)
-  (when (check-var-expected-val 'init-loaded-fully t :test #'eq)
-    (clean-nonvisiting-buffers)
-    ;; TODO: make this more error-resistant, somehow. having to send emacs a
-    ;; sigterm because this function fails on quit is annoying.
-    (let ((saved-buf (find-file saved-files)))
-      (with-current-buffer saved-buf
-        (erase-buffer)
-        (-let* ((visiting (get-sorted-visiting-file-buffers))
-                (tupled
-                 (--keep
-                  (format-visiting-file-line
-                   (cdr (-first (-lambda (e) (funcall (car e) it))
-                                save-visiting-files-alist))
-                   (file-truename (buffer-file-name it))
-                   (with-current-buffer it (point)))
-                  visiting))
-                (str (--reduce-from (format "%s\n%s" acc it) "" tupled)))
-          (insert (replace-regexp-in-string "\\`\\s-+" "" str))
-          (save-buffer)))
-      (kill-buffer saved-buf))))
+  (clean-nonvisiting-buffers)
+  ;; TODO: make this more error-resistant, somehow. having to send emacs a
+  ;; sigterm because this function fails on quit is annoying.
+  (let ((saved-buf (find-file saved-files)))
+    (with-current-buffer saved-buf
+      (erase-buffer)
+      (-let* ((visiting (get-sorted-visiting-file-buffers))
+              (tupled
+               (--keep
+                (format-visiting-file-line
+                 (cdr (-first (-lambda (e) (funcall (car e) it))
+                              save-visiting-files-alist))
+                 (file-truename (buffer-file-name it))
+                 (with-current-buffer it (point)))
+                visiting))
+              (str (--reduce-from (format "%s\n%s" acc it) "" tupled)))
+        (insert (replace-regexp-in-string "\\`\\s-+" "" str))
+        (save-buffer)))
+    (kill-buffer saved-buf)))
 
 ;;; checking for features
 (defmacro with-feature (feature-sym &rest body)
@@ -1498,35 +1506,33 @@ way I prefer, and regards `comment-padding', unlike the standard version."
         (error "submodule failure"))))
 
 (defun actual-setup-submodules ()
-  (when (setup-internet-connection-check 'check)
-    (if (not (executable-find "git"))
-        (send-message-to-scratch
-         "git not installed! some features will be unavailable.")
-      (-let* ((git-submodule-buf-name "*git-submodule-errors*")
-              (default-directory init-home-folder-dir)
-              (submodule-out-buf
-               (get-buffer-create git-submodule-buf-name))
-              ((all-dirs failed)
-               (let ((debug-on-error nil))
-                 (condition-case err
-                     (run-git-updates submodule-out-buf)
-                   (error
-                    (with-temp-buffer
-                      (cl-assert
-                       (zerop
-                        (call-process
-                         "git" nil t nil
-                         "submodule" "--quiet" "foreach" "echo $path")))
-                      (let* ((out (buffer-string))
-                             (processed
-                              (replace-regexp-in-string "\n\\'" "" out)))
-                        (list (split-string processed "\n") t))))))))
-        (if failed
-            (progn
-              (pop-to-buffer submodule-out-buf)
-              (goto-char (point-max)))
-          (kill-buffer git-submodule-buf-name))
-        all-dirs))))
+  (cl-assert (internet-connected-p))
+  (cl-assert (executable-find "git"))
+  (-let* ((git-submodule-buf-name "*git-submodule-errors*")
+          (default-directory init-home-folder-dir)
+          (submodule-out-buf
+           (get-buffer-create git-submodule-buf-name))
+          ((all-dirs failed)
+           (let ((debug-on-error nil))
+             (condition-case err
+                 (run-git-updates submodule-out-buf)
+               (error
+                (with-temp-buffer
+                  (cl-assert
+                   (zerop
+                    (call-process
+                     "git" nil t nil
+                     "submodule" "--quiet" "foreach" "echo $path")))
+                  (let* ((out (buffer-string))
+                         (processed
+                          (replace-regexp-in-string "\n\\'" "" out)))
+                    (list (split-string processed "\n") t))))))))
+    (if failed
+        (progn
+          (pop-to-buffer submodule-out-buf)
+          (goto-char (point-max)))
+      (kill-buffer git-submodule-buf-name))
+    all-dirs))
 
 ;;; TODO: make this work lol
 (defun update-packages-in-list ()
@@ -3582,35 +3588,10 @@ If this list is empty, the value of `my-loc-lib-result-fun' is called."
   (message "")
   (switch-to-buffer "*scratch*")
   (delete-other-windows)
-  (setq init-loaded-fully t)
   (unless (eq (frame-parameter (selected-frame) 'fullscreen) 'fullboth)
     (toggle-frame-fullscreen))
   (garbage-collect))
 
-(defconst my-error-fmt-str
-  "error[%1]: %2
-
-%3
-data:
-%3
-%4")
-
-(cl-defun check-var-expected-val
-    (var expected-val &key (test #'equal))
-  (let ((val (symbol-value var))
-        (debug-on-error nil)
-        (debug-on-signal nil))
-    (condition-case err
-        (if (funcall test val expected-val) t
-          (signal 'my-init-error
-                  (list (format "`%s' is not set to '%s' (value is '%s')!"
-                                'init-loaded-fully expected-val val))))
-      (my-init-error
-       (pcase err
-         (`(,err-sym . ,msg)
-          (apply #'debug msg)))))))
-
-;;; debugging macros!!!
 (cl-defmacro msg-eval (sexp &key (pre "") (format "%S => '%s'") name)
   (declare (indent 1))
   (let ((res (cl-gensym))
@@ -3619,6 +3600,15 @@ data:
             (,res ,sexp))
        (message ,fmt ,(or name `',sexp) ,res)
        ,res)))
+
+;;; debugging macros!!!
+(defconst my-error-fmt-str
+  "error[%1]: %2
+
+%3
+data:
+%3
+%4")
 
 (defun sym-or-key (spec)
   (pcase spec

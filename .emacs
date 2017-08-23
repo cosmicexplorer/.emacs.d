@@ -1,5 +1,8 @@
 ;;; -* lexical-binding: t -*-
 
+(require 'package)
+(require 'cl-lib)
+
 (package-initialize)
 
 (defgroup my-customizations nil "all `defcustom' forms in my own init scripts")
@@ -35,6 +38,7 @@
 
 ;;; load all my cool functions!!!
 (load-my-script "functions" "utils")
+(setq exec-path (get-exec-path))
 
 ;;; for compatibility between different operating environments
 (load-my-script "compat" "init-scripts")
@@ -59,16 +63,6 @@
 (add-hook
  'after-init-hook
  (z (byte-recompile-directory init-home-folder-dir 0)))
-
-;;; let's do it
-(add-hook
- 'after-init-hook
- (z
-  (progn
-    (when check-internet-connection
-      (setup-internet-connection-check 'check))
-    (when monitor-internet-connection
-      (setup-internet-connection-check 'monitor)))))
 
 (add-hook 'after-init-hook #'redisplay)
 (add-hook 'after-init-hook #'redisplay t)
@@ -295,6 +289,8 @@
  '(multi-isearch-search nil)
  '(my-isearch-search-fun (quote do-normal-isearch))
  '(my-loc-lib-do-on-result (quote (find-file)))
+ '(ns-alternate-modifier (quote super))
+ '(ns-command-modifier (quote meta))
  '(nxml-slash-auto-complete-flag t)
  '(org-agenda-files nil)
  '(org-catch-invisible-edits (quote smart))
