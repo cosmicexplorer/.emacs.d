@@ -255,8 +255,7 @@
             "this"
             "spec"
             )
-         (? (| (: (? "i") (? "e") (? (| "s" "d" "r")))
-               "ing"
+         (? (| "ing"
                "age"
                "ish"
                (: (? "ific") "ally")
@@ -265,7 +264,8 @@
                "ic"
                "al"
                (: (? "e") "n")
-               (: (? "a") (? "t") "ion"))))
+               (: (? "a") (? "t") "ion")))
+         (? (: (? "i") (? "e") (? (| "s" "d" "r")))))
       eow)))
 
 (defconst warning-highlights-keywords
