@@ -1008,3 +1008,5 @@ Use (process-buffer `my-rw-process') instead."
     (linum-mode -1)))
 
 (add-hook 'book-txt-view-hook #'stop-book-txt-view-hook)
+
+(setq exec-path (get-exec-path))
