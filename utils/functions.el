@@ -971,14 +971,13 @@ details."
 (defmacro l (expr)
   (with-gensyms (arg)
     `(lambda (,arg)
-       ,(cl-subst arg '_ expr :test #'eq))))
+       ,(cl-subst arg '_ (macroexpand-all expr) :test #'eq))))
 
 (defmacro |> (&rest exprs) `(l (-> _ ,@exprs)))
+(defmacro |-> (&rest exprs) `(l (--> _ ,@exprs)))
 
 (defmacro *> (expr)
-  (with-gensyms (e)
-    `(let ((,e (l ,expr)))
-       (l (cl-mapcar ,e _)))))
+  `(l (cl-mapcar (l ,expr) _)))
 
 (defcustom save-visiting-files-reject-regexps (list (rx bos (in space)))
   "Regexps used to reject files to save on shutdown."
