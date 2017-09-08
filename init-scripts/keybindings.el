@@ -39,7 +39,7 @@
     (cl-destructuring-bind (&key load map kill assign) ft
       (cl-assert (and (symbolp load)
                       (listp kill)
-                      (listp assign)) t)
+                      (listp assign)))
       (let* ((cur `(set-keys-helper ,map ',kill ',assign))
              (to-eval
               (if others `(progn ,cur (set-keys-in others)) cur)))
@@ -193,8 +193,11 @@
 ;;; (really helm-swoop is better but if you need full POSIX regex then ok)
 (global-set-key (kbd "C-c M-r") 'search-all-buffers)
 
-(eval-after-load 'java-mode
-  '(define-key java-mode-map (kbd "C-c C-w") nil))
+(defconst java-keys-alist
+  '((:load cc-mode
+     :map java-mode-map
+     :kill ("(" "C-c C-w"))))
+(set-keys-in java-keys-alist)
 
 ;;; c/c++/java
 (add-hook 'c-initialization-hook
