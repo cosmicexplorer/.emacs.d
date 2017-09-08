@@ -230,4 +230,8 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
 ;;     ((vary nil) t)
 ;;     (_ nil)))
 
+(defun or-fun (&rest values)
+  (cl-reduce (lambda (a b) (or a b)) values
+             :initial-value nil))
+
 (provide 'utilities)
