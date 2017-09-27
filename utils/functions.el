@@ -3554,8 +3554,7 @@ If this list is empty, the value of `my-loc-lib-result-fun' is called."
 
 (cl-defmacro append-keymaps-to (orig-map (&rest keymaps) &rest body)
   (declare (indent 2))
-  (unless (symbolp orig-map)
-    (user-error "orig-map '%S' should be a symbol!"))
+  (cl-check-type orig-map symbol)
   `(let ((,orig-map (make-composed-keymap '(,@keymaps) ,orig-map)))
      ,@body))
 
@@ -3811,5 +3810,33 @@ documentation for `paredit-space-for-delimiter-predicates'."
 ;; buffer with `helm-regexp'."
 ;;   (interactive
 ;;    ()))
+
+(cl-defun tweetify-zalgo-buffer (&optional (buf (current-buffer)))
+  (with-current-buffer buf
+    (let ((orig (buffer-string)))
+      (with-temp-buffer
+        (insert orig)
+        (goto-char (point-min))
+        (let* ((desired (cl-loop
+                         while (re-search-forward "[A-Z ]" nil t)
+                         concat (match-string 0)
+                         do (replace-match "")))
+               (sample (cl-loop
+                        for i from 1 upto (- 140 (length desired))
+                        concat (->> (+ (random (- (point-max) (point-min)))
+                                       (point-min))
+                                    (char-after)
+                                    (make-string 1)))))
+          (cl-loop
+           with n = (length desired)
+           with diff = (/ (length sample) n)
+           with pre = (substring sample 0 diff)
+           for i from 1 upto n
+           for ch = (aref desired (1- i))
+           for beg = (* i diff)
+           for end = (+ beg diff)
+           for s = (substring sample beg end)
+           concat (format "%c%s" ch s) into joined
+           finally return (concat pre joined)))))))
 
 (provide 'functions)
