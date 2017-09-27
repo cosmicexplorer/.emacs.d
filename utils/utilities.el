@@ -234,4 +234,39 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
   (cl-reduce (lambda (a b) (or a b)) values
              :initial-value nil))
 
+;;; TODO: pcase cl types
+;;; TODO: pcase refer to current value being matched without using let/app
+;;; TODO: (--map (pcase it) ...) is commonly used -- can/should this be macroed?
+;;; TODO: ensure type definitions are easily usable with a defun form
+;;; FIXME: our own custom defun form should be nice, but should also try to
+;;; implement useful stuff as much as possible, and have a short name, and use a
+;;; consistent, existing (if possible) syntax for placeholder args
+
+(cl-defun keymap-do (spec &optional (map (make-sparse-keymap)))
+  (cl-check-type map keymap)
+  (pcase-exhaustive spec
+    (nil spec)
+    ((pred keymapp)
+     (make-composed-keymap (list map) spec))
+    ((pred stringp)
+     (keymap-do (cons spec nil) map)
+    ((pred functionp)
+     (keymap-do (funcall spec map) map))
+    (`(,(and key (pred stringp)) . ,(and cmd (or nil (pred commandp))))
+     (let ((new-map (copy-keymap map)))
+       (define-key new-map (kbd key) cmd)
+       new-map))
+    ((pred listp)
+     (keymap-from-alist spec :allow-empty t)))))
+
+;;; FIXME: look at all these different ways to handle error branches
+;;; FIXME: make it much easier to define simple pcase macros (or make examples!)
+(cl-defun keymap-from-alist (keys &optional (src (make-sparse-keymap)) parent)
+  (cl-check-type keys list)
+  (cl-check-type src (or null keymap))
+  (cl-check-type parent (or null keymap))
+  (-> (--map (keymap-do it (make-sparse-keymap))
+             keys)
+      (make-composed-keymap parent)))
+
 (provide 'utilities)

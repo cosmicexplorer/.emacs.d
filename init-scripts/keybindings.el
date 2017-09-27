@@ -18,33 +18,55 @@
 (defvar prev-keymaps nil)
 
 (defun set-key-dwim (map key cmd)
-  (cl-assert (stringp key))
-  (cl-assert (or (null cmd)
-                 (commandp cmd)))
+  (cl-check-type key string)
+  (cl-check-type cmd (or command null))
   (cl-etypecase map
-    (keymap (define-key map (kbd key) cmd))
-    (null (global-set-key (kbd key) cmd))))
+    (keymap
+     (define-key map (kbd key) cmd)
+     map)
+    (null
+     (global-set-key (kbd key) cmd)
+     (current-global-map))))
 
-(defun set-keys-helper (map kill assign)
-  (when (symbolp map) (setq map (symbol-value map)))
-  (cl-assert (and (listp kill) (listp assign)))
-  (cl-loop for to-kill in kill
-           do (set-key-dwim map to-kill nil))
-  (cl-loop for (key cmd) in assign
-           do (set-key-dwim map key cmd)))
+(defun set-keys-helper (maps kill assign)
+  (cl-check-type maps list)
+  (cl-check-type kill list)
+  (cl-check-type assign list)
+  (let* ((keymaps (->> maps
+                       (--map
+                        (cl-etypecase it
+                          (function (funcall it))
+                          (symbol (symbol-value it))
+                          (keymap it)
+                          (null it)))))
+         (commands (->> (append kill assign)
+                        (--map
+                         (pcase-exhaustive it
+                           ((pred stringp)
+                            (cons it nil))
+                           (`(,(pred stringp) . ,(pred commandp))
+                            it))))))
+    (cl-assert (and (-> keymaps length (> 0))
+                    (-> commands length (> 0))))
+    (--map (cl-reduce (-lambda (cur-map (key-seq defn))
+                        (set-key-dwim cur-map key-seq defn))
+                      commands
+                      :initial-value it)
+           keymaps)))
 
 (defun set-keys-in (keys-alist)
   (cl-assert (and keys-alist (listp keys-alist)) t)
   (cl-destructuring-bind (ft &rest others) keys-alist
     (cl-destructuring-bind (&key load map kill assign) ft
-      (cl-assert (and (symbolp load)
-                      (listp kill)
-                      (listp assign)))
-      (let* ((cur `(set-keys-helper ,map ',kill ',assign))
-             (to-eval
-              (if others `(progn ,cur (set-keys-in others)) cur)))
-        (if load (eval-after-load load to-eval)
-          (eval to-eval))))))
+      (let ((map-list (if (listp map) map (list map))))
+        (cl-check-type load symbol)
+        (cl-check-type kill list)
+        (cl-check-type assign list)
+        (let* ((cur `(set-keys-helper ',map-list ',kill ',assign))
+               (to-eval
+                (if others `(list ,cur (set-keys-in others)) cur)))
+          (if load (eval-after-load load to-eval)
+            (eval to-eval)))))))
 
 ;;; globally usable basic text insertion or command-running shortcuts
 (global-set-key (kbd "C-M-;") #'newline-and-comment)
@@ -283,9 +305,11 @@
       #'mc/mark-next-like-this)))
 
 ;;; makefile
-(with-eval-after-spec make-mode
-  (define-key makefile-gmake-mode-map (kbd "M-n") nil)
-  (define-key makefile-gmake-mode-map (kbd "M-p") nil))
+(defconst makefile-keys-alist
+  '((:load make-mode
+     :map (makefile-gmake-mode-map makefile-bsdmake-mode-map)
+     :kill ("M-n" "M-p"))))
+(set-keys-in makefile-keys-alist)
 
 ;;; replacing text
 (global-set-key (kbd "M-$") 'replace-string)
