@@ -676,3 +676,6 @@ See URL `https://github.com/ndmitchell/hlint'."
 
 ;;; jq
 (add-to-list 'auto-mode-alist '("\\.jq\\'" . jq-mode))
+
+;;; antlr
+(add-to-list 'auto-mode-alist '("\\.g4\\'" . antlr-mode))
