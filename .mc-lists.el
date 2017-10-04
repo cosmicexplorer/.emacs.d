@@ -97,6 +97,7 @@
         toggle-letter-case
         transpose-words
         wgrep-finish-edit
+        yaml-electric-backspace
         ))
 
 (setq mc/cmds-to-run-once
@@ -117,6 +118,7 @@
         isearch-backward-regexp
         isearch-delete-char
         latex-compile
+        markdown-outdent-or-delete
         mc/mark-next-not-cider
         mc/mark-prev-not-cider
         mouse-set-region
