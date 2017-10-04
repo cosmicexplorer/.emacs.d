@@ -30,24 +30,25 @@
 
 (defun set-keys-helper (maps kill assign)
   (cl-check-type maps list)
+  (cl-assert (> (length maps) 0))
   (cl-check-type kill list)
   (cl-check-type assign list)
-  (let* ((keymaps (->> maps
-                       (--map
-                        (cl-etypecase it
-                          (function (funcall it))
-                          (symbol (symbol-value it))
-                          (keymap it)
-                          (null it)))))
-         (commands (->> (append kill assign)
-                        (--map
-                         (pcase-exhaustive it
-                           ((pred stringp)
-                            (cons it nil))
-                           (`(,(pred stringp) . ,(pred commandp))
-                            it))))))
-    (cl-assert (and (-> keymaps length (> 0))
-                    (-> commands length (> 0))))
+  (let* ((keymaps (--map
+                   (cl-etypecase it
+                     (function (funcall it))
+                     (symbol (symbol-value it))
+                     (keymap it)
+                     (null it))
+                   maps))
+         (commands (--map
+                    (pcase-exhaustive it
+                      ((pred stringp)
+                       (list it nil))
+                      (`(,(pred stringp) ,(pred commandp))
+                       it))
+                    (append kill assign))))
+    (cl-assert (> (length keymaps) 0))
+    (cl-assert (> (length commands) 0))
     (--map (cl-reduce (-lambda (cur-map (key-seq defn))
                         (set-key-dwim cur-map key-seq defn))
                       commands
@@ -62,11 +63,11 @@
         (cl-check-type load symbol)
         (cl-check-type kill list)
         (cl-check-type assign list)
-        (let* ((cur `(set-keys-helper ',map-list ',kill ',assign))
-               (to-eval
-                (if others `(list ,cur (set-keys-in others)) cur)))
-          (if load (eval-after-load load to-eval)
-            (eval to-eval)))))))
+        (cl-check-type map-list list)
+        (if load (eval-after-load load
+                   `(set-keys-helper ',map-list ',kill ',assign))
+          (set-keys-helper map-list kill assign))
+        (when others (set-keys-in others))))))
 
 ;;; globally usable basic text insertion or command-running shortcuts
 (global-set-key (kbd "C-M-;") #'newline-and-comment)
@@ -520,7 +521,8 @@
           (_ nil))))))
 
 (defconst function-help-keys-alist
-  `((:kill ("C-M-h")
+  `((:map (nil)
+     :kill ("C-M-h")
      :assign
      (("C-h f" ,(find-function-switch-pfx
                     (make-new-help #'describe-function)

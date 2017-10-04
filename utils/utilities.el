@@ -245,7 +245,7 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
 (cl-defun keymap-do (spec &optional (map (make-sparse-keymap)))
   (cl-check-type map keymap)
   (pcase-exhaustive spec
-    (nil spec)
+    (`nil spec)
     ((pred keymapp)
      (make-composed-keymap (list map) spec))
     ((pred stringp)
