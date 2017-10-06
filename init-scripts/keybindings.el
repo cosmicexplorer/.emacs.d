@@ -219,7 +219,7 @@
 (defconst java-keys-alist
   '((:load cc-mode
      :map java-mode-map
-     :kill ("(" "C-c C-w"))))
+     :kill ("(" "{" "C-c C-w"))))
 (set-keys-in java-keys-alist)
 
 ;;; c/c++/java
