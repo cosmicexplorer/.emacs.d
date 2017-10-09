@@ -38,7 +38,6 @@
 
 ;;; load all my cool functions!!!
 (load-my-script "functions" "utils")
-(setq exec-path (get-exec-path))
 
 ;;; for compatibility between different operating environments
 (load-my-script "compat" "init-scripts")
@@ -51,6 +50,8 @@
 (load-my-script "languages" "init-scripts")
 ;;; cause what else is emacs for
 (load-my-script "keybindings" "init-scripts")
+
+(add-hook 'after-init-hook (z (setq exec-path (get-exec-path))))
 
 ;;; load submodules!!!!
 (add-hook 'after-init-hook #'setup-submodules-load)
