@@ -16,6 +16,7 @@
 (global-set-key (kbd "C-s-b") #'backward-sexp)
 (global-set-key (kbd "M-.") nil)
 (global-set-key (kbd "M-?") nil)
+(global-set-key (kbd "C-x M-w") #'cycle-window-configuration)
 
 (defvar prev-keymaps nil)
 
