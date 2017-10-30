@@ -222,6 +222,12 @@
      :kill ("(" "{" "C-c C-w"))))
 (set-keys-in java-keys-alist)
 
+(defconst rust-keys-alist
+  '((:load rust-mode
+     :map rust-mode-map
+     :assign (("<C-tab>" rust-format-buffer)))))
+(set-keys-in rust-keys-alist)
+
 ;;; c/c++/java
 (add-hook 'c-initialization-hook
           (lambda ()
