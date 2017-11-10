@@ -96,7 +96,7 @@
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
 
 ;; show line numbers
-(global-linum-mode 1)
+;; (global-linum-mode 1)
 ;; make them relative
 (setq linum-format 'fix-linum-relative)
 ;;; make it weird
@@ -542,22 +542,23 @@ to clean up.")
 (setenv "EDITOR" "emacsclient")
 
 ;;; setup submodules and make them
+(defconst submodule-dirs
+  '("emacs-helm-ag" "emacs-color-themes" "ESS"))
+
 (defun setup-submodules-load ()
-  (cl-assert (executable-find "git"))
-  (let ((all-dirs (actual-setup-submodules)))
-    (msg-evals (all-dirs) :before "setup-submodules-load")
-    (cl-mapc
-     (lambda (dir)
-       (add-to-list
-        'load-path (expand-file-name dir init-home-folder-dir)))
-     all-dirs)
-    (add-to-list 'load-path
-                 (expand-file-name "org-mode/lisp/" init-home-folder-dir))
-    (autoload #'org-element-update-syntax "org-element.el")
-    (autoload #'org-define-error "org-compat.el")
-    (require 'org)
-    (require 'helm-ag)
-    (require 'color-theme-danny)))
+  (actual-setup-submodules)
+  (cl-mapc
+   (lambda (dir)
+     (add-to-list
+      'load-path (expand-file-name dir init-home-folder-dir)))
+   submodule-dirs)
+  (add-to-list 'load-path
+               (expand-file-name "org-mode/lisp/" init-home-folder-dir))
+  (autoload #'org-element-update-syntax "org-element.el")
+  (autoload #'org-define-error "org-compat.el")
+  (require 'org)
+  (require 'helm-ag)
+  (require 'color-theme-danny))
 
 ;;; ibuffer moves things around when i mark things and this scares me
 (defadvice ibuffer-mark-interactive (after re-recenter activate) (recenter))

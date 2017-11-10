@@ -681,3 +681,10 @@ See URL `https://github.com/ndmitchell/hlint'."
 
 ;;; antlr
 (add-to-list 'auto-mode-alist '("\\.g4\\'" . antlr-mode))
+
+;;; rust
+(add-hook 'rust-mode-hook #'racer-mode)
+(add-hook 'racer-mode-hook #'eldoc-mode)
+(add-hook 'racer-mode-hook #'company-mode)
+(add-hook 'racer-mode-hook #'racer-mode)
+(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
