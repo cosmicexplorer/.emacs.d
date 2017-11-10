@@ -330,7 +330,9 @@ Lisp code." t)
 (setq auto-mode-alist
       (cons '("SConscript" . python-mode) auto-mode-alist))
 (add-hook 'python-mode-hook #'eldoc-mode)
-(add-to-list 'auto-mode-alist '("BUILD\\'" . python-mode))
+
+(add-to-list 'auto-mode-alist '("BUILD" . python-mode))
+
 (add-to-list 'auto-mode-alist '("\\.aurora\\'" . python-mode))
 
 ;;; js/css/html
