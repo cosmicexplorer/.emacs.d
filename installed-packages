@@ -19,6 +19,7 @@ espuds
 evil
 f3
 flycheck-package
+flycheck-rust
 font-lock-studio
 ggtags
 ghc
@@ -70,6 +71,7 @@ solarized-theme
 sourcemap
 speech-tagger
 thrift
+toml-mode
 tuareg
 vimrc-mode
 visual-fill-column

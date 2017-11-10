@@ -1505,33 +1505,32 @@ way I prefer, and regards `comment-padding', unlike the standard version."
         (error "submodule failure"))))
 
 (defun actual-setup-submodules ()
-  (cl-assert (internet-connected-p))
-  (cl-assert (executable-find "git"))
-  (-let* ((git-submodule-buf-name "*git-submodule-errors*")
-          (default-directory init-home-folder-dir)
-          (submodule-out-buf
-           (get-buffer-create git-submodule-buf-name))
-          ((all-dirs failed)
-           (let ((debug-on-error nil))
-             (condition-case err
-                 (run-git-updates submodule-out-buf)
-               (error
-                (with-temp-buffer
-                  (cl-assert
-                   (zerop
-                    (call-process
-                     "git" nil t nil
-                     "submodule" "--quiet" "foreach" "echo $path")))
-                  (let* ((out (buffer-string))
-                         (processed
-                          (replace-regexp-in-string "\n\\'" "" out)))
-                    (list (split-string processed "\n") t))))))))
-    (if failed
-        (progn
-          (pop-to-buffer submodule-out-buf)
-          (goto-char (point-max)))
-      (kill-buffer git-submodule-buf-name))
-    all-dirs))
+  (when (and (internet-connected-p) (executable-find "git"))
+    (-let* ((git-submodule-buf-name "*git-submodule-errors*")
+            (default-directory init-home-folder-dir)
+            (submodule-out-buf
+             (get-buffer-create git-submodule-buf-name))
+            ((all-dirs failed)
+             (let ((debug-on-error nil))
+               (condition-case err
+                   (run-git-updates submodule-out-buf)
+                 (error
+                  (with-temp-buffer
+                    (cl-assert
+                     (zerop
+                      (call-process
+                       "git" nil t nil
+                       "submodule" "--quiet" "foreach" "echo $path")))
+                    (let* ((out (buffer-string))
+                           (processed
+                            (replace-regexp-in-string "\n\\'" "" out)))
+                      (list (split-string processed "\n") t))))))))
+      (if failed
+          (progn
+            (pop-to-buffer submodule-out-buf)
+            (goto-char (point-max)))
+        (kill-buffer git-submodule-buf-name))
+      all-dirs)))
 
 ;;; TODO: make this work lol
 (defun update-packages-in-list ()
