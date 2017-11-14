@@ -191,6 +191,7 @@
  '(git-gutter:update-interval 1)
  '(git-gutter:window-width 0)
  '(global-company-mode t)
+ '(global-linum-mode nil)
  '(global-smart-tab-mode t)
  '(global-undo-tree-mode t)
  '(grep-command "gr ")

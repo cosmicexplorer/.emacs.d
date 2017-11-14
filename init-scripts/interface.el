@@ -95,8 +95,10 @@
 ;;; see docs for funcs n stuff
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
 
-;; show line numbers
-;; (global-linum-mode 1)
+(let ((local-bin "/usr/local/bin"))
+  (when (file-directory-p local-bin)
+    (add-to-list 'exec-path local-bin)))
+
 ;; make them relative
 (setq linum-format 'fix-linum-relative)
 ;;; make it weird

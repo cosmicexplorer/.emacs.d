@@ -1511,10 +1511,14 @@ way I prefer, and regards `comment-padding', unlike the standard version."
             (submodule-out-buf
              (get-buffer-create git-submodule-buf-name))
             ((all-dirs failed)
-             (let ((debug-on-error nil))
+             (let ((debug-on-error nil)
+                   (prev-term (getenv "TERM")))
+               (setenv "TERM" "ansi")
                (condition-case err
-                   (run-git-updates submodule-out-buf)
+                   (prog1 (run-git-updates submodule-out-buf)
+                     (setenv "TERM" prev-term))
                  (error
+                  (setenv "TERM" prev-term)
                   (with-temp-buffer
                     (cl-assert
                      (zerop
