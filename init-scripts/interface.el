@@ -96,7 +96,7 @@
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
 
 ;; show line numbers
-(global-linum-mode 1)
+;; (global-linum-mode 1)
 ;; make them relative
 (setq linum-format 'fix-linum-relative)
 ;;; make it weird
