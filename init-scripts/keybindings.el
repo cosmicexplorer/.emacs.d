@@ -77,6 +77,16 @@
 (global-set-key (kbd "C-x d") #'dired)
 (global-set-key (kbd "C-x C-d") #'dired)
 (define-key dired-mode-map (kbd "M-f") #'find-dired)
+(define-key dired-mode-map (kbd "<tab>")
+  (lambda ()
+    (interactive)
+    (call-interactively #'dired-maybe-insert-subdir)
+    (recenter)))
+(define-key dired-mode-map (kbd "S-<tab>")
+  (lambda ()
+    (interactive)
+    (call-interactively #'dired-up-directory)
+    (recenter)))
 ;;; cause otherwise this doesn't work in graphical mode
 (global-set-key (kbd "<C-return>") 'newline-and-indent)
 ;;; just destroy unused files
