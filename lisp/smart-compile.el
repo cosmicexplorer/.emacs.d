@@ -187,6 +187,11 @@ evaluate FUNCTION instead of running a compilation command.
   :type 'string
   :group 'smart-compile)
 
+
+(defun smart-compile--simplify-root-path (path)
+  (cl-assert (file-directory-p path))
+  (format "~/%s" (file-relative-name path (expand-file-name "~"))))
+
 ;;;###autoload
 (defun smart-compile (&optional arg)
   "An interface to `compile'.
@@ -282,8 +287,9 @@ which is defined in `smart-compile-alist'."
                       for num from 1 to 15
                       collect (concat (repeat-string num "../") "pants"))))))
         (setq-local compile-command
-                    (format "pushd %s >/dev/null && ./pants "
-                            (file-name-directory pants-build-file)))
+                    (format "pushd %s && ./pants "
+                            (smart-compile--simplify-root-path
+                             (file-name-directory pants-build-file))))
         (call-interactively 'compile)
         (setq not-yet nil))
        ((and smart-compile-check-sbt
