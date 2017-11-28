@@ -46,6 +46,7 @@ misc-cmds
 mmm-mode
 multiple-cursors
 nhexl-mode
+org
 pacmacs
 paredit
 pdf-tools
