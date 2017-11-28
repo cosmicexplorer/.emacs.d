@@ -372,8 +372,8 @@
          ("conf" (mode . conf-mode))
          ("grammar" (or (name . "\\.y\\'")
                         (name . "\\.jison\\'")))
-         ("thrift" (or (mode . thrift-mode)
-                       (mode . scrooge-mode)))
+         ("thrift/scrooge" (or (mode . thrift-mode)
+                               (mode . scrooge-mode)))
          ("documentation"
           (or
            (name . "help")
