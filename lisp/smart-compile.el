@@ -187,6 +187,16 @@ evaluate FUNCTION instead of running a compilation command.
   :type 'string
   :group 'smart-compile)
 
+
+(defun smart-compile--simplify-root-path (path)
+  (cl-assert (file-directory-p path))
+  (format "~/%s" (file-relative-name path (expand-file-name "~"))))
+
+(defun smart-compile--simplify-root-file (file-path)
+  (cl-assert (and (file-readable-p file-path)
+                  (not (file-directory-p file-path))))
+  (format "~/%s" (file-relative-name file-path (expand-file-name "~"))))
+
 ;;;###autoload
 (defun smart-compile (&optional arg)
   "An interface to `compile'.
@@ -244,9 +254,10 @@ which is defined in `smart-compile-alist'."
                                                `(if (file-directory-p
                                                      ,build-file)
                                                     ,build-file
-                                                  (file-name-directory
-                                                   ,build-file))
-                                             build-file))
+                                                  (smart-compile--simplify-root-path (file-name-directory ,build-file)))
+                                             (and (stringp build-file)
+                                                  (file-readable-p build-file)
+                                                  (smart-compile--simplify-root-file build-file))))
                                       `("%s" ,cmd-result)))))
                             (if ,filter-cmd (funcall ,filter-cmd res)
                               res)))
@@ -282,8 +293,9 @@ which is defined in `smart-compile-alist'."
                       for num from 1 to 15
                       collect (concat (repeat-string num "../") "pants"))))))
         (setq-local compile-command
-                    (format "pushd %s >/dev/null && ./pants "
-                            (file-name-directory pants-build-file)))
+                    (format "pushd %s && ./pants "
+                            (smart-compile--simplify-root-path
+                             (file-name-directory pants-build-file))))
         (call-interactively 'compile)
         (setq not-yet nil))
        ((and smart-compile-check-sbt
@@ -298,7 +310,8 @@ which is defined in `smart-compile-alist'."
                       (concat (repeat-string num "../") "build.sbt"))))))
         (setq-local compile-command
                     (format "pushd %s >/dev/null && sbt "
-                            (file-name-directory sbt-build-file)))
+                            (smart-compile--simplify-root-path
+                             (file-name-directory sbt-build-file))))
         (call-interactively 'compile)
         (setq not-yet nil))))
 
