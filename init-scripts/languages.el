@@ -355,6 +355,7 @@ Lisp code." t)
 
 ;;; config files
 (add-to-list 'auto-mode-alist '("\\.clang-format\\'" . conf-mode))
+(add-to-list 'auto-mode-alist '("\\.ini\\b" . conf-mode))
 
 (defun html-eldoc-function ()
   (let ((context (car (last (save-excursion (sgml-get-context))))))
