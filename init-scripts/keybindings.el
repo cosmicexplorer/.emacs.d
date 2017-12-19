@@ -11,6 +11,9 @@
 ;;; 3. C-Spc to start selection (set mark) in terminal!
 ;;; 4. remember that M-= gets word counts!
 
+(setq x-meta-keysym 'super
+      x-super-keysym 'meta)
+
 (global-set-key (kbd "M-Z") (cmd (insert " ")))
 (global-set-key (kbd "C-s-f") #'forward-sexp)
 (global-set-key (kbd "C-s-b") #'backward-sexp)
