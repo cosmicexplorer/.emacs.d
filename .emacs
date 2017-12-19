@@ -147,6 +147,7 @@
  '(edebug-eval-macro-args t)
  '(edebug-save-windows nil)
  '(ediff-split-window-function (quote split-window-horizontally))
+ '(ediff-window-setup-function (quote ediff-setup-windows-plain))
  '(electric-pair-mode t)
  '(electric-pair-pairs
    (quote
