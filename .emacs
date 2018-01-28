@@ -85,7 +85,8 @@
  '(auto-revert-verbose nil)
  '(book-txt-view-buffer-contents (quote fill))
  '(book-txt-view-font-size 12)
- '(browse-url-browser-function (quote browse-url-chromium))
+ '(browse-url-browser-function (quote browse-url-firefox))
+ '(browse-url-firefox-program "firefox-nightly")
  '(cloc-use-3rd-gen nil)
  '(coffee-args-compile (quote ("-c" "-b" "--no-header" "-m")))
  '(coffee-indent-like-python-mode t)
@@ -309,7 +310,7 @@
  '(org-support-shift-select (quote always))
  '(package-selected-packages
    (quote
-    (typescript-mode org toml-mode flycheck-rust racer rust-mode markdown-mode jq-mode vimrc-mode polymode intero shm nhexl-mode web-mode f3 scrooge projectile thrift cuda-mode visual-fill-column realgud mmm-mode pdf-tools font-lock-studio shut-up git-gutter-fringe yaml-mode sourcemap wgrep wgrep-ag wgrep-helm ag pacmacs slime-company enh-ruby-mode robe tuareg solarized-theme color-theme-solarized highlight-parentheses racket-mode sage-shell-mode gnuplot-mode gnuplot sml-mode skewer-mode csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters paredit misc-cmds minimap literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game magit multiple-cursors)))
+    (org typescript-mode toml-mode flycheck-rust racer rust-mode markdown-mode jq-mode vimrc-mode polymode intero shm nhexl-mode web-mode f3 scrooge projectile thrift cuda-mode visual-fill-column realgud mmm-mode pdf-tools font-lock-studio shut-up git-gutter-fringe yaml-mode sourcemap wgrep wgrep-ag wgrep-helm ag pacmacs slime-company enh-ruby-mode robe tuareg solarized-theme color-theme-solarized highlight-parentheses racket-mode sage-shell-mode gnuplot-mode gnuplot sml-mode skewer-mode csv-mode git-gutter matlab-mode speech-tagger lua-mode ensime scala-mode company-ghc company-ghci ghc epresent helm-gtags ggtags xterm-color web-beautify w3m smartrep rainbow-mode rainbow-delimiters paredit misc-cmds minimap literate-coffee-mode linum-relative less-css-mode js2-mode helm-swoop go-mode flycheck-package evil espuds ein company color-theme cloc cider better-defaults auctex 2048-game magit multiple-cursors)))
  '(perl6-indent-offset 2)
  '(rainbow-ansi-colors t)
  '(rainbow-html-colors t)
@@ -320,7 +321,8 @@
  '(read-file-name-completion-ignore-case t)
  '(safe-local-variable-values
    (quote
-    ((markdown-enable-math . t)
+    ((markdown-list-indent-width . 2)
+     (markdown-enable-math . t)
      (c-offsets-alist
       (inexpr-class . +)
       (inexpr-statement . +)
