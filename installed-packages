@@ -75,6 +75,7 @@ speech-tagger
 thrift
 toml-mode
 tuareg
+typescript-mode
 vimrc-mode
 visual-fill-column
 w3m
