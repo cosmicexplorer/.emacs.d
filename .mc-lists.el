@@ -65,6 +65,7 @@
         markdown-demote
         markdown-electric-backquote
         markdown-exdent-or-delete
+        markdown-outdent-or-delete
         markdown-promote
         newline-and-indent-fix-cc-mode
         org-end-of-line
@@ -118,7 +119,6 @@
         isearch-backward-regexp
         isearch-delete-char
         latex-compile
-        markdown-outdent-or-delete
         mc/mark-next-not-cider
         mc/mark-prev-not-cider
         mouse-set-region

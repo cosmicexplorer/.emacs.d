@@ -4,6 +4,7 @@ auctex
 better-defaults
 cider
 cloc
+cmake-mode
 color-theme
 color-theme-solarized
 company
