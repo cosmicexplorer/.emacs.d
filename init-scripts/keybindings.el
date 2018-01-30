@@ -77,8 +77,8 @@
 
 ;;; globally usable basic text insertion or command-running shortcuts
 (global-set-key (kbd "C-M-;") #'newline-and-comment)
-(global-set-key (kbd "C-x d") #'dired)
-(global-set-key (kbd "C-x C-d") #'dired)
+(global-set-key (kbd "C-x d") #'dired-find-containing-or-gen)
+(global-set-key (kbd "C-x C-d") #'dired-find-containing-or-gen)
 (define-key dired-mode-map (kbd "M-f") #'find-dired)
 (define-key dired-mode-map (kbd "<tab>")
   (lambda ()
@@ -965,6 +965,10 @@
 (with-eval-after-spec helm-ag
   (global-set-key (kbd "C-c a") #'my-helm-ag)
   (global-set-key (kbd "C-c C-a") #'my-helm-ag))
+
+(with-eval-after-spec rg3
+  (global-set-key (kbd "C-c a") #'rg3)
+  (global-set-key (kbd "C-c C-a") #'rg3))
 
 (global-set-key (kbd "M-y") #'yank-pop)
 (global-set-key (kbd "C-M-y") #'helm-show-kill-ring)

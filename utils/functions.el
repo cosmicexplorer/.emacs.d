@@ -3842,4 +3842,47 @@ documentation for `paredit-space-for-delimiter-predicates'."
            concat (format "%c%s" ch s) into joined
            finally return (concat pre joined)))))))
 
+(defun get-buf-dir (buf)
+  (with-current-buffer buf
+    default-directory))
+
+(defun format-dir-filename (dir)
+  (let ((expanded (expand-file-name dir)))
+    (replace-regexp-in-string "/\\'" "" expanded)))
+
+(defun dir-contained-within (super-dir sub-dir)
+  (let* ((abs-super (format-dir-filename super-dir))
+         (abs-sub (format-dir-filename sub-dir)))
+    (string-match-p
+     (format "\\`\\(?:%s\\)" (regexp-quote abs-super))
+     abs-sub)))
+
+(defun dired-use-containing-buffer (dir)
+  ;; if there's a dired buffer open which contains the desired directory,
+  ;; expand subdirectories until this one is displayed, and jump to it
+  (cl-assert (file-directory-p dir))
+  (let* ((dired-bufs (--filter (and (with-current-buffer it
+                                      (eq major-mode 'dired-mode))
+                                    (dir-contained-within (get-buf-dir it) dir))
+                               (buffer-list)))
+         (sorted-containing-bufs
+          (sort dired-bufs (lambda (super-buf sub-buf)
+                             (dir-contained-within
+                              (get-buf-dir super-buf)
+                              (get-buf-dir sub-buf))))))
+    (car (last sorted-containing-bufs))))
+
+(defun dired-find-containing-or-gen (dir &optional pfx)
+  (interactive
+   (list (ido-read-directory-name "Dired: " nil nil t)
+         current-prefix-arg))
+  ;; if pfx, just make a new buffer (or use the exact one), otherwise use
+  ;; any containing buffer and expand down to that section, and if no containing
+  ;; dired buffer (finally) just make a new one
+  (if pfx (dired dir)
+    (let ((containing-buffer (dired-use-containing-buffer dir)))
+      (if containing-buffer
+          (switch-to-buffer containing-buffer)
+        (dired dir)))))
+
 (provide 'functions)
