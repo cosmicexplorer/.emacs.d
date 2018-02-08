@@ -962,13 +962,9 @@
   (define-key ag-mode-map (kbd "g") #'re-ag-reset-args-and-recompile)
   (define-key ag-mode-map (kbd "G") #'re-ag))
 
-(with-eval-after-spec helm-ag
-  (global-set-key (kbd "C-c a") #'my-helm-ag)
-  (global-set-key (kbd "C-c C-a") #'my-helm-ag))
-
-(with-eval-after-spec rg3
-  (global-set-key (kbd "C-c a") #'rg3)
-  (global-set-key (kbd "C-c C-a") #'rg3))
+(with-eval-after-spec helm-rg
+  (global-set-key (kbd "C-c a") #'helm-rg)
+  (global-set-key (kbd "C-c C-a") #'helm-rg))
 
 (global-set-key (kbd "M-y") #'yank-pop)
 (global-set-key (kbd "C-M-y") #'helm-show-kill-ring)

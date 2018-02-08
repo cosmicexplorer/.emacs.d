@@ -80,6 +80,8 @@
 (require 'poly-markdown)
 
 (add-to-list 'auto-mode-alist '("\\.[rR]md\\'" . poly-markdown+r-mode))
+(add-to-list 'auto-mode-alist '("\\.[rR]\\'" . R-mode))
+(add-to-list 'auto-mode-alist '("\\.[rR]script\\'" . R-mode))
 
 (defconst rmd-export-cmd-fmt-str
   "Rscript - && pandoc \"%s\" -o \"%s\"")

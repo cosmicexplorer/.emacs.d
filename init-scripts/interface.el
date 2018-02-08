@@ -1013,3 +1013,8 @@ Use (process-buffer `my-rw-process') instead."
 (add-hook 'book-txt-view-hook #'stop-book-txt-view-hook)
 
 (setq exec-path (get-exec-path))
+
+(setq read-file-name-function #'ido-read-file-name)
+
+(defadvice read-file-name (before reset-file-name-function activate)
+  (setq read-file-name-function #'ido-read-file-name))
