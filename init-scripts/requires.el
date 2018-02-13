@@ -53,6 +53,7 @@
 (require 'rx)
 (require 'widget)
 (require 'epa-file)
+(require 'helm-rg)
 
 ;;; my stuff
 (require 'utilities)
