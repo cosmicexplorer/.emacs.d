@@ -1015,6 +1015,3 @@ Use (process-buffer `my-rw-process') instead."
 (setq exec-path (get-exec-path))
 
 (setq read-file-name-function #'ido-read-file-name)
-
-(defadvice read-file-name (before reset-file-name-function activate)
-  (setq read-file-name-function #'ido-read-file-name))
