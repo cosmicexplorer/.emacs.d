@@ -1015,3 +1015,22 @@ Use (process-buffer `my-rw-process') instead."
 (setq exec-path (get-exec-path))
 
 (setq read-file-name-function #'ido-read-file-name)
+
+(add-to-list 'helm-completing-read-handlers-alist '(find-file . ido))
+
+(defvar ido-read-file-name-toggle nil)
+
+(defadvice read-file-name (around use-ido activate)
+  (if ido-read-file-name-toggle ad-do-it
+    (setq ad-return-value
+          (let ((ido-read-file-name-toggle t))
+            (apply #'ido-read-file-name (ad-get-args 0))))))
+
+
+(defvar ido-read-directory-name-toggle nil)
+
+(defadvice read-directory-name (around use-ido activate)
+  (if ido-read-directory-name-toggle ad-do-it
+    (setq ad-return-value
+          (let ((ido-read-directory-name-toggle t))
+            (apply #'ido-read-directory-name (ad-get-args 0))))))
