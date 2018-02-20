@@ -3846,31 +3846,54 @@ documentation for `paredit-space-for-delimiter-predicates'."
   (with-current-buffer buf
     default-directory))
 
-(defun format-dir-filename (dir)
-  (let ((expanded (expand-file-name dir)))
-    (replace-regexp-in-string "/\\'" "" expanded)))
-
-(defun dir-contained-within (super-dir sub-dir)
-  (let* ((abs-super (format-dir-filename super-dir))
-         (abs-sub (format-dir-filename sub-dir)))
-    (string-match-p
-     (format "\\`\\(?:%s\\)" (regexp-quote abs-super))
-     abs-sub)))
+(defun dir-contained-within (dired-buf sub-dir)
+  (let* ((super-dir (get-buf-dir dired-buf))
+         (abs-super (file-name-as-directory (expand-file-name super-dir)))
+         (abs-sub (file-name-as-directory (expand-file-name sub-dir))))
+    (when (string-match-p
+           (format "\\`\\(?:%s\\)" (regexp-quote abs-super))
+           abs-sub)
+      (list
+       :dired-buf dired-buf
+       :super-dir super-dir
+       :sub-dir-relpath (file-relative-name sub-dir super-dir)))))
 
 (defun dired-use-containing-buffer (dir)
   ;; if there's a dired buffer open which contains the desired directory,
   ;; expand subdirectories until this one is displayed, and jump to it
   (cl-assert (file-directory-p dir))
-  (let* ((dired-bufs (--filter (and (with-current-buffer it
-                                      (eq major-mode 'dired-mode))
-                                    (dir-contained-within (get-buf-dir it) dir))
-                               (buffer-list)))
+  (let* ((dired-bufs
+          (->>
+           (buffer-list)
+           (--filter (with-current-buffer it
+                       (eq major-mode 'dired-mode)))
+           (--map (dir-contained-within it dir))
+           (--filter (not (null it)))))
          (sorted-containing-bufs
-          (sort dired-bufs (lambda (super-buf sub-buf)
-                             (dir-contained-within
-                              (get-buf-dir super-buf)
-                              (get-buf-dir sub-buf))))))
-    (car (last sorted-containing-bufs))))
+          (sort dired-bufs (-lambda ((&plist :super-dir super-dir)
+                                     (&plist :super-dir sub-dir))
+                             (< (length super-dir) (length sub-dir))))))
+    (-> sorted-containing-bufs (last) (car))))
+
+(defun get-dir-parent (dir)
+  (-> dir
+      (directory-file-name)
+      (file-name-directory)))
+
+(defun dired-expand-to-subdir (containing-dir-info)
+  (-let* (((&plist :dired-buf dired-buf
+                   :sub-dir-relpath sub-dir-relpath)
+           containing-dir-info)
+          (dir-expansions
+           (cl-loop for cur-subdir-path = sub-dir-relpath
+                    then (get-dir-parent cur-subdir-path)
+                    while cur-subdir-path
+                    collecting cur-subdir-path into paths
+                    finally return (reverse paths))))
+    (with-current-buffer dired-buf
+      (cl-loop for dir-path in dir-expansions
+               do (dired-insert-subdir dir-path)))
+    dired-buf))
 
 (defun dired-find-containing-or-gen (dir &optional pfx)
   (interactive
@@ -3880,9 +3903,8 @@ documentation for `paredit-space-for-delimiter-predicates'."
   ;; any containing buffer and expand down to that section, and if no containing
   ;; dired buffer (finally) just make a new one
   (if pfx (dired dir)
-    (let ((containing-buffer (dired-use-containing-buffer dir)))
-      (if containing-buffer
-          (switch-to-buffer containing-buffer)
-        (dired dir)))))
+    (-if-let (containing-buffer (dired-use-containing-buffer dir))
+        (switch-to-buffer (dired-expand-to-subdir containing-buffer))
+      (dired dir))))
 
 (provide 'functions)
