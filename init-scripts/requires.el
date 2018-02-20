@@ -17,6 +17,8 @@
 (require 'clang-format)
 (require 'comint)
 (require 'ensime)
+(require 'helm)
+(require 'helm-mode)
 (require 'helm-config)
 (require 'helm-gtags)
 (require 'helm-swoop)
