@@ -70,6 +70,12 @@
 (add-hook 'after-init-hook #'garbage-collect)
 (add-hook 'after-init-hook #'garbage-collect t)
 
+(let ((local-emacs-script
+       (concat (file-name-as-directory (expand-file-name "~"))
+               ".local.emacs")))
+  (when (file-readable-p local-emacs-script)
+    (load-file local-emacs-script)))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
