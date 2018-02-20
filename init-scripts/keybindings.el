@@ -783,6 +783,13 @@
 (define-key paredit-mode-map (kbd "M-S-<up>") #'paredit-backward-up)
 (define-key paredit-mode-map (kbd "M-S-<down>") #'paredit-forward-up)
 
+(defun my-paredit-kill (&optional arg)
+  (interactive "P")
+  (if (region-active-p)
+      (kill-region (region-beginning) (region-end))
+    (paredit-kill arg)))
+(define-key paredit-mode-map (kbd "C-k") #'my-paredit-kill)
+
 ;;; comint!
 (defun my-comint-move-prompt-region (fn)
   (lambda (N)
