@@ -1067,3 +1067,6 @@
 
 (global-set-key (kbd "M-=") #'count-chars-words-lines-buffer)
 (global-set-key (kbd "M-T") #'transpose-lines)
+
+(with-eval-after-spec yaml-mode
+  (define-key yaml-mode-map (kbd "<backspace>") #'delete-backward-char))
