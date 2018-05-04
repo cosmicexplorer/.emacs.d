@@ -978,6 +978,12 @@
   (global-set-key (kbd "C-c a") #'helm-rg)
   (global-set-key (kbd "C-c C-a") #'helm-rg))
 
+(with-eval-after-spec f3
+  (global-set-key (kbd "C-c C-f") #'f3))
+
+(with-eval-after-spec python-mode
+  (define-key python-mode-map (kbd "C-c C-f") nil))
+
 (global-set-key (kbd "M-y") #'yank-pop)
 (global-set-key (kbd "C-M-y") #'helm-show-kill-ring)
 (define-key paredit-mode-map (kbd "C-M-y") #'helm-show-kill-ring)
