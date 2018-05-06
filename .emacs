@@ -186,7 +186,7 @@
      (ess-indent-from-chain-start . t)
      (ess-indent-with-fancy-comments . t)))
  '(eval-expression-print-level nil)
- '(fill-column 80)
+ '(fill-column 100)
  '(git-gutter:update-hooks
    '(after-save-hook after-revert-hook find-file-hook after-change-major-mode-hook text-scale-mode-hook magit-revert-buffer-hook magit-status-refresh-hook magit-run-git-hook))
  '(git-gutter:update-interval 1)
@@ -227,6 +227,7 @@
  '(helm-move-to-line-cycle-in-source t)
  '(helm-rg-default-directory 'git-root)
  '(helm-swoop-pre-input-function (lambda nil (thing-at-point 'symbol)))
+ '(highlight-80+-columns 100)
  '(hippie-expand-try-functions-list
    '(try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol))
  '(hl-paren-background-colors '("light goldenrod"))
