@@ -349,22 +349,17 @@
                    (format "help(describe-bindings): %s<%S>"
                            (buffer-name buf) buf-mode)))
                 ;; multiple types of help use this stack structure
-                ((and `(,_ ,item . ,_)
-                      ;; set `name' and `desc' for each case and use in format
-                      ;; string below
-                      (or (and (guard (and (symbolp item)
-                                           (fboundp item)))
-                               (let desc "function")
-                               (let name item))
-                          (and (guard (and (symbolp item)
-                                           (boundp item)))
-                               (let desc "variable")
-                               (let name item))
-                          (and (let (cl-struct package-desc (name name))
-                                 item)
-                               (let desc "elisp-package"))
-                          (let desc "something")))
-                 (format "help(describe-%s): %s" desc name))
+                (`(,_ ,item . ,_)
+                 (-let (([name desc]
+                         (pcase-exhaustive item
+                           ((pred symbolp)
+                            (cond ((fboundp item) [item "function"])
+                                  ((boundp item) [item "variable"])
+                                  (t [item "something-symbolic"])))
+                           (`(cl-struct package-desc (name ,name))
+                            [name "elisp-package"])
+                           (_ [item "something"]))))
+                   (format "help(describe-%s: %s" desc name)))
                 (`(,x)
                  (format "help(%s)" x)))))
     (rename-buffer name t)))
