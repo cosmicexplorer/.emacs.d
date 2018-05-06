@@ -350,16 +350,16 @@
                            (buffer-name buf) buf-mode)))
                 ;; multiple types of help use this stack structure
                 (`(,_ ,item . ,_)
-                 (-let (([name desc]
+                 (-let (((name desc)
                          (pcase-exhaustive item
                            ((pred symbolp)
-                            (cond ((fboundp item) [item "function"])
-                                  ((boundp item) [item "variable"])
-                                  (t [item "something-symbolic"])))
+                            (cond ((fboundp item) (list item "function"))
+                                  ((boundp item) (list item "variable"))
+                                  (t (list item "something-symbolic"))))
                            (`(cl-struct package-desc (name ,name))
-                            [name "elisp-package"])
-                           (_ [item "something"]))))
-                   (format "help(describe-%s: %s" desc name)))
+                            (list name "elisp-package"))
+                           (_ (list item "something")))))
+                   (format "help(describe-%s: %s)" desc name)))
                 (`(,x)
                  (format "help(%s)" x)))))
     (rename-buffer name t)))
