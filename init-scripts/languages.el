@@ -690,5 +690,6 @@ See URL `https://github.com/ndmitchell/hlint'."
 (add-hook 'rust-mode-hook #'racer-mode)
 (add-hook 'racer-mode-hook #'eldoc-mode)
 (add-hook 'racer-mode-hook #'company-mode)
-(add-hook 'racer-mode-hook #'racer-mode)
 (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+(add-hook 'rust-mode-hook (lambda ()
+                            (add-to-list 'electric-pair-pairs (cons ?| ?|))))
