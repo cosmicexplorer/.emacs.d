@@ -100,6 +100,12 @@
     (interactive)
     (call-interactively #'dired-up-directory)
     (recenter)))
+(define-key dired-mode-map (kbd "R")
+  (lambda ()
+    (interactive)
+    (let ((read-file-name-function #'ido-read-file-name))
+      (call-interactively #'dired-do-rename))))
+
 ;;; cause otherwise this doesn't work in graphical mode
 (global-set-key (kbd "<C-return>") 'newline-and-indent)
 ;;; just destroy unused files
