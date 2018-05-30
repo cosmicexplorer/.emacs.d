@@ -3593,7 +3593,7 @@ If this list is empty, the value of `my-loc-lib-result-fun' is called."
     (toggle-frame-fullscreen))
   (garbage-collect))
 
-(cl-defmacro msg-eval (sexp &key (pre "") (format "%S => '%s'") name)
+(cl-defmacro msg-eval (sexp &key (pre "") (format "%S => '%S'") name)
   (declare (indent 1))
   (let ((res (cl-gensym))
         (fmt (cl-gensym)))
