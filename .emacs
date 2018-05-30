@@ -108,7 +108,7 @@
  '(compile-command "make")
  '(completion-auto-help 'lazy)
  '(completion-cycle-threshold t)
- '(completion-pcm-word-delimiters "-_./:|       \f")
+ '(completion-pcm-word-delimiters "-_./:|       ")
  '(completions-format 'horizontal)
  '(cperl-hairy nil)
  '(cperl-invalid-face 'cperl-no-trailing-whitespace-face)
