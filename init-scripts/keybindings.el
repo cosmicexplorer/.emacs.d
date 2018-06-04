@@ -693,7 +693,7 @@
   (define-key magit-mode-map (kbd "<backtab>") #'magit-section-cycle-global)
   (define-key magit-status-mode-map (kbd "C-w") nil))
 (with-eval-after-spec magit-blame
-  (define-key magit-blame-mode-map (kbd "c") #'magit-show-commit))
+  (define-key magit-blame-read-only-mode-map (kbd "c") #'magit-show-commit))
 (with-eval-after-spec magit-process
   (define-key magit-process-mode-map (kbd "k") #'magit-process-kill))
 
