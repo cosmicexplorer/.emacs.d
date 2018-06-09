@@ -114,6 +114,7 @@
         ess-load-file
         eval-buffer-and-message
         eval-expression
+        helm-rg--bounce-dump
         helm-swoop
         help-for-help
         isearch-backward-regexp
