@@ -5,8 +5,6 @@
 ;;; indentation silliness
 (setq-default indent-tabs-mode nil)     ;; use spaces not tabs
 (setq tab-width 2)                      ; 4-spacers get at me
-(add-hook 'prog-mode-hook (lambda () (setq fill-column 80)))
-(add-hook 'text-mode-hook (lambda () (setq fill-column 80)))
 
 ;;; commenting
 (defun make-comments-like-c ()
@@ -687,9 +685,26 @@ See URL `https://github.com/ndmitchell/hlint'."
 (add-to-list 'auto-mode-alist '("\\.g4\\'" . antlr-mode))
 
 ;;; rust
-(add-hook 'rust-mode-hook #'racer-mode)
-(add-hook 'racer-mode-hook #'eldoc-mode)
-(add-hook 'racer-mode-hook #'company-mode)
-(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-(add-hook 'rust-mode-hook (lambda ()
-                            (add-to-list 'electric-pair-pairs (cons ?| ?|))))
+
+(defun add-pipes-to-local-electric-pairs ()
+  (let ((pipe-char ?|))
+    (unless (alist-get pipe-char electric-pair-pairs)
+      (setq-local electric-pair-pairs `((,pipe-char . ,pipe-char) ,@electric-pair-pairs)))))
+
+(when-let ((rustup-exe (executable-find "rustup")))
+  (with-temp-buffer
+    (call-process rustup-exe nil t nil "component" "list")
+    (goto-char (point-min))
+    (unless (re-search-forward (rx "rust-src") nil t)
+      (message "installing rust-src with rustup at %s..." rustup-exe)
+      (call-process rustup-exe nil t nil "component" "add" "rust-src")))
+  (require 'racer)
+  (setq racer-rust-src-path
+        (format "%s/%s"
+                (trim-whitespace (shell-command-to-string "rustc --print sysroot"))
+                "lib/rustlib/src/rust/src"))
+  (add-hook 'rust-mode-hook #'racer-mode)
+  (add-hook 'racer-mode-hook #'eldoc-mode)
+  (add-hook 'racer-mode-hook #'company-mode)
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+  (add-hook 'rust-mode-hook #'add-pipes-to-local-electric-pairs))
