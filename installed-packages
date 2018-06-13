@@ -2,6 +2,7 @@
 2048-game
 ag
 auctex
+bazel-mode
 better-defaults
 cider
 cloc
@@ -32,6 +33,7 @@ git-gutter-fringe
 gnuplot
 gnuplot-mode
 go-mode
+groovy-mode
 helm-gtags
 helm-rg
 helm-swoop
@@ -45,12 +47,15 @@ linum-relative
 literate-coffee-mode
 lua-mode
 magit
+magithub
 markdown-mode
 matlab-mode
 minimap
+misc-cmds
 mmm-mode
 multiple-cursors
 nhexl-mode
+org
 pacmacs
 paredit
 pcre2el
@@ -61,6 +66,7 @@ protobuf-mode
 racer
 racket-mode
 rainbow-delimiters
+rainbow-mode
 realgud
 robe
 rust-mode
@@ -78,6 +84,8 @@ sourcemap
 speech-tagger
 thrift
 toml-mode
+tuareg
+typescript-mode
 use-package
 vimrc-mode
 visual-fill-column

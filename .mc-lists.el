@@ -29,6 +29,7 @@
         camel-case-left-word
         camel-case-right-word
         coffee-dedent-line-backspace
+        comment-dwim
         compile-goto-error
         completion-at-point
         cperl-electric-terminator
