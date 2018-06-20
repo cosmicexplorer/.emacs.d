@@ -1076,3 +1076,5 @@
 
 (with-eval-after-spec yaml-mode
   (define-key yaml-mode-map (kbd "<backspace>") #'delete-backward-char))
+
+(define-key conf-colon-mode-map (kbd "C-c C-w") nil)
