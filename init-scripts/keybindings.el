@@ -319,6 +319,7 @@
 (define-key emacs-lisp-mode-map (kbd "C-M-x") #'eval-buffer-and-message)
 (define-key emacs-lisp-mode-map (kbd "<return>") #'newline)
 (define-key paredit-mode-map (kbd "M-q") #'comment-fill-paragraph)
+(define-key paredit-mode-map (kbd "M-C") #'paredit-convolute-sexp)
 (define-key paredit-mode-map (kbd "M-.") nil)
 (define-key paredit-mode-map (kbd "M-?") nil)
 (define-key emacs-lisp-mode-map (kbd "C-c C-e") #'view-macro-expansion)
