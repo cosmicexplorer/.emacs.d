@@ -565,6 +565,17 @@
            (funcall then-do window buffer))
           (_ nil))))))
 
+(defadvice ffap-prompter (around no-guess activate)
+  (setq ad-return-value (ffap-guesser)))
+
+(global-set-key
+ (kbd "C-M-x C-f")
+ (lambda (&optional pfx)
+   (interactive "P")
+   (let ((new-file (find-file-noselect (ffap-guesser))))
+     (if pfx (switch-to-buffer new-file)
+       (pop-to-buffer new-file)))))
+
 (defconst function-help-keys-alist
   `((:map (nil)
      :kill ("C-M-h")
