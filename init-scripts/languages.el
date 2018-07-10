@@ -331,8 +331,6 @@ Lisp code." t)
       (cons '("SConscript" . python-mode) auto-mode-alist))
 (add-hook 'python-mode-hook #'eldoc-mode)
 
-(add-to-list 'auto-mode-alist '("BUILD" . python-mode))
-
 (add-to-list 'auto-mode-alist '("\\.aurora\\'" . python-mode))
 
 ;;; js/css/html
@@ -708,3 +706,6 @@ See URL `https://github.com/ndmitchell/hlint'."
   (add-hook 'racer-mode-hook #'company-mode)
   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
   (add-hook 'rust-mode-hook #'add-pipes-to-local-electric-pairs))
+
+(define-derived-mode build-file-mode python-mode "BUILD")
+(add-to-list 'auto-mode-alist '("BUILD" . build-file-mode))
