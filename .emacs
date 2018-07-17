@@ -169,6 +169,8 @@
      ((nth 2 electric-quote-chars)
       nth 3 electric-quote-chars)))
  '(enable-recursive-minibuffers t)
+ '(ensime-eldoc-hints 'all)
+ '(ensime-startup-notification nil)
  '(ensime-startup-snapshot-notification nil)
  '(ess-S-assign "_")
  '(ess-default-style 'OWN)
@@ -187,8 +189,7 @@
      (ess-indent-with-fancy-comments . t)))
  '(eval-expression-print-level nil)
  '(f3-before-args
-   (quote
-    ("-not" "(" "-ipath" "*.git/*" "-or" "-ipath" "*.pants.d/*" "-or" "-name" "*.pyc" ")")))
+   '("-not" "(" "-ipath" "*.git/*" "-or" "-ipath" "*.pants.d/*" "-or" "-name" "*.pyc" ")"))
  '(fill-column 100)
  '(git-gutter:update-hooks
    '(after-save-hook after-revert-hook find-file-hook after-change-major-mode-hook text-scale-mode-hook magit-revert-buffer-hook magit-status-refresh-hook magit-run-git-hook))
@@ -306,7 +307,7 @@
  '(org-startup-folded t)
  '(org-support-shift-select 'always)
  '(package-selected-packages
-   '(0blayout 2048-game ag auctex bazel-mode better-defaults cider cloc cmake-mode color-theme color-theme-modern color-theme-solarized company company-ghc company-ghci csv-mode cuda-mode dired-sidebar ein enh-ruby-mode ensime epresent espuds evil f3 flycheck-package flycheck-rust font-lock-studio ggtags ghc git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode groovy-mode helm-gtags helm-rg helm-swoop highlight-parentheses ibuffer-sidebar intero jq-mode js2-mode less-css-mode linum-relative literate-coffee-mode lua-mode magit magithub markdown-mode matlab-mode minimap misc-cmds mmm-mode multiple-cursors nhexl-mode org pacmacs paredit pcre2el pdf-tools polymode projectile protobuf-mode racer racket- racket-mode rainbow-delimiters rainbow-mode realgud robe rust-mode sage-shell-mode scala-mode scrooge shm shut-up skewer-mode slime-company smartrep sml-mode solarized-theme sourcemap speech-tagger thrift toml-mode tuareg typescript-mode use-package vimrc-mode visual-fill-column w3m web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode))
+   '(cl-lib graphql-mode dockerfile-mode 0blayout 2048-game ag auctex bazel-mode better-defaults cider cloc cmake-mode color-theme color-theme-modern color-theme-solarized company company-ghc company-ghci csv-mode cuda-mode dired-sidebar ein enh-ruby-mode epresent espuds evil f3 flycheck-package flycheck-rust font-lock-studio ggtags ghc git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode groovy-mode helm-gtags helm-rg helm-swoop highlight-parentheses ibuffer-sidebar intero jq-mode js2-mode less-css-mode linum-relative literate-coffee-mode lua-mode magit markdown-mode matlab-mode minimap mmm-mode multiple-cursors nhexl-mode org pacmacs paredit pcre2el pdf-tools polymode projectile protobuf-mode racer racket-mode rainbow-delimiters rainbow-mode robe rust-mode sage-shell-mode scala-mode scrooge shm shut-up skewer-mode slime-company smartrep sml-mode solarized-theme sourcemap speech-tagger thrift toml-mode tuareg typescript-mode use-package vimrc-mode visual-fill-column w3m web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode))
  '(perl6-indent-offset 2)
  '(rainbow-ansi-colors t)
  '(rainbow-html-colors t)
@@ -317,7 +318,8 @@
  '(read-file-name-completion-ignore-case t)
  '(rust-indent-offset 2)
  '(safe-local-variable-values
-   '((f3-before-args "-not" "(" "-ipath" "*.git/*" "-or" "-ipath" "*.pants.d/*" "-or" "-iname" "*.pyc" ")")
+   '((f3-default-directory . /home/cosmicexplorer/projects/active/ping-pong)
+     (f3-before-args "-not" "(" "-ipath" "*.git/*" "-or" "-ipath" "*.pants.d/*" "-or" "-iname" "*.pyc" ")")
      (f3-default-directory . project)
      (c-file-offsets
       (block-close . 0)

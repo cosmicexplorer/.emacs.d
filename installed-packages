@@ -5,6 +5,7 @@ auctex
 bazel-mode
 better-defaults
 cider
+cl-lib
 cloc
 cmake-mode
 color-theme
@@ -16,9 +17,9 @@ company-ghci
 csv-mode
 cuda-mode
 dired-sidebar
+dockerfile-mode
 ein
 enh-ruby-mode
-ensime
 epresent
 espuds
 evil
@@ -33,6 +34,7 @@ git-gutter-fringe
 gnuplot
 gnuplot-mode
 go-mode
+graphql-mode
 groovy-mode
 helm-gtags
 helm-rg
@@ -47,11 +49,9 @@ linum-relative
 literate-coffee-mode
 lua-mode
 magit
-magithub
 markdown-mode
 matlab-mode
 minimap
-misc-cmds
 mmm-mode
 multiple-cursors
 nhexl-mode
@@ -67,7 +67,6 @@ racer
 racket-mode
 rainbow-delimiters
 rainbow-mode
-realgud
 robe
 rust-mode
 sage-shell-mode
