@@ -57,14 +57,22 @@
     (call-process "kinit")))
 (add-hook 'magit-credential-hook #'call-kinit-if-necessary-magit)
 
+(defcustom magit-push-destination-remote-default "origin"
+  "Default remote to suggest a branch for in `magit-reset-push-destination'."
+  :type 'string
+  :safe (lambda (&rest _args) t))
+
 ;;; fix magit's inane keybinding changes
 (defun magit-reset-push-destination (remote-branch &optional current-branch)
   (interactive (list (magit-read-remote-branch
                       "remote branch to push to" nil
-                      (let ((remotes (magit-list-remotes)))
-                        (when remotes
-                          (concat (car remotes) "/"
-                                  (magit-get-current-branch)))))))
+                      (let* ((remotes (magit-list-remotes))
+                             (default-remote
+                               (or (cl-find magit-push-destination-remote-default remotes
+                                            :test #'string-equal)
+                                   (car remotes))))
+                        (and default-remote
+                             (format "%s/%s" default-remote (magit-get-current-branch)))))))
   (magit-git-push
    (or current-branch (magit-get-current-branch))
    remote-branch '("-u")))
@@ -527,3 +535,6 @@ If SUBMODE is not provided, use `LANG-mode' by default."
 
 ;;; encrypted files
 (epa-file-enable)
+
+(with-eval-after-spec ensime
+  (add-to-list 'auto-mode-alist '("\\.ensime\\'" . emacs-lisp-mode)))

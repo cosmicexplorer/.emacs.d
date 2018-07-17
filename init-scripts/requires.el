@@ -12,6 +12,8 @@
 
 ;;; ESS is done in `./package-setup.el'
 
+(require 'ess)
+(require 'ess-help)
 (require 'ansi-color)
 (require 'browse-kill-ring)
 (require 'clang-format)
@@ -56,6 +58,7 @@
 (require 'widget)
 (require 'epa-file)
 (require 'helm-rg)
+(require 'pcase)
 
 ;;; my stuff
 (require 'utilities)
