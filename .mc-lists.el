@@ -116,6 +116,7 @@
         ess-load-file
         eval-buffer-and-message
         eval-expression
+        helm-rg
         helm-rg--bounce-dump
         helm-swoop
         help-for-help
@@ -125,6 +126,8 @@
         latex-compile
         mc/mark-next-not-cider
         mc/mark-prev-not-cider
+        mouse-drag-mode-line
+        mouse-select-window
         mouse-set-region
         rerun-command
         smart-compile
