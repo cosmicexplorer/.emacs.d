@@ -1425,10 +1425,24 @@ way I prefer, and regards `comment-padding', unlike the standard version."
         (bol-pt (line-beginning-position)))
     (goto-char (max bol-pt reg-pt))))
 
+(defconst keep-tabs-for-derived-modes '(makefile-mode)
+  "Don't screw around with leading TAB indentation in modes derived from these.")
+
+(defconst whitespace-tab-removal-symbols '(indentation indentation:tab indentation:space)
+  "The symbols in `whitespace-style' which cause `whitespace-cleanup' to remove TABs.")
+
+(defun whitespace-cleanup-sometimes-no-tabs ()
+  "Run `whitespace-cleanup', but don't screw around with tabs in Makefiles."
+  (if (apply #'derived-mode-p keep-tabs-for-derived-modes)
+      (let ((whitespace-style
+             (cl-remove-if (l (cl-find _ whitespace-tab-removal-symbols)) whitespace-style)))
+        (whitespace-cleanup))
+    (whitespace-cleanup)))
+
 (defun nuke-whitespace-except-this-line ()
   (interactive)
   (when destroy-whitespace
-    (if (not (in-whitespace-region-p)) (whitespace-cleanup)
+    (if (not (in-whitespace-region-p)) (whitespace-cleanup-sometimes-no-tabs)
       (let* ((pt (point))
              (str (buffer-substring
                    (let ((res (search-back-bol-or-reg "[^[:space:]]")))
@@ -1436,7 +1450,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                        (goto-char pt)
                        (point-min)))
                    pt)))
-        (whitespace-cleanup)
+        (whitespace-cleanup-sometimes-no-tabs)
         (insert str)))))
 
 ;;; read-only text
