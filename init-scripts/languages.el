@@ -709,3 +709,8 @@ See URL `https://github.com/ndmitchell/hlint'."
 
 (define-derived-mode build-file-mode python-mode "BUILD")
 (add-to-list 'auto-mode-alist '("BUILD" . build-file-mode))
+
+(defun makefile-insert-tab ()
+  (insert "	"))
+(add-hook 'makefile-mode-hook
+          (z (setq-local indent-line-function #'makefile-insert-tab)))
