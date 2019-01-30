@@ -14,6 +14,8 @@
 (setq x-meta-keysym 'super
       x-super-keysym 'meta)
 
+(global-set-key (kbd "<escape> <escape> <escape>") nil)
+
 (global-set-key (kbd "M-Z") (cmd (insert " ")))
 (global-set-key (kbd "C-s-f") #'forward-sexp)
 (global-set-key (kbd "C-s-b") #'backward-sexp)
