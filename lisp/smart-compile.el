@@ -286,7 +286,9 @@ which is defined in `smart-compile-alist'."
        ((and smart-compile-check-pants
              (setq pants-build-file
                    (cl-find-if
-                    #'file-exists-p
+                    (lambda (file)
+                      (and (file-executable-p file)
+                           (not (file-directory-p file))))
                     (append
                      '("./pants")
                      (cl-loop
