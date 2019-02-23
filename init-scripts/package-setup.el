@@ -123,7 +123,9 @@
   (magit-define-popup-action 'magit-push-popup ?P "just fuckin push it lol"
     #'magit-push-current-to-upstream ?u)
   (magit-define-popup-action 'magit-pull-popup ?F "just fuckin pull it lol"
-     #'my-magit-pull-upstream-branch ?u)
+    #'my-magit-pull-upstream-branch ?u)
+  (magit-define-popup-action 'magit-pull-popup ?B "BUMP IT! (pull upstream push origin)"
+    #'my-magit-bump-master ?u)
   (magit-define-popup-action 'magit-pull-popup ?f "pull EVERYTHING"
     #'magit-just-pull ?F)
   (magit-add-action-to-popup "DESTRUCTION" magit-push-popup)
@@ -171,6 +173,30 @@
  '(?C "Clean" magit-clean-popup) magit-dispatch-popup nil ?R)
 
 (define-key magit-mode-map (kbd "C") #'magit-clean-popup)
+
+(defcustom my-magit-upstream-remote-default "upstream"
+  "Default remote to pull from when updating in `my-magit-bump-master'."
+  :type 'string
+  :safe (lambda (&rest _args) t))
+
+(defun my-magit-generate-branch-with-remote (remote branch)
+  (format "%s %s" remote branch))
+
+(defun my-magit-bump-master (upstream origin)
+  (interactive (list
+                (if (cl-find my-magit-upstream-remote-default (magit-list-remotes)
+                             :test #'string-equal)
+                    my-magit-upstream-remote-default
+                    (completing-read "upstream remote: " (magit-list-remotes)
+                                     nil t nil nil))
+                (if (cl-find magit-push-destination-remote-default (magit-list-remotes)
+                             :test #'string-equal)
+                    magit-push-destination-remote-default
+                    (completing-read "remote to update:  " (magit-list-remotes)
+                                     nil t nil nil))))
+  (let ((cur-branch (magit-get-current-branch)))
+    (magit-git-pull (my-magit-generate-branch-with-remote upstream cur-branch) nil)
+    (magit-git-push cur-branch (my-magit-generate-branch-with-remote origin cur-branch) nil)))
 
 (defun my-magit-diff-paths (a b)
   (interactive (list (completing-read
