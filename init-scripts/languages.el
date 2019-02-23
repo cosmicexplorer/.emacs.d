@@ -705,7 +705,9 @@ See URL `https://github.com/ndmitchell/hlint'."
   (add-hook 'racer-mode-hook #'eldoc-mode)
   (add-hook 'racer-mode-hook #'company-mode)
   (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-  (add-hook 'rust-mode-hook #'add-pipes-to-local-electric-pairs))
+  (add-hook 'rust-mode-hook #'add-pipes-to-local-electric-pairs)
+  (add-hook 'rust-mode-hook (z (setq comment-start "/* "
+                                     comment-end " */"))))
 
 (define-derived-mode build-file-mode python-mode "BUILD")
 (add-to-list 'auto-mode-alist '("BUILD" . build-file-mode))
