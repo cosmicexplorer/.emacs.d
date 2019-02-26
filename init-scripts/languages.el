@@ -709,10 +709,33 @@ See URL `https://github.com/ndmitchell/hlint'."
   (add-hook 'rust-mode-hook (z (setq comment-start "/* "
                                      comment-end " */"))))
 
+;;; Pants support!
 (define-derived-mode build-file-mode python-mode "BUILD")
-(add-to-list 'auto-mode-alist '("BUILD" . build-file-mode))
+(add-to-list 'auto-mode-alist '("\\(\\`\\|\\<\\)BUILD\\(\\.[a-zA-Z]+\\)?\\'" . build-file-mode))
 
+;;; makefile support!
 (defun makefile-insert-tab ()
   (insert "	"))
 (add-hook 'makefile-mode-hook
           (z (setq-local indent-line-function #'makefile-insert-tab)))
+
+(defconst pants-cur-year-header-fmt-leading-whitespace "
+# coding=utf-8
+# Copyright %s Pants project contributors (see CONTRIBUTORS.md).
+# Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+")
+
+(defun pants-python-header ()
+  (let* ((cur-year (format-time-string "%Y"))
+         (formatted-text
+          (format pants-cur-year-header-fmt-leading-whitespace
+                  cur-year)))
+    (replace-regexp-in-string (rx bos (one-or-more (or whitespace "\n"))) "" formatted-text)))
+
+(defun pants-insert-python-header ()
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (insert (pants-python-header))))
