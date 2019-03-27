@@ -931,9 +931,17 @@ scope of the command's precision.")
 
 (defconst json-fmt-buf-basename "*json-formatted*")
 
+(defcustom json-fmt-sort-keys nil
+  "Whether to use --sort-keys when invoking jq in `json-fmt'."
+  :type 'boolean)
+
 (defun json-fmt (&optional pfx)
   (interactive "P")
-  (pp-code-subproc "jq" (list ".") json-fmt-buf-basename (when pfx 'json-mode)))
+  (pp-code-subproc
+   "jq" (append
+         (and json-fmt-sort-keys '("--sort-keys"))
+         '("."))
+   json-fmt-buf-basename (when pfx 'json-mode)))
 
 (defconst xml-fmt-buf-basename "*xml-formatted*")
 
