@@ -1029,3 +1029,9 @@ Use (process-buffer `my-rw-process') instead."
     (setq ad-return-value
           (let ((ido-read-directory-name-toggle t))
             (apply #'ido-read-directory-name (ad-get-args 0))))))
+
+(defun print-killed-buffer-name ()
+  (message "killed %s" (buffer-name)))
+
+;; (add-hook 'kill-buffer-hook #'print-killed-buffer-name)
+;; (remove-hook 'kill-buffer-hook #'print-killed-buffer-name)
