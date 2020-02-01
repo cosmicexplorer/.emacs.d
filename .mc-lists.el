@@ -94,7 +94,9 @@
         paredit-raise-sexp
         racket--paredit-open-square
         sgml-slash
+        skeleton-pair-insert-maybe
         smart-tab
+        split-line
         tex-handle-newline
         toggle-letter-case
         transpose-words
@@ -127,9 +129,13 @@
         mc/mark-next-not-cider
         mc/mark-prev-not-cider
         mouse-drag-mode-line
+        mouse-drag-vertical-line
         mouse-select-window
         mouse-set-region
+        my-helm-swoop
         rerun-command
+        rust-format-buffer
         smart-compile
+        undo-tree-visualize
         wdired-finish-edit
         ))

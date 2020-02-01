@@ -11,3 +11,6 @@
         path = emacs-helm-ag
         url = https://github.com:/cosmicexplorer/emacs-helm-ag.git
         branch = play
+[submodule "magit"]
+	path = magit
+	url = git@github.com:magit/magit.git

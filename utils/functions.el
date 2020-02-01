@@ -19,6 +19,12 @@
 
 (defmacro logify (expr) `(not (not ,expr)))
 
+(defmacro negate (fn)
+  (declare (indent 1))
+  (once-only (fn)
+    `(lambda (&rest args)
+       (not (apply ,fn args)))))
+
 (defconst sentinel-successful-exit-msg "finished\n")
 
 (defcustom pop-on-error-display-function #'pop-to-buffer
@@ -2982,8 +2988,8 @@ which evaluates to a regexp."
 misbehave (e.g. `helm')."
   :type '(repeat function))
 
-(defun clean-all-buffers-to-deleted-files ()
-  (interactive)
+(defun clean-all-buffers-to-deleted-files (kill-dired-bufs-too)
+  (interactive "P")
   (cl-loop for buf in (buffer-list)
            for name = (buffer-name buf)
            for fname = (buffer-file-name buf)
@@ -2993,14 +2999,17 @@ misbehave (e.g. `helm')."
                    (string-match-p important-buffer-names-regexp name)
                    (process-live-p (get-buffer-process buf)))
            unless (and (stringp fname)
-                     (file-exists-p fname))
+                       (file-exists-p fname))
+           unless (and (not kill-dired-bufs-too)
+                       (with-current-buffer buf
+                         (derived-mode-p 'dired-mode)))
            do (kill-buffer buf)))
 
-(defun clean-nonvisiting-buffers ()
-  (interactive)
+(defun clean-nonvisiting-buffers (kill-dired-bufs-too)
+  (interactive "P")
   (tramp-cleanup-all-connections)
   (tramp-cleanup-all-buffers)
-  (clean-all-buffers-to-deleted-files))
+  (clean-all-buffers-to-deleted-files kill-dired-bufs-too))
 
 (defun get-linewise-center (beg end)
   (unless (<= beg end) (error (format "beg (%d) is before end (%d)" beg end)))

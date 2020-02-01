@@ -49,6 +49,16 @@
       (push-mark)
       (magit-section-goto (magit-get-section sec-diff)))))
 
+(defadvice substring-no-properties (around allow-nil-for-magit-status activate)
+  (when (null (ad-get-arg 0))
+    (ad-set-arg 0 ""))
+  ad-do-it)
+
+(defadvice propertize (around allow-nil-for-magit-status activate)
+  (when (null (ad-get-arg 0))
+    (ad-set-arg 0 ""))
+  ad-do-it)
+
 (defcustom run-kinit-magit-creds nil
   "Whether to run kinit before magit credential operations."
   :safe 'booleanp)
@@ -117,20 +127,20 @@
       (magit-run-git-with-editor
        "pull" "-v" args remote branch))))
 
-(with-eval-after-load 'magit-remote
-  (magit-define-popup-action 'magit-push-popup ?u "I PUSH WHERE I WANT"
-    #'magit-reset-push-destination ?p)
-  (magit-define-popup-action 'magit-push-popup ?P "just fuckin push it lol"
-    #'magit-push-current-to-upstream ?u)
-  (magit-define-popup-action 'magit-pull-popup ?F "just fuckin pull it lol"
-    #'my-magit-pull-upstream-branch ?u)
-  (magit-define-popup-action 'magit-pull-popup ?B "BUMP IT! (pull upstream push origin)"
-    #'my-magit-bump-master ?u)
-  (magit-define-popup-action 'magit-pull-popup ?f "pull EVERYTHING"
-    #'magit-just-pull ?F)
-  (magit-add-action-to-popup "DESTRUCTION" magit-push-popup)
-  (magit-define-popup-action 'magit-push-popup ?d "DESTROY IT"
-    #'magit-delete-remote-branch))
+;(with-eval-after-load 'magit-popup
+;  (magit-define-popup-action 'magit-push-popup ?u "I PUSH WHERE I WANT"
+;    #'magit-reset-push-destination ?p)
+;  (magit-define-popup-action 'magit-push-popup ?P "just fuckin push it lol"
+;    #'magit-push-current-to-upstream ?u)
+;  (magit-define-popup-action 'magit-pull-popup ?F "just fuckin pull it lol"
+;    #'my-magit-pull-upstream-branch ?u)
+;  (magit-define-popup-action 'magit-pull-popup ?B "BUMP IT! (pull upstream push origin)"
+;    #'my-magit-bump-master ?u)
+;  (magit-define-popup-action 'magit-pull-popup ?f "pull EVERYTHING"
+;    #'magit-just-pull ?F)
+;  (magit-add-action-to-popup "DESTRUCTION" magit-push-popup)
+;  (magit-define-popup-action 'magit-push-popup ?d "DESTROY IT"
+;    #'magit-delete-remote-branch))
 
 (defun my-magit-reset-hard (commit)
   (interactive (list (my-magit-read-branch-or-commit "Reset head to")))
@@ -152,8 +162,8 @@
              (?S "Soft Reset" my-magit-reset-soft)
              (?M "Mixed Reset" my-magit-reset-head)))
 
-(magit-add-action-to-popup
- '(?R "Reset" my-magit-reset-popup) magit-dispatch-popup nil ?!)
+;(magit-add-action-to-popup
+; '(?R "Reset" my-magit-reset-popup) magit-dispatch-popup nil ?!)
 
 (define-key magit-status-mode-map (kbd "R") #'my-magit-reset-popup)
 (define-key magit-branch-section-map (kbd "R") #'my-magit-reset-popup)
@@ -169,8 +179,8 @@
   :man-page "git-clean"
   :actions '((?C "Clean All (be careful!)" my-magit-clean-all)))
 
-(magit-add-action-to-popup
- '(?C "Clean" magit-clean-popup) magit-dispatch-popup nil ?R)
+;(magit-add-action-to-popup
+; '(?C "Clean" magit-clean-popup) magit-dispatch-popup nil ?R)
 
 (define-key magit-mode-map (kbd "C") #'magit-clean-popup)
 
@@ -277,6 +287,14 @@
 
 (defun git-gutter-refresh-ignore-errors ()
   (ignore-errors (git-gutter:refresh)))
+
+;;; NB: kill everything from `vc' -- we can't control what it calls.
+(defadvice vc-before-save (around do-not-call-status activate)
+  nil)
+(defadvice vc-after-save (around do-not-call-status activate)
+  nil)
+(defadvice vc-refresh-state (around do-not-call-status activate)
+  nil)
 
 (define-minor-mode git-gutter-fringe-hack-mode
   "hack to make git gutter work"

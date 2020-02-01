@@ -5,6 +5,7 @@
 ;;; some way, shape, or form
 
 (require 'helm)
+(load-my-script "init-scripts/package-setup")
 
 ;;; prompts for (yes/no) -> (y/n)
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -101,6 +102,7 @@
 
 ;; make them relative
 (setq linum-format 'fix-linum-relative)
+;; (setq linum-format 'dynamic)
 ;;; make it weird
 (defvar linum-relative-symbols
   ">"
@@ -578,6 +580,9 @@ to clean up.")
 
 ;;; keep dired in sync
 (add-hook 'dired-mode-hook #'auto-revert-mode)
+
+(when-let ((zsh-exe (executable-find "zsh")))
+  (setq explicit-shell-file-name zsh-exe))
 
 (defadvice ansi-color-filter-apply (around no-errors activate)
   (let ((res (ignore-errors ad-do-it)))

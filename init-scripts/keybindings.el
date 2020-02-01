@@ -111,7 +111,7 @@
 ;;; cause otherwise this doesn't work in graphical mode
 (global-set-key (kbd "<C-return>") 'newline-and-indent)
 ;;; just destroy unused files
-(global-set-key (kbd "C-x C-M-d") 'kill-buffer-and-move-file-to-trash)
+(global-set-key (kbd "C-x C-S-s") 'kill-buffer-and-move-file-to-trash)
 ;;; opposite of yank-pop
 (global-set-key (kbd "C-M-y") 'yank-push)
 ;;; reset quit key combination to close
@@ -148,6 +148,9 @@
   (interactive)
   (helm-swoop :$query (thing-at-point 'symbol)))
 (global-set-key (kbd "C-x o") #'my-helm-swoop)
+
+(global-set-key (kbd "C-S-s") #'my-helm-swoop)
+(global-set-key (kbd "C-x o") #'isearch-forward)
 ;;; find regexp in ALL open buffers
 (defun my-multi-swoop-all (pfx)
   (interactive "P")
@@ -156,6 +159,7 @@
 (global-set-key (kbd "C-x f") 'my-multi-swoop-all)
 ;;; find buffer by name
 (global-set-key (kbd "C-x b") 'helm-buffers-list)
+(global-set-key (kbd "C-x C-b") 'helm-buffers-list)
 
 ;; after killing C-x o with helm,
 ;; let's make sure we do have buffer switching in the event of non-graphical
@@ -201,9 +205,6 @@
 
 ;; visualize undo-tree
 (global-set-key (kbd "C-x t") 'undo-tree-visualize)
-
-;; use ibuffer for buffer list
-(global-set-key (kbd "C-x C-b") 'ibuffer)
 
 ;; kill current buffer and close pane
 (global-set-key (kbd "C-x C-k") 'close-and-kill-this-pane)
@@ -291,7 +292,12 @@
      (define-key coffee-mode-map (kbd "C-c C-r") #'coffee-send-region)
      (define-key coffee-mode-map (kbd "C-c C-c") #'coffee-compile-buffer)
      (define-key coffee-mode-map (kbd "C-M-h") nil)
-     (define-key coffee-mode-map (kbd "C-M-g") #'restart-coffee)))
+     (define-key comint-mode-map (kbd "C-c R")
+       (lambda ()
+        (interactive)
+        (if (string-equal (buffer-name) coffee-repl-buffer)
+              (restart-coffee)
+            (user-error "no function defined for comint mode for C-c R! TODO!!!"))))))
 
 ;;; js
 (defconst js-mode-maps (list js-mode-map js2-mode-map))
@@ -347,11 +353,21 @@
   (define-key lisp-mode-map (kbd "C-h f") 'slime-documentation)
   (define-key lisp-mode-map (kbd "C-h v") 'slime-documentation)
   (define-key lisp-mode-map (kbd "C-h h") 'slime-hyperspec-lookup)
+  (define-key lisp-mode-map (kbd "C-c C-S-w") #'destroy-all-whitespace-nearby)
+  (define-key paredit-mode-map (kbd "M-p") nil)
+  (define-key paredit-mode-map (kbd "M-n") nil)
   (when (boundp 'slime-mode-indirect-map)
     (define-key slime-mode-indirect-map (kbd "M-p")
-      #'mc/mark-previous-like-this)
+      ;; #'mc/mark-previous-like-this
+      nil
+      )
     (define-key slime-mode-indirect-map (kbd "M-n")
-      #'mc/mark-next-like-this)))
+      ;; #'mc/mark-next-like-this
+      nil
+      ))
+  (define-key slime-repl-mode-map (kbd "M-p") #'slime-repl-previous-input)
+  (define-key slime-repl-mode-map (kbd "M-n") #'slime-repl-next-input)
+  )
 
 ;;; makefile
 (defconst makefile-keys-alist
@@ -568,16 +584,16 @@
            (funcall then-do window buffer))
           (_ nil))))))
 
-(defadvice ffap-prompter (around no-guess activate)
-  (setq ad-return-value (ffap-guesser)))
+;; (defadvice ffap-prompter (around no-guess activate)
+;;   (setq ad-return-value (ffap-guesser)))
 
-(global-set-key
- (kbd "C-M-x C-f")
- (lambda (&optional pfx)
-   (interactive "P")
-   (let ((new-file (find-file-noselect (ffap-guesser))))
-     (if pfx (switch-to-buffer new-file)
-       (pop-to-buffer new-file)))))
+;; (global-set-key
+;;  (kbd "C-M-x C-f")
+;;  (lambda (&optional pfx)
+;;    (interactive "P")
+;;    (let ((new-file (find-file-noselect (ffap-guesser))))
+;;      (if pfx (switch-to-buffer new-file)
+;;        (pop-to-buffer new-file)))))
 
 (defconst function-help-keys-alist
   `((:map (nil)
@@ -707,7 +723,7 @@
   (define-key magit-mode-map (kbd "<backtab>") #'magit-section-cycle-global)
   (define-key magit-status-mode-map (kbd "C-w") nil))
 (with-eval-after-spec magit-blame
-  (define-key magit-blame-read-only-mode-map (kbd "c") #'magit-show-commit))
+  (define-key magit-blame-mode-map (kbd "c") #'magit-show-commit))
 (with-eval-after-spec magit-process
   (define-key magit-process-mode-map (kbd "k") #'magit-process-kill))
 
@@ -998,8 +1014,7 @@
   (global-set-key (kbd "C-c a") #'helm-rg)
   (global-set-key (kbd "C-c C-a") #'helm-rg))
 
-(with-eval-after-spec f3
-  (global-set-key (kbd "C-c C-f") #'f3))
+(global-set-key (kbd "C-c C-f") #'f3)
 
 (with-eval-after-spec python-mode
   (define-key python-mode-map (kbd "C-c C-f") nil))
@@ -1093,3 +1108,54 @@
 
 (with-eval-after-spec conf-mode
   (define-key conf-colon-mode-map (kbd "C-c C-w") nil))
+
+(define-key helm-map (kbd "<right>") #'helm-next-source)
+(define-key helm-map (kbd "<left>") #'helm-previous-source)
+
+;;; NB: override from `subr'. Fails to start python-mode for some reason unless this is overridden!
+(defun load-history-filename-element (file-regexp)
+  "Get the first elt of `load-history' whose car matches FILE-REGEXP.
+Return nil if there isn't one."
+  (let* ((loads load-history)
+         (load-elt (and loads (car loads))))
+    (save-match-data
+      (while (and loads
+                  (or (null (car load-elt))
+                      (not (stringp (car load-elt)))
+                      (not (string-match file-regexp (car load-elt)))))
+        (setq loads (cdr loads)
+              load-elt (and loads (car loads)))))
+    load-elt))
+
+
+(defun match-pex-filename-p (filename)
+  (string-match-p "\\.[^\\.]*pex\\'" filename))
+
+(defun archive-nil-summarize (&rest args)
+  (apply #'archive-zip-summarize args))
+
+(defun archive-nil-extract (&rest args)
+  (apply #'archive-zip-extract args))
+
+(defun archive-nil-write-file-member (&rest args)
+  (apply #'archive-zip-write-file-member args))
+
+
+(setq archive-nil-expunge archive-zip-expunge)
+
+(defadvice archive-find-type (around pex-as-zip activate)
+  (if (match-pex-filename-p (buffer-file-name))
+      'zip
+    ad-do-it))
+
+(defadvice archive-mode (around pex-as-zip activate)
+  (if (match-pex-filename-p (buffer-file-name))
+      (let ((archive-subtype 'zip))
+        ad-do-it)
+    ad-do-it))
+
+(add-to-list 'auto-mode-alist
+             '(".*PEX.*-INFO\\'" . json-mode))
+
+(add-to-list 'auto-mode-alist
+             '("\\.[^\\.]*pex\\'"))
