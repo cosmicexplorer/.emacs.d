@@ -95,6 +95,8 @@
  '(browse-url-firefox-program "firefox-nightly")
  '(cloc-use-3rd-gen nil)
  '(coffee-args-compile '("-c" "--bare" "--no-header"))
+ '(coffee-command
+   "/Users/dmcclanahan/tools/coffeescript/invoke-coffeescript.zsh")
  '(coffee-indent-like-python-mode t)
  '(coffee-switch-to-compile-buffer t)
  '(coffee-tab-width 2)

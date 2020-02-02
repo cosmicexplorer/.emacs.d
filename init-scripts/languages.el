@@ -121,11 +121,27 @@
 `coffee-compiled-buffer-name'."
   (interactive "r")
   (coffee-cleanup-compile-buffer)
-  ;; TODO: the defsubst `coffee-generate-sourcemap-p' checks if `coffee-args-compile' has '-m' or
-  ;; '--map', but it appears to always fail for some reason? Is it related to the fact that
-  ;; defsubsts aren't really function? See
-  ;; https://github.com/defunkt/coffee-mode/blob/master/coffee-mode.el#L344
   (coffee-start-generate-sourcemap-process start end))
+
+(defun my-coffee--get-compile-buffer (src-buf)
+  (with-current-buffer (get-buffer-create coffee-compiled-buffer-name)
+    (setq-local default-directory (buffer-local-value 'default-directory src-buf))
+    (current-buffer)))
+
+(defun coffee-start-compile-process (curbuf line column)
+  (lambda (start end)
+    (let ((proc (apply 'start-file-process "coffee-mode"
+                       (my-coffee--get-compile-buffer curbuf)
+                       coffee-command (append coffee-args-compile '("-s" "-p"))))
+          (curfile (buffer-file-name curbuf)))
+      (set-process-query-on-exit-flag proc nil)
+      (set-process-sentinel
+       proc (coffee-compile-sentinel curbuf curfile line column))
+      (with-current-buffer curbuf
+        (process-send-region proc start end))
+      (process-send-string proc "\n")
+      (process-send-eof proc)
+      (setq coffee--process proc))))
 
 
 (defconst my-coffee--comint-single-line-prompt "coffee>")
@@ -137,191 +153,7 @@
   (rx
    (: bol
       (| (literal my-coffee--comint-single-line-prompt)
-         (literal my-coffee--comint-multiline-prompt))
-      (* space)
-      eol)))
-
-
-(defadvice coffee-repl (around fix-repl-with-hacks-from-the-source activate)
-  (let ((coffee-command (expand-file-name "~/tools/coffeescript/invoke-coffeescript.zsh"))
-        ;; (comint-process-echoes t)
-        ;; (comint-prompt-regexp my-coffee--comint-single-line-prompt-regexp)
-        ;; (comint-use-prompt-regexp t)
-        )
-    (with-current-buffer (save-window-excursion (pop-to-buffer ad-do-it))
-      (setq-local
-       coffee-command coffee-command
-       ;; comint-process-echoes comint-process-echoes
-       ;; comint-prompt-regexp comint-prompt-regexp
-       ;; comint-use-prompt-regexp comint-use-prompt-regexp
-       )
-      (set-window-buffer (selected-window) (current-buffer)))))
-
-(defconst coffee-comint-optimized-regexp
-  (rx (| (: "\x1b[" not-newline (in "GJK"))
-         (in "")
-         (: (+ "\n") eos))))
-
-(require 'helm-rg)
-(rx-define dot-plus-newline (| any "\n"))
-
-(defconst my-coffee--comint-rx-expr
-  `(: bos (named-group :first-line (* not-newline))
-      ;; eol (can't actually match against this if we want to match anything on other lines)
-      "\n"
-      (named-group :eval-result (* not-newline))
-      "\n"
-      ;; bol (can't actually match against this if we want to match anything on other lines)
-      (named-group :prompt-line
-                   (: (or (literal ,my-coffee--comint-single-line-prompt)
-                          (literal ,my-coffee--comint-multiline-prompt))
-                      (* not-newline)))
-      (*? dot-plus-newline)
-      eos))
-
-(defmacro p* (&rest args)
-  "Abbreviation for `pcase-exhaustive'."
-  (declare (indent 1) (debug (form &rest (pcase-PAT body))))
-  `(pcase-exhaustive ,@args))
-
-(defvar-local my-coffee--previous-output-prompt nil)
-
-(defun my--parse-sym-map-specs (sym-map-specs)
-  (cl-loop
-   for (key-sym source-sym) in sym-map-specs
-   do (cl-assert (and (keywordp key-sym)
-                      (and (symbolp source-sym)
-                           (not (keywordp source-sym)))))
-   ))
-
-(cl-defmacro my--with-buffer-local-symbol (buffer-or-name (bind-sym source-sym) &rest body)
-  (declare (indent 2))
-  (p* `(,buffer-or-name ,bind-sym ,source-sym)
-    (`(,(or (and (helm-rg-cl-typep helm-rg-non-keyword-symbol) (app (symbol-value) buf-value))
-            buf-value)
-       ,(and (helm-rg-cl-typep helm-rg-non-keyword-symbol) bind-sym)
-       ,(and (helm-rg-cl-typep helm-rg-non-keyword-symbol)
-             (pred boundp)
-             source-sym))
-     (let ((progn-result (cl-gensym))
-           (binding-result (cl-gensym))
-           (value-result (cl-gensym)))
-       `(with-current-buffer ,buf-value
-          (let* ((,bind-sym ,source-sym)
-                 (,progn-result (progn ,@body)))
-            (p* ,progn-result
-              ((helm-rg-&key-complete
-                ((:result ,value-result))
-                ((:bindings `(,,bind-sym . ,,binding-result))))
-               (setq-local ,source-sym ,binding-result)
-               ,value-result))))))))
-
-
-(defun my-coffee--clean-up-filter-output-string (string)
-  (->> string
-       (replace-regexp-in-string coffee-comint-optimized-regexp "")
-       (replace-regexp-in-string "\uFF00" "\n")
-       (ansi-color-apply)))
-
-
-(defun coffee-comint-filter (string)
-  (msg-eval
-      (-> (p* (ansi-color-filter-apply (msg-eval string :name "pre-output-filter/input"))
-            ((helm-rg-rx (eval my-coffee--comint-rx-expr))
-             (my--with-buffer-local-symbol coffee-repl-buffer (prev-prompt
-                                                               my-coffee--previous-output-prompt)
-               (p* (list (msg-eval prev-prompt) first-line eval-result prompt-line)
-                 (`(nil ,_ "" ,new-prompt)
-                  `(:result ,new-prompt :bindings (prev-prompt . ,new-prompt)))
-                 (`(,same-prompt ,_ "" ,same-prompt)
-                  `(:result "" :bindings (prev-prompt . ,same-prompt)))
-                 (`(,_
-                    ,_
-                    ,(and line (guard (not (string-empty-p line))))
-                    ,new-prompt)
-                  `(:result ,(format "%s\n%s" line new-prompt) :bindings (prev-prompt . ,new-prompt))))))
-            ((helm-rg-rx
-              (: bos (* not-newline)
-                 "\n"
-                 (named-group :continuation-line
-                              (:
-                               (eval my-coffee--comint-multiline-continuation-prompt)
-                               (* not-newline)))
-                 eos))
-             (my--with-buffer-local-symbol coffee-repl-buffer (prev-prompt
-                                                               my-coffee--previous-output-prompt)
-               `(:result ,continuation-line
-                         :bindings (prev-prompt .,continuation-line))))
-            ((and (helm-rg-rx (: (| (eval my-coffee--comint-single-line-prompt)
-                                    (eval my-coffee--comint-multiline-prompt))
-                                 (* not-newline)))
-                  single-whole-prompt)
-             (my--with-buffer-local-symbol coffee-repl-buffer (prev-prompt
-                                                               my-coffee--previous-output-prompt)
-               `(:result ,(if (string-equal prev-prompt single-whole-prompt)
-                              ""
-                            single-whole-prompt)
-                         :bindings (prev-prompt . ,single-whole-prompt))))
-            (_ ""))
-          (my-coffee--clean-up-filter-output-string))
-    :name "pre-output-filter/result"))
-
-(defconst my-coffee--ctrl-v-start-multiline-regexp
-  (rx (: (group (+ ?))
-         (+ (| space ?\n))
-         eos)))
-
-(defun idk-filter (inp)
-  (message "inp: '%s'" inp)
-  t)
-
-
-;;; perl
-(require 'cperl-mode)
-(fset 'perl-mode 'cperl-mode)
-(setq cperl-indent-level 2)
-(defun my-cperl-eldoc-documentation-function ()
-  "Return meaningful doc string for `eldoc-mode'."
-  (car
-   (let ((cperl-message-on-help-error nil))
-     (cperl-get-help))))
-(defun setup-cperl-mode ()
-  (turn-on-eldoc-mode)
-  (set (make-local-variable 'eldoc-documentation-function)
-       'my-cperl-eldoc-documentation-function)
-  (electric-pair-mode 1))
-(add-hook 'cperl-mode-hook #'setup-cperl-mode)
-
-;;; yes, this perl re.pl business is a massive hack. i claim none of it would be
-;;; required if re.pl wasn't also a massive hack (who doesn't put newlines after
-;;; their own repl's output????)
-(defun perl-repl-get-real-str ()
-  (buffer-substring-no-properties
-   comint-last-output-start
-   (process-mark (get-buffer-process (current-buffer)))))
-
-;;; fixes 'print "hey"'
-(defun perl-repl-fix-both-early-and-late-insertions (str)
-  (goto-char (point-max))
-  ;; the noerror argument shouldn't matter, but provided anyway
-  (let ((real-str (perl-repl-get-real-str))
-        (inhibit-read-only t))
-    (when (string-match-p
-           (concat (regexp-quote perl-repl-prompt) ".+\\'") real-str)
-      (backward-char (length real-str))
-      (re-search-forward (regexp-quote perl-repl-prompt))
-      (delete-region (- (point) (length perl-repl-prompt)) (point))
-      (newline)
-      (goto-char (1- (point-max)))
-      (let ((prev-final-char (char-after)))
-        (insert perl-repl-prompt)
-        (delete-char 1)
-        (backward-char (length perl-repl-prompt))
-        (insert prev-final-char)
-        (newline))))
-  (goto-char (point-max)))
-
-;;; fixes 'foreach ((1, 2, 3)) { print "$_ hey " }'
+         (literal my-coffee--comint-multiline-prompt))z;;; fixes 'foreach ((1, 2, 3)) { print "$_ hey " }'
 (defun perl-repl-fix-late-insertions (str)
   (ignore-errors
     (goto-char (point-max))
@@ -606,7 +438,6 @@ Lisp code." t)
 (define-derived-mode cjsx-mode coffee-mode "CJSX"
   "Major mode for editing CJSX."
   (coffee-mode)
-  (set (make-local-variable 'coffee-command) "cjsx")
   (setq mode-name "CJSX")
   (setq major-mode 'cjsx-mode))
 (add-to-list 'auto-mode-alist '("\\.cjsx\\'" . cjsx-mode))
