@@ -461,6 +461,66 @@ Lisp code." t)
                                        (with-current-buffer (get-buffer coffee-compiled-buffer-name)
                                          (my-coffee--compiled-output-mode))))
 
+
+(defun my-coffee--clear-sideways-whitespace-on-line ()
+  "If there is any whitespace to the left or right of point on this line, delete it!"
+  (re-search-backward "\\([^[:space:]]\\)\\([[:space:]]*\\)")
+  (replace-match "" nil nil nil 2)
+  (re-search-forward "\\([[:space:]]*\\)\\([^[:space:]]\\)")
+  (replace-match "" nil nil nil 1))
+
+(defun my-coffee-insert-type-parameter ()
+  "Insert a generic type parameter, for use at the beginning of defining a generic function.
+
+Point is placed at: ###::<|point|>###."
+  (interactive)
+  (my-coffee--clear-sideways-whitespace-on-line)
+  (insert " ###::<>###")
+  (backward-char 4))
+
+(defun my-coffee-insert-fn-type-annotation ()
+  "Insert a type annotation for an argument, variable, or really whatever!!!
+
+There is some whitespace trickery, then point is inserted at: ###: |point|###."
+  (interactive)
+  (my-coffee--clear-sideways-whitespace-on-line)
+  (insert "###: ###")
+  (backward-char 3))
+
+(defun my-coffee-goto-beg-of-type-annotation ()
+  "When inside a type annotation with ###::?###, go to the beginning of the first #!"
+  (interactive)
+  (re-search-backward "###::?"))
+
+(defun my-coffee-goto-end-of-type-annotation (&optional no-insert-space)
+  "When inside a type annotation with ###::?###, go to the end of the last #!"
+  (interactive "PP")
+  (re-search-forward "###[^:]")
+  (backward-char)
+  (when (and (looking-at-p "[[:space:]]*$")
+             (not no-insert-space))
+    (my-coffee--clear-sideways-whitespace-on-line)
+    (insert " ")))
+
+(defvar my-coffee-enhanced-flow-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "M-a <up>") #'my-coffee-insert-type-parameter)
+    (define-key map (kbd "M-a M-a") #'my-coffee-insert-fn-type-annotation)
+    (define-key map (kbd "M-a <left>") #'my-coffee-goto-beg-of-type-annotation)
+    (define-key map (kbd "M-a M-<left>") #'my-coffee-goto-beg-of-type-annotation)
+    (define-key map (kbd "M-a <right>") #'my-coffee-goto-end-of-type-annotation)
+    (define-key map (kbd "M-a M-<right>") #'my-coffee-goto-end-of-type-annotation)
+    map))
+
+(define-derived-mode my-coffee-enhanced-flow-mode litcoffee-mode "ENHANCE!!"
+  "Major mode for editing literate coffeescript with flow type annotations.")
+
+(add-hook 'my-coffee-enhanced-flow-mode-hook (z (highlight-80+-mode -1)))
+(add-hook 'my-coffee-enhanced-flow-mode-hook (z (auto-fill-mode -1)))
+
+(add-hook 'litcoffee-mode-hook (z (unless (derived-mode-p 'my-coffee-enhanced-flow-mode)
+                                    (my-coffee-enhanced-flow-mode))))
+
 ;;; latex
 (setq LaTeX-command-style '(("" "%(PDF)%(latex) -file-line-error %S%(PDFout)")))
 (defconst latex-widen-cash-regexp "[^[:space:]]")
