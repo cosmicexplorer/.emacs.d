@@ -153,7 +153,8 @@
   (rx
    (: bol
       (| (literal my-coffee--comint-single-line-prompt)
-         (literal my-coffee--comint-multiline-prompt))z;;; fixes 'foreach ((1, 2, 3)) { print "$_ hey " }'
+         (literal my-coffee--comint-multiline-prompt)))))
+;;; fixes 'foreach ((1, 2, 3)) { print "$_ hey " }'
 (defun perl-repl-fix-late-insertions (str)
   (ignore-errors
     (goto-char (point-max))
@@ -447,6 +448,19 @@ Lisp code." t)
             (set (make-local-variable 'coffee-args-compile)
                  (cons "-l" coffee-args-compile))))
 
+(defvar my-coffee--compiled-output-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "q") #'quit-window)
+    map))
+
+(define-derived-mode my-coffee--compiled-output-mode js-mode "WE LOVE COFFEE!!!!!"
+  "Major mode for inspecting coffeescript compile output."
+  :after-hook (read-only-mode 1))
+
+(add-hook 'coffee-after-compile-hook (lambda (&rest _args)
+                                       (with-current-buffer (get-buffer coffee-compiled-buffer-name)
+                                         (my-coffee--compiled-output-mode))))
+
 ;;; latex
 (setq LaTeX-command-style '(("" "%(PDF)%(latex) -file-line-error %S%(PDFout)")))
 (defconst latex-widen-cash-regexp "[^[:space:]]")
@@ -704,7 +718,8 @@ See URL `https://github.com/ndmitchell/hlint'."
                                      comment-end " */"))))
 
 ;;; Pants support!
-(define-derived-mode build-file-mode python-mode "BUILD")
+(define-derived-mode build-file-mode python-mode "BUILD"
+  (setq-local python-indent-offset 4))
 (add-to-list 'auto-mode-alist '("\\(\\`\\|\\<\\)BUILD\\(\\.[a-zA-Z]+\\)?\\'" . build-file-mode))
 
 ;;; makefile support!
