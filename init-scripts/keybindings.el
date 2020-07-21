@@ -146,7 +146,7 @@
 ;;; C-u [number] M-x helm-swoop RET
 (defun my-helm-swoop ()
   (interactive)
-  (helm-swoop :$query (thing-at-point 'symbol)))
+  (helm-swoop :query (thing-at-point 'symbol)))
 (global-set-key (kbd "C-x o") #'my-helm-swoop)
 
 (global-set-key (kbd "C-S-s") #'my-helm-swoop)

@@ -61,6 +61,7 @@ paredit
 pcre2el
 pdf-tools
 perl6-mode
+php-mode
 polymode
 projectile
 protobuf-mode
@@ -70,6 +71,7 @@ rainbow-mode
 robe
 rust-mode
 sage-shell-mode
+sass-mode
 scala-mode
 scrooge
 shm

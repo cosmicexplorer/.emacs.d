@@ -302,7 +302,7 @@
 (defun find-warning-words (pfx)
   (interactive "P")
   (if pfx (helm-multi-swoop-all warning-highlights-regexp)
-    (helm-swoop :$query warning-highlights-regexp)))
+    (helm-swoop :query warning-highlights-regexp)))
 
 (defun find-warnings-in-dir (dir)
   (interactive "Mdirectory: ")
