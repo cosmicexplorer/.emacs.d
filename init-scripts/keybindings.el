@@ -203,6 +203,21 @@
 (global-set-key (kbd "C-M-<up>") 'windmove-up)
 (global-set-key (kbd "C-M-<down>") 'windmove-down)
 
+(global-set-key (kbd "C-M-S-I") 'windmove-up)
+(global-set-key (kbd "C-M-J") 'windmove-left)
+(global-set-key (kbd "C-M-L") 'windmove-right)
+(global-set-key (kbd "C-M-K") 'windmove-down)
+
+(global-set-key (kbd "C-M-{") 'backward-paragraph)
+(global-set-key (kbd "C-M-S-{") 'backward-paragraph)
+(global-set-key (kbd "C-M-}") 'forward-paragraph)
+(global-set-key (kbd "C-M-S-}") 'forward-paragraph)
+
+(global-set-key (kbd "C-x C-M-S-I") 'split-window-vertically)
+(global-set-key (kbd "C-x C-M-J") 'split-window-horizontally)
+(global-set-key (kbd "C-x C-M-L") 'split-window-right)
+(global-set-key (kbd "C-x C-M-K") 'split-window-below)
+
 ;; visualize undo-tree
 (global-set-key (kbd "C-x t") 'undo-tree-visualize)
 
@@ -213,20 +228,21 @@
 (global-set-key (kbd "C-c C-k") 'smart-compile)
 
 ;;; w3m
-(when (executable-find "w3m")
-  (define-key w3m-mode-map (kbd "C-<tab>") 'w3m-tab-next-buffer)
-  (define-key w3m-mode-map (kbd "C-l C-<tab>") 'w3m-tab-move-right)
-  (define-key w3m-mode-map (kbd "<C-iso-lefttab>") 'w3m-tab-previous-buffer)
-  (define-key w3m-mode-map (kbd "C-l <C-iso-lefttab>") 'w3m-tab-move-left)
-  (define-key w3m-mode-map (kbd "C-w") 'w3m-delete-buf-remember)
-  (define-key w3m-mode-map (kbd "C-t") 'w3m-create-empty-session)
-  (define-key w3m-mode-map (kbd "C-S-t") 'w3m-restore-buffer)
-  (define-key w3m-mode-map (kbd "<C-return>") 'w3m-goto-url-new-tab)
-  (define-key w3m-mode-map (kbd "<C-mouse-1>") 'w3m-forget)
-  (define-key w3m-mode-map (kbd "<C-drag-mouse-1>") 'w3m-forget)
-  (define-key w3m-mode-map (kbd "<C-down-mouse-1>") 'w3m-goto-url-new-tab-mouse)
-  (define-key w3m-mode-map (kbd "<down-mouse-1>") 'w3m-goto-url-mouse)
-  (define-key w3m-mode-map (kbd "v") 'w3m-view-source))
+(with-eval-after-spec w3m
+  (when (executable-find "w3m")
+    (define-key w3m-mode-map (kbd "C-<tab>") 'w3m-tab-next-buffer)
+    (define-key w3m-mode-map (kbd "C-l C-<tab>") 'w3m-tab-move-right)
+    (define-key w3m-mode-map (kbd "<C-iso-lefttab>") 'w3m-tab-previous-buffer)
+    (define-key w3m-mode-map (kbd "C-l <C-iso-lefttab>") 'w3m-tab-move-left)
+    (define-key w3m-mode-map (kbd "C-w") 'w3m-delete-buf-remember)
+    (define-key w3m-mode-map (kbd "C-t") 'w3m-create-empty-session)
+    (define-key w3m-mode-map (kbd "C-S-t") 'w3m-restore-buffer)
+    (define-key w3m-mode-map (kbd "<C-return>") 'w3m-goto-url-new-tab)
+    (define-key w3m-mode-map (kbd "<C-mouse-1>") 'w3m-forget)
+    (define-key w3m-mode-map (kbd "<C-drag-mouse-1>") 'w3m-forget)
+    (define-key w3m-mode-map (kbd "<C-down-mouse-1>") 'w3m-goto-url-new-tab-mouse)
+    (define-key w3m-mode-map (kbd "<down-mouse-1>") 'w3m-goto-url-mouse)
+    (define-key w3m-mode-map (kbd "v") 'w3m-view-source)))
 
 ;; make C-z undo instead of FUCKING UP MY ENTIRE LIFE by suspending
 (global-set-key (kbd "C-z") 'undo-tree-undo)
@@ -1159,3 +1175,8 @@ Return nil if there isn't one."
 
 (add-to-list 'auto-mode-alist
              '("\\.[^\\.]*pex\\'"))
+
+(global-set-key (kbd "C-x M-d") #'final-directory-component)
+(global-set-key (kbd "C-x M-p") #'repo-relative-path)
+
+(define-key java-mode-map (kbd "C-c C-k") #'smart-compile)

@@ -3938,4 +3938,30 @@ documentation for `paredit-space-for-delimiter-predicates'."
         (switch-to-buffer (dired-expand-to-subdir containing-buffer))
       (dired dir))))
 
+(cl-defmacro defun-insert-or-message-string (name &rest body)
+  (declare (indent 1))
+  (with-gensyms (pfx-arg inner-result)
+    `(defun ,name (&optional ,pfx-arg)
+       (interactive "P")
+       (let ((,inner-result (progn ,@body)))
+         (cl-check-type ,inner-result string)
+         (cond
+          (,pfx-arg
+           (insert ,inner-result))
+          ((called-interactively-p 'any)
+           (message "%s" ,inner-result))
+          (t ,inner-result))))))
+
+(defun-insert-or-message-string final-directory-component
+  (--> default-directory
+       (split-string it "/")
+       (-filter (negate string-blank-p) it)
+       (last it)
+       (first it)))
+
+(require 'helm-rg)
+(defun-insert-or-message-string repo-relative-path
+  (-> (buffer-file-name)
+      (file-relative-name (helm-rg--get-git-root))))
+
 (provide 'functions)
