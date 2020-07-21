@@ -1548,11 +1548,12 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                  (error
                   (setenv "TERM" prev-term)
                   (with-temp-buffer
-                    (cl-assert
-                     (zerop
+                    ;; (cl-assert
+                     ;; (zerop
                       (call-process
                        "git" nil t nil
-                       "submodule" "--quiet" "foreach" "echo $path")))
+                       "submodule" "--quiet" "foreach" "echo $path")
+                      ;; ))
                     (let* ((out (buffer-string))
                            (processed
                             (replace-regexp-in-string "\n\\'" "" out)))
