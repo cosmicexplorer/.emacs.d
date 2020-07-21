@@ -45,7 +45,9 @@
         ess-smart-S-assign
         ess-smart-comma
         eval-last-sexp
+        final-directory-component
         forward-sexp
+        haml-electric-backspace
         helm-buffers-list
         helm-show-kill-ring
         html-autoclose-tag
