@@ -114,6 +114,11 @@
 (add-hook 'prog-mode-hook #'selective-turn-on-auto-fill)
 (defvar coffee-string-interpolation-regexp "#{[^}]*}")
 
+;;; Highlight the current line in all programming modes!!
+(add-hook 'prog-mode-hook #'hl-line-mode)
+(require 'highlight-sexp)
+(global-highlight-sexp-mode)
+
 ;;; coffeescript!!!!
 (require 'coffee-mode)
 (defun coffee-compile-region (start end)
