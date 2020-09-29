@@ -117,7 +117,12 @@
 ;;; Highlight the current line in all programming modes!!
 (add-hook 'prog-mode-hook #'hl-line-mode)
 (require 'highlight-sexp)
-(global-highlight-sexp-mode)
+
+(add-hook 'lisp-mode-hook #'highlight-sexp-mode)
+(add-hook 'emacs-lisp-mode-hook #'highlight-sexp-mode)
+;;; Turning this on globally messes up highlighting in large enough scala source files with many
+;;; strings :(
+;; (global-highlight-sexp-mode)
 
 ;;; coffeescript!!!!
 (require 'coffee-mode)

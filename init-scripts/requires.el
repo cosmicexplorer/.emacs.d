@@ -21,7 +21,9 @@
 (require 'ensime)
 (require 'helm)
 (require 'helm-mode)
-(require 'helm-config)
+;; This package attempts to use `minibuffer-local-must-match-filename-map',
+;; which appears to have been recently removed.
+; (require 'helm-config)
 (require 'helm-gtags)
 (require 'helm-swoop)
 (require 'highlight-80+)

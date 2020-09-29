@@ -40,6 +40,8 @@ helm-gtags
 helm-rg
 helm-swoop
 highlight-parentheses
+highlight-quoted
+highlight-stages
 ibuffer-sidebar
 intero
 jq-mode
@@ -55,6 +57,7 @@ minimap
 mmm-mode
 multiple-cursors
 nhexl-mode
+nim-mode
 org
 pacmacs
 paredit
@@ -67,7 +70,6 @@ projectile
 protobuf-mode
 racer
 rainbow-delimiters
-rainbow-mode
 robe
 rust-mode
 sage-shell-mode

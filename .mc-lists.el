@@ -135,8 +135,10 @@
         mouse-select-window
         mouse-set-region
         my-helm-swoop
+        not-modified
         rerun-command
         rust-format-buffer
+        shell-command
         smart-compile
         undo-tree-visualize
         wdired-finish-edit

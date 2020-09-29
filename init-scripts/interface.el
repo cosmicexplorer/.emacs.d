@@ -551,10 +551,11 @@ to clean up.")
      (add-to-list
       'load-path (expand-file-name dir init-home-folder-dir)))
    submodule-dirs)
-  (add-to-list 'load-path
-               (expand-file-name "org-mode/lisp/" init-home-folder-dir))
-  (autoload #'org-element-update-syntax "org-element.el")
-  (autoload #'org-define-error "org-compat.el")
+  ;; These used to use a custom org-mode install, but I've removed that.
+  ; (add-to-list 'load-path
+  ;             (expand-file-name "org-mode/lisp/" init-home-folder-dir))
+  ; (autoload #'org-element-update-syntax "org-element.el")
+  ; (autoload #'org-define-error "org-compat.el")
   (require 'org)
   (require 'helm-ag)
   (require 'color-theme-danny))
