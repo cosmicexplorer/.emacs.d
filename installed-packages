@@ -17,6 +17,7 @@ cloc
 cmake-font-lock
 color-theme-approximate
 color-theme-modern
+company
 company-ghc
 company-ghci
 company-nixos-options
@@ -123,6 +124,7 @@ origami-predef
 pabbrev
 pacmacs
 pcre2el
+pdf-tools
 php-mode
 pkgbuild-mode
 poly-R
