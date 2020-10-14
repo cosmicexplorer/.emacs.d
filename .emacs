@@ -235,10 +235,10 @@
  '(helm-rg-default-directory 'git-root)
  '(helm-swoop-pre-input-function (lambda nil (thing-at-point 'symbol)))
  '(highlight-80+-columns 100)
+ '(highlight-parentheses-background-colors '("light goldenrod"))
+ '(highlight-parentheses-colors '("chocolate" "magenta" "tomato" "yellow"))
  '(hippie-expand-try-functions-list
    '(try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol))
- '(hl-paren-background-colors '("light goldenrod"))
- '(hl-paren-colors '("chocolate" "magenta" "tomato" "yellow"))
  '(ido-enable-flex-matching t)
  '(ido-mode 'both nil (ido))
  '(inhibit-startup-buffer-menu t)
@@ -312,7 +312,7 @@
  '(org-startup-folded t)
  '(org-support-shift-select 'always)
  '(package-selected-packages
-   '(nim-mode highlight-stages highlight-quoted sass-mode php-mode kotlin-mode perl6-mode cl-lib graphql-mode dockerfile-mode 0blayout 2048-game ag auctex bazel-mode better-defaults cider cloc cmake-mode color-theme color-theme-modern color-theme-solarized company company-ghc company-ghci csv-mode cuda-mode dired-sidebar ein enh-ruby-mode epresent espuds evil f3 flycheck-package flycheck-rust font-lock-studio ggtags ghc git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode groovy-mode helm-gtags helm-rg helm-swoop highlight-parentheses ibuffer-sidebar intero jq-mode js2-mode less-css-mode linum-relative literate-coffee-mode lua-mode markdown-mode matlab-mode minimap mmm-mode multiple-cursors nhexl-mode org pacmacs paredit pcre2el pdf-tools polymode projectile protobuf-mode racer rainbow-delimiters robe rust-mode sage-shell-mode scala-mode scrooge shm shut-up skewer-mode slime-company smartrep sml-mode solarized-theme sourcemap speech-tagger thrift toml-mode typescript-mode use-package vimrc-mode visual-fill-column web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode))
+   '(helm-ag nim-mode highlight-stages highlight-quoted sass-mode php-mode kotlin-mode cl-lib graphql-mode dockerfile-mode 0blayout 2048-game ag auctex bazel-mode better-defaults cider cloc cmake-mode color-theme color-theme-modern company company-ghc company-ghci csv-mode cuda-mode dired-sidebar ein enh-ruby-mode epresent espuds evil f3 flycheck-package flycheck-rust font-lock-studio ggtags ghc git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode groovy-mode helm-gtags helm-rg helm-swoop highlight-parentheses ibuffer-sidebar intero jq-mode js2-mode less-css-mode linum-relative literate-coffee-mode lua-mode markdown-mode matlab-mode minimap mmm-mode multiple-cursors nhexl-mode org pacmacs paredit pcre2el pdf-tools polymode projectile protobuf-mode racer rainbow-delimiters robe rust-mode sage-shell-mode scala-mode scrooge shm shut-up skewer-mode slime-company smartrep sml-mode solarized-theme sourcemap speech-tagger thrift toml-mode typescript-mode use-package vimrc-mode visual-fill-column web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode))
  '(perl6-indent-offset 2)
  '(rainbow-ansi-colors t)
  '(rainbow-html-colors t)

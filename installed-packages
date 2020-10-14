@@ -10,7 +10,6 @@ cloc
 cmake-mode
 color-theme
 color-theme-modern
-color-theme-solarized
 company
 company-ghc
 company-ghci
@@ -36,6 +35,7 @@ gnuplot-mode
 go-mode
 graphql-mode
 groovy-mode
+helm-ag
 helm-gtags
 helm-rg
 helm-swoop
@@ -63,7 +63,6 @@ pacmacs
 paredit
 pcre2el
 pdf-tools
-perl6-mode
 php-mode
 polymode
 projectile

@@ -18,7 +18,6 @@
 (require 'browse-kill-ring)
 (require 'clang-format)
 (require 'comint)
-(require 'ensime)
 (require 'helm)
 (require 'helm-mode)
 ;; This package attempts to use `minibuffer-local-must-match-filename-map',

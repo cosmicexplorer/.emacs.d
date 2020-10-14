@@ -162,8 +162,8 @@
 (defconst my-coffee--fused-prompt-regexp
   (rx
    (: bol
-      (| (literal my-coffee--comint-single-line-prompt)
-         (literal my-coffee--comint-multiline-prompt)))))
+      (| (eval my-coffee--comint-single-line-prompt)
+         (eval my-coffee--comint-multiline-prompt)))))
 ;;; fixes 'foreach ((1, 2, 3)) { print "$_ hey " }'
 (defun perl-repl-fix-late-insertions (str)
   (ignore-errors

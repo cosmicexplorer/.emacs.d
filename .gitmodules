@@ -1,8 +1,3 @@
-[submodule "ESS"]
-        path = ESS
-        url = https://github.com/emacs-ess/ESS.git
-        ignore = dirty
-        branch = master
 [submodule "emacs-color-themes"]
         path = emacs-color-themes
         url = https://github.com/cosmicexplorer/emacs-color-themes.git
@@ -11,6 +6,3 @@
         path = emacs-helm-ag
         url = https://github.com:/cosmicexplorer/emacs-helm-ag.git
         branch = play
-[submodule "magit"]
-	path = magit
-	url = git@github.com:magit/magit.git
