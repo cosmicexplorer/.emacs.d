@@ -314,6 +314,7 @@
  '(package-selected-packages
    '(helm-ag nim-mode highlight-stages highlight-quoted sass-mode php-mode kotlin-mode cl-lib graphql-mode dockerfile-mode 0blayout 2048-game ag auctex bazel-mode better-defaults cider cloc cmake-mode color-theme color-theme-modern company company-ghc company-ghci csv-mode cuda-mode dired-sidebar ein enh-ruby-mode epresent espuds evil f3 flycheck-package flycheck-rust font-lock-studio ggtags ghc git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode groovy-mode helm-gtags helm-rg helm-swoop highlight-parentheses ibuffer-sidebar intero jq-mode js2-mode less-css-mode linum-relative literate-coffee-mode lua-mode markdown-mode matlab-mode minimap mmm-mode multiple-cursors nhexl-mode org pacmacs paredit pcre2el pdf-tools polymode projectile protobuf-mode racer rainbow-delimiters robe rust-mode sage-shell-mode scala-mode scrooge shm shut-up skewer-mode slime-company smartrep sml-mode solarized-theme sourcemap speech-tagger thrift toml-mode typescript-mode use-package vimrc-mode visual-fill-column web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode))
  '(perl6-indent-offset 2)
+ '(python-indent-def-block-scale 1)
  '(rainbow-ansi-colors t)
  '(rainbow-html-colors t)
  '(rainbow-latex-colors t)

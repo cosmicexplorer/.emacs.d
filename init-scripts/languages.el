@@ -741,6 +741,9 @@ See URL `https://github.com/ndmitchell/hlint'."
 (setq prolog-program-name
       (cl-find-if #'executable-find '("swipl" "prolog")))
 
+;;; prolog, but a new version used in spack!
+(add-to-list 'auto-mode-alist '("\\.lp\\'" . prolog-mode))
+
 ;;; pdf-tools rox
 (add-to-list 'auto-mode-alist '("\\.pdf$" . pdf-view-mode))
 

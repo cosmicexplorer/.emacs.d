@@ -581,7 +581,8 @@
   (define-key markdown-mode-map (kbd "<M-left>") #'markdown-promote-list-item)
   (define-key markdown-mode-map (kbd "<M-up>") #'markdown-move-list-item-up)
   (define-key markdown-mode-map (kbd "<M-down>")
-    #'markdown-move-list-item-down))
+    #'markdown-move-list-item-down)
+  (define-key markdown-mode-map (kbd "<s-return>") #'markdown-insert-list-item))
 
 (with-eval-after-spec grep
   (define-key grep-mode-map (kbd "G") #'refind-or-grep)
