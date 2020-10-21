@@ -25,9 +25,8 @@
  (magit-margin-settings nil)
  (magit-merge nil)
  (magit-pull nil)
- (magit-push
-  ("--force-with-lease")
-  nil)
+ (magit-push nil
+             ("--force-with-lease"))
  (magit-rebase nil)
  (magit-remote
   ("-f"))

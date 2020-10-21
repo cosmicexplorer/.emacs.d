@@ -115,6 +115,8 @@
  '(cperl-hairy nil)
  '(cperl-invalid-face 'cperl-no-trailing-whitespace-face)
  '(create-lockfiles nil)
+ '(cursor-in-non-selected-windows 'box)
+ '(cursor-type '(hbar . 2))
  '(dabbrev-case-replace nil)
  '(desktop-save-mode t)
  '(dired-auto-revert-buffer t)
@@ -193,6 +195,7 @@
  '(f3-before-args
    '("-not" "(" "-ipath" "*.git/*" "-or" "-ipath" "*.pants.d/*" "-or" "-name" "*.pyc" ")"))
  '(fill-column 100)
+ '(focus-follows-mouse t)
  '(git-gutter:update-hooks
    '(after-save-hook after-revert-hook find-file-hook after-change-major-mode-hook text-scale-mode-hook magit-revert-buffer-hook magit-status-refresh-hook magit-run-git-hook))
  '(git-gutter:update-interval 1)
@@ -293,6 +296,7 @@
  '(minibuffer-eldef-shorten-default t)
  '(minibuffer-electric-default-mode t)
  '(minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
+ '(mouse-autoselect-window t)
  '(multi-isearch-search nil)
  '(my-isearch-search-fun 'do-normal-isearch)
  '(my-loc-lib-do-on-result '(find-file))
@@ -312,7 +316,7 @@
  '(org-startup-folded t)
  '(org-support-shift-select 'always)
  '(package-selected-packages
-   '(helm-ag nim-mode highlight-stages highlight-quoted sass-mode php-mode kotlin-mode cl-lib graphql-mode dockerfile-mode 0blayout 2048-game ag auctex bazel-mode better-defaults cider cloc cmake-mode color-theme color-theme-modern company company-ghc company-ghci csv-mode cuda-mode dired-sidebar ein enh-ruby-mode epresent espuds evil f3 flycheck-package flycheck-rust font-lock-studio ggtags ghc git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode groovy-mode helm-gtags helm-rg helm-swoop highlight-parentheses ibuffer-sidebar intero jq-mode js2-mode less-css-mode linum-relative literate-coffee-mode lua-mode markdown-mode matlab-mode minimap mmm-mode multiple-cursors nhexl-mode org pacmacs paredit pcre2el pdf-tools polymode projectile protobuf-mode racer rainbow-delimiters robe rust-mode sage-shell-mode scala-mode scrooge shm shut-up skewer-mode slime-company smartrep sml-mode solarized-theme sourcemap speech-tagger thrift toml-mode typescript-mode use-package vimrc-mode visual-fill-column web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode))
+   '(color-theme-approximate helm-ag nim-mode highlight-stages highlight-quoted sass-mode php-mode kotlin-mode cl-lib graphql-mode dockerfile-mode 0blayout 2048-game ag auctex bazel-mode better-defaults cider cloc cmake-mode color-theme-modern company company-ghc company-ghci csv-mode cuda-mode dired-sidebar ein enh-ruby-mode epresent espuds evil f3 flycheck-package flycheck-rust font-lock-studio ggtags ghc git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode groovy-mode helm-gtags helm-rg helm-swoop highlight-parentheses ibuffer-sidebar intero jq-mode js2-mode less-css-mode linum-relative literate-coffee-mode lua-mode markdown-mode matlab-mode minimap mmm-mode multiple-cursors nhexl-mode org pacmacs paredit pcre2el pdf-tools polymode projectile protobuf-mode racer rainbow-delimiters robe rust-mode sage-shell-mode scala-mode scrooge shm shut-up skewer-mode slime-company smartrep sml-mode solarized-theme sourcemap speech-tagger thrift toml-mode typescript-mode use-package vimrc-mode visual-fill-column web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode))
  '(perl6-indent-offset 2)
  '(python-indent-def-block-scale 1)
  '(rainbow-ansi-colors t)
@@ -484,6 +488,10 @@
  '(undo-tree-auto-save-history t)
  '(undo-tree-visualizer-diff t)
  '(warning-suppress-types '((undo discard-info)))
+ '(window-divider-default-bottom-width 3)
+ '(window-divider-default-places t)
+ '(window-divider-default-right-width 3)
+ '(window-divider-mode nil)
  '(woman-fill-frame nil)
  '(woman-imenu t)
  '(xmllint-pretty-level 2)
@@ -494,7 +502,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(cperl-no-trailing-whitespace-face ((t (:underline nil))))
+ '(cursor ((t (:background "magenta"))))
  '(font-latex-script-char-face ((t (:foreground "burlywood"))))
  '(italic ((t (:foreground "magenta" :slant italic))))
  '(underline ((t (:foreground "yellow" :underline t))))
+ '(window-divider ((t (:foreground "deep sky blue"))))
+ '(window-divider-first-pixel ((t (:foreground "chartreuse"))))
+ '(window-divider-last-pixel ((t (:foreground "pale turquoise"))))
  '(woman-unknown ((t (:background "#333333" :foreground "#ff0000")))))

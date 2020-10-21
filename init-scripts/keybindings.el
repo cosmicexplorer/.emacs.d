@@ -582,6 +582,11 @@
   (define-key markdown-mode-map (kbd "<M-up>") #'markdown-move-list-item-up)
   (define-key markdown-mode-map (kbd "<M-down>")
     #'markdown-move-list-item-down)
+  (define-key markdown-mode-map (kbd "<s-right>") #'markdown-demote-list-item)
+  (define-key markdown-mode-map (kbd "<s-left>") #'markdown-promote-list-item)
+  (define-key markdown-mode-map (kbd "<s-up>") #'markdown-move-list-item-up)
+  (define-key markdown-mode-map (kbd "<s-down>")
+    #'markdown-move-list-item-down)
   (define-key markdown-mode-map (kbd "<s-return>") #'markdown-insert-list-item))
 
 (with-eval-after-spec grep

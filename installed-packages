@@ -8,7 +8,7 @@ cider
 cl-lib
 cloc
 cmake-mode
-color-theme
+color-theme-approximate
 color-theme-modern
 company
 company-ghc

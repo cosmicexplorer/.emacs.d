@@ -36,3 +36,5 @@ srecode-map.el
 package-lock.json
 /installed-packages~
 .emacs.desktop*
+/eln-cache/
+/gmon.out
