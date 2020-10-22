@@ -11,7 +11,7 @@
 (setq scroll-preserve-screen-position t)
 
 ;;; set font size and type
-(defcustom best-text-size-height 90
+(defcustom best-text-size-height 40
   "This scales the size of text on the screen.
 
 NB: It appears to be necessary to change for no conceivable reason -- it would be good to keep an
@@ -43,7 +43,8 @@ eye on when and why this occurs in the future."
     (set-frame-font family)
     family))
 
-(select-font best-font-face)
+(add-hook 'window-setup-hook (z (select-font best-font-face)))
+(add-hook 'window-setup-hook #'best-text-size)
 
 ;;; have normal delete/selection (type over selected text to delete)
 (delete-selection-mode 1)

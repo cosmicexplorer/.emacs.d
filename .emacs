@@ -51,13 +51,14 @@
 ;;; cause what else is emacs for
 (load-my-script "keybindings" "init-scripts")
 
-;;; TODO: what does this do? Why does it need to be after init?
-(add-hook 'after-init-hook (z (setq exec-path (get-exec-path))))
+;;; TODO: why is this necessary?
+(setq exec-path (get-exec-path))
 
 ;;; load submodules!!!!
-(add-hook 'after-init-hook #'setup-submodules-load)
+(setup-submodules-load)
+
 ;;; make it look nice
-(add-hook 'after-init-hook (z (load-my-script "visuals" "init-scripts")))
+(load-my-script "visuals" "init-scripts")
 
 ;;; byte-compile everything: slow on first startup, but /significantly/ faster
 ;;; during normal usage
@@ -66,11 +67,8 @@
  'after-init-hook
  (z (byte-recompile-directory init-home-folder-dir 0)))
 
-;;; TODO: what are these for?
-(add-hook 'after-init-hook #'redisplay)
-(add-hook 'after-init-hook #'redisplay t)
+;;; This just seems like a nice idea.
 (add-hook 'after-init-hook #'garbage-collect)
-(add-hook 'after-init-hook #'garbage-collect t)
 
 (let ((local-emacs-script
        (concat (file-name-as-directory (expand-file-name "~"))
@@ -504,11 +502,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "black" :foreground "green" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :width normal :foundry "YOFo" :family "Telegrama"))))
+ '(bold ((t (:inherit default :foreground "cyan" :weight bold))))
+ '(bold-italic ((t (:inherit (bold italic) :foreground "dark magenta" :slant italic :weight bold))))
  '(cperl-no-trailing-whitespace-face ((t (:underline nil))))
  '(cursor ((t (:background "magenta"))))
  '(font-latex-script-char-face ((t (:foreground "burlywood"))))
- '(italic ((t (:foreground "magenta" :slant italic))))
- '(underline ((t (:foreground "yellow" :underline t))))
+ '(italic ((t (:inherit default :foreground "magenta" :slant italic))))
+ '(underline ((t (:inherit default :foreground "yellow" :underline t))))
  '(window-divider ((t (:foreground "deep sky blue"))))
  '(window-divider-first-pixel ((t (:foreground "chartreuse"))))
  '(window-divider-last-pixel ((t (:foreground "pale turquoise"))))

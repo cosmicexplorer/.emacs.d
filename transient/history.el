@@ -3,9 +3,9 @@
   ("-w"))
  (magit-branch nil)
  (magit-cherry-pick nil
-		    ("--ff"))
+                    ("--ff"))
  (magit-commit nil
-	       ("--no-verify" "--reuse-message=ORIG_HEAD"))
+               ("--no-verify" "--reuse-message=ORIG_HEAD"))
  (magit-diff
   ("--no-ext-diff" "--stat"))
  (magit-dispatch nil)
@@ -27,7 +27,7 @@
  (magit-merge nil)
  (magit-pull nil)
  (magit-push nil
-	     ("--force-with-lease"))
+             ("--force-with-lease"))
  (magit-rebase nil)
  (magit-remote
   ("-f"))
