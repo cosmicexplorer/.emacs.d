@@ -312,6 +312,7 @@
  '(org-link-elisp-confirm-function 'y-or-n-p)
  '(org-link-from-user-regexp nil)
  '(org-link-shell-confirm-function 'y-or-n-p)
+ '(org-list-allow-alphabetical t)
  '(org-src-fontify-natively t)
  '(org-startup-folded t)
  '(org-support-shift-select 'always)

@@ -347,6 +347,7 @@
 (define-key paredit-mode-map (kbd "M-.") nil)
 (define-key paredit-mode-map (kbd "M-?") nil)
 (define-key emacs-lisp-mode-map (kbd "C-c C-e") #'view-macro-expansion)
+(define-key emacs-lisp-mode-map (kbd "C-c C-s") #'macrostep-mode)
 (define-key emacs-lisp-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
 (define-key lisp-interaction-mode-map (kbd "C-c C-j") #'eval-sexp-and-newline)
 (define-key emacs-lisp-mode-map (kbd "C-M-d") #'eval-defun)

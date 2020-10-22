@@ -211,6 +211,29 @@ of ARG. (>= n 0), and if the list runs out before n does, this terminates."
 (pcase-defmacro cl-type (&rest types)
   `(and ,@(funcall (*> `(pred (pcase--flip cl-typep ',_))) types)))
 
+(pcase-defmacro lit (expr destination)
+  "Similar to `(app (lambda (lit) ,expr) ,destination)'."
+  (declare (indent 2) (debug (sexp name)))
+  `(app (lambda (lit) ,expr) ,destination))
+
+(define-error 'check-type-with-description-error "`cl-check-type' didn't state the actual type."
+  'my-errors)
+
+(cl-defmacro check-whatever-type-it-may-be (expr type)
+  "A macro similar to `cl-check-type', except it states what the actual type was."
+  (declare (debug (place cl-type-spec)))
+  `(condition-case err
+       (cl-check-type ,expr ,type)
+     (wrong-type-argument
+      (pcase-exhaustive err
+        ((and `(,_ ,_ ,value ,_)
+              (app (error-message-string) err-str))
+         (signal
+          'check-type-with-description-error
+          `(,err-str
+            ,(format "Actual runtime type: %S"
+                     (type-of value)))))))))
+
 ;;; FIXME: want some way to modify the value being matched! can't do that obv,
 ;;; so find some way to simulate it. e.g. (app FUNCTION UPATTERN) could have
 ;;; UPATTERN replaced with the rest of the match-forms -- this would work
