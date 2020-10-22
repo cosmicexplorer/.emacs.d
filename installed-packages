@@ -21,6 +21,7 @@ ein
 enh-ruby-mode
 epresent
 espuds
+ess
 evil
 f3
 flycheck-package
@@ -51,6 +52,8 @@ less-css-mode
 linum-relative
 literate-coffee-mode
 lua-mode
+magit
+magit-popup
 markdown-mode
 matlab-mode
 minimap
@@ -65,10 +68,12 @@ pcre2el
 pdf-tools
 php-mode
 polymode
+poly-R
 projectile
 protobuf-mode
 racer
 rainbow-delimiters
+rainbow-mode
 robe
 rust-mode
 sage-shell-mode
