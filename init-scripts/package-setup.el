@@ -575,8 +575,6 @@ If SUBMODE is not provided, use `LANG-mode' by default."
 (my-mmm-markdown-auto-class "perl" 'cperl-mode)
 (my-mmm-markdown-auto-class "shell" 'shell-script-mode)
 
-(put 'highlight-80+-columns 'safe-local-variable (lambda (_) t))
-
 ;;; encrypted files
 (epa-file-enable)
 

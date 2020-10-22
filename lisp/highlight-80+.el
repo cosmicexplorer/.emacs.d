@@ -41,6 +41,7 @@
 (defcustom highlight-80+-columns 80
   "*Number of columns to allow in lines."
   :group 'highlight-80+
+  :safe t
   :type 'integer)
 
 (defface highlight-80+-line

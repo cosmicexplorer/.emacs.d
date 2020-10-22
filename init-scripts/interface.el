@@ -88,10 +88,9 @@
 
 
 ;;; org-mode
-(add-hook 'org-mode-hook
-          (lambda ()
-            (highlight-80+-mode -1)
-            (auto-fill-mode -1)))
+(add-hook 'org-mode-hook (z (auto-fill-mode -1)))
+(with-eval-after-spec highlight-80+
+  (add-hook 'org-mode-hook (z (highlight-80+-mode -1))))
 
 ;;; see docs for funcs n stuff
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
@@ -558,7 +557,8 @@ to clean up.")
   ; (autoload #'org-define-error "org-compat.el")
   (require 'org)
   (require 'helm-ag)
-  (require 'color-theme-danny))
+  (require 'danny-theme)
+  (enable-theme 'danny))
 
 ;;; ibuffer moves things around when i mark things and this scares me
 (defadvice ibuffer-mark-interactive (after re-recenter activate) (recenter))

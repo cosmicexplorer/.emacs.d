@@ -51,20 +51,22 @@
 ;;; cause what else is emacs for
 (load-my-script "keybindings" "init-scripts")
 
+;;; TODO: what does this do? Why does it need to be after init?
 (add-hook 'after-init-hook (z (setq exec-path (get-exec-path))))
 
 ;;; load submodules!!!!
 (add-hook 'after-init-hook #'setup-submodules-load)
-
 ;;; make it look nice
 (add-hook 'after-init-hook (z (load-my-script "visuals" "init-scripts")))
 
 ;;; byte-compile everything: slow on first startup, but /significantly/ faster
 ;;; during normal usage
+;;; TODO: Do this async!!!
 (add-hook
  'after-init-hook
  (z (byte-recompile-directory init-home-folder-dir 0)))
 
+;;; TODO: what are these for?
 (add-hook 'after-init-hook #'redisplay)
 (add-hook 'after-init-hook #'redisplay t)
 (add-hook 'after-init-hook #'garbage-collect)

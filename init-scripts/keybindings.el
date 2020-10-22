@@ -912,7 +912,8 @@
 (global-set-key (kbd "C-M-S-e") #'end-of-line)
 
 (global-set-key (kbd "C-c C-v") #'delete-whole-line)
-(global-set-key (kbd "C-x C-r") #'revert-buffer-no-confirm)
+(with-eval-after-spec misc-cmds
+  (global-set-key (kbd "C-x C-r") #'revert-buffer-no-confirm))
 
 (eval-after-load 'python
   '(progn

@@ -30,7 +30,8 @@
 ;;; more ess-mode nonsense
 (add-hook 'ess-mode-hook #'warning-highlights-mode)
 (add-hook 'ess-mode-hook #'auto-fill-mode)
-(add-hook 'ess-mode-hook #'highlight-80+-mode)
+(with-eval-after-spec highlight-80+
+  (add-hook 'ess-mode-hook #'highlight-80+-mode))
 
 (defun my-inf-ess-end-send-input ()
   (interactive)
@@ -105,13 +106,15 @@
     (process-send-eof proc)))
 
 ;;; highlight cursor and auto-fill when over 80 chars in certain modes
-(defvar no-auto-fill-modes
-  '(litcoffee-mode tex-mode markdown-mode elisp-byte-code-mode))
-(defun selective-turn-on-auto-fill ()
-  (unless (member major-mode no-auto-fill-modes)
-    (highlight-80+-mode)
-    (auto-fill-mode)))
-(add-hook 'prog-mode-hook #'selective-turn-on-auto-fill)
+(with-eval-after-spec highlight-80+
+  (defconst no-auto-fill-modes
+    '(litcoffee-mode tex-mode markdown-mode elisp-byte-code-mode))
+  (defun selective-turn-on-auto-fill ()
+    (unless (member major-mode no-auto-fill-modes)
+      (highlight-80+-mode)
+      (auto-fill-mode)))
+  (add-hook 'prog-mode-hook #'selective-turn-on-auto-fill))
+
 (defvar coffee-string-interpolation-regexp "#{[^}]*}")
 
 ;;; Highlight the current line in all programming modes!!
@@ -525,8 +528,9 @@ There is some whitespace trickery, then point is inserted at: ###: |point|###."
 (define-derived-mode my-coffee-enhanced-flow-mode litcoffee-mode "ENHANCE!!"
   "Major mode for editing literate coffeescript with flow type annotations.")
 
-(add-hook 'my-coffee-enhanced-flow-mode-hook (z (highlight-80+-mode -1)))
 (add-hook 'my-coffee-enhanced-flow-mode-hook (z (auto-fill-mode -1)))
+(with-eval-after-spec highlight-80+
+  (add-hook 'my-coffee-enhanced-flow-mode-hook (z (highlight-80+-mode -1))))
 
 (add-hook 'litcoffee-mode-hook (z (unless (derived-mode-p 'my-coffee-enhanced-flow-mode)
                                     (my-coffee-enhanced-flow-mode))))
