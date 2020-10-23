@@ -1,50 +1,64 @@
-;;; modifications to ui only (called when frame made)
+;;; modifications to ui only
 
-;;; remove toolbars
-(menu-bar-mode 0)                       ;  remove menu bar for a line of space
-(tool-bar-mode 0)                       ; and tool bar for graphical
-
-;;; configure scrolling
-(setq scroll-step 1)
-(setq scroll-conservatively 10000)
-(scroll-bar-mode 0)
-(setq scroll-preserve-screen-position t)
+(require 'cl-lib)
 
 ;;; set font size and type
-(defcustom best-text-size-height 40
-  "This scales the size of text on the screen.
-
-NB: It appears to be necessary to change for no conceivable reason -- it would be good to keep an
-eye on when and why this occurs in the future."
-  :type 'integer
+(defcustom best-text-sizes-alist
+  `((best . 1.0)
+    (massive . 10.0)
+    (big . 5.0)
+    (medium . 2.0)
+    (little . 1.0)
+    (even-littler . 0.5)
+    (tiny . 0.2))
+  "This alist generates methods to scale the size of text on the screen."
+  :type '(alist :key-type (symbol :tag "Method name prefix.")
+                :value-type (float :tag "The font size as a multiple of the default height."))
   :group 'display)
 
-(defun best-text-size ()
+(defun generate-specific-text-size-method (prefix size)
+  (check-whatever-type-it-may-be prefix symbol)
+  (check-whatever-type-it-may-be size integer)
+  `(defun ,(->> prefix (symbol-name) (format "%s-text-size") (intern)) ()
+     ,(format "Set the `default' font size to %d points." size)
+     (interactive)
+     (set-face-attribute ','default nil :height ,size)))
+
+;;; Once the first window has been created, generate the window sizing methods.
+(add-hook
+ 'window-setup-hook
+ (z (cl-loop
+     with default-size = (face-attribute 'default :height)
+     for (prefix . size) in best-text-sizes-alist
+     for dilated-points = (round (* default-size size))
+     do (eval (generate-specific-text-size-method prefix dilated-points)))))
+
+(defun increase-font-size ()
   (interactive)
-  (set-face-attribute 'default nil :height best-text-size-height))
+  (let ((attr (face-attribute 'default :height)))
+    (set-face-attribute 'default nil :height (+ attr 10))))
 
-(defcustom best-font-face "Telegrama"
-  "The default font face to use in emacs!"
-  :type '(string symbol)
-  :group 'display)
+(defun increase-font-size-a-little ()
+  (interactive)
+  (let ((attr (face-attribute 'default :height)))
+    (set-face-attribute 'default nil :height (+ attr 5))))
 
-(defun extract-font-family (font-spec-like)
-  (pcase-exhaustive font-spec-like
-    ((and (cl-type string) family) family)
-    ((and (cl-type symbol) (app (symbol-name) family)) family)
-    ((and (pred fontp) (lit (symbol-name (font-get lit :family)) family)) family)))
+(defun decrease-font-size ()
+  (interactive)
+  (let ((attr (face-attribute 'default :height)))
+    (set-face-attribute 'default nil :height (- attr 10))))
 
-(defun select-font (font-spec-like)
-  (interactive (list (x-select-font)))
-  (let ((family (extract-font-family font-spec-like)))
-    (check-whatever-type-it-may-be family string)
-    (add-to-list 'default-frame-alist `(font . ,family))
-    (set-face-attribute 'default t :font family)
-    (set-frame-font family)
-    family))
+(defun decrease-font-size-a-little ()
+  (interactive)
+  (let ((attr (face-attribute 'default :height)))
+    (set-face-attribute 'default nil :height (- attr 5))))
 
-(add-hook 'window-setup-hook (z (select-font best-font-face)))
-(add-hook 'window-setup-hook #'best-text-size)
-
-;;; have normal delete/selection (type over selected text to delete)
-(delete-selection-mode 1)
+(define-minor-mode change-font-size-mode
+  "Change font size interactively!" nil "FontSize"
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "<up>") #'increase-font-size)
+    (define-key map (kbd "<down>") #'decrease-font-size)
+    (define-key map (kbd "<left>") #'decrease-font-size-a-little)
+    (define-key map (kbd "<right>") #'increase-font-size-a-little)
+    (define-key map (kbd "q") #'change-font-size-mode)
+    map))

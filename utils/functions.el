@@ -228,61 +228,6 @@ also."
                   nil nil "*newbuf*")))) ;; with default title *newbuf*
   (normal-mode))
 
-(defun massive-text ()
-  (interactive)
-  (set-face-attribute 'default nil :height 400))
-
-(defun big-text ()
-  (interactive)
-  (set-face-attribute 'default nil :height 200))
-
-(defun medium-text ()
-  (interactive)
-  (set-face-attribute 'default nil :height 150))
-
-(defun little-text ()
-  (interactive)
-  (set-face-attribute 'default nil :height 100))
-
-(defalias 'small-text 'little-text)
-
-(defun even-littler-text ()
-  (interactive)
-  (set-face-attribute 'default nil :height 90))
-
-(defun increase-font-size ()
-  (interactive)
-  (let ((attr (face-attribute 'default :height)))
-    (set-face-attribute 'default nil :height (+ attr 10))))
-
-(defun increase-font-size-a-little ()
-  (interactive)
-  (let ((attr (face-attribute 'default :height)))
-    (set-face-attribute 'default nil :height (+ attr 5))))
-
-(defun decrease-font-size ()
-  (interactive)
-  (let ((attr (face-attribute 'default :height)))
-    (set-face-attribute 'default nil :height (- attr 10))))
-
-(defun decrease-font-size-a-little ()
-  (interactive)
-  (let ((attr (face-attribute 'default :height)))
-    (set-face-attribute 'default nil :height (- attr 5))))
-
-(define-minor-mode change-font-size-mode
-  "Change font size interactively!" nil "FontSize"
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "<up>") #'increase-font-size)
-    (define-key map (kbd "<down>") #'decrease-font-size)
-    (define-key map (kbd "<left>") #'decrease-font-size-a-little)
-    (define-key map (kbd "<right>") #'increase-font-size-a-little)
-    map))
-
-(defun tiny-text ()
-  (interactive)
-  (set-face-attribute 'default nil :height 50))
-
 ;; Switching to ibuffer puts the cursor on the most recent buffer
 (defadvice ibuffer (around ibuffer-point-to-most-recent)
   (let ((recent-buffer-name (buffer-name)))

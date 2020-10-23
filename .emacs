@@ -118,6 +118,7 @@
  '(cursor-in-non-selected-windows 'box)
  '(cursor-type '(hbar . 2))
  '(dabbrev-case-replace nil)
+ '(delete-selection-mode t)
  '(desktop-save-mode t)
  '(dired-auto-revert-buffer t)
  '(dired-clean-up-buffers-too nil)
@@ -195,7 +196,7 @@
  '(f3-before-args
    '("-not" "(" "-ipath" "*.git/*" "-or" "-ipath" "*.pants.d/*" "-or" "-name" "*.pyc" ")"))
  '(fill-column 100)
- '(focus-follows-mouse t)
+ '(focus-follows-mouse nil)
  '(git-gutter:update-hooks
    '(after-save-hook after-revert-hook find-file-hook after-change-major-mode-hook text-scale-mode-hook magit-revert-buffer-hook magit-status-refresh-hook magit-run-git-hook))
  '(git-gutter:update-interval 1)
@@ -292,11 +293,12 @@
  '(markdown-list-indent-width 2)
  '(markdown-live-preview-delete-export 'delete-on-destroy)
  '(markdown-live-preview-do-sync nil)
+ '(menu-bar-mode nil)
  '(minibuffer-depth-indicate-mode t)
  '(minibuffer-eldef-shorten-default t)
  '(minibuffer-electric-default-mode t)
  '(minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
- '(mouse-autoselect-window t)
+ '(mouse-autoselect-window nil)
  '(multi-isearch-search nil)
  '(my-isearch-search-fun 'do-normal-isearch)
  '(my-loc-lib-do-on-result '(find-file))
@@ -474,6 +476,11 @@
      (flycheck-mode)))
  '(save-place-file "(expand-file-name \"saveplace\" init-home-folder-dir)")
  '(save-place-mode nil)
+ '(scalable-fonts-allowed t)
+ '(scroll-bar-mode nil)
+ '(scroll-conservatively 10000)
+ '(scroll-preserve-screen-position 1)
+ '(scroll-step 1)
  '(search-default-mode 'char-fold-to-regexp)
  '(show-paren-mode t)
  '(smart-tab-completion-functions-alist
@@ -502,7 +509,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "black" :foreground "green" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :width normal :foundry "YOFo" :family "Telegrama"))))
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "black" :foreground "green" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 40 :width normal :foundry "YOFo" :family "Telegrama"))))
  '(bold ((t (:inherit default :foreground "cyan" :weight bold))))
  '(bold-italic ((t (:inherit (bold italic) :foreground "dark magenta" :slant italic :weight bold))))
  '(cperl-no-trailing-whitespace-face ((t (:underline nil))))
