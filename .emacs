@@ -336,7 +336,8 @@
  '(read-file-name-completion-ignore-case t)
  '(rust-indent-offset 2)
  '(safe-local-variable-values
-   '((highlight-stages-mode)
+   '((highlight-80+-columns . 100)
+     (highlight-stages-mode)
      (highlight-sexp-mode)
      (org-todo-keyword-faces
       ("UNCLEAR" :foreground "red" :box t :weight light)

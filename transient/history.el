@@ -2,8 +2,9 @@
  (magit-blame
   ("-w"))
  (magit-branch nil)
- (magit-cherry-pick nil
-                    ("--ff"))
+ (magit-cherry-pick
+  ("--ff")
+  nil)
  (magit-commit nil
                ("--no-verify" "--reuse-message=ORIG_HEAD"))
  (magit-diff
