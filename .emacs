@@ -9,7 +9,8 @@
 
 (defconst init-home-folder-dir (file-truename user-emacs-directory))
 
-(setq backup-directory-alist `(("." . ,(concat init-home-folder-dir "backup-files/"))))
+(setq backup-directory-alist `(("." . ,(concat init-home-folder-dir "backup-files/")))
+      undo-tree-history-directory-alist `(("." . ,(concat init-home-folder-dir "undo-tree-history/"))))
 
 (defgroup my-errors nil
   "`defcustom' group for error handling in my own emacs lisp code."
@@ -30,9 +31,6 @@
   (load-file (expand-file-name
               (format "%s/%s.el" (or dir ".") fname)
               init-home-folder-dir)))
-
-;;; Make sure everything is byte-recompiled so we don't load old versions of things!
-(byte-recompile-directory init-home-folder-dir 0)
 
 ;;; load the packages i like
 (load-my-script "packages" "init-scripts")
@@ -689,8 +687,9 @@
  '(tool-bar-mode nil)
  '(undo-outer-limit 5000000)
  '(undo-tree-auto-save-history t)
- '(undo-tree-history-directory-alist '(("\".\"" . "\"backup-files/\"")))
+ '(undo-tree-enable-undo-in-region nil)
  '(undo-tree-visualizer-diff t)
+ '(undo-tree-visualizer-timestamps t)
  '(visible-bell t)
  '(warning-suppress-types '((undo discard-info)))
  '(window-divider-default-bottom-width 3)
@@ -711,8 +710,3 @@
  '(bold-italic ((t (:family "Telegrama Italic"))))
  '(italic ((t (:family "Telegrama Italic"))))
  '(some-new-face ((t (:family "Ancho"))) t))
-
-;; Local Variables:
-;; highlight-sexp-mode: nil
-;; highlight-stages-mode: nil
-;; End:
