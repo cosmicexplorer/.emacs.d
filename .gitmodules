@@ -2,7 +2,6 @@
         path = emacs-color-themes
         url = https://github.com/cosmicexplorer/emacs-color-themes.git
         branch = master
-[submodule "emacs-helm-ag"]
-        path = emacs-helm-ag
-        url = https://github.com:/cosmicexplorer/emacs-helm-ag.git
-        branch = play
+[submodule "helm-rg"]
+	path = helm-rg
+	url = git@github.com:cosmicexplorer/helm-rg

@@ -115,17 +115,12 @@
       (auto-fill-mode)))
   (add-hook 'prog-mode-hook #'selective-turn-on-auto-fill))
 
-(defvar coffee-string-interpolation-regexp "#{[^}]*}")
-
-;;; Highlight the current line in all programming modes!!
-(add-hook 'prog-mode-hook #'hl-line-mode)
-(require 'highlight-sexp)
-
-(add-hook 'lisp-mode-hook #'highlight-sexp-mode)
-(add-hook 'emacs-lisp-mode-hook #'highlight-sexp-mode)
-;;; Turning this on globally messes up highlighting in large enough scala source files with many
-;;; strings :(
-;; (global-highlight-sexp-mode)
+(with-eval-after-spec highlight-sexp
+  (add-hook 'lisp-mode-hook #'highlight-sexp-mode)
+  (add-hook 'emacs-lisp-mode-hook #'highlight-sexp-mode))
+(with-eval-after-spec highlight-stages
+  (add-hook 'lisp-mode-hook #'highlight-stages-mode)
+  (add-hook 'emacs-lisp-mode-hook #'highlight-stages-mode))
 
 ;;; coffeescript!!!!
 (require 'coffee-mode)
@@ -135,6 +130,8 @@
   (interactive "r")
   (coffee-cleanup-compile-buffer)
   (coffee-start-generate-sourcemap-process start end))
+
+(defvar coffee-string-interpolation-regexp "#{[^}]*}")
 
 (defun my-coffee--get-compile-buffer (src-buf)
   (with-current-buffer (get-buffer-create coffee-compiled-buffer-name)
@@ -759,9 +756,7 @@ See URL `https://github.com/ndmitchell/hlint'."
 (add-to-list 'auto-mode-alist '("\\.ll\\'" . llvm-mode))
 
 ;;; elisp
-(add-hook 'emacs-lisp-mode-hook (lambda () (setq comment-padding " ")))
 (add-hook 'emacs-lisp-mode-hook #'highlight-quoted-mode)
-(highlight-stages-global-mode)
 
 ;;; jq
 (add-to-list 'auto-mode-alist '("\\.jq\\'" . jq-mode))

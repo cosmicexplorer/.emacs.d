@@ -31,6 +31,9 @@
               (format "%s/%s.el" (or dir ".") fname)
               init-home-folder-dir)))
 
+;;; Make sure everything is byte-recompiled so we don't load old versions of things!
+(byte-recompile-directory init-home-folder-dir 0)
+
 ;;; load the packages i like
 (load-my-script "packages" "init-scripts")
 
@@ -56,18 +59,8 @@
 ;;; make it look nice
 (load-my-script "visuals" "init-scripts")
 
-;;; TODO: why is this necessary?
-(setq exec-path (get-exec-path))
-
 ;;; load submodules!!!!
 (setup-submodules-load)
-
-;;; byte-compile everything: slow on first startup, but /significantly/ faster
-;;; during normal usage
-;;; TODO: Do this async!!!
-(add-hook
- 'after-init-hook
- (z (byte-recompile-directory init-home-folder-dir 0)))
 
 ;;; This just seems like a nice idea.
 (add-hook 'after-init-hook #'garbage-collect)
@@ -120,7 +113,8 @@
  '(create-lockfiles nil)
  '(cursor-in-non-selected-windows '(hbar . 10))
  '(cursor-type 'hollow)
- '(dabbrev-case-replace nil)
+ '(dabbrev-case-replace 'case-replace)
+ '(delete-old-versions t)
  '(delete-selection-mode t)
  '(desktop-save-mode t)
  '(dired-auto-revert-buffer t)
@@ -204,7 +198,6 @@
    '(after-save-hook after-revert-hook find-file-hook after-change-major-mode-hook text-scale-mode-hook magit-revert-buffer-hook magit-status-refresh-hook magit-run-git-hook))
  '(git-gutter:update-interval 1)
  '(git-gutter:window-width 0)
- '(global-company-mode t)
  '(global-hl-line-mode t)
  '(global-hl-line-sticky-flag t)
  '(global-linum-mode nil)
@@ -247,6 +240,7 @@
  '(highlight-80+-columns 100)
  '(highlight-parentheses-background-colors '("light goldenrod"))
  '(highlight-parentheses-colors '("chocolate" "magenta" "tomato" "yellow"))
+ '(highlight-stages-global-mode t)
  '(hippie-expand-try-functions-list
    '(try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol))
  '(ido-enable-flex-matching t)
@@ -330,7 +324,7 @@
  '(pabbrev-idle-timer-verbose nil)
  '(pabbrev-mode-hook '(pabbrev-mode-set-explicitly))
  '(package-selected-packages
-   '(company-nixos-options helm-nixos-options nix-buffer nix-env-install nix-mode nix-sandbox nix-update nixos-options nixpkgs-fmt pretty-sha-path w3m pabbrev origami-predef origami orglink org-treeusage org-translate org-table-comment org-randomnote org-random-todo org-radiobutton org-pretty-tags org-pdftools org-link-beautify ob-coffeescript ob-rust org-edna org-beautify-theme helpful grip-mode sysctl orgit orgnav org-agenda-property ess-R-data-view ess-r-insert-obj ess-smart-equals ess-smart-underscore ess-view ess-view-data helm-R cmake-font-lock cl-lib-highlight faceup lisp-local modern-fringes modern-sh unicode-math-input unicode-progress-reporter unicode-whitespace diredfl diredful dynamic-fonts emoji-fontset font-lock-profiler font-utils fontawesome fontify-face highlight-refontification lisp-extra-font-lock magic-latex-buffer modern-cpp-font-lock morlock preproc-font-lock propfont-mixed proportional simple-call-tree unicode-fonts use-ttf all-the-icons all-the-icons-dired all-the-icons-gnus all-the-icons-ibuffer all-the-icons-ivy all-the-icons-ivy-rich mediawiki 0blayout 2048-game ag auctex bazel-mode better-defaults cider cl-lib cloc cmake-mode color-theme-approximate color-theme-modern company company-ghc company-ghci csv-mode cuda-mode dired-sidebar dockerfile-mode ein enh-ruby-mode epresent espuds ess evil f3 flycheck-package flycheck-rust font-lock-studio ggtags ghc git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode graphql-mode groovy-mode helm-ag helm-gtags helm-rg helm-swoop highlight-parentheses highlight-quoted highlight-stages ibuffer-sidebar intero jq-mode js2-mode kotlin-mode less-css-mode linum-relative literate-coffee-mode lua-mode magit-popup markdown-mode matlab-mode minimap mmm-mode multiple-cursors nhexl-mode nim-mode org pacmacs paredit pcre2el pdf-tools php-mode polymode poly-R projectile protobuf-mode racer rainbow-delimiters rainbow-mode robe rust-mode sage-shell-mode sass-mode scala-mode scrooge shm shut-up skewer-mode slime-company smartrep sml-mode solarized-theme sourcemap speech-tagger thrift toml-mode typescript-mode use-package vimrc-mode visual-fill-column web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode))
+   '(smart-tab company-nixos-options helm-nixos-options nix-buffer nix-env-install nix-mode nix-sandbox nix-update nixos-options nixpkgs-fmt pretty-sha-path w3m pabbrev origami-predef origami orglink org-treeusage org-translate org-table-comment org-randomnote org-random-todo org-radiobutton org-pretty-tags org-pdftools org-link-beautify ob-coffeescript ob-rust org-edna org-beautify-theme helpful grip-mode sysctl orgit orgnav org-agenda-property ess-R-data-view ess-r-insert-obj ess-smart-equals ess-smart-underscore ess-view ess-view-data helm-R cmake-font-lock cl-lib-highlight faceup lisp-local modern-fringes modern-sh unicode-math-input unicode-progress-reporter unicode-whitespace diredfl diredful dynamic-fonts emoji-fontset font-lock-profiler font-utils fontawesome fontify-face highlight-refontification lisp-extra-font-lock magic-latex-buffer modern-cpp-font-lock morlock preproc-font-lock propfont-mixed proportional simple-call-tree unicode-fonts use-ttf all-the-icons all-the-icons-dired all-the-icons-gnus all-the-icons-ibuffer all-the-icons-ivy all-the-icons-ivy-rich mediawiki 0blayout 2048-game ag auctex bazel-mode better-defaults cider cl-lib cloc cmake-mode color-theme-approximate color-theme-modern company company-ghc company-ghci csv-mode cuda-mode dired-sidebar dockerfile-mode ein enh-ruby-mode epresent espuds ess evil f3 flycheck-package flycheck-rust font-lock-studio ggtags ghc git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode graphql-mode groovy-mode helm-ag helm-gtags helm-swoop highlight-parentheses highlight-quoted highlight-stages ibuffer-sidebar intero jq-mode js2-mode kotlin-mode less-css-mode linum-relative literate-coffee-mode lua-mode magit-popup markdown-mode matlab-mode minimap mmm-mode multiple-cursors nhexl-mode nim-mode org pacmacs paredit pcre2el pdf-tools php-mode polymode poly-R projectile protobuf-mode racer rainbow-delimiters rainbow-mode robe rust-mode sage-shell-mode sass-mode scala-mode scrooge shm shut-up skewer-mode slime-company smartrep sml-mode solarized-theme sourcemap speech-tagger thrift toml-mode typescript-mode use-package vimrc-mode visual-fill-column web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode))
  '(perl6-indent-offset 2)
  '(python-indent-def-block-scale 1)
  '(rainbow-ansi-colors t)
@@ -342,7 +336,9 @@
  '(read-file-name-completion-ignore-case t)
  '(rust-indent-offset 2)
  '(safe-local-variable-values
-   '((org-todo-keyword-faces
+   '((highlight-stages-mode)
+     (highlight-sexp-mode)
+     (org-todo-keyword-faces
       ("UNCLEAR" :foreground "red" :box t :weight light)
       ("RESEARCH" :foreground "#ffaabb" :slant oblique)
       ("PLAUSIBLE" :foreground "yellow" :underline t :background "red")
@@ -692,6 +688,7 @@
  '(tool-bar-mode nil)
  '(undo-outer-limit 5000000)
  '(undo-tree-auto-save-history t)
+ '(undo-tree-history-directory-alist '(("\".\"" . "\"backup-files/\"")))
  '(undo-tree-visualizer-diff t)
  '(visible-bell t)
  '(warning-suppress-types '((undo discard-info)))
@@ -710,20 +707,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :extend nil :stipple nil :background "black" :foreground "green" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 100 :width normal :foundry "YOFo" :family "Telegrama"))))
- '(bold ((t (:inherit default :foreground "cyan" :weight extra-bold))))
- '(bold-italic ((t (:inherit (bold italic) :foreground "dark magenta" :slant italic :weight bold :family "Telegrama Italic"))))
- '(browse-url-button ((t (:inherit link))))
- '(cperl-no-trailing-whitespace-face ((t (:underline nil))))
- '(cursor ((t (:background "cyan"))))
- '(font-latex-script-char-face ((t (:foreground "burlywood"))))
- '(font-lock-comment-face ((t (:extend t :background "dark magenta" :foreground "white"))))
- '(hl-line ((t (:extend t :box (:line-width (3 . 2) :color "sandy brown")))))
- '(italic ((t (:inherit default :foreground "magenta" :slant italic :family "Telegrama Italic"))))
- '(org-agenda-property-face ((t (:inherit font-lock-comment-face :extend nil))))
- '(region ((t (:extend t :background "blue3" :foreground "white"))))
- '(some-new-face ((t (:family "Ancho"))) t)
- '(underline ((t (:inherit default :foreground "yellow" :underline t))))
- '(window-divider ((t (:foreground "deep sky blue"))))
- '(window-divider-first-pixel ((t (:foreground "chartreuse"))))
- '(window-divider-last-pixel ((t (:foreground "pale turquoise"))))
- '(woman-unknown ((t (:background "#333333" :foreground "#ff0000")))))
+ '(bold-italic ((t (:family "Telegrama Italic"))))
+ '(italic ((t (:family "Telegrama Italic"))))
+ '(some-new-face ((t (:family "Ancho"))) t))
+
+;; Local Variables:
+;; highlight-sexp-mode: nil
+;; highlight-stages-mode: nil
+;; End:

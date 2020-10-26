@@ -506,7 +506,7 @@ to clean up.")
 
 ;;; setup submodules and make them
 (defconst submodule-dirs
-  '("emacs-helm-ag" "emacs-color-themes" "ESS"))
+  '("emacs-color-themes" "helm-rg"))
 
 (defun setup-submodules-load ()
   (actual-setup-submodules)
@@ -515,10 +515,12 @@ to clean up.")
      (add-to-list
       'load-path (expand-file-name dir init-home-folder-dir)))
    submodule-dirs)
-  (require 'org)
-  (require 'helm-ag)
   (require 'danny-theme)
-  (enable-theme 'danny))
+  (require 'helm-rg)
+  ;; NB: I do not know why this needs to be enabled both now and later. But otherwise our hl-line
+  ;; face is not applied.
+  (enable-theme 'danny)
+  (add-hook 'window-setup-hook (z (enable-theme 'danny)) 100))
 
 ;;; ibuffer moves things around when i mark things and this scares me
 (defadvice ibuffer-mark-interactive (after re-recenter activate) (recenter))

@@ -2,7 +2,6 @@
 (defun setup-cider-stuff ()
   (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
   (setq nrepl-log-messages t)
-  (global-company-mode)
   (add-hook 'cider-mode-hook 'rainbow-delimiters-mode)
   (add-hook 'cider-mode-hook 'enable-paredit-mode)
   (add-hook 'cider-mode-hook 'subword-mode))

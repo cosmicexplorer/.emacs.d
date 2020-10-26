@@ -580,3 +580,8 @@ If SUBMODE is not provided, use `LANG-mode' by default."
 
 (with-eval-after-spec ensime
   (add-to-list 'auto-mode-alist '("\\.ensime\\'" . emacs-lisp-mode)))
+
+(with-eval-after-spec helm-rg
+  (defun-insert-or-message-string repo-relative-path
+    (-> (buffer-file-name)
+        (file-relative-name (helm-rg--get-git-root)))))

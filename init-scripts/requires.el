@@ -35,7 +35,6 @@
 (require 'revbufs)
 (require 'saveplace)
 (require 'smart-compile)
-(require 'smart-tab)
 (require 'tramp)
 (require 'undo-tree)
 (require 'web-beautify)
@@ -52,7 +51,6 @@
 (require 'rx)
 (require 'widget)
 (require 'epa-file)
-(require 'helm-rg)
 (require 'pcase)
 (require 'pabbrev)
 

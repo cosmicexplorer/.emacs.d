@@ -65,7 +65,6 @@ helm-R
 helm-ag
 helm-gtags
 helm-nixos-options
-helm-rg
 helm-swoop
 helpful
 highlight-parentheses
@@ -152,6 +151,7 @@ shut-up
 simple-call-tree
 skewer-mode
 slime-company
+smart-tab
 smartrep
 sml-mode
 solarized-theme

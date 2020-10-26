@@ -3905,9 +3905,4 @@ documentation for `paredit-space-for-delimiter-predicates'."
        (last it)
        (first it)))
 
-(require 'helm-rg)
-(defun-insert-or-message-string repo-relative-path
-  (-> (buffer-file-name)
-      (file-relative-name (helm-rg--get-git-root))))
-
 (provide 'functions)
