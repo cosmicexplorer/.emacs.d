@@ -30,67 +30,33 @@
   '(w3m-mode special-mode
     eww-mode eshell-mode ibuffer-mode undo-tree-visualizer-mode
     magit-mode magit-status-mode magit-log-mode))
-(defun set-correct-trailing-whitespace ()
-  (setq show-trailing-whitespace
-        (not (apply #'derived-mode-p no-show-whitespace-modes))))
-(defun set-correct-trailing-whitespace-all-buffers ()
-  (loop for buf in (buffer-list)
-        do (with-current-buffer buf (set-correct-trailing-whitespace))))
-(add-hook
- 'buffer-list-update-hook #'set-correct-trailing-whitespace-all-buffers)
-(add-hook 'after-change-major-mode-hook #'set-correct-trailing-whitespace)
 
-;; do backups well and put them into a separate folder
-(defconst my-backup-dir (expand-file-name "backup-files" init-home-folder-dir))
-(setq backup-directory-alist `(("." . ,my-backup-dir)))
-(setq auto-save-file-name-transforms nil)
-
-(defconst my-autosave-dir
-  (expand-file-name "auto-save-files" init-home-folder-dir))
-
-(defconst dir-sep
-  (if (memq system-type '(windows-nt ms-dos)) "\\"
-    "/"))
-
-(defun make-auto-save-file-name ()
-  (let* ((fname (buffer-file-name))
-         (out-fname (replace-regexp-in-string dir-sep "!" fname)))
-    (expand-file-name out-fname my-autosave-dir)))
-
-(defun auto-save-file-name-p (file-basename)
-  (file-exists-p (expand-file-name file-basename my-autosave-dir)))
-
-(setq backup-by-copying t)
-(setq delete-old-versions t
-      kept-new-versions 6
-      kept-old-versions 2
-      version-control t)
-
-;; do the same thing for undo-tree history
-(setq undo-tree-history-directory-alist
-      `((".*" . ,(concat init-home-folder-dir "undo-tree-history"))))
-(setq undo-tree-visualizer-timestamps t)
-
-;; load w3m web browser
-(when (executable-find "w3m")
-  (require 'w3m)
-  (setq w3m-use-cookies t)
-  (setq w3m-coding-system 'utf-8
-        w3m-file-coding-system 'utf-8
-        w3m-file-name-coding-system 'utf-8
-        w3m-input-coding-system 'utf-8
-        w3m-output-coding-system 'utf-8
-        w3m-terminal-coding-system 'utf-8)
-  (add-hook 'w3m-mode-hook
-            '(lambda ()
-               (w3m-turnoff-inline-images)
-               (w3m-toggle-inline-images))))
+(with-eval-after-spec w3m
+  (when (executable-find "w3m")
+    (require 'w3m)
+    (setq w3m-use-cookies t)
+    (setq w3m-coding-system 'utf-8
+          w3m-file-coding-system 'utf-8
+          w3m-file-name-coding-system 'utf-8
+          w3m-input-coding-system 'utf-8
+          w3m-output-coding-system 'utf-8
+          w3m-terminal-coding-system 'utf-8)
+    (add-hook 'w3m-mode-hook
+              '(lambda ()
+                 (w3m-turnoff-inline-images)
+                 (w3m-toggle-inline-images)))))
 
 
 ;;; org-mode
 (add-hook 'org-mode-hook (z (auto-fill-mode -1)))
 (with-eval-after-spec highlight-80+
   (add-hook 'org-mode-hook (z (highlight-80+-mode -1))))
+(add-hook 'org-mode-hook (z (font-lock-debug-fontify))
+          100)
+;; (org-link-beautify-mode 1)
+(org-pretty-tags-global-mode 1)
+(global-org-radiobutton-mode 1)
+(global-orglink-mode)
 
 ;;; see docs for funcs n stuff
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
@@ -550,11 +516,6 @@ to clean up.")
      (add-to-list
       'load-path (expand-file-name dir init-home-folder-dir)))
    submodule-dirs)
-  ;; These used to use a custom org-mode install, but I've removed that.
-  ; (add-to-list 'load-path
-  ;             (expand-file-name "org-mode/lisp/" init-home-folder-dir))
-  ; (autoload #'org-element-update-syntax "org-element.el")
-  ; (autoload #'org-define-error "org-compat.el")
   (require 'org)
   (require 'helm-ag)
   (require 'danny-theme)

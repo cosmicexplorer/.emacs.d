@@ -54,6 +54,7 @@
 (require 'epa-file)
 (require 'helm-rg)
 (require 'pcase)
+(require 'pabbrev)
 
 ;;; my stuff
 (require 'utilities)

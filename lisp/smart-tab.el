@@ -55,6 +55,7 @@
 ;;; Code:
 
 (require 'easy-mmode)
+(require 'pcase)
 
 (eval-when-compile
   ;; Forward declaration, does not define variable
@@ -67,13 +68,12 @@
 (defvar smart-tab-debug nil
   "Turn on for logging about which `smart-tab' function ends up being called.")
 
-(defcustom smart-tab-using-hippie-expand nil
-  "Use `hippie-expand' to expand text.
-Use either `hippie-expand' or `dabbrev-expand' for expanding text
-when we don't have to indent."
+(defcustom smart-tab-fallback-expand 'pabbrev-expand
+  "Used to expand text when we don't have an alternative."
   :type '(choice
-          (const :tag "hippie-expand" t)
-          (const :tag "dabbrev-expand" nil))
+          (const :tag "hippie-expand" 'hippie-expand)
+          (const :tag "dabbrev-expand" 'dabbrev-expand)
+          (const :tag "pabbrev-expand" 'pabbrev-expand))
   :group 'smart-tab)
 
 (defcustom smart-tab-completion-functions-alist
@@ -82,7 +82,7 @@ when we don't have to indent."
   "A-list of major modes in which to use a mode specific completion function.
 If current major mode is not found in this alist, fall back to
 `hippie-expand' or `dabbrev-expand', depending on the value of
-`smart-tab-using-hippie-expand'"
+`smart-tab-fallback-expand'"
   :type '(alist :key-type (symbol :tag "Major mode")
                 :value-type (function :tag "Completion function to use in this mode"))
   :group 'smart-tab)
@@ -112,9 +112,10 @@ If current major mode is not found in this alist, fall back to
                  (boundp' auto-complete-mode)
                  auto-complete-mode)
             (smart-tab-funcall 'ac-start :force-init t)
-          (if smart-tab-using-hippie-expand
-              (hippie-expand nil)
-            (dabbrev-expand nil)))
+          (pcase-exhaustive smart-tab-fallback-expand
+            (`hippie-expand (hippie-expand nil))
+            (`dabbrev-expand (dabbrev-expand nil))
+            (`pabbrev-expand (pabbrev-expand))))
       (funcall completion-function))))
 
 (defun smart-tab-must-expand (&optional prefix)
@@ -154,7 +155,7 @@ indent the current line or selection.
 
 In a regular buffer, `smart-tab' will attempt to expand with
 either `hippie-expand' or `dabbrev-expand', depending on the
-value of `smart-tab-using-hippie-expand'. Alternatively, if
+value of `smart-tab-fallback-expand'. Alternatively, if
 `auto-complete-mode' is enabled in the current buffer,
 `auto-complete' will be used to attempt expansion. If the mark is
 active, or PREFIX is \\[universal-argument], then `smart-tab'

@@ -16,6 +16,9 @@
                 :value-type (float :tag "The font size as a multiple of the default height."))
   :group 'display)
 
+;;; TODO: develop SOME sort of pcase hackery to write methods like this.
+;;; NB: the separate use of `eval' was illuminating. "macros" are perhaps MUCH less important than
+;;; "metaprogramming" in general.
 (defun generate-specific-text-size-method (prefix size)
   (check-whatever-type-it-may-be prefix symbol)
   (check-whatever-type-it-may-be size integer)
@@ -56,9 +59,18 @@
 (define-minor-mode change-font-size-mode
   "Change font size interactively!" nil "FontSize"
   (let ((map (make-sparse-keymap)))
+    ;;; TODO: don't make these the arrow keys -- make this a persistent minor mode, and make it
+    ;;; really easy to get back to where you were at the start!
     (define-key map (kbd "<up>") #'increase-font-size)
     (define-key map (kbd "<down>") #'decrease-font-size)
     (define-key map (kbd "<left>") #'decrease-font-size-a-little)
     (define-key map (kbd "<right>") #'increase-font-size-a-little)
     (define-key map (kbd "q") #'change-font-size-mode)
     map))
+
+(defgroup handled-faces nil
+  "???"
+  :group 'faces)
+(defface some-new-face nil
+  "???"
+  :group 'handled-faces)

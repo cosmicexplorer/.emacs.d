@@ -552,7 +552,8 @@
      (define-key org-mode-map (kbd "M-a M-a") #'my-org-beginning-of-section)
      (define-key org-mode-map (kbd "M-a M-e") #'my-org-end-of-section)
      (define-key org-mode-map (kbd "M-a M-n") #'my-org-next-element)
-     (define-key org-mode-map (kbd "M-a M-p") #'my-org-previous-element)))
+     (define-key org-mode-map (kbd "M-a M-p") #'my-org-previous-element)
+     ))
 
 ;;; convenience bindings from working with windows
 (global-set-key (kbd "M-`") #'indent-regardless-of-mode)
@@ -622,31 +623,19 @@
   `((:map (nil)
      :kill ("C-M-h")
      :assign
-     (("C-h f" ,(find-function-switch-pfx
-                    (make-new-help #'describe-function)
-                  :invert t))
-      ("C-h v" ,(find-function-switch-pfx
-                    (make-new-help #'describe-variable)
-                  :invert t))
-      ("C-h k" ,(find-function-switch-pfx
-                    (make-new-help #'describe-key)
-                  :invert t))
-      ("C-h C-k" ,(find-function-switch-pfx
-                      (make-new-help #'describe-key)
-                    :invert t))
-      ("C-h d" ,(find-function-switch-pfx
-                   (make-new-help #'describe-function-or-variable)
-                 :invert t))
-      ("C-M-h d" ,(find-function-switch-pfx
-                      (make-new-help #'describe-function-or-variable-at-point)
-                    :invert t))
+     (("C-h f" ,(find-function-switch-pfx #'helpful-function :invert t))
+      ("C-h v" ,(find-function-switch-pfx #'helpful-variable :invert t))
+      ("C-h k" ,(find-function-switch-pfx #'helpful-key :invert t))
+      ("C-h C-k" ,(find-function-switch-pfx #'helpful-key :invert t))
+      ("C-h d" ,(find-function-switch-pfx #'describe-function-or-variable :invert t))
+      ("C-M-h d" ,(find-function-switch-pfx #'describe-function-or-variable-at-point :invert t))
       ("C-h C-d" ,(find-function-switch-pfx #'find-function-or-variable))
       ("C-M-h C-d"
        ,(find-function-switch-pfx #'find-function-or-variable-at-point))
       ("C-M-h f"
-       ,(find-function-switch-pfx (make-new-help #'describe-function-at-point)))
+       ,(find-function-switch-pfx #'describe-function-at-point))
       ("C-M-h v"
-       ,(find-function-switch-pfx (make-new-help #'describe-variable-at-point)))
+       ,(find-function-switch-pfx #'describe-variable-at-point))
       ("C-h C-f" ,(find-function-switch-pfx #'find-function))
       ("C-M-h C-f" ,(find-function-switch-pfx #'find-function-at-point))
       ("C-h C-v" ,(find-function-switch-pfx #'find-variable))
@@ -824,6 +813,7 @@
   'paredit-forward-slurp-sexp)
 (define-key paredit-mode-map (kbd "M-a M-<left>")
   'paredit-backward-slurp-sexp)
+(define-key paredit-mode-map (kbd "C-M-a C-M-a") #'beginning-of-defun)
 (define-key paredit-mode-map (kbd "C-M-a C-M-<right>")
   'paredit-forward-barf-sexp)
 (define-key paredit-mode-map (kbd "C-c <down>")
@@ -975,8 +965,8 @@
   (define-key ess-mode-map (kbd "C-M-h") nil))
 
 (global-set-key (kbd "C-:") #'eval-expression)
-(global-set-key (kbd "C-S-h f") #'describe-function)
-(global-set-key (kbd "C-S-h v") #'describe-variable)
+(global-set-key (kbd "C-S-h f") #'helpful-function)
+(global-set-key (kbd "C-S-h v") #'helpful-variable)
 (global-set-key (kbd "C-S-h d") #'describe-function-or-variable)
 
 (with-eval-after-spec helm
