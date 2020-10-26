@@ -151,6 +151,7 @@ shut-up
 simple-call-tree
 skewer-mode
 slime-company
+smart-compile
 smart-tab
 smartrep
 sml-mode
@@ -161,6 +162,8 @@ sysctl
 thrift
 toml-mode
 typescript-mode
+udev-mode
+undo-tree
 unicode-fonts
 unicode-math-input
 unicode-progress-reporter
