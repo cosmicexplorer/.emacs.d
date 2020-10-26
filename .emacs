@@ -111,7 +111,7 @@
  '(cperl-hairy nil)
  '(cperl-invalid-face 'cperl-no-trailing-whitespace-face)
  '(create-lockfiles nil)
- '(cursor-in-non-selected-windows '(hbar . 10))
+ '(cursor-in-non-selected-windows '(hbar . 12))
  '(cursor-type 'hollow)
  '(dabbrev-case-replace 'case-replace)
  '(delete-old-versions t)
@@ -242,8 +242,7 @@
  '(highlight-parentheses-background-colors '("light goldenrod"))
  '(highlight-parentheses-colors '("chocolate" "magenta" "tomato" "yellow"))
  '(highlight-stages-global-mode t)
- '(hippie-expand-try-functions-list
-   '(try-complete-file-name-partially try-complete-file-name try-expand-all-abbrevs try-expand-dabbrev try-expand-dabbrev-all-buffers try-expand-dabbrev-from-kill try-complete-lisp-symbol-partially try-complete-lisp-symbol))
+ '(hl-sexp-background-color nil)
  '(ido-enable-flex-matching t)
  '(ido-mode 'both nil (ido))
  '(inhibit-startup-buffer-menu t)
