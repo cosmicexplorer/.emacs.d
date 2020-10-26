@@ -634,7 +634,7 @@
   `((:map (nil)
      :kill ("C-M-h")
      :assign
-     (("C-h f" ,(find-function-switch-pfx #'helpful-function :invert t))
+     (("C-h f" ,(find-function-switch-pfx #'helpful-callable :invert t))
       ("C-h v" ,(find-function-switch-pfx #'helpful-variable :invert t))
       ("C-h k" ,(find-function-switch-pfx #'helpful-key :invert t))
       ("C-h C-k" ,(find-function-switch-pfx #'helpful-key :invert t))
@@ -976,7 +976,7 @@
   (define-key ess-mode-map (kbd "C-M-h") nil))
 
 (global-set-key (kbd "C-:") #'eval-expression)
-(global-set-key (kbd "C-S-h f") #'helpful-function)
+(global-set-key (kbd "C-S-h f") #'helpful-callable)
 (global-set-key (kbd "C-S-h v") #'helpful-variable)
 (global-set-key (kbd "C-S-h d") #'describe-function-or-variable)
 

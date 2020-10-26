@@ -1573,7 +1573,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
   (interactive)
   (let ((symb (function-called-at-point)))
     (when symb
-      (helpful-function symb))))
+      (helpful-callable symb))))
 
 (defun describe-variable-at-point ()
   (interactive)
@@ -1587,7 +1587,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
     (if (and symb (not (equal symb 0)))
         (helpful-variable symb)
       (let ((fun-symb (function-called-at-point)))
-        (when fun-symb (helpful-function fun-symb))))))
+        (when fun-symb (helpful-callable fun-symb))))))
 
 (defun function-or-symbol (sym) (or (fboundp sym) (boundp sym)))
 (defun describe-function-or-variable ()
@@ -1601,7 +1601,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
                          (format "(default %s) " (symbol-name real-symb))))
                obarray #'function-or-symbol t nil nil
                (when real-symb (symbol-name real-symb)))))
-    (if (fboundp (intern val)) (helpful-function (intern val))
+    (if (fboundp (intern val)) (helpful-callable (intern val))
       (helpful-variable (intern val)))))
 
 (defun find-function-or-variable ()
