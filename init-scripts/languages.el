@@ -115,12 +115,13 @@
       (auto-fill-mode)))
   (add-hook 'prog-mode-hook #'selective-turn-on-auto-fill))
 
-(with-eval-after-spec highlight-sexp
-  (add-hook 'lisp-mode-hook #'highlight-sexp-mode)
-  (add-hook 'emacs-lisp-mode-hook #'highlight-sexp-mode))
-(with-eval-after-spec highlight-stages
-  (add-hook 'lisp-mode-hook #'highlight-stages-mode)
-  (add-hook 'emacs-lisp-mode-hook #'highlight-stages-mode))
+(require 'highlight-sexp)
+(add-hook 'lisp-mode-hook #'highlight-sexp-mode)
+(add-hook 'emacs-lisp-mode-hook #'highlight-sexp-mode)
+
+(require 'highlight-stages)
+(add-hook 'lisp-mode-hook #'highlight-stages-mode)
+(add-hook 'emacs-lisp-mode-hook #'highlight-stages-mode)
 
 ;;; coffeescript!!!!
 (require 'coffee-mode)

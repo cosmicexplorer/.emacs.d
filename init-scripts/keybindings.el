@@ -142,6 +142,16 @@
 
 (global-set-key (kbd "C-c W") #'clear-beginning-whitespace)
 
+;;; FIXME: company and pabbrev trying to play together is annoying. Essentially what this does is to
+;;; use pabbrev for every tab completion, and then fall back to company when it has none. The reason
+;;; for this is that pabbrev attempts to fill extremely fast, and company will sometimes call out to
+;;; things like clang.
+;;; The only annoyance is that this means something like `defmacro' will not often be completed
+;;; right when emacs is starting up, as it would have been with `completion-at-point'.
+(with-eval-after-spec company
+  (define-key company-active-map (kbd "TAB") nil)
+  (define-key company-active-map [tab] nil))
+
 ;;; helm
 ;;; the below can also be applied over multiple lines with:
 ;;; C-u [number] M-x helm-swoop RET

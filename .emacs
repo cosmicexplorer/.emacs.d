@@ -95,6 +95,8 @@
  '(coffee-switch-to-compile-buffer t)
  '(coffee-tab-width 2)
  '(comint-prompt-read-only t)
+ '(company-continue-commands
+   '(not save-buffer save-some-buffers save-buffers-kill-terminal save-buffers-kill-emacs completion-at-point))
  '(company-dabbrev-code-modes
    '(prog-mode batch-file-mode csharp-mode css-mode erlang-mode haskell-mode jde-mode lua-mode python-mode))
  '(company-dabbrev-downcase nil)
@@ -196,6 +198,7 @@
    '(after-save-hook after-revert-hook find-file-hook after-change-major-mode-hook text-scale-mode-hook magit-revert-buffer-hook magit-status-refresh-hook magit-run-git-hook))
  '(git-gutter:update-interval 1)
  '(git-gutter:window-width 0)
+ '(global-company-mode t)
  '(global-hl-line-mode t)
  '(global-hl-line-sticky-flag t)
  '(global-linum-mode nil)
