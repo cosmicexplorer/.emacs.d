@@ -248,6 +248,9 @@ concatenates DIR with them (e.g. ./file.txt)."
     (lambda (file) (or (string-equal file ".") (string-equal file "..")))
     (directory-files dir))))
 
+
+;;;### (autoloads nil "unix-find" "unix-find.el" (0 0 0 0))
+;;; Generated autoloads from unix-find.el
 ;;;###autoload
 (defun unix-find (dir &rest args)
   "Recognizes :[i]name, :[i]wholename, :[i]regex, :[i]wholeregex, :not,
@@ -302,6 +305,16 @@ search. Probably pretty slow."
                                (lambda (result)
                                  (replace-regexp-in-string
                                   "/+" "/" result)) res)))))))
+
+(autoload 'unix-find "unix-find" "\
+Recognizes :[i]name, :[i]wholename, :[i]regex, :[i]wholeregex, :not,
+:maxdepth, :mindepth, :type, :perm, :binary (which uses `file-binary-p'), and
+:size. Doesn't care about the positioning of :maxdepth and :mindepth. :type
+recognizes 'd', 'f', 'p', 'l', and 's', and :size only accepts a number of
+bytes, as well as a > or < sign in front. Performs breadth-first
+search. Probably pretty slow.
+
+\(fn DIR &rest ARGS)" nil nil)
 
 (defun unix-find-modify-arg (arg-string)
   (cond ((and (>= (length arg-string) 2)
@@ -374,8 +387,14 @@ search. Probably pretty slow."
   "Previous find command run.")
 (make-variable-buffer-local 'unix-find-prev-find-command)
 
+;;;###autoload
 (define-compilation-mode unix-find-mode "Find"
   "Compilation derived mode to display results of `find'")
+
+(autoload 'unix-find-mode "unix-find" "\
+Compilation derived mode to display results of `find'
+
+\(fn)" nil nil)
 
 (defun unix-find-get-buf-base-name (find-command)
   (concat find-command "@"
@@ -415,6 +434,17 @@ prompt according to `unix-find-begin-prompt'."
                        (2 font-lock-variable-name-face)))))
             (unix-find-do-find buf find-command find-cmd-parsed)))
       (message "%s: %s" "Could not parse input to find" find-command))))
+
+(register-definition-prefixes "unix-find" '("cleanup-find-buffers" "files-except-tree" "unix-find-"))
+
+;;;***
+
+(autoload 'u-find "unix-find" "\
+Parses and converts arguments with hyphen syntax (-name, -regex, etc) to
+atoms as a sexp for input to `unix-find' (:name, :regex, etc). Displays default
+prompt according to `unix-find-begin-prompt'.
+
+\(fn &optional PREFIX-ARG)" t nil)
 
 (defun unix-find-clear-prev-cmd-and-refind ()
   (interactive)

@@ -21,6 +21,7 @@ color-theme-modern
 company
 company-ghc
 company-ghci
+company-nixos-options
 csv-mode
 cuda-mode
 dired-sidebar
@@ -63,6 +64,7 @@ groovy-mode
 helm-R
 helm-ag
 helm-gtags
+helm-nixos-options
 helm-rg
 helm-swoop
 helpful
@@ -82,7 +84,6 @@ lisp-local
 literate-coffee-mode
 lua-mode
 magic-latex-buffer
-magit
 magit-popup
 markdown-mode
 matlab-mode
@@ -96,6 +97,13 @@ morlock
 multiple-cursors
 nhexl-mode
 nim-mode
+nix-buffer
+nix-env-install
+nix-mode
+nix-sandbox
+nix-update
+nixos-options
+nixpkgs-fmt
 ob-coffeescript
 ob-rust
 org
@@ -125,6 +133,7 @@ php-mode
 poly-R
 polymode
 preproc-font-lock
+pretty-sha-path
 projectile
 propfont-mixed
 proportional

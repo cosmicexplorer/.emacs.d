@@ -9,6 +9,8 @@
 
 (defconst init-home-folder-dir (file-truename user-emacs-directory))
 
+(setq backup-directory-alist `(("." . ,(concat init-home-folder-dir "backup-files/"))))
+
 (defgroup my-errors nil
   "`defcustom' group for error handling in my own emacs lisp code."
   :group 'my-customizations)
@@ -207,7 +209,6 @@
  '(global-hl-line-sticky-flag t)
  '(global-linum-mode nil)
  '(global-pabbrev-mode t)
- '(global-smart-tab-mode t)
  '(global-undo-tree-mode t)
  '(grep-command "gr ")
  '(grep-highlight-matches 'auto)
@@ -329,7 +330,7 @@
  '(pabbrev-idle-timer-verbose nil)
  '(pabbrev-mode-hook '(pabbrev-mode-set-explicitly))
  '(package-selected-packages
-   '(w3m s3m pabbrev origami-predef origami orglink org-treeusage org-translate org-table-comment org-randomnote org-random-todo org-radiobutton org-pretty-tags org-pdftools org-link-beautify ob-coffeescript ob-rust org-edna org-beautify-theme helpful grip-mode sysctl orgit orgnav org-agenda-property ess-R-data-view ess-r-insert-obj ess-smart-equals ess-smart-underscore ess-view ess-view-data helm-R cmake-font-lock cl-lib-highlight faceup lisp-local modern-fringes modern-sh unicode-math-input unicode-progress-reporter unicode-whitespace diredfl diredful dynamic-fonts emoji-fontset font-lock-profiler font-utils fontawesome fontify-face highlight-refontification lisp-extra-font-lock magic-latex-buffer modern-cpp-font-lock morlock preproc-font-lock propfont-mixed proportional simple-call-tree unicode-fonts use-ttf all-the-icons all-the-icons-dired all-the-icons-gnus all-the-icons-ibuffer all-the-icons-ivy all-the-icons-ivy-rich mediawiki 0blayout 2048-game ag auctex bazel-mode better-defaults cider cl-lib cloc cmake-mode color-theme-approximate color-theme-modern company company-ghc company-ghci csv-mode cuda-mode dired-sidebar dockerfile-mode ein enh-ruby-mode epresent espuds ess evil f3 flycheck-package flycheck-rust font-lock-studio ggtags ghc git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode graphql-mode groovy-mode helm-ag helm-gtags helm-rg helm-swoop highlight-parentheses highlight-quoted highlight-stages ibuffer-sidebar intero jq-mode js2-mode kotlin-mode less-css-mode linum-relative literate-coffee-mode lua-mode magit magit-popup markdown-mode matlab-mode minimap mmm-mode multiple-cursors nhexl-mode nim-mode org pacmacs paredit pcre2el pdf-tools php-mode polymode poly-R projectile protobuf-mode racer rainbow-delimiters rainbow-mode robe rust-mode sage-shell-mode sass-mode scala-mode scrooge shm shut-up skewer-mode slime-company smartrep sml-mode solarized-theme sourcemap speech-tagger thrift toml-mode typescript-mode use-package vimrc-mode visual-fill-column web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode))
+   '(company-nixos-options helm-nixos-options nix-buffer nix-env-install nix-mode nix-sandbox nix-update nixos-options nixpkgs-fmt pretty-sha-path w3m pabbrev origami-predef origami orglink org-treeusage org-translate org-table-comment org-randomnote org-random-todo org-radiobutton org-pretty-tags org-pdftools org-link-beautify ob-coffeescript ob-rust org-edna org-beautify-theme helpful grip-mode sysctl orgit orgnav org-agenda-property ess-R-data-view ess-r-insert-obj ess-smart-equals ess-smart-underscore ess-view ess-view-data helm-R cmake-font-lock cl-lib-highlight faceup lisp-local modern-fringes modern-sh unicode-math-input unicode-progress-reporter unicode-whitespace diredfl diredful dynamic-fonts emoji-fontset font-lock-profiler font-utils fontawesome fontify-face highlight-refontification lisp-extra-font-lock magic-latex-buffer modern-cpp-font-lock morlock preproc-font-lock propfont-mixed proportional simple-call-tree unicode-fonts use-ttf all-the-icons all-the-icons-dired all-the-icons-gnus all-the-icons-ibuffer all-the-icons-ivy all-the-icons-ivy-rich mediawiki 0blayout 2048-game ag auctex bazel-mode better-defaults cider cl-lib cloc cmake-mode color-theme-approximate color-theme-modern company company-ghc company-ghci csv-mode cuda-mode dired-sidebar dockerfile-mode ein enh-ruby-mode epresent espuds ess evil f3 flycheck-package flycheck-rust font-lock-studio ggtags ghc git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode graphql-mode groovy-mode helm-ag helm-gtags helm-rg helm-swoop highlight-parentheses highlight-quoted highlight-stages ibuffer-sidebar intero jq-mode js2-mode kotlin-mode less-css-mode linum-relative literate-coffee-mode lua-mode magit-popup markdown-mode matlab-mode minimap mmm-mode multiple-cursors nhexl-mode nim-mode org pacmacs paredit pcre2el pdf-tools php-mode polymode poly-R projectile protobuf-mode racer rainbow-delimiters rainbow-mode robe rust-mode sage-shell-mode sass-mode scala-mode scrooge shm shut-up skewer-mode slime-company smartrep sml-mode solarized-theme sourcemap speech-tagger thrift toml-mode typescript-mode use-package vimrc-mode visual-fill-column web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode))
  '(perl6-indent-offset 2)
  '(python-indent-def-block-scale 1)
  '(rainbow-ansi-colors t)
@@ -716,7 +717,7 @@
  '(cursor ((t (:background "cyan"))))
  '(font-latex-script-char-face ((t (:foreground "burlywood"))))
  '(font-lock-comment-face ((t (:extend t :background "dark magenta" :foreground "white"))))
- '(hl-line ((t (:box (:line-width (3 . 2) :color "sandy brown")))))
+ '(hl-line ((t (:extend t :box (:line-width (3 . 2) :color "sandy brown")))))
  '(italic ((t (:inherit default :foreground "magenta" :slant italic :family "Telegrama Italic"))))
  '(org-agenda-property-face ((t (:inherit font-lock-comment-face :extend nil))))
  '(region ((t (:extend t :background "blue3" :foreground "white"))))

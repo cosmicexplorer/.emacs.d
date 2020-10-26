@@ -53,9 +53,8 @@
   (add-hook 'org-mode-hook (z (highlight-80+-mode -1))))
 (add-hook 'org-mode-hook (z (font-lock-debug-fontify))
           100)
-;; (org-link-beautify-mode 1)
+(org-link-beautify-mode 1)
 (org-pretty-tags-global-mode 1)
-(global-org-radiobutton-mode 1)
 (global-orglink-mode)
 
 ;;; see docs for funcs n stuff

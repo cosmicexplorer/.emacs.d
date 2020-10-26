@@ -22,6 +22,7 @@
 (global-set-key (kbd "M-.") nil)
 (global-set-key (kbd "M-?") nil)
 (global-set-key (kbd "C-x M-w") #'cycle-window-configuration)
+(global-set-key (kbd "C-x M-s") #'save-current-window-configuration)
 
 (defvar prev-keymaps nil)
 

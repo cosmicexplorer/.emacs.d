@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t -*-
 
-(defvar internet-check-url "google.com")
+(defconst internet-check-url "8.8.8.8")
 
 (defun internet-connected-p ()
   (zerop
@@ -12,8 +12,9 @@
              '("gnu" . "https://elpa.gnu.org/packages/") t)
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
-(add-to-list 'package-archives
-             '("org" . "https://orgmode.org/elpa/") t)
+;; this archive will occasionally time out
+;; (add-to-list 'package-archives
+;;              '("org" . "https://orgmode.org/elpa/") t)
 
 (defcustom installed-packages-file
   (expand-file-name "installed-packages" init-home-folder-dir)
