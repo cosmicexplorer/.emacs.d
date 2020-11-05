@@ -72,6 +72,10 @@ highlight-quoted
 highlight-refontification
 highlight-stages
 ibuffer-sidebar
+info-buffer
+info-colors
+info-rename-buffer
+inform
 intero
 jq-mode
 js2-mode
