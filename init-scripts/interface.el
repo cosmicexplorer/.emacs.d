@@ -36,15 +36,15 @@
     (require 'w3m)
     (setq w3m-use-cookies t)
     (setq w3m-coding-system 'utf-8
-          w3m-file-coding-system 'utf-8
-          w3m-file-name-coding-system 'utf-8
-          w3m-input-coding-system 'utf-8
-          w3m-output-coding-system 'utf-8
-          w3m-terminal-coding-system 'utf-8)
+	  w3m-file-coding-system 'utf-8
+	  w3m-file-name-coding-system 'utf-8
+	  w3m-input-coding-system 'utf-8
+	  w3m-output-coding-system 'utf-8
+	  w3m-terminal-coding-system 'utf-8)
     (add-hook 'w3m-mode-hook
-              '(lambda ()
-                 (w3m-turnoff-inline-images)
-                 (w3m-toggle-inline-images)))))
+	      '(lambda ()
+		 (w3m-turnoff-inline-images)
+		 (w3m-toggle-inline-images)))))
 
 
 ;;; org-mode
@@ -52,10 +52,8 @@
 (with-eval-after-spec highlight-80+
   (add-hook 'org-mode-hook (z (highlight-80+-mode -1))))
 (add-hook 'org-mode-hook (z (font-lock-debug-fontify))
-          100)
-(org-link-beautify-mode 1)
+	  100)
 (org-pretty-tags-global-mode 1)
-(global-orglink-mode)
 
 ;;; see docs for funcs n stuff
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
@@ -89,23 +87,23 @@
 (defvar integer-buffer-line-count nil)
 (make-variable-buffer-local 'integer-buffer-line-count)
 (setq-default mode-line-format
-              '("  " mode-line-modified
-                (list 'line-number-mode "  ")
-                (:eval (when line-number-mode
-                         (let ((str "L%l"))
-                           (when (and (not (buffer-modified-p))
-                                      my-mode-line-buffer-line-count)
-                             (setq str (concat str "/"
-                                               my-mode-line-buffer-line-count)))
-                           str)))
-                "  %p"
-                (list 'column-number-mode "      C%c")
-                "  " mode-line-buffer-identification
-                "  " mode-line-modes))
+	      '("  " mode-line-modified
+		(list 'line-number-mode "  ")
+		(:eval (when line-number-mode
+			 (let ((str "L%l"))
+			   (when (and (not (buffer-modified-p))
+				      my-mode-line-buffer-line-count)
+			     (setq str (concat str "/"
+					       my-mode-line-buffer-line-count)))
+			   str)))
+		"  %p"
+		(list 'column-number-mode "      C%c")
+		"  " mode-line-buffer-identification
+		"  " mode-line-modes))
 (defun output-lines-in-buffer ()
   (setq integer-buffer-line-count (count-lines (point-min) (point-max)))
   (setq my-mode-line-buffer-line-count (int-to-string
-                                        integer-buffer-line-count)))
+					integer-buffer-line-count)))
 
 ;;; convenience hooks
 (add-hook 'find-file-hook 'output-lines-in-buffer)
@@ -115,9 +113,9 @@
 ;;; turn off linum mode for pdf/ps whatever files because it takes like a
 ;;; million years to scroll through it otherwise
 (add-hook 'after-change-major-mode-hook
-          (lambda ()
-            (when (derived-mode-p 'doc-view-mode)
-              (linum-mode 0))))
+	  (lambda ()
+	    (when (derived-mode-p 'doc-view-mode)
+	      (linum-mode 0))))
 (add-hook 'help-mode-hook #'turn-off-linum)
 (add-hook 'Info-mode-hook #'turn-off-linum)
 (add-hook 'Man-mode-hook #'turn-off-linum)
@@ -184,56 +182,56 @@
   (rx
    (: bow
       (: (| (: "to" (? (| space punct)) "do")
-            (: "fix" (? (| space punct)) (? "me"))
-            ;; (: (+? (: alpha (| space punct))) alpha)
-            (: "dep" (? (: "end" (? (: "en" (| "t" "c"))))))
-            (: "deprecate")
-            (>= 3 "x")
-            "hack"
-            "iffy"
-            "change"
-            "modif"
-            (: "opt" (? "imiz"))
-            "broke"
-            "break"
-            "since"
-            "should"
-            (: "remov" (| "e" "al" "es" "ed" "er"))
-            (: "delet" (| "ed" "es" "er"))
-            "warn"
-            (: "err" (? "or"))
-            "only"
-            "review"
-            "must"
-            "note"
-            "need"
-            "asap"
-            (: "danger" (? "ous"))
-            "strict"
-            "race"
-            "experiment"
-            "arbitrary"
-            "require"
-            "consider"
-            "actual"
-            "usual"
-            "instead"
-            "expect"
-            "me"
-            "this"
-            "spec"
-            )
-         (? (| "ing"
-               "age"
-               "ish"
-               (: (? "ific") "ally")
-               "ly"
-               "y"
-               "ic"
-               "al"
-               (: (? "e") "n")
-               (: (? "a") (? "t") "ion")))
-         (? (: (? "i") (? "e") (? (| "s" "d" "r")))))
+	    (: "fix" (? (| space punct)) (? "me"))
+	    ;; (: (+? (: alpha (| space punct))) alpha)
+	    (: "dep" (? (: "end" (? (: "en" (| "t" "c"))))))
+	    (: "deprecate")
+	    (>= 3 "x")
+	    "hack"
+	    "iffy"
+	    "change"
+	    "modif"
+	    (: "opt" (? "imiz"))
+	    "broke"
+	    "break"
+	    "since"
+	    "should"
+	    (: "remov" (| "e" "al" "es" "ed" "er"))
+	    (: "delet" (| "ed" "es" "er"))
+	    "warn"
+	    (: "err" (? "or"))
+	    "only"
+	    "review"
+	    "must"
+	    "note"
+	    "need"
+	    "asap"
+	    (: "danger" (? "ous"))
+	    "strict"
+	    "race"
+	    "experiment"
+	    "arbitrary"
+	    "require"
+	    "consider"
+	    "actual"
+	    "usual"
+	    "instead"
+	    "expect"
+	    "me"
+	    "this"
+	    "spec"
+	    )
+	 (? (| "ing"
+	       "age"
+	       "ish"
+	       (: (? "ific") "ally")
+	       "ly"
+	       "y"
+	       "ic"
+	       "al"
+	       (: (? "e") "n")
+	       (: (? "a") (? "t") "ion")))
+	 (? (: (? "i") (? "e") (? (| "s" "d" "r")))))
       eow)))
 
 (defconst warning-highlights-keywords
@@ -272,8 +270,8 @@
   (interactive "Mdirectory: ")
   (when (or current-prefix-arg (string-equal dir "")) (setq dir "."))
   (grep (concat init-home-folder-dir "switch-grep.sh" " -E "
-                "\"(^|[^a-zA-Z])(" warning-words-grep-regex
-                ")([^a-zA-Z]|$)\" \"" dir "\"")))
+		"\"(^|[^a-zA-Z])(" warning-words-grep-regex
+		")([^a-zA-Z]|$)\" \"" dir "\"")))
 
 
 
@@ -283,10 +281,10 @@
 (defun rename-shell-buffer ()
   (rename-buffer
    (format "%s: %s"
-           (replace-regexp-in-string
-            mode-fun-regex ""
-            (symbol-name major-mode))
-           default-directory)
+	   (replace-regexp-in-string
+	    mode-fun-regex ""
+	    (symbol-name major-mode))
+	   default-directory)
    t))
 
 ;;; output eshell buffers to file
@@ -297,9 +295,9 @@
 
 (defun shell-record-history-filters ()
   (add-hook 'comint-input-filter-functions
-            #'shell-send-input-to-history nil t)
+	    #'shell-send-input-to-history nil t)
   (add-hook 'comint-output-filter-functions
-            #'shell-send-output-to-history nil t))
+	    #'shell-send-output-to-history nil t))
 
 (defvar shell-user-output-file (concat init-home-folder-dir "shell-output"))
 (add-hook 'shell-mode-hook #'shell-record-history-filters)
@@ -309,32 +307,32 @@
 ;;; same for info and help
 (defun help-rename-buffer ()
   (when-let ((name
-              (pcase help-xref-stack-item
-                (`(describe-bindings nil ,buf)
-                 (let ((buf-mode (with-current-buffer buf major-mode)))
-                   (format "help(describe-bindings): %s<%S>"
-                           (buffer-name buf) buf-mode)))
-                ;; multiple types of help use this stack structure
-                (`(,_ ,item . ,_)
-                 (-let (((name desc)
-                         (pcase-exhaustive item
-                           ((pred symbolp)
-                            (cond ((fboundp item) (list item "function"))
-                                  ((boundp item) (list item "variable"))
-                                  (t (list item "something-symbolic"))))
-                           (`(cl-struct package-desc (name ,name))
-                            (list name "elisp-package"))
-                           (_ (list item "something")))))
-                   (format "help(describe-%s: %s)" desc name)))
-                (`(,x)
-                 (format "help(%s)" x)))))
+	      (pcase help-xref-stack-item
+		(`(describe-bindings nil ,buf)
+		 (let ((buf-mode (with-current-buffer buf major-mode)))
+		   (format "help(describe-bindings): %s<%S>"
+			   (buffer-name buf) buf-mode)))
+		;; multiple types of help use this stack structure
+		(`(,_ ,item . ,_)
+		 (-let (((name desc)
+			 (pcase-exhaustive item
+			   ((pred symbolp)
+			    (cond ((fboundp item) (list item "function"))
+				  ((boundp item) (list item "variable"))
+				  (t (list item "something-symbolic"))))
+			   (`(cl-struct package-desc (name ,name))
+			    (list name "elisp-package"))
+			   (_ (list item "something")))))
+		   (format "help(describe-%s: %s)" desc name)))
+		(`(,x)
+		 (format "help(%s)" x)))))
     (rename-buffer name t)))
 
 (add-hook 'help-mode-hook #'help-rename-buffer)
 
 (defun info-rename-buffer ()
   (when-let ((file Info-current-file)
-             (node Info-current-node))
+	     (node Info-current-node))
     (rename-buffer
      (format
       "Info: %s->%s"
@@ -345,27 +343,27 @@
 (defun cider-doc-rename-buf ()
   (rename-buffer
    (format "cider-doc: %s (%s)"
-           cider-docview-symbol
-           (let ((info (cider-var-info cider-docview-symbol)))
-             (reduce
-              (lambda (a b) (if (and a b) (concat a ":" b) a))
-              (mapcar
-               (lambda (str-or-list)
-                 (if (listp str-or-list)
-                     (when (nrepl-dict-get info (car str-or-list))
-                       (car str-or-list))
-                   (nrepl-dict-get info str-or-list)))
-               (list '("macro") '("special-form") "class" "member"
-                     "super" "interfaces" "forms-str"))
-              :initial-value "")))
+	   cider-docview-symbol
+	   (let ((info (cider-var-info cider-docview-symbol)))
+	     (reduce
+	      (lambda (a b) (if (and a b) (concat a ":" b) a))
+	      (mapcar
+	       (lambda (str-or-list)
+		 (if (listp str-or-list)
+		     (when (nrepl-dict-get info (car str-or-list))
+		       (car str-or-list))
+		   (nrepl-dict-get info str-or-list)))
+	       (list '("macro") '("special-form") "class" "member"
+		     "super" "interfaces" "forms-str"))
+	      :initial-value "")))
    t))
 
 ;;; TODO: this for eww!
 (defun eww-get-buffer-name (&optional my-mode)
   (setq prev-special-buffer (cons "*eww*" (current-buffer)))
   (format "%s: %s (%s)"
-          "eww" (plist-get eww-data :title)
-          (cdr (memq 'href (car (second (plist-get eww-data :dom)))))))
+	  "eww" (plist-get eww-data :title)
+	  (cdr (memq 'href (car (second (plist-get eww-data :dom)))))))
 
 (defadvice run-python (around no-stinkin-errors activate)
   (with-current-buffer (process-buffer ad-do-it)
@@ -394,12 +392,12 @@ to clean up.")
     (incf clean-sample-index))
    ((>= clean-sample-index clean-sampling-period)
     (let* ((buffer-basename-parted
-            (--partition-by
-             (replace-regexp-in-string "<[0-9]+>\\'" "" (buffer-name it))
-             (buffer-list)))
-           (repeated-versions
-            ;; only need one version of all these
-            (--mapcat (-drop 1 it) buffer-basename-parted)))
+	    (--partition-by
+	     (replace-regexp-in-string "<[0-9]+>\\'" "" (buffer-name it))
+	     (buffer-list)))
+	   (repeated-versions
+	    ;; only need one version of all these
+	    (--mapcat (-drop 1 it) buffer-basename-parted)))
       (-each repeated-versions #'kill-buffer)
       (setq clean-sample-index 0)))))
 
@@ -411,9 +409,9 @@ to clean up.")
 (defun buffer-list-update-watcher ()
   (let ((top (car (buffer-list))))
     (when (and set-watched-help-buf
-               (not (eq top set-watched-help-buf)))
+	       (not (eq top set-watched-help-buf)))
       (setq set-watched-help-buf nil
-            watched-help-buf top))))
+	    watched-help-buf top))))
 
 (add-hook 'buffer-list-update-hook #'buffer-list-update-watcher)
 
@@ -432,7 +430,7 @@ to clean up.")
     (interactive)
     (call-interactively help-fn)
     (if (buffer-live-p prev-help-buf)
-        (switch-to-buffer prev-help-buf)
+	(switch-to-buffer prev-help-buf)
       (error "help kbd failed: buffer '%s' is dead" prev-help-buf))))
 
 (defvar info-prev-file nil)
@@ -440,14 +438,14 @@ to clean up.")
 
 (defun info-make-backup ()
   (setq info-prev-file Info-current-file
-        info-prev-node Info-current-node))
+	info-prev-node Info-current-node))
 (defun info-copy-from-backup ()
   (when-let ((file info-prev-file)
-             (node info-prev-node))
+	     (node info-prev-node))
     (save-window-excursion
       (info (format "(%s)%s" file node)))
     (setq info-prev-file nil
-          info-prev-node nil)))
+	  info-prev-node nil)))
 
 (defadvice Info-directory (after rename-info-buffer activate)
   (info-rename-buffer))
@@ -466,8 +464,8 @@ to clean up.")
   (set-process-query-on-exit-flag
    (get-buffer-process (current-buffer)) nil)
   (add-hook 'comint-output-filter-functions
-            (lambda (&rest args) (rename-shell-buffer))
-            nil t)
+	    (lambda (&rest args) (rename-shell-buffer))
+	    nil t)
   (linum-mode -1)
   (rename-shell-buffer))
 
@@ -569,26 +567,26 @@ to clean up.")
 
 (defadvice man (around no-switch-buf activate)
   (let* ((win (selected-window))
-         (buf ad-do-it))
+	 (buf ad-do-it))
     (unless current-prefix-arg
       (quit-windows-on buf)
       (with-selected-window win
-        (display-buffer-same-window buf nil)))))
+	(display-buffer-same-window buf nil)))))
 
 (defadvice woman (around no-switch-buf activate)
   (let* ((win (selected-window))
-         (win-pt (window-point win))
-         (win-st (window-start win))
-         (prev-buf (current-buffer)))
+	 (win-pt (window-point win))
+	 (win-st (window-start win))
+	 (prev-buf (current-buffer)))
     ad-do-it
     (let ((buf (get-buffer (cdr (first woman-buffer-alist)))))
       (unless current-prefix-arg
-        (quit-windows-on buf)
-        (with-selected-window win
-          (set-window-buffer win prev-buf)
-          (set-window-point win win-pt)
-          (set-window-start win win-st)
-          (display-buffer-same-window buf nil))))))
+	(quit-windows-on buf)
+	(with-selected-window win
+	  (set-window-buffer win prev-buf)
+	  (set-window-point win win-pt)
+	  (set-window-start win win-st)
+	  (display-buffer-same-window buf nil))))))
 
 (defadvice list-processes (around no-switch-buf activate)
   (let* ((prev-config (current-window-configuration)))
@@ -618,32 +616,32 @@ to clean up.")
 (defun back-to-window-before-compilation ()
   (interactive)
   (cond ((and
-          (window-live-p window-before-compilation)
-          (not (string= (buffer-name (window-buffer window-before-compilation))
-                        "*compilation*")))
-         (select-window window-before-compilation))
-        ((buffer-live-p buffer-before-compilation)
-         (pop-to-buffer buffer-before-compilation)
-         (setq window-before-compilation
-               (get-buffer-window buffer-before-compilation)))
-        (t (message "%s" "no window before compilation!"))))
+	  (window-live-p window-before-compilation)
+	  (not (string= (buffer-name (window-buffer window-before-compilation))
+			"*compilation*")))
+	 (select-window window-before-compilation))
+	((buffer-live-p buffer-before-compilation)
+	 (pop-to-buffer buffer-before-compilation)
+	 (setq window-before-compilation
+	       (get-buffer-window buffer-before-compilation)))
+	(t (message "%s" "no window before compilation!"))))
 (defun back-to-compilation-window ()
   (interactive)
   (cond ((and
-          (window-live-p compilation-window)
-          (string= (buffer-name (window-buffer compilation-window))
-                   "*compilation*"))
-         (select-window compilation-window))
-        ((buffer-live-p (get-buffer "*compilation*"))
-         (pop-to-buffer "*compilation*")
-         (setq compilation-window (get-buffer-window "*compilation*")))
-        (t (message "%s" "no compilation window!"))))
+	  (window-live-p compilation-window)
+	  (string= (buffer-name (window-buffer compilation-window))
+		   "*compilation*"))
+	 (select-window compilation-window))
+	((buffer-live-p (get-buffer "*compilation*"))
+	 (pop-to-buffer "*compilation*")
+	 (setq compilation-window (get-buffer-window "*compilation*")))
+	(t (message "%s" "no compilation window!"))))
 (defun reset-window-before-compilation ()
   (interactive)
   (if (string= (buffer-name) "*compilation*")
       (message "%s" "already in compilation buffer!")
     (setq buffer-before-compilation (current-buffer)
-          window-before-compilation (selected-window))))
+	  window-before-compilation (selected-window))))
 
 ;;; char folding
 ;; add minus sign − to equivalence for - (hyphen)
@@ -655,16 +653,16 @@ to clean up.")
 
 (cl-defun add-char-fold-chars
     (range equiv &optional (spread-range t)
-           (target-tbl char-fold-table) (source-tbl target-tbl))
+	   (target-tbl char-fold-table) (source-tbl target-tbl))
   (let* ((entry (char-table-range source-tbl range))
-         (chars (cl-loop for i from 0 upto (- (length entry) 1)
-                         for s = (substring entry i (1+ i))
-                         when (string-match-p
-                               (char-fold-to-regexp (char-to-string range))
-                               s)
-                         collect s))
-         (opt-reg
-          (regexp-opt (append chars (cl-mapcar #'char-to-string added)))))
+	 (chars (cl-loop for i from 0 upto (- (length entry) 1)
+			 for s = (substring entry i (1+ i))
+			 when (string-match-p
+			       (char-fold-to-regexp (char-to-string range))
+			       s)
+			 collect s))
+	 (opt-reg
+	  (regexp-opt (append chars (cl-mapcar #'char-to-string added)))))
     (set-char-table-range source-tbl range entry)
     (set-char-table-range target-tbl range opt-reg)))
 
@@ -673,15 +671,15 @@ to clean up.")
 (defun add-minus-eq-char-folds ()
   (with-eval-after-load 'dash
     (let ((dash-sym ?-)
-          (eq-sym ?=)
-          (added-dash-syms '(?− ?‐)))
+	  (eq-sym ?=)
+	  (added-dash-syms '(?− ?‐)))
       (add-char-fold-chars dash-sym added-dash-syms)
       (-if-let*
-          ((dash-fold (char-table-range char-fold-table dash-sym))
-           (dash-matched (string-match "\\`\\[\\([^]]+?\\)\\]\\'" dash-fold))
-           (dash-chars (append (match-string 1 dash-fold) nil)))
-          (add-char-fold-chars eq-sym dash-chars)
-        (throw 'init-fail "char fold customizations failed!")))))
+	  ((dash-fold (char-table-range char-fold-table dash-sym))
+	   (dash-matched (string-match "\\`\\[\\([^]]+?\\)\\]\\'" dash-fold))
+	   (dash-chars (append (match-string 1 dash-fold) nil)))
+	  (add-char-fold-chars eq-sym dash-chars)
+	(throw 'init-fail "char fold customizations failed!")))))
 
 ;; (add-minus-eq-char-folds)
 ;; FIXME! make smart quotes equiv to quotes
@@ -691,19 +689,19 @@ to clean up.")
   (remove-hook 'isearch-mode-hook #'multi-isearch-setup))
 
 (defconst regexp-special '("\\(?:" "\\(" "\\|" "\\)" "." "[" "]" "?" "??"
-                           "*" "*?" "+" "+?" "-"))
+			   "*" "*?" "+" "+?" "-"))
 (defconst regexp-special-impure '("\\(?:\\`\\|\\\\(\\|\\\\(?:\\|\\[\\)\\^"
-                                  "\\$\\(?:\\'\\|\\\\)\\)"
-                                  "\\[:[a-z]+:\\]"
-                                  "\\\\{[0-9]+\\(?:,[0-9]+\\)?\\\\}"
-                                  "\\\\[a-zA-Z=`'<>]"))
+				  "\\$\\(?:\\'\\|\\\\)\\)"
+				  "\\[:[a-z]+:\\]"
+				  "\\\\{[0-9]+\\(?:,[0-9]+\\)?\\\\}"
+				  "\\\\[a-zA-Z=`'<>]"))
 (defconst backslash-regexp-special "\\(?:\\\\\\\\\\)*")
 (defconst regexp-special-coalesced
   (let ((concd
-         (format "\\(?:%s\\|%s\\)"
-                 (mapconcat (lambda (str) (format "\\(?:%s\\)" str))
-                            regexp-special-impure "\\|")
-                 (regexp-opt regexp-special))))
+	 (format "\\(?:%s\\|%s\\)"
+		 (mapconcat (lambda (str) (format "\\(?:%s\\)" str))
+			    regexp-special-impure "\\|")
+		 (regexp-opt regexp-special))))
     (concat backslash-regexp-special concd)))
 
 (defun char-fold-non-special (str)
@@ -711,7 +709,7 @@ to clean up.")
 
 (defun word-boundary-fold (str)
   (replace-regexp-in-string "[[:space:]\n]+" "\\(?:.\\|\n\\)*?"
-                            (trim-whitespace str) nil t))
+			    (trim-whitespace str) nil t))
 
 (defun do-complete-char-word-fold (re)
   (word-boundary-fold (char-fold-non-special re)))
@@ -722,14 +720,14 @@ to clean up.")
 (defun do-isearch (real-regexp string bound noerror count)
   (let ((fun (if isearch-forward #'re-search-forward #'re-search-backward)))
     (condition-case er
-        (funcall fun real-regexp bound noerror count)
+	(funcall fun real-regexp bound noerror count)
       (search-failed
        (signal (car er)
-               (if-let ((prefix (get isearch-regexp-function
-                                     'isearch-message-prefix)))
-                   (and (stringp prefix)
-                        (list (format "%s   [using %ssearch]" string prefix)))
-                 (cdr er)))))))
+	       (if-let ((prefix (get isearch-regexp-function
+				     'isearch-message-prefix)))
+		   (and (stringp prefix)
+			(list (format "%s   [using %ssearch]" string prefix)))
+		 (cdr er)))))))
 
 (defun isearch-fast-and-loose (string &optional bound noerror count)
   (do-isearch
@@ -801,23 +799,23 @@ accessible to the user who started the current emacs process."
     (error "PATH must be a string: ('%S')" path))
   (with-temp-buffer
     (let ((code
-           (cl-case system-type
-             (windows-nt
-              (error "%s" "`make-named-pipe' must be implemented for windows!"))
-             (t (call-process "mkfifo" nil t nil
-                              "-m" (number-to-string mode) path)))))
+	   (cl-case system-type
+	     (windows-nt
+	      (error "%s" "`make-named-pipe' must be implemented for windows!"))
+	     (t (call-process "mkfifo" nil t nil
+			      "-m" (number-to-string mode) path)))))
       (unless (zerop code)
-        (error "making pipe failed with code '%d'. stdout/stderr:\n%s"
-               code (buffer-string))
-        path))))
+	(error "making pipe failed with code '%d'. stdout/stderr:\n%s"
+	       code (buffer-string))
+	path))))
 
 (defun make-rw-proc-dir ()
   (let* ((new-dir (make-temp-file
-                   my-rw-process-dir-prefix my-rw-process-dir-suffix))
-         (new-fifo
-          (let ((default-directory new-dir))
-            (make-named-pipe
-             (expand-file-name my-rw-named-pipe-filename) user-rw-mode-bits))))
+		   my-rw-process-dir-prefix my-rw-process-dir-suffix))
+	 (new-fifo
+	  (let ((default-directory new-dir))
+	    (make-named-pipe
+	     (expand-file-name my-rw-named-pipe-filename) user-rw-mode-bits))))
     (unless my-rw-process-only-me
       (set-file-modes new-dir all-rw-mode-bits)
       (set-file-modes new-fifo))
@@ -828,42 +826,42 @@ accessible to the user who started the current emacs process."
 
 (defun clear-old-rw-proc ()
   (let* ((old-proc (and (processp my-rw-process) my-rw-process))
-         (old-buf (and old-proc (process-buffer old-proc)))
-         (ret ))
+	 (old-buf (and old-proc (process-buffer old-proc)))
+	 (ret ))
     ;; TODO: make all literal strings into constants
     (list
      :new-buf (generate-new-buffer
-               (format "*%s*" my-rw-process-buffer-base-name))
+	       (format "*%s*" my-rw-process-buffer-base-name))
      :new-err-buf (generate-new-buffer
-                   (format "*%s-errors*" my-rw-process-buffer-base-name))
+		   (format "*%s-errors*" my-rw-process-buffer-base-name))
      :old-proc (and (process-live-p old-proc) old-proc)
      :old-buf (and (buffer-live-p old-buf) old-buf))))
 
 (defun read-pipe-filter (proc msg)
   (with-current-buffer (process-buffer proc)
     (let* ((win (get-buffer-window (current-buffer) t))
-           (at-end (= (window-point win) (point-max))))
+	   (at-end (= (window-point win) (point-max))))
       (save-excursion
-        (goto-char (point-max))
-        (insert msg))
+	(goto-char (point-max))
+	(insert msg))
       (when at-end
-        (with-selected-window win
-          (goto-char (point-max)))))))
+	(with-selected-window win
+	  (goto-char (point-max)))))))
 
 (defun read-from-pipe (fname)
   (let ((path (expand-file-name fname)))
     (unless (file-exists-p (expand-file-name fname))
       (throw 'pipe-does-not-exist
-             (format "the named pipe at '%s' does not exist"
-                     fname)))
+	     (format "the named pipe at '%s' does not exist"
+		     fname)))
     (let* ((buf (generate-new-buffer (format "pipe@%s" path)))
-           (cat-proc (make-process
-                      :name (format "pipe-read@%s" path)
-                      :buffer buf
-                      :command (list "cat" path)
-                      :connection-type 'pipe
-                      :filter #'read-pipe-filter
-                      :sentinel #'ignore)))
+	   (cat-proc (make-process
+		      :name (format "pipe-read@%s" path)
+		      :buffer buf
+		      :command (list "cat" path)
+		      :connection-type 'pipe
+		      :filter #'read-pipe-filter
+		      :sentinel #'ignore)))
       (switch-to-buffer buf))))
 
 (defun my-rw-pipe-write (str &optional wait)
@@ -904,31 +902,31 @@ indicates whether this function created a new asynchronous process.
 Note: do NOT rely on the name of the created process's buffer to stay the same!
 Use (process-buffer `my-rw-process') instead."
   (pcase (append (clear-old-rw-proc)
-                 (make-rw-proc-dir))
+		 (make-rw-proc-dir))
     (`(:new-buf ,new-buf :new-err-buf ,err-buf
        :old-proc ,old-proc :old-buf ,old-buf
        :dir ,dir :fifo ,fifo)
      (let* ((send-name (format "*send-%s*" my-rw-process-base-name))
-            (recv-name (format "*recv-%s*" my-rw-process-base-name))
-            (send-proc
-             (make-process
-              :name send-name
-              :buffer nil
-              :command (list "dd" (format "of=%s" fifo))
-              :connection-type 'pipe
-              :noquery my-rw-process-query-on-exit
-              :stderr err-buf))
-            (recv-proc
-             (make-process
-              :name recv-name
-              :buffer new-buf
-              :command (list "dd" (format "if=%s" fifo))
-              :connection-type 'pipe
-              :noquery my-rw-process-query-on-exit
-              :stderr err-buf))))
+	    (recv-name (format "*recv-%s*" my-rw-process-base-name))
+	    (send-proc
+	     (make-process
+	      :name send-name
+	      :buffer nil
+	      :command (list "dd" (format "of=%s" fifo))
+	      :connection-type 'pipe
+	      :noquery my-rw-process-query-on-exit
+	      :stderr err-buf))
+	    (recv-proc
+	     (make-process
+	      :name recv-name
+	      :buffer new-buf
+	      :command (list "dd" (format "if=%s" fifo))
+	      :connection-type 'pipe
+	      :noquery my-rw-process-query-on-exit
+	      :stderr err-buf))))
      (async-start
       (lambda ()
-        ()))
+	()))
      )
     (_ (error "%s" "unknown error!"))))
 
@@ -969,7 +967,7 @@ Use (process-buffer `my-rw-process') instead."
 
 (defun stop-book-txt-view-hook ()
   (when (and book-txt-view book-txt-view-underlying
-             (not (eq book-txt-view-underlying (current-buffer))))
+	     (not (eq book-txt-view-underlying (current-buffer))))
     (rainbow-mode -1)
     (linum-mode -1)))
 
@@ -986,8 +984,8 @@ Use (process-buffer `my-rw-process') instead."
 (defadvice read-file-name (around use-ido activate)
   (if ido-read-file-name-toggle ad-do-it
     (setq ad-return-value
-          (let ((ido-read-file-name-toggle t))
-            (apply #'ido-read-file-name (ad-get-args 0))))))
+	  (let ((ido-read-file-name-toggle t))
+	    (apply #'ido-read-file-name (ad-get-args 0))))))
 
 
 (defvar ido-read-directory-name-toggle nil)
@@ -995,8 +993,8 @@ Use (process-buffer `my-rw-process') instead."
 (defadvice read-directory-name (around use-ido activate)
   (if ido-read-directory-name-toggle ad-do-it
     (setq ad-return-value
-          (let ((ido-read-directory-name-toggle t))
-            (apply #'ido-read-directory-name (ad-get-args 0))))))
+	  (let ((ido-read-directory-name-toggle t))
+	    (apply #'ido-read-directory-name (ad-get-args 0))))))
 
 (defun print-killed-buffer-name ()
   (message "killed %s" (buffer-name)))

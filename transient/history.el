@@ -14,8 +14,8 @@
  (magit-gitignore nil)
  (magit-log
   ("-n256" "--graph" "--color" "--decorate" "--stat")
-  ("-n256" "--graph" "--decorate")
   ("-n256" "--graph" "--color" "--decorate")
+  ("-n256" "--graph" "--decorate")
   ("-n256" "-Sgpg" "--graph" "--decorate")
   ("-n256" "-Spin" "--graph" "--decorate")
   ("-n256" "-Spinentry" "--graph" "--decorate")

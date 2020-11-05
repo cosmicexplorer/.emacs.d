@@ -81,6 +81,7 @@ linum-relative
 lisp-extra-font-lock
 lisp-local
 literate-coffee-mode
+lsp-mode
 lua-mode
 magic-latex-buffer
 magit-popup
@@ -109,7 +110,6 @@ org
 org-agenda-property
 org-beautify-theme
 org-edna
-org-link-beautify
 org-pdftools
 org-pretty-tags
 org-radiobutton
@@ -119,7 +119,6 @@ org-table-comment
 org-translate
 org-treeusage
 orgit
-orglink
 orgnav
 origami
 origami-predef
@@ -137,11 +136,11 @@ projectile
 propfont-mixed
 proportional
 protobuf-mode
-racer
 rainbow-delimiters
 rainbow-mode
 robe
 rust-mode
+rustic
 sage-shell-mode
 sass-mode
 scala-mode

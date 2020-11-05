@@ -78,9 +78,11 @@
         org-self-insert-command
         org-shiftcontrolleft
         org-shiftcontrolright
+        org-shiftdown
         org-shiftleft
         org-shiftright
         org-yank
+        pabbrev-expand-maybe
         paredit-backslash
         paredit-backspace-delete-highlight
         paredit-backward

@@ -3905,4 +3905,31 @@ documentation for `paredit-space-for-delimiter-predicates'."
        (last it)
        (first it)))
 
+(defcustom delete-all-matching-pages-regexp "\\`Info: "
+  "The regexp to delete all Info pages in `delete-all-info-pages'!"
+  :type 'regexp
+  :group 'my-customizations)
+
+(defun actually-kill-all-these-buffers (buffer-list regexp)
+  (->> buffer-list
+       (--filter (string-match-p regexp (buffer-name it)))
+       (--map (prog1 (buffer-name it) (kill-buffer it)))
+       (--map (format "buffer: %s killed" it))))
+
+(defun delete-all-info-pages (&optional regexp)
+  (interactive "P")
+  (cl-destructuring-bind (do-jump-to-messages . regexp)
+      (pcase-exhaustive regexp
+        (`nil
+         `(nil . ,delete-all-matching-pages-regexp))
+        ((and (pred valid-regexp-p) the-regexp)
+         `(nil . ,the-regexp))
+        (`(4)
+         `(nil . ,delete-all-matching-pages-regexp)))
+    (let ((killed-buffers (actually-kill-all-these-buffers (buffer-list) regexp)))
+      (message "buffers killed\n%s"
+               (mapconcat #'identity killed-buffers "\n"))
+      (when do-jump-to-messages
+        (switch-to-messages)))))
+
 (provide 'functions)

@@ -165,87 +165,6 @@
    (: bol
       (| (eval my-coffee--comint-single-line-prompt)
          (eval my-coffee--comint-multiline-prompt)))))
-;;; fixes 'foreach ((1, 2, 3)) { print "$_ hey " }'
-(defun perl-repl-fix-late-insertions (str)
-  (ignore-errors
-    (goto-char (point-max))
-    (let ((real-str (perl-repl-get-real-str)))
-      (when (and (or (string-match-p (concat "\\`"
-                                             (regexp-quote perl-repl-prompt))
-                                     real-str)
-                     (not (string-match-p (regexp-quote perl-repl-prompt)
-                                          real-str)))
-                 (not (string-match-p "Welcome to the perl re\\.pl!" real-str)))
-        (let ((inhibit-read-only t))
-          (backward-char (length real-str))
-          (when (< (+ (point) (length perl-repl-prompt)) (point-max))
-            (insert (buffer-substring-no-properties
-                     (+ (point) (length perl-repl-prompt))
-                     (point-max))))
-          (forward-char (length perl-repl-prompt))
-          (delete-region (point) (point-max))
-          (goto-char (point-max)))))))
-
-;;; fixes '2 + 2'
-(defun perl-repl-fix-early-insertions (str)
-  (goto-char (point-max))
-  (let ((real-str (perl-repl-get-real-str)))
-    (backward-char (length perl-repl-prompt))
-    (when (and (string-equal
-                (buffer-substring-no-properties (point) (point-max))
-                perl-repl-prompt)
-               (not (char-equal (char-before) (str2char "\n"))))
-      (newline))
-    (goto-char (point-max))))
-
-(defun perl-repl-trim-leading-whitespace (str)
-  (let ((real-str (perl-repl-get-real-str)))
-    (when (string-match-p (regexp-quote perl-repl-prompt) real-str)
-      (goto-char (- (point) (length real-str)))
-      (while (string-match-p "[[:space:]\r\n]" (char-to-string (char-after)))
-        (delete-char 1))
-      (goto-char (point-max)))))
-
-(defvar perl-repl-prompt "$ ")
-
-(defvar perl-repl-prompt-regexp (concat "^" (regexp-quote perl-repl-prompt)))
-
-(setq perl-repl-output-filter-functions
-      '(perl-repl-fix-both-early-and-late-insertions
-        perl-repl-fix-late-insertions
-        perl-repl-fix-early-insertions
-        perl-repl-trim-leading-whitespace
-        ansi-color-process-output
-        comint-postoutput-scroll-to-bottom
-        comint-watch-for-password-prompt))
-
-(define-derived-mode perl-repl-mode comint-mode "re.pl"
-  "\\<cperl-mode-map>"
-  :syntax-table cperl-mode-syntax-table
-  (save-excursion
-    (hi-lock-mode 1)
-    (hi-lock-set-pattern "\\`Welcome to the perl re.pl!"
-                         'font-lock-variable-name-face))
-  (set (make-local-variable 'font-lock-defaults)
-       '(cperl-font-lock-keywords t))
-  (setf comint-prompt-read-only t)
-  (setf comint-use-prompt-regexp t)
-  (setf comint-prompt-regexp perl-repl-prompt-regexp)
-  (setf comint-output-filter-functions perl-repl-output-filter-functions)
-  (set (make-local-variable 'paragraph-separate) "\\'")
-  (set (make-local-variable 'paragraph-start) perl-repl-prompt-regexp))
-
-(defun re.pl ()
-  (interactive)
-  (if (executable-find "re.pl")
-      (progn
-        (pop-to-buffer
-         (make-comint-in-buffer
-          "re.pl" nil (convert-standard-filename
-                       (concat init-home-folder-dir
-                               "init-scripts/perl-repl-helper.sh"))))
-        (perl-repl-mode))
-    (message "Sorry, re.pl must be installed for this command to work.")))
 
 ;;; c/c++/java
 (setq-default c-basic-offset 2) ;; cc-mode uses this instead of tab-width
@@ -772,25 +691,20 @@ See URL `https://github.com/ndmitchell/hlint'."
     (unless (alist-get pipe-char electric-pair-pairs)
       (setq-local electric-pair-pairs `((,pipe-char . ,pipe-char) ,@electric-pair-pairs)))))
 
-(when-let ((rustup-exe (executable-find "rustup")))
-  (with-temp-buffer
-    (call-process rustup-exe nil t nil "component" "list")
-    (goto-char (point-min))
-    (unless (re-search-forward (rx "rust-src") nil t)
-      (message "installing rust-src with rustup at %s..." rustup-exe)
-      (call-process rustup-exe nil t nil "component" "add" "rust-src")))
-  (require 'racer)
-  (setq racer-rust-src-path
+(require 'rustic)
+(add-hook 'rust-mode-hook #'rustic-mode)
+(add-hook 'rustic-mode-hook #'eldoc-mode)
+(add-hook 'rustic-mode-hook #'company-mode)
+(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+(add-hook 'rust-mode-hook #'add-pipes-to-local-electric-pairs)
+(add-hook 'rust-mode-hook (z (setq comment-start "/* "
+                                   comment-end " */")))
+
+(setq rustic-racer-rust-src-path
         (format "%s/%s"
                 (trim-whitespace (shell-command-to-string "rustc --print sysroot"))
                 "lib/rustlib/src/rust/src"))
-  (add-hook 'rust-mode-hook #'racer-mode)
-  (add-hook 'racer-mode-hook #'eldoc-mode)
-  (add-hook 'racer-mode-hook #'company-mode)
-  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-  (add-hook 'rust-mode-hook #'add-pipes-to-local-electric-pairs)
-  (add-hook 'rust-mode-hook (z (setq comment-start "/* "
-                                     comment-end " */"))))
+
 
 ;;; Pants support!
 (define-derived-mode build-file-mode python-mode "BUILD"

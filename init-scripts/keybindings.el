@@ -219,6 +219,12 @@
 (global-set-key (kbd "C-M-L") 'windmove-right)
 (global-set-key (kbd "C-M-K") 'windmove-down)
 
+;; (global-set-key (kbd "C-S-a") nil)
+;; (global-set-key (kbd "C-S-A <right>") #'windmove-right)
+;; (global-set-key (kbd "C-S-A <left>") #'windmove-left)
+;; (global-set-key (kbd "C-S-A <down>") #'windmove-down)
+;; (global-set-key (kbd "C-S-A <up>") #'windmove-up)
+
 (global-set-key (kbd "C-M-{") 'backward-paragraph)
 (global-set-key (kbd "C-M-S-{") 'backward-paragraph)
 (global-set-key (kbd "C-M-}") 'forward-paragraph)
@@ -284,16 +290,19 @@
      :kill ("(" "{" "C-c C-w"))))
 (set-keys-in java-keys-alist)
 
-(defconst rust-keys-alist
-  '((:load rust-mode
-     :map rust-mode-map
+(defconst rustic-keys-alist
+  '((:load rustic-mode
+     :map rustic-mode-map
      :assign (("<C-tab>" rust-format-buffer)))))
-(set-keys-in rust-keys-alist)
-(defconst racer-keys-alist
-  '((:load racer-mode
-     :map racer-mode-map
-     :assign (("C-h d" racer-describe)))))
-(set-keys-in racer-keys-alist)
+(with-eval-after-spec rustic
+  (define-key rustic-mode-map (kbd "<C-tab>") #'rust-format-buffer))
+(with-eval-after-spec rust-mode
+  (set-keys-in rust-keys-alist))
+;; (defconst racer-keys-alist
+;;   '((:load racer-mode
+;;      :map racer-mode-map:
+;;      :assign (("C-h d" racer-describe)))))
+;; (set-keys-in racer-keys-aliSt)
 
 ;;; c/c++/java
 (add-hook 'c-initialization-hook
@@ -1047,6 +1056,13 @@
 (global-set-key (kbd "M-y") #'yank-pop)
 (global-set-key (kbd "C-M-y") #'helm-show-kill-ring)
 (define-key paredit-mode-map (kbd "C-M-y") #'helm-show-kill-ring)
+
+;;; Add some special motions so I can move *between* lisp symbols.
+(define-key paredit-mode-map (kbd "C-s-<left>") #'camel-case-left-word)
+(define-key paredit-mode-map (kbd "C-s-M-b") #'camel-case-left-word)
+
+(define-key paredit-mode-map (kbd "C-s-<right>") #'camel-case-right-word)
+(define-key paredit-mode-map (kbd "C-s-M-f") #'camel-case-right-word)
 
 (global-set-key (kbd "C-w b") #'push-buffer-to-kill-ring)
 
