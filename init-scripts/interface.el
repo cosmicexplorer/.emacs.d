@@ -330,16 +330,6 @@
 
 (add-hook 'help-mode-hook #'help-rename-buffer)
 
-(defun info-rename-buffer ()
-  (when-let ((file Info-current-file)
-             (node Info-current-node))
-    (rename-buffer
-     (format
-      "Info: %s->%s"
-      (file-name-nondirectory Info-current-file)
-      Info-current-node)
-     t)))
-
 (defun cider-doc-rename-buf ()
   (rename-buffer
    (format "cider-doc: %s (%s)"
@@ -445,28 +435,6 @@
     (if (buffer-live-p prev-help-buf)
         (switch-to-buffer prev-help-buf)
       (error "help kbd failed: buffer '%s' is dead" prev-help-buf))))
-
-;; (defvar info-prev-file nil)
-;; (defvar info-prev-node nil)
-
-;; (defun info-make-backup ()
-;;   (setq info-prev-file Info-current-file
-;;         info-prev-node Info-current-node))
-;; (defun info-copy-from-backup ()
-;;   (when-let ((file info-prev-file)
-;;              (node info-prev-node))
-;;     (save-window-excursion
-;;       (info (format "(%s)%s" file node)))
-;;     (setq info-prev-file nil
-;;           info-prev-node nil)))
-
-;; (defadvice Info-directory (after rename-info-buffer activate)
-;;   (info-rename-buffer))
-;; (defadvice Info-goto-node (before make-copy-info-buffer activate)
-;;   (info-make-backup))
-;; (defadvice Info-goto-node (after rename-new-info-buffer activate)
-;;   (info-rename-buffer)
-;;   (info-copy-from-backup))
 
 (add-hook 'eshell-mode-hook #'rename-shell-buffer)
 (add-hook 'eshell-directory-change-hook #'rename-shell-buffer)
@@ -1008,12 +976,6 @@ Use (process-buffer `my-rw-process') instead."
     (setq ad-return-value
           (let ((ido-read-directory-name-toggle t))
             (apply #'ido-read-directory-name (ad-get-args 0))))))
-
-(defun print-killed-buffer-name ()
-  (message "killed %s" (buffer-name)))
-
-(add-hook 'kill-buffer-hook #'print-killed-buffer-name)
-;; (remove-hook 'kill-buffer-hook #'print-killed-buffer-name)
 
 (defun get-time-zone-and-offset-nicely ()
   (cl-destructuring-bind (utc-offset-seconds local-zone-name) (current-time-zone)

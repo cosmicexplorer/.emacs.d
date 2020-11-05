@@ -245,6 +245,7 @@
  '(hl-sexp-background-color nil)
  '(ido-enable-flex-matching t)
  '(ido-mode 'both nil (ido))
+ '(info-rename-buffer-mode t nil (info-rename-buffer))
  '(inhibit-startup-buffer-menu t)
  '(inhibit-startup-echo-area-message nil)
  '(inhibit-startup-screen t)

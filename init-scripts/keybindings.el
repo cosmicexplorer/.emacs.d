@@ -1066,8 +1066,6 @@
 
 (global-set-key (kbd "C-w b") #'push-buffer-to-kill-ring)
 
-(define-key Info-mode-map (kbd "M-b") #'clone-buffer)
-
 (define-key diff-mode-map (kbd "M-w") #'diff-mode-copy)
 (define-key diff-mode-map (kbd "C-k") #'diff-mode-copy)
 (define-key magit-mode-map (kbd "M-w") #'diff-mode-copy)
@@ -1076,6 +1074,20 @@
   (define-key git-rebase-mode-map (kbd "C-z") #'git-rebase-undo))
 
 (global-set-key (kbd "C-M-h i") #'helm-info)
+(define-key Info-mode-map (kbd "b") #'Info-history-back)
+(define-key Info-mode-map (kbd "f") #'Info-history-forward)
+
+(defun generate-info-address ()
+  (format "(%s)%s" Info-current-file Info-current-node))
+(defun my-Info-new-tab ()
+  (interactive)
+  ;; Using the existing (buffer-name) *should* take advantage of `info-rename-buffer-mode'.
+  (let ((new-buffer (generate-new-buffer (buffer-name)))
+        (info-address (generate-info-address)))
+    (info info-address new-buffer)))
+(define-key Info-mode-map (kbd "M-b") #'my-Info-new-tab)
+
+
 (global-set-key (kbd "<M-home>") #'beginning-of-buffer)
 (global-set-key (kbd "<M-end>") #'end-of-buffer)
 (global-set-key (kbd "C-c R") #'resurrect-buffer-from-file)
@@ -1139,9 +1151,6 @@
 ;;; isearch
 (define-key isearch-mode-map (kbd "<backspace>") #'isearch-del-char)
 (define-key isearch-mode-map (kbd "M-l") #'isearch-toggle-normal)
-
-(define-key Info-mode-map (kbd "b") #'Info-history-back)
-(define-key Info-mode-map (kbd "f") #'Info-history-forward)
 
 (global-set-key (kbd "M-=") #'count-chars-words-lines-buffer)
 (global-set-key (kbd "M-T") #'transpose-lines)

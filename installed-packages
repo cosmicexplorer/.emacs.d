@@ -8,6 +8,7 @@ all-the-icons-ibuffer
 all-the-icons-ivy
 all-the-icons-ivy-rich
 auctex
+bart-mode
 bazel-mode
 better-defaults
 cider
@@ -92,6 +93,7 @@ magit-popup
 markdown-mode
 matlab-mode
 mediawiki
+minibuffer-line
 minimap
 mmm-mode
 modern-cpp-font-lock
@@ -100,6 +102,7 @@ modern-sh
 morlock
 multiple-cursors
 nhexl-mode
+niceify-info
 nim-mode
 nix-buffer
 nix-env-install
@@ -140,6 +143,7 @@ projectile
 propfont-mixed
 proportional
 protobuf-mode
+python-info
 rainbow-delimiters
 rainbow-mode
 robe
