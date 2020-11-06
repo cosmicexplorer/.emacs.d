@@ -2,8 +2,9 @@
 
 set -euxo pipefail
 
-for dir in auto-save-files auto-save-list undo-tree-history backup-files; do
-  find "$dir" -not -name '.gitignore' -type f -exec rm {} '+'
-done
+find undo-tree-history/ \
+     -not -name '.gitignore' \
+     -type f \
+     -exec rm -v {} '+'
 
 rm -f .emacs.desktop

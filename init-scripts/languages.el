@@ -1,6 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
 ;;; configuration for various language modes
+(add-hook #'prog-mode-hook #'display-fill-column-indicator-mode)
 
 ;;; indentation silliness
 (setq-default indent-tabs-mode nil)     ;; use spaces not tabs

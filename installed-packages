@@ -25,6 +25,7 @@ company-ghci
 company-nixos-options
 csv-mode
 cuda-mode
+dhall-mode
 dired-sidebar
 diredfl
 diredful
