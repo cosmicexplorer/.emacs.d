@@ -593,11 +593,6 @@ Turning on normal search turns off fast-and-loose mode."
 (defun isearch-get-fun () (symbol-function my-isearch-search-fun))
 (setq isearch-search-fun-function #'isearch-get-fun)
 
-(defface cperl-no-trailing-whitespace-face
-  '((((class color))))
-  "NO" :group 'cperl-mode)
-
-
 ;;; TODO: make `my-rw-process'-* into a MELPA package!
 ;;; - create two processes implementing bidirectional communication over named
 ;;; pipe!
@@ -839,30 +834,6 @@ Use (process-buffer `my-rw-process') instead."
     (setq ad-return-value
           (let ((ido-read-directory-name-toggle t))
             (apply #'ido-read-directory-name (ad-get-args 0))))))
-
-(defun get-time-zone-and-offset-nicely ()
-  (cl-destructuring-bind (utc-offset-seconds local-zone-name) (current-time-zone)
-    (cl-assert (% utc-offset-seconds 3600) t
-               "The number of seconds should be equal to an hour. We are directly assuming we are not in Sri Lanka for ease of programming.")
-    (let* ((utc-offset (/ utc-offset-seconds 3600))
-           (parity-sym (cond
-                        ((> utc-offset-seconds 0) "+")
-                        ((< utc-offset-seconds 0) "-")
-                        (t "=")))
-           (abs-offset (abs utc-offset)))
-      `(
-        ,local-zone-name
-        ,utc-offset
-        ,(format "UTC%s%d" parity-sym abs-offset)
-        ))))
-
-(defun get-a-nice-updating-time-display ()
-  (cl-destructuring-bind (local-zone-name utc-offset nicely-formatted-utc-offset)
-      (get-time-zone-and-offset-nicely)
-    (let ((full-time (format-time-string "%H:%M:%S"))
-          (unix-time (format-time-string "%s")))
-      (format "%s %d[%s] %s" full-time utc-offset local-zone-name unix-time))))
-
 
 (add-hook 'debugger-mode-hook #'buffer-enable-undo -5)
 (add-hook 'debugger-mode-hook #'undo-tree-mode 5)
