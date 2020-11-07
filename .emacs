@@ -66,11 +66,7 @@
 ;;; This just seems like a nice idea.
 (add-hook 'after-init-hook #'garbage-collect)
 
-(let ((local-emacs-script
-       (concat (file-name-as-directory (expand-file-name "~"))
-               ".local.emacs")))
-  (when (file-readable-p local-emacs-script)
-    (load-file local-emacs-script)))
+(add-hook 'kill-emacs-hook (z (clean-nonvisiting-buffers t)))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -111,6 +107,7 @@
  '(coffee-indent-like-python-mode t)
  '(coffee-switch-to-compile-buffer t)
  '(coffee-tab-width 2)
+ '(comint-completion-addsuffix "")
  '(comint-completion-autolist t)
  '(comint-completion-fignore '("#" "~" "%"))
  '(comint-completion-recexact t)
@@ -134,6 +131,7 @@
  '(cursor-in-non-selected-windows '(hbar . 12))
  '(cursor-type 'hollow)
  '(dabbrev-case-replace 'case-replace)
+ '(debug-on-error t)
  '(default-justification 'full)
  '(delete-old-versions t)
  '(delete-selection-mode t)
@@ -283,7 +281,7 @@
  '(idle-update-delay 0.5)
  '(ido-enable-flex-matching t)
  '(ido-mode 'both nil (ido))
- '(info-rename-buffer-mode t nil (info-rename-buffer))
+ '(info-rename-buffer-mode nil nil (info-rename-buffer))
  '(inhibit-startup-buffer-menu t)
  '(inhibit-startup-echo-area-message nil)
  '(inhibit-startup-screen t)
@@ -347,7 +345,7 @@
  '(minibuffer-line-mode t)
  '(minibuffer-line-refresh-interval 1)
  '(minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
- '(mode-require-final-newline 'visit)
+ '(mode-require-final-newline t)
  '(mouse-autoselect-window nil)
  '(multi-isearch-search nil)
  '(my-isearch-search-fun 'do-normal-isearch)
@@ -377,7 +375,7 @@
  '(pabbrev-minimal-expansion-p t)
  '(pabbrev-mode-hook '(pabbrev-mode-set-explicitly))
  '(package-selected-packages
-   '(dhall-mode minibuffer-line niceify-info python-info bart-mode info-buffer info-colors info-rename-buffer inform lsp-mode rustic smart-compile udev-mode undo-tree smart-tab company-nixos-options helm-nixos-options nix-buffer nix-env-install nix-mode nix-sandbox nix-update nixos-options nixpkgs-fmt pretty-sha-path w3m pabbrev origami-predef origami org-treeusage org-translate org-table-comment org-randomnote org-random-todo org-radiobutton org-pretty-tags org-pdftools ob-coffeescript ob-rust org-edna org-beautify-theme helpful grip-mode sysctl orgit orgnav org-agenda-property ess-R-data-view ess-r-insert-obj ess-smart-equals ess-smart-underscore ess-view ess-view-data helm-R cmake-font-lock cl-lib-highlight faceup lisp-local modern-fringes modern-sh unicode-math-input unicode-progress-reporter unicode-whitespace diredfl diredful dynamic-fonts emoji-fontset font-lock-profiler font-utils fontawesome fontify-face highlight-refontification lisp-extra-font-lock magic-latex-buffer modern-cpp-font-lock morlock preproc-font-lock propfont-mixed proportional simple-call-tree unicode-fonts use-ttf all-the-icons all-the-icons-dired all-the-icons-gnus all-the-icons-ibuffer all-the-icons-ivy all-the-icons-ivy-rich mediawiki 0blayout 2048-game ag auctex bazel-mode better-defaults cider cl-lib cloc cmake-mode color-theme-approximate color-theme-modern company company-ghc company-ghci csv-mode cuda-mode dired-sidebar dockerfile-mode ein enh-ruby-mode epresent espuds ess evil f3 flycheck-package flycheck-rust font-lock-studio ggtags ghc git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode graphql-mode groovy-mode helm-ag helm-gtags helm-swoop highlight-parentheses highlight-quoted highlight-stages ibuffer-sidebar intero jq-mode js2-mode kotlin-mode less-css-mode linum-relative literate-coffee-mode lua-mode magit-popup markdown-mode matlab-mode minimap mmm-mode multiple-cursors nhexl-mode nim-mode org pacmacs paredit pcre2el pdf-tools php-mode polymode poly-R projectile protobuf-mode rainbow-delimiters rainbow-mode robe rust-mode sage-shell-mode sass-mode scala-mode scrooge shm shut-up skewer-mode slime-company smartrep sml-mode solarized-theme sourcemap speech-tagger thrift toml-mode typescript-mode use-package vimrc-mode visual-fill-column web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode))
+   '(strace-mode dhall-mode minibuffer-line niceify-info python-info bart-mode info-buffer info-colors info-rename-buffer inform lsp-mode rustic smart-compile udev-mode undo-tree smart-tab company-nixos-options helm-nixos-options nix-buffer nix-env-install nix-mode nix-sandbox nix-update nixos-options nixpkgs-fmt pretty-sha-path w3m pabbrev origami-predef origami org-treeusage org-translate org-table-comment org-randomnote org-random-todo org-radiobutton org-pretty-tags org-pdftools ob-coffeescript ob-rust org-edna org-beautify-theme helpful grip-mode sysctl orgit orgnav org-agenda-property ess-R-data-view ess-r-insert-obj ess-smart-equals ess-smart-underscore ess-view ess-view-data helm-R cmake-font-lock cl-lib-highlight faceup lisp-local modern-fringes modern-sh unicode-math-input unicode-progress-reporter unicode-whitespace diredfl diredful dynamic-fonts emoji-fontset font-lock-profiler font-utils fontawesome fontify-face highlight-refontification lisp-extra-font-lock magic-latex-buffer modern-cpp-font-lock morlock preproc-font-lock propfont-mixed proportional simple-call-tree unicode-fonts use-ttf all-the-icons all-the-icons-dired all-the-icons-gnus all-the-icons-ibuffer all-the-icons-ivy all-the-icons-ivy-rich mediawiki 0blayout 2048-game ag auctex bazel-mode better-defaults cider cl-lib cloc cmake-mode color-theme-approximate color-theme-modern company company-ghc company-ghci csv-mode cuda-mode dired-sidebar dockerfile-mode ein enh-ruby-mode epresent espuds ess evil f3 flycheck-package flycheck-rust font-lock-studio ggtags ghc git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode graphql-mode groovy-mode helm-ag helm-gtags helm-swoop highlight-parentheses highlight-quoted highlight-stages ibuffer-sidebar intero jq-mode js2-mode kotlin-mode less-css-mode linum-relative literate-coffee-mode lua-mode magit-popup markdown-mode matlab-mode minimap mmm-mode multiple-cursors nhexl-mode nim-mode org pacmacs paredit pcre2el pdf-tools php-mode polymode poly-R projectile protobuf-mode rainbow-delimiters rainbow-mode robe rust-mode sage-shell-mode sass-mode scala-mode scrooge shm shut-up skewer-mode slime-company smartrep sml-mode solarized-theme sourcemap speech-tagger thrift toml-mode typescript-mode use-package vimrc-mode visual-fill-column web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode))
  '(pcmpl-x-ack-program "(executable-find \"rg\")")
  '(pcomplete-autolist t)
  '(pcomplete-compare-entry-function 'file-newer-than-file-p)
@@ -750,6 +748,7 @@
  '(scroll-preserve-screen-position 1)
  '(scroll-step 1)
  '(search-default-mode 'char-fold-to-regexp)
+ '(sh-basic-offset 2)
  '(shift-select-mode t)
  '(show-paren-mode t)
  '(show-trailing-whitespace t)
@@ -791,10 +790,5 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :extend nil :stipple nil :background "black" :foreground "green" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 100 :width normal :foundry "YOFo" :family "Telegrama"))))
  '(bold-italic ((t (:family "Telegrama Italic"))))
- '(fill-column-indicator ((t (:inherit shadow :inverse-video t))))
- '(info-xref ((t (:inherit link :background "#884488" :box (:line-width (2 . 2) :color "magenta" :style released-button)))))
  '(italic ((t (:family "Telegrama Italic"))))
- '(minibuffer-line ((t (:background "#37013f" :foreground "dark cyan"))))
- '(some-new-face ((t (:family "Ancho"))) t)
- '(trailing-whitespace ((t (:extend t :background "red1"))))
- '(variable-pitch ((t (:background "#1f0000" :distant-foreground "magenta" :foreground "yellow" :box (:line-width (6 . 2) :color "#cc69b4" :style pressed-button) :family "Ancho")))))
+ '(variable-pitch ((t (:family "Ancho")))))

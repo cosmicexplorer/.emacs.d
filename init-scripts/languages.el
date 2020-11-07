@@ -203,7 +203,7 @@
 
 ;;; shell
 (defun setup-sh-indentation ()
-  (warning-highlights-mode-activate)
+  (ignore-errors (warning-highlights-mode-activate))
   (setq sh-basic-offset 2)
   (setq sh-indentation 2))
 (add-hook 'sh-mode-hook #'setup-sh-indentation)

@@ -11,11 +11,8 @@
 (setq-default nuke-trailing-whitespace-p t)
 (add-hook 'before-save-hook 'nuke-whitespace-except-this-line)
 
-(require 'warning-words)
-(defun warning-highlights-mode-activate ()
-  (warning-highlights-mode 1))
 ;;; add it to programming modes!
-(add-hook 'prog-mode-hook #'warning-highlights-mode-activate)
+(add-hook 'prog-mode-hook #'warning-highlights-mode)
 
 ;;; only show whitespace sometimes
 (defvar no-show-whitespace-modes
@@ -865,3 +862,11 @@ Use (process-buffer `my-rw-process') instead."
     (let ((full-time (format-time-string "%H:%M:%S"))
           (unix-time (format-time-string "%s")))
       (format "%s %d[%s] %s" full-time utc-offset local-zone-name unix-time))))
+
+
+(add-hook 'debugger-mode-hook #'buffer-enable-undo -5)
+(add-hook 'debugger-mode-hook #'undo-tree-mode 5)
+(add-hook 'backtrace-mode-hook
+          (z (advice-add revert-buffer-function
+                         :after (lambda (&rest r) (setq-local inhibit-read-only t))))
+          100)
