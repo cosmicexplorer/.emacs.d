@@ -130,6 +130,8 @@
  '(create-lockfiles nil)
  '(cursor-in-non-selected-windows '(hbar . 12))
  '(cursor-type 'hollow)
+ '(custom-safe-themes
+   '(default "bce8a104ed35b6d5f5e11ade5e4a5eeb9e82caf50e458f6f4a8722951de21ee0"))
  '(dabbrev-case-replace 'case-replace)
  '(debug-on-error t)
  '(default-justification 'full)

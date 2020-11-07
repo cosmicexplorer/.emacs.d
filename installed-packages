@@ -166,6 +166,7 @@ sml-mode
 solarized-theme
 sourcemap
 speech-tagger
+strace-mode
 sysctl
 thrift
 toml-mode
