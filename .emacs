@@ -169,7 +169,7 @@
  '(dired-recursive-deletes 'always)
  '(display-buffer-alist
    '(("\\*Async Shell Command\\*.*" display-buf-no-win-save-shell-command-buf)))
- '(display-fill-column-indicator-character 111)
+ '(display-fill-column-indicator-character 64)
  '(display-raw-bytes-as-hex t)
  '(ecb-options-version "2.40")
  '(ecb-tip-of-the-day nil)
@@ -232,7 +232,7 @@
  '(git-gutter:window-width 0)
  '(global-auto-revert-mode t)
  '(global-company-mode t)
- '(global-display-fill-column-indicator-mode nil)
+ '(global-display-fill-column-indicator-mode t)
  '(global-hl-line-mode t)
  '(global-hl-line-sticky-flag t)
  '(global-linum-mode nil)
