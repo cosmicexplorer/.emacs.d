@@ -26,7 +26,10 @@
           (lambda () (setq comment-start "// " comment-end "")))
 
 ;;; assembly before S
-(push '("\\.[sS]\\'" . asm-mode) auto-mode-alist)
+(add-to-list 'auto-mode-alist '("\\.[sS]\\'" . asm-mode))
+
+;;; Add preferred custom .emacsrc file.
+(add-to-list 'auto-mode-alist '("\\.emacsrc\\'" . emacs-lisp-mode))
 
 ;;; more ess-mode nonsense
 (add-hook 'ess-mode-hook #'warning-highlights-mode)

@@ -74,6 +74,7 @@
         org-end-of-line
         org-force-self-insert
         org-forward-paragraph
+        org-replace-backward-paragraph
         org-return
         org-self-insert-command
         org-shiftcontrolleft

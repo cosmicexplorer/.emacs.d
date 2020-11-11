@@ -24,6 +24,8 @@
 (global-set-key (kbd "C-x M-w") #'cycle-window-configuration)
 (global-set-key (kbd "C-x M-s") #'save-current-window-configuration)
 
+;;; TODO: a command to wrap parentheses around region
+
 (defvar prev-keymaps nil)
 
 (defun set-key-dwim (map key cmd)
@@ -418,6 +420,7 @@
 (global-set-key (kbd "M-#") 'replace-regexp)
 
 ;;; org-mode
+;;; FIXME ASAP: This needs to be UPSTREAMED TO ORG.
 (defun org-replace-forward-paragraph ()
   (interactive "^")
   (unless (eobp)
@@ -555,6 +558,7 @@
      (define-key org-mode-map (kbd "S-<down>") #'org-shiftdown)
      ;; (define-key org-mode-map (kbd "C-p") #'outline-previous-heading)
      ;; (define-key org-mode-map (kbd "C-n") #'outline-next-heading)
+     ;; FIXME: These bindings are illegally good for moving around .org documents.
      (define-key org-mode-map (kbd "C-p") #'my-org-previous-section)
      (define-key org-mode-map (kbd "C-n") #'my-org-next-section)
      (define-key org-mode-map (kbd "C-b") #'my-org-up-section)
@@ -639,6 +643,8 @@
 ;;      (if pfx (switch-to-buffer new-file)
 ;;        (pop-to-buffer new-file)))))
 
+(require 'functions)
+
 (defconst function-help-keys-alist
   `((:map (nil)
      :kill ("C-M-h")
@@ -660,11 +666,9 @@
       ("C-M-h C-f" ,(find-function-switch-pfx #'find-function-at-point))
       ("C-h C-v" ,(find-function-switch-pfx #'find-variable))
       ("C-M-h C-v" ,(find-function-switch-pfx #'find-variable-at-point))
-      ("C-h b" ,(find-function-switch-pfx
-                    (make-new-help #'describe-bindings)
-                  :invert t))
+      ("C-h b" ,(find-function-switch-pfx #'describe-bindings :invert t))
       ("C-h l"
-       ,(find-function-switch-pfx (make-new-help #'view-lossage) :invert t))))))
+       ,(find-function-switch-pfx #'view-lossage :invert t))))))
 (set-keys-in function-help-keys-alist)
 
 ;;; c-h a -> apropos in help map
@@ -675,6 +679,10 @@
                  (with-current-buffer buf
                    (set-window-buffer win buf)
                    (set-window-point win (point-min)))))))
+
+;;; TODO:
+;; (require 'helpful)
+;; (define-key )
 
 ;;; FIXME: this doesn't work at all and it's stupid
 ;; (with-eval-after-spec help
@@ -915,9 +923,9 @@
 (global-set-key (kbd "C-c d") #'git-gutter:diff-and-switch)
 (global-set-key (kbd "C-c r") #'git-gutter:revert-hunk)
 (global-set-key (kbd "<home>") #'beg-of-line-text)
-(global-set-key (kbd "<end>") #'end-of-maybe-visual-line)
+(global-set-key (kbd "<end>") #'end-of-line)
 (global-set-key (kbd "C-a") #'beg-of-line-text)
-(global-set-key (kbd "C-e") #'end-of-maybe-visual-line)
+(global-set-key (kbd "C-e") #'end-of-line)
 (global-set-key (kbd "C-M-S-a") #'beginning-of-line)
 (global-set-key (kbd "C-M-S-e") #'end-of-line)
 

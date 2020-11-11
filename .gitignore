@@ -38,3 +38,4 @@ package-lock.json
 .emacs.desktop*
 /eln-cache/
 /gmon.out
+!/*.zsh

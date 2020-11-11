@@ -53,6 +53,7 @@
 (require 'epa-file)
 (require 'pcase)
 (require 'pabbrev)
+(require 'org-sync)
 
 ;;; my stuff
 (require 'utilities)

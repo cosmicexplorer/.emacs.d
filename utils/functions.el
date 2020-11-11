@@ -9,7 +9,8 @@
   (cl-check-type str string)
   (split-string str path-separator t "[[:space:]\n]+"))
 
-(defun get-exec-path ()
+(defun remove-empty-directories-from-exec-path ()
+  "No clue why this is necessary!!!!"
   (--> (append exec-path
                (path-split (getenv "PATH"))
                (path-split (shell-command-to-string "echo -n $PATH")))
@@ -24,6 +25,24 @@
   (once-only (fn)
     `(lambda (&rest args)
        (not (apply ,fn args)))))
+
+;;; TEST!!!
+(cl-defun save-window-configuration-and-restore-with-keys (buffer keys &key maps kill)
+  "Map KEYS in MAPS to a lambda which restores the window configuration at the time it was called.
+
+Returns `nil' on success."
+  (let* ((cfg (save-current-window-configuration))
+         (return-to-back-then
+          (lambda ()
+            (interactive)
+            (set-window-configuration cfg))))
+    (with-current-buffer buffer
+      (cl-loop with local-map = (or maps (current-local-map))
+
+               for map in maps
+               for key in keys
+               do (define-key local-map key return-to-back-then)))
+    (when kill (kill-buffer))))
 
 (defconst sentinel-successful-exit-msg "finished\n")
 
@@ -1115,13 +1134,6 @@ its filename, and a message is sent if the predicate returns non-nil."
       (w3m-goto-url-new-session (car w3m-cur-url-ptr))
     (message "%s" "No old urls to restore!"))
   (setq w3m-cur-url-ptr (cdr w3m-cur-url-ptr)))
-
-;;; org-mode stuff
-(defadvice org-kill-line (around org-kill-region-advice)
-  (if (use-region-p)
-      (kill-region (region-beginning) (region-end))
-    ad-do-it))
-(ad-activate 'org-kill-line)
 
 ;;; TODO: make these work
 ;; (defadvice org-open-at-point (around org-recenter-open)
@@ -2333,18 +2345,9 @@ by another percent."
     (set-visited-file-name name)
     (save-buffer)))
 
-(defun beg-of-maybe-visual-line ()
-  (interactive "^")
-  (if (derived-mode-p 'text-mode) (beginning-of-visual-line)
-    (beginning-of-line)))
-
-(defun end-of-maybe-visual-line ()
-  (interactive "^")
-  (if (derived-mode-p 'text-mode) (end-of-visual-line) (end-of-line)))
-
 (defun beg-of-line-text ()
   (interactive "^")
-  (beg-of-maybe-visual-line)
+  (beginning-of-line)
   (while (whitespacep (char-after)) (right-char)))
 
 (defun end-of-line-text ()
@@ -2854,31 +2857,6 @@ by another percent."
            with start = ""
            do (setq start (concat start str))
            finally return start))
-
-(defun show-the-time ()
-  (interactive)
-  (let ((fmt (format-time-string "%H:%M:%S@%Y-%m-%d" (current-time))))
-    (if (called-interactively-p 'any)
-        (message "%s" fmt)
-      fmt)))
-
-(defun goto-file-line-at-rev-magit (file line rev &optional other-window)
-  (interactive
-   (let ((file (buffer-file-name
-                (save-window-excursion (call-interactively #'ido-find-file)))))
-     (list file
-           (read-number "line number: ")
-           (let ((default-directory (file-name-directory file)))
-             (my-magit-read-branch-or-commit "revision"))
-           current-prefix-arg)))
-  (let* ((default-directory (file-name-directory file))
-         (buf
-          (if other-window
-              (magit-find-file-other-window rev file)
-            (magit-find-file rev file))))
-    (with-current-buffer buf
-      (goto-line line)
-      (recenter))))
 
 (defun make-pred-regexp (reg)
   (apply-partially #'string-match-p reg))

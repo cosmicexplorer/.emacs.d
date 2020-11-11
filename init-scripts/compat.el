@@ -27,3 +27,7 @@
          (cond ((string-equal name-start "MINGW") t)
                ((string-equal name-start "CYGWI") t)
                (t nil)))))
+
+;;; This directory is necessary for many system functions on macOS.
+(when (and (eq system-type 'darwin) (file-directory-p "/usr/local/bin"))
+  (add-to-list 'exec-path "/usr/local/bin"))

@@ -585,3 +585,6 @@ If SUBMODE is not provided, use `LANG-mode' by default."
   (defun-insert-or-message-string repo-relative-path
     (-> (buffer-file-name)
         (file-relative-name (helm-rg--get-git-root)))))
+
+;;; TODO: upstream this, this should be a defcustom!
+(setq-default org-indent-local nil)

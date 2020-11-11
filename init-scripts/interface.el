@@ -9,7 +9,7 @@
 
 ;; Remove trailing whitespace from a line
 (setq-default nuke-trailing-whitespace-p t)
-(add-hook 'before-save-hook 'nuke-whitespace-except-this-line)
+(add-hook 'before-save-hook #'nuke-whitespace-except-this-line)
 
 ;;; add it to programming modes!
 (add-hook 'prog-mode-hook #'warning-highlights-mode)
@@ -47,10 +47,6 @@
 ;;; see docs for funcs n stuff
 (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
 
-(let ((local-bin "/usr/local/bin"))
-  (when (file-directory-p local-bin)
-    (add-to-list 'exec-path local-bin)))
-
 ;; make them relative
 (setq linum-format 'fix-linum-relative)
 ;; (setq linum-format 'dynamic)
@@ -68,6 +64,7 @@
 ;;; RAINBOW
 (add-hook 'text-mode-hook #'rainbow-mode)
 (add-hook 'prog-mode-hook #'rainbow-mode)
+;;; NO RAINBOW
 (add-hook 'html-mode-hook #'rainbow-mode)
 
 ;;; get and update the current number of lines within the buffer
@@ -238,67 +235,6 @@
 (defadvice cider-doc-lookup (after reread-name activate)
   (cider-doc-rename-buf))
 
-(defvar prev-help-buf nil)
-
-(defadvice help-setup-xref (before make-prev-buf activate)
-  (setq prev-help-buf (get-buffer-create "~Help~")))
-
-(defadvice help-buffer (around use-prev activate)
-  (setq ad-return-value prev-help-buf))
-
-;; (defcustom clean-sampling-period 20
-;;   "Number of times `buffer-list-clean-many-versions' will skip before attempting
-;; to clean up.")
-;; (defvar clean-sample-index 0)
-;; (defun buffer-list-clean-many-versions ()
-;;   (cond
-;;    ((not (wholenump clean-sample-index))
-;;     (setq clean-sample-index 0))
-;;    ((< clean-sample-index clean-sampling-period)
-;;     (incf clean-sample-index))
-;;    ((>= clean-sample-index clean-sampling-period)
-;;     (let* ((buffer-basename-parted
-;;             (--partition-by
-;;              (replace-regexp-in-string "<[0-9]+>\\'" "" (buffer-name it))
-;;              (buffer-list)))
-;;            (repeated-versions
-;;             ;; only need one version of all these
-;;             (--mapcat (-drop 1 it) buffer-basename-parted)))
-;;       (-each repeated-versions #'kill-buffer)
-;;       (setq clean-sample-index 0)))))
-
-;; (add-hook 'buffer-list-update-hook #'buffer-list-clean-many-versions)
-
-;; (defvar set-watched-help-buf nil)
-;; (defvar watched-help-buf nil)
-
-;; (defun buffer-list-update-watcher ()
-;;   (let ((top (car (buffer-list))))
-;;     (when (and set-watched-help-buf
-;;                (not (eq top set-watched-help-buf)))
-;;       (setq set-watched-help-buf nil
-;;             watched-help-buf top))))
-
-;; (add-hook 'buffer-list-update-hook #'buffer-list-update-watcher)
-
-;; (defun help-do-button (pos &optional pfx)
-;;   (interactive (list (point) current-prefix-arg))
-;;   (let ((prefix-arg nil))
-;;     (save-window-excursion
-;;       (setq set-watched-help-buf (car (buffer-list)))
-;;       (push-button pos)))
-;;   (if pfx (pop-to-buffer watched-help-buf)
-;;     (display-buffer-same-window watched-help-buf nil))
-;;   (setq watched-help-buf nil))
-
-(defun make-new-help (help-fn)
-  (lambda ()
-    (interactive)
-    (call-interactively help-fn)
-    (if (buffer-live-p prev-help-buf)
-        (switch-to-buffer prev-help-buf)
-      (error "help kbd failed: buffer '%s' is dead" prev-help-buf))))
-
 (add-hook 'eshell-mode-hook #'rename-shell-buffer)
 (add-hook 'eshell-directory-change-hook #'rename-shell-buffer)
 
@@ -348,7 +284,7 @@
 
 ;;; setup submodules and make them
 (defconst submodule-dirs
-  '("emacs-color-themes" "helm-rg"))
+  '("emacs-color-themes" "helm-rg" "warning-words"))
 
 (defun setup-submodules-load ()
   (actual-setup-submodules)
@@ -359,6 +295,7 @@
    submodule-dirs)
   (require 'danny-theme)
   (require 'helm-rg)
+  (require 'warning-words)
   ;; NB: I do not know why this needs to be enabled both now and later. But otherwise our hl-line
   ;; face is not applied.
   (enable-theme 'danny)
@@ -441,8 +378,6 @@
 
 (defadvice dired-async-after-file-create (after revert-bufs activate)
   (run-with-timer 0 nil #'revert-buffer nil t))
-
-(setq ring-bell-function (lambda ()))
 
 ;;; TODO: make this work, then add these; they get kind of annoying, though
 ;; (add-hook 'shell-mode-hook #'set-mark-end-process-output-mode)
@@ -812,7 +747,7 @@ Use (process-buffer `my-rw-process') instead."
 
 (add-hook 'book-txt-view-hook #'stop-book-txt-view-hook)
 
-(setq exec-path (get-exec-path))
+(setq exec-path (remove-empty-directories-from-exec-path))
 
 (setq read-file-name-function #'ido-read-file-name)
 
@@ -841,3 +776,8 @@ Use (process-buffer `my-rw-process') instead."
           (z (advice-add revert-buffer-function
                          :after (lambda (&rest r) (setq-local inhibit-read-only t))))
           100)
+
+(setq-default bug-reference-url-format "https://github.com/pantsbuild/pants/issues/%s")
+(add-hook 'prog-mode-hook #'bug-reference-mode)
+
+(setq company-lighter '(" " company-lighter-base))
