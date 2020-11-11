@@ -31,3 +31,6 @@
 ;;; This directory is necessary for many system functions on macOS.
 (when (and (eq system-type 'darwin) (file-directory-p "/usr/local/bin"))
   (add-to-list 'exec-path "/usr/local/bin"))
+
+
+(provide 'compat)

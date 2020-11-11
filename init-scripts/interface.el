@@ -781,3 +781,7 @@ Use (process-buffer `my-rw-process') instead."
 (add-hook 'prog-mode-hook #'bug-reference-mode)
 
 (setq company-lighter '(" " company-lighter-base))
+(add-hook 'org-mode-hook (z (company-mode 0)))
+
+
+(provide 'interface)

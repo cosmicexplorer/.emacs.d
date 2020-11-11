@@ -577,6 +577,25 @@
      (define-key org-mode-map (kbd "M-a M-e") #'my-org-end-of-section)
      (define-key org-mode-map (kbd "M-a M-n") #'my-org-next-element)
      (define-key org-mode-map (kbd "M-a M-p") #'my-org-previous-element)
+     ;; for the kinesis advantage 2 and osx:
+     (define-key org-mode-map (kbd "<s-right>") #'org-metaright)
+     (define-key org-mode-map (kbd "<s-left>") #'org-metaleft)
+     (define-key org-mode-map (kbd "<s-up>") #'org-metaup)
+     (define-key org-mode-map (kbd "<s-down>") #'org-metadown)
+     (define-key org-mode-map (kbd "<s-return>")
+       (lambda ()
+         (interactive)
+         (funcall-interactively #'org-insert-item (org-at-item-checkbox-p))))
+     ;; FIXME: because it's so much more convenient in markdown!!!!
+     ;; (define-key org-mode-map (kbd "`") (lambda ()
+     ;;                                      (interactive)
+     ;;                                      (insert "~x~")
+     ;;                                      (backward-char)
+     ;;                                      (save-excursion
+     ;;                                        (font-lock-ensure
+     ;;                                         (1- (point))
+     ;;                                         (1+ (point))))
+     ;;                                      (delete-backward-char 1)))
      ))
 
 ;;; convenience bindings from working with windows
@@ -864,6 +883,9 @@
 (define-key paredit-mode-map (kbd "DEL") 'paredit-backspace-delete-highlight)
 (define-key paredit-mode-map (kbd "M-S-<up>") #'paredit-backward-up)
 (define-key paredit-mode-map (kbd "M-S-<down>") #'paredit-forward-up)
+;;; on macs too!!!
+(define-key paredit-mode-map (kbd "s-S-<up>") #'paredit-backward-up)
+(define-key paredit-mode-map (kbd "s-S-<down>") #'paredit-forward-up)
 
 (defun my-paredit-kill (&optional arg)
   (interactive "P")
@@ -1224,3 +1246,7 @@ Return nil if there isn't one."
 (global-set-key (kbd "C-x M-p") #'repo-relative-path)
 
 (define-key java-mode-map (kbd "C-c C-k") #'smart-compile)
+
+
+;;; TODO: not until we can make it all declarative like defcustom with `set-keys-in'!!!
+;; (provide 'keybindings)

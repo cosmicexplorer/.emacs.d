@@ -29,3 +29,5 @@
                            "\"]]}}"))
            (write-region nil nil lein-profiles-file))
          (setup-cider-stuff)))))
+
+(provide 'cider-setup)
