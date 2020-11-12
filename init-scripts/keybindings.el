@@ -537,6 +537,23 @@
     (goto-char (caar (reverse (org-list-struct)))))
   (org-forward-element))
 
+;;; TODO: org-mode improvements
+;; (defun
+;;     (lambda ()
+;;          (interactive)
+;;          (funcall-interactively #'org-insert-item (org-at-item-checkbox-p))))
+
+;; (defun
+;;     (lambda ()
+;;                                                    (interactive)
+;;                                                    (let ((check (org-at-item-checkbox-p)))
+;;                                                      (funcall-interactively #'org-meta-return)
+;;                                                      (when (and check
+;;                                                                 ;; we don't want to add the checkbox
+;;                                                                 ;; if it's already there (why???)
+;;                                                                 (not (org-at-item-checkbox-p)))
+;;                                                        (funcall-interactively #'org-toggle-checkbox)))))
+
 (eval-after-load 'org
   '(progn
      (define-key org-mode-map (kbd "<C-up>") #'org-replace-backward-paragraph)
@@ -582,11 +599,12 @@
      (define-key org-mode-map (kbd "<s-left>") #'org-metaleft)
      (define-key org-mode-map (kbd "<s-up>") #'org-metaup)
      (define-key org-mode-map (kbd "<s-down>") #'org-metadown)
-     (define-key org-mode-map (kbd "<s-return>")
-       (lambda ()
-         (interactive)
-         (funcall-interactively #'org-insert-item (org-at-item-checkbox-p))))
+     ;; (define-key org-mode-map (kbd "<s-return>")
+     ;;   ;; TODO: also fix the visual-line kill issue in org mode!
+     ;;   )
+     ;; (define-key org-mode-map (kbd "<C-return>") )
      ;; FIXME: because it's so much more convenient in markdown!!!!
+     ;; (this impl trails the ~ face afterwards)
      ;; (define-key org-mode-map (kbd "`") (lambda ()
      ;;                                      (interactive)
      ;;                                      (insert "~x~")
