@@ -2929,11 +2929,11 @@ misbehave (e.g. `helm')."
                          (derived-mode-p 'dired-mode)))
            do (kill-buffer buf)))
 
-(defun clean-nonvisiting-buffers (kill-dired-bufs-too)
+(defun clean-nonvisiting-buffers (&optional dired-survives)
   (interactive "P")
   (tramp-cleanup-all-connections)
   (tramp-cleanup-all-buffers)
-  (clean-all-buffers-to-deleted-files kill-dired-bufs-too))
+  (clean-all-buffers-to-deleted-files (not dired-survives)))
 
 (defun get-linewise-center (beg end)
   (unless (<= beg end) (error (format "beg (%d) is before end (%d)" beg end)))
