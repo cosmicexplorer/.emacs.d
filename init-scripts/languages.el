@@ -532,6 +532,7 @@ There is some whitespace trickery, then point is inserted at: ###: |point|###."
                    :filename (buffer-file-name buffer)
                    :buffer buffer)))))))
 
+(require 'flycheck)
 (flycheck-define-command-checker 'haskell-hlint-better
   "A Haskell style checker using hlint.
 See URL `https://github.com/ndmitchell/hlint'."
@@ -680,6 +681,7 @@ See URL `https://github.com/ndmitchell/hlint'."
 (add-to-list 'auto-mode-alist '("\\.ll\\'" . llvm-mode))
 
 ;;; elisp
+(require 'highlight-quoted)
 (add-hook 'emacs-lisp-mode-hook #'highlight-quoted-mode)
 
 ;;; jq
