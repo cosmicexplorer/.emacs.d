@@ -100,10 +100,13 @@
 ;;; million years to scroll through it otherwise
 (add-hook 'after-change-major-mode-hook
           (lambda ()
+            ;; TODO: For some reason, this major mode doesn't seem to have any hook. Put this in utils?
             (when (derived-mode-p 'doc-view-mode)
-              (linum-mode 0))))
+              (turn-off-linum))))
 (add-hook 'help-mode-hook #'turn-off-linum)
 (add-hook 'Info-mode-hook #'turn-off-linum)
+(require 'fix-info-buffer-names)
+(add-hook 'Info-mode-hook #'fix-info-rename-buffer-mode)
 (add-hook 'Man-mode-hook #'turn-off-linum)
 (add-hook 'org-mode-hook #'turn-off-linum)
 (defvar image-mode-hook nil)
@@ -294,12 +297,9 @@
       'load-path (expand-file-name dir init-home-folder-dir)))
    submodule-dirs)
   (require 'danny-theme)
+  (danny-setup)
   (require 'helm-rg)
-  (require 'warning-words)
-  ;; NB: I do not know why this needs to be enabled both now and later. But otherwise our hl-line
-  ;; face is not applied.
-  (enable-theme 'danny)
-  (add-hook 'window-setup-hook (z (enable-theme 'danny)) 100))
+  (require 'warning-words))
 
 ;;; ibuffer moves things around when i mark things and this scares me
 (defadvice ibuffer-mark-interactive (after re-recenter activate) (recenter))

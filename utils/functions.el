@@ -123,7 +123,7 @@ Should accept a single argument, which is the buffer to display."
   `(cons #'list ,form))
 
 (cl-defmacro once-only ((&rest names) form)
-  (declare (indent 1))
+  (declare (indent 1) (debug (&rest symbol)))
   (if (not names) form
     (let ((gensyms (--map (cl-gensym) names)))
       `(let (,@(--map `(,it (cl-gensym)) gensyms))
@@ -1446,7 +1446,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
          (zerop
           (call-process
            "git" nil t nil
-           "submodule" "foreach" "git" "checkout" "master"))
+           "submodule" "foreach" "git" "checkout" "main"))
          (msg-evals (((buffer-string) bstr)) :before "fetch")
          (zerop
           (call-process-shell-command
@@ -1479,7 +1479,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
               (let ((default-directory (expand-file-name dir)))
                 (zerop
                  (call-process-shell-command
-                  "timeout -k 1 10 git pull origin master"
+                  "timeout -k 1 10 git pull origin main"
                   nil t nil))))
             failed)
            (list all-dirs failed))))

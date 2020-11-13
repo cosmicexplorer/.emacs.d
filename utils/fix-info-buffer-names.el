@@ -52,7 +52,7 @@ automatically changed to include the current header.
 See the command \\[fix-info-rename-buffer]."
   :group 'info
   :init-value nil
-  :global t
+  :global nil
   :keymap '(("R" . fix-info-rename-buffer))
   (when info-rename-buffer-mode
     (info-rename-buffer-mode 0))

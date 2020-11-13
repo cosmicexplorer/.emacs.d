@@ -54,6 +54,8 @@
 (require 'pcase)
 (require 'pabbrev)
 (require 'helpful)
+(require 'minibuffer-line)
+(require 'company)
 
 ;;; my stuff
 (require 'utilities)
