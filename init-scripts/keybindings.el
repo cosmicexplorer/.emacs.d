@@ -554,6 +554,19 @@
 ;;                                                                 (not (org-at-item-checkbox-p)))
 ;;                                                        (funcall-interactively #'org-toggle-checkbox)))))
 
+(defun my-org-make-quote-at-point-or-region (pt mark)
+  "Take REGION and make it an Org quote."
+  (interactive "r")
+  (goto-char pt)
+  (let* ((quote-begin "<<")
+         (extra-length (length quote-begin))
+         (quote-end ">>")
+         (final-extra-length (+ extra-length (length quote-end))))
+    (insert quote-begin)
+    (goto-char (+ mark extra-length))
+    (insert quote-end)
+    (goto-char pt)))
+
 (eval-after-load 'org
   '(progn
      (define-key org-mode-map (kbd "<C-up>") #'org-replace-backward-paragraph)
@@ -573,6 +586,7 @@
      (define-key org-mode-map (kbd "S-<up>") #'org-shiftup)
      (define-key org-mode-map (kbd "C-c e") #'org-latex-export-to-pdf)
      (define-key org-mode-map (kbd "S-<down>") #'org-shiftdown)
+     (define-key org-mode-map (kbd "C-M-q") #'my-org-make-quote-at-point-or-region)
      ;; (define-key org-mode-map (kbd "C-p") #'outline-previous-heading)
      ;; (define-key org-mode-map (kbd "C-n") #'outline-next-heading)
      ;; FIXME: These bindings are illegally good for moving around .org documents.

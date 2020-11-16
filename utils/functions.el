@@ -26,7 +26,7 @@
     `(lambda (&rest args)
        (not (apply ,fn args)))))
 
-;;; TEST!!!
+;;; TODO: TEST!!!
 (cl-defun save-window-configuration-and-restore-with-keys (buffer keys &key maps kill)
   "Map KEYS in MAPS to a lambda which restores the window configuration at the time it was called.
 
@@ -43,6 +43,8 @@ Returns `nil' on success."
                for key in keys
                do (define-key local-map key return-to-back-then)))
     (when kill (kill-buffer))))
+
+;;; TODO: method to swap all windows vertically/horizontally!!!
 
 (defconst sentinel-successful-exit-msg "finished\n")
 
