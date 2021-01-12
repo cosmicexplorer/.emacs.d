@@ -103,6 +103,7 @@ nix-update
 nixpkgs-fmt
 ob-coffeescript
 ob-rust
+org
 org-agenda-property
 org-beautify-theme
 org-edna
@@ -121,6 +122,7 @@ org-treeusage
 orgit
 orgnav
 origami-predef
+ox-gfm
 pabbrev
 pacmacs
 pcre2el

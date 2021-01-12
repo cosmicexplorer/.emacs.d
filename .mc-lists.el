@@ -115,6 +115,7 @@
         async-shell-command
         clang-format-buffer
         delete-other-windows-maybe-save
+        delete-window
         describe-key
         describe-variable
         edebug-continue-mode
@@ -139,6 +140,8 @@
         mouse-set-region
         my-helm-swoop
         not-modified
+        org-insert-todo-heading
+        org-table-copy-down
         rerun-command
         rust-format-buffer
         shell-command
