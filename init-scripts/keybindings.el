@@ -160,19 +160,32 @@
 (defun my-helm-swoop ()
   (interactive)
   (helm-swoop :query (thing-at-point 'symbol)))
-(global-set-key (kbd "C-x o") #'my-helm-swoop)
-
 (global-set-key (kbd "C-S-s") #'my-helm-swoop)
-(global-set-key (kbd "C-x o") #'isearch-forward)
+
+(defmacro with-my-isearch-environment (&rest body)
+  (declare (indent 0))
+  `(let ((case-fold-search t)
+         (search-upper-case t)
+         (search-default-mode #'char-fold-to-regexp)
+         (char-fold-symmetric t))
+     ,@body))
+(defun my-isearch-call (fn)
+  (lambda (pfx)
+    (interactive "P")
+    (with-my-isearch-environment
+      (call-interactively fn))))
+(global-set-key (kbd "C-s") (my-isearch-call #'isearch-forward-regexp))
+(global-set-key (kbd "C-r") (my-isearch-call #'isearch-backward-regexp))
+
 ;;; find regexp in ALL open buffers
 (defun my-multi-swoop-all (pfx)
   (interactive "P")
   (if pfx (helm-multi-swoop-all (thing-at-point 'symbol))
     (helm-multi-swoop-all)))
-(global-set-key (kbd "C-x f") 'my-multi-swoop-all)
+(global-set-key (kbd "C-x f") #'my-multi-swoop-all)
 ;;; find buffer by name
-(global-set-key (kbd "C-x b") 'helm-buffers-list)
-(global-set-key (kbd "C-x C-b") 'helm-buffers-list)
+(global-set-key (kbd "C-x b") #'helm-buffers-list)
+(global-set-key (kbd "C-x C-b") #'helm-buffers-list)
 
 ;; after killing C-x o with helm,
 ;; let's make sure we do have buffer switching in the event of non-graphical
@@ -1245,6 +1258,7 @@ Return nil if there isn't one."
 (defun match-pex-filename-p (filename)
   (string-match-p "\\.[^\\.]*pex\\'" filename))
 
+(require 'arc-mode)
 (defun archive-nil-summarize (&rest args)
   (apply #'archive-zip-summarize args))
 

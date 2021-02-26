@@ -26,7 +26,8 @@
  (magit-log:-S "gpg" "pin" "pinentry")
  (magit-margin-settings nil)
  (magit-merge nil)
- (magit-pull nil)
+ (magit-pull nil
+             ("--rebase"))
  (magit-push nil
              ("--force-with-lease"))
  (magit-rebase nil)

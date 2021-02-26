@@ -36,7 +36,7 @@
 (require 'saveplace)
 (require 'smart-compile)
 (require 'tramp)
-(require 'undo-tree)
+; (require 'undo-tree)
 (require 'web-beautify)
 (require 'js2-mode)
 (require 'highlight-parentheses)
@@ -65,5 +65,8 @@
 (require 'ob-coffee)
 (require 'jison-mode)
 
-(load (expand-file-name "~/quicklisp/slime-helper.el"))
+(let ((slime-helper
+       (expand-file-name "~/quicklisp/slime-helper.el")))
+  (when (file-exists-p slime-helper)
+    (load slime-helper)))
 (setq inferior-lisp-program "sbcl")
