@@ -306,14 +306,20 @@
      :kill ("(" "{" "C-c C-w"))))
 (set-keys-in java-keys-alist)
 
-(defconst rustic-keys-alist
-  '((:load rustic-mode
-     :map rustic-mode-map
+(defconst rust-keys-alist
+  '((:load rust-mode
+     :map rust-mode-map
      :assign (("<C-tab>" rust-format-buffer)))))
-(with-eval-after-spec rustic
-  (define-key rustic-mode-map (kbd "<C-tab>") #'rust-format-buffer))
-(with-eval-after-spec rust-mode
-  (set-keys-in rust-keys-alist))
+(set-keys-in rust-keys-alist)
+
+;; (defconst rustic-keys-alist
+;;   '((:load rustic-mode
+;;      :map rustic-mode-map
+;;      :assign (("<C-tab>" rust-format-buffer)))))
+;; (with-eval-after-spec rustic
+;;   (define-key rustic-mode-map (kbd "<C-tab>") #'rust-format-buffer))
+;; (with-eval-after-spec rustic-mode
+;;   (set-keys-in rustic-keys-alist))
 ;; (defconst racer-keys-alist
 ;;   '((:load racer-mode
 ;;      :map racer-mode-map:

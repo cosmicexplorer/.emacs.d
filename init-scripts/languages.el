@@ -697,14 +697,17 @@ See URL `https://github.com/ndmitchell/hlint'."
     (unless (alist-get pipe-char electric-pair-pairs)
       (setq-local electric-pair-pairs `((,pipe-char . ,pipe-char) ,@electric-pair-pairs)))))
 
-(require 'rustic)
-(add-hook 'rust-mode-hook #'rustic-mode)
-(add-hook 'rustic-mode-hook #'eldoc-mode)
-(add-hook 'rustic-mode-hook #'company-mode)
-(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-(add-hook 'rust-mode-hook #'add-pipes-to-local-electric-pairs)
+(require 'rust-mode)
+;; (require 'rustic)
+;; (add-hook 'rust-mode-hook #'rustic-mode)
+;; (add-hook 'rustic-mode-hook #'eldoc-mode)
+;; (add-hook 'rustic-mode-hook #'company-mode)
+;; (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+;; (add-hook 'rustic-mode-hook #'add-pipes-to-local-electric-pairs)
 (add-hook 'rust-mode-hook (z (setq comment-start "/* "
                                    comment-end " */")))
+;; (add-hook 'rustic-mode-hook (z (setq comment-start "/* "
+;;                                      comment-end " */")))
 
 (setq rustic-racer-rust-src-path
         (format "%s/%s"
