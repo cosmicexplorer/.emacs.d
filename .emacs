@@ -381,27 +381,7 @@
      (destroy-whitespace)
      (nil)
      (flycheck-mode)))
- '(save-place-file "(expand-file-name \"saveplace\" init-home-folder-dir)")
- '(save-place-mode nil)
- '(search-default-mode 'char-fold-to-regexp)
- '(show-paren-mode t)
- '(smart-tab-completion-functions-alist
-   '((lisp-mode . slime-complete-symbol)
-     (text-mode . dabbrev-completion)))
- '(smart-tab-default-functions-alist
-   '((org-mode . org-cycle)
-     (markdown-mode . toggle-subtree-markdown)))
- '(smart-tab-disabled-major-modes nil)
- '(smart-tab-using-hippie-expand t)
- '(tool-bar-mode nil)
- '(undo-outer-limit 5000000)
- '(undo-tree-auto-save-history t)
- '(undo-tree-visualizer-diff t)
  '(warning-suppress-types '((undo discard-info)))
- '(woman-fill-frame nil)
- '(woman-imenu t)
- '(xmllint-pretty-level 2)
- '(yank-pop-change-selection t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
