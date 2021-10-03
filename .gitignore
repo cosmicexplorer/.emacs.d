@@ -39,3 +39,4 @@ package-lock.json
 /eln-cache/
 /gmon.out
 !/*.zsh
+/.lsp-session-v1

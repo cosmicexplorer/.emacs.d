@@ -11,8 +11,9 @@
 ;;; 3. C-Spc to start selection (set mark) in terminal!
 ;;; 4. remember that M-= gets word counts!
 
-(setq x-meta-keysym 'super
-      x-super-keysym 'meta)
+(when (eq system-type 'darwin)
+  (setq x-meta-keysym 'super
+        x-super-keysym 'meta))
 
 (global-set-key (kbd "<escape> <escape> <escape>") nil)
 
@@ -263,9 +264,9 @@
 (with-eval-after-spec w3m
   (when (executable-find "w3m")
     (define-key w3m-mode-map (kbd "C-<tab>") 'w3m-tab-next-buffer)
-    (define-key w3m-mode-map (kbd "C-l C-<tab>") 'w3m-tab-move-right)
+    ;; (define-key w3m-mode-map (kbd "C-l C-<tab>") 'w3m-tab-move-right)
     (define-key w3m-mode-map (kbd "<C-iso-lefttab>") 'w3m-tab-previous-buffer)
-    (define-key w3m-mode-map (kbd "C-l <C-iso-lefttab>") 'w3m-tab-move-left)
+    ;; (define-key w3m-mode-map (kbd "C-l <C-iso-lefttab>") 'w3m-tab-move-left)
     (define-key w3m-mode-map (kbd "C-w") 'w3m-delete-buf-remember)
     (define-key w3m-mode-map (kbd "C-t") 'w3m-create-empty-session)
     (define-key w3m-mode-map (kbd "C-S-t") 'w3m-restore-buffer)
