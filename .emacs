@@ -12,13 +12,13 @@
 (defun do-not-offer-to-save-any-special-buffers ()
   (cl-loop for buf in (buffer-list)
            for name = (buffer-name buf)
-           when (string-match-p "\\` " name)
+           when (string-match-p "\\`\\(?: \\|magit-process\\)" name)
            do (with-current-buffer buf
                 (do-not-offer-to-save-this-buffer))))
 
 (do-not-offer-to-save-any-special-buffers)
 
-(add-hook 'buffer-list-update-hook #'do-not-offer-to-save-this-buffer)
+(add-hook 'buffer-list-update-hook #'do-not-offer-to-save-any-special-buffers)
 
 (package-initialize)
 
