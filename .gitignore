@@ -40,3 +40,5 @@ package-lock.json
 /gmon.out
 !/*.zsh
 /.lsp-session-v1
+/transient/history.el
+/email-auth-info.sexp
