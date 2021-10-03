@@ -7,10 +7,15 @@
   `((best . 1.0)
     (massive . 10.0)
     (big . 5.0)
-    (medium . 2.0)
-    (little . 1.0)
+    (medium . 2.0)                      ; good for a small 1920x1080 screen
+    (little . 1.0)                      ; good for a large 1360x768 screen
+    (just-a-tad-tinier . 0.9)
+    (smaller . 0.8)
+    (pretty-small . 0.7)
+    (pixelated-small . 0.6)
     (even-littler . 0.5)
-    (tiny . 0.2))
+    (tiny . 0.2)
+    (miniscule . 0.1))
   "This alist generates methods to scale the size of text on the screen."
   :type '(alist :key-type (symbol :tag "Method name prefix.")
                 :value-type (float :tag "The font size as a multiple of the default height."))
@@ -67,10 +72,3 @@
     (define-key map (kbd "<right>") #'increase-font-size-a-little)
     (define-key map (kbd "q") #'change-font-size-mode)
     map))
-
-(defgroup handled-faces nil
-  "???"
-  :group 'faces)
-(defface some-new-face nil
-  "???"
-  :group 'handled-faces)

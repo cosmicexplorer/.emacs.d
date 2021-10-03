@@ -3,6 +3,23 @@
 (require 'package)
 (require 'cl-lib)
 
+(defun do-not-offer-to-save-this-buffer ()
+  (setq-local buffer-offer-save nil))
+
+(with-current-buffer (messages-buffer)
+  (do-not-offer-to-save-this-buffer))
+
+(defun do-not-offer-to-save-any-special-buffers ()
+  (cl-loop for buf in (buffer-list)
+           for name = (buffer-name buf)
+           when (string-match-p "\\` " name)
+           do (with-current-buffer buf
+                (do-not-offer-to-save-this-buffer))))
+
+(do-not-offer-to-save-any-special-buffers)
+
+(add-hook 'buffer-list-update-hook #'do-not-offer-to-save-this-buffer)
+
 (package-initialize)
 
 (defgroup my-customizations nil "all `defcustom' forms in my own init scripts")
@@ -187,206 +204,8 @@
  '(org-src-fontify-natively t)
  '(org-startup-folded t)
  '(org-support-shift-select 'always)
- '(package-selected-packages (
-                               0blayout
-                              2048-game
-                              ag
-                              aggressive-fill-paragraph
-                              all-the-icons-dired
-                              all-the-icons-gnus
-                              all-the-icons-ibuffer
-                              all-the-icons-ivy
-                              all-the-icons-ivy-rich
-                              auctex
-                              bart-mode
-                              bazel-mode
-                              better-defaults
-                              cider
-                              cl-lib
-                              cl-lib-highlight
-                              cloc
-                              cmake-font-lock
-                              cmake-mode
-                              color-theme
-                              color-theme-approximate
-                              color-theme-modern
-                              color-theme-solarized
-                              company
-                              company-ghc
-                              company-ghci
-                              company-nixos-options
-                              csv-mode
-                              cuda-mode
-                              dhall-mode
-                              dired-sidebar
-                              diredfl
-                              diredful
-                              dockerfile-mode
-                              dynamic-fonts
-                              ein
-                              emoji-fontset
-                              enh-ruby-mode
-                              epresent
-                              espuds
-                              ess-R-data-view
-                              ess-r-insert-obj
-                              ess-smart-equals
-                              ess-smart-underscore
-                              ess-view
-                              ess-view-data
-                              evil
-                              f3
-                              faceup
-                              flycheck-package
-                              flycheck-rust
-                              font-lock-profiler
-                              font-lock-studio
-                              fontawesome
-                              fontify-face
-                              ggtags
-                              ghc
-                              git-gutter
-                              git-gutter-fringe
-                              gnuplot
-                              gnuplot-mode
-                              go-mode
-                              graphql-mode
-                              grip-mode
-                              groovy-mode
-                              helm-R
-                              helm-ag
-                              helm-gtags
-                              helm-nixos-options
-                              helm-rg
-                              helm-swoop
-                              helpful
-                              highlight-parentheses
-                              highlight-quoted
-                              highlight-refontification
-                              highlight-stages
-                              ibuffer-sidebar
-                              info-buffer
-                              info-colors
-                              info-rename-buffer
-                              inform
-                              intero
-                              jq-mode
-                              js2-mode
-                              kotlin-mode
-                              less-css-mode
-                              linum-relative
-                              lisp-extra-font-lock
-                              lisp-local
-                              literate-coffee-mode
-                              lsp-mode
-                              lua-mode
-                              magic-latex-buffer
-                              magit-popup
-                              markdown-mode
-                              matlab-mode
-                              mediawiki
-                              minibuffer-line
-                              minimap
-                              mmm-mode
-                              modern-cpp-font-lock
-                              modern-fringes
-                              modern-sh
-                              morlock
-                              multiple-cursors
-                              nhexl-mode
-                              niceify-info
-                              nim-mode
-                              nix-buffer
-                              nix-env-install
-                              nix-mode
-                              nix-sandbox
-                              nix-update
-                              nixpkgs-fmt
-                              ob-coffeescript
-                              ob-rust
-                              org
-                              org-agenda-property
-                              org-beautify-theme
-                              org-edna
-                              org-pdftools
-                              org-pretty-tags
-                              org-radiobutton
-                              org-random-todo
-                              org-randomnote
-                              org-ref
-                              org-sync
-                              org-table-comment
-                              org-transform-tree-table
-                              org-translate
-                              org-tree-slide
-                              org-treeusage
-                              orgit
-                              orgnav
-                              origami-predef
-                              ox-gfm
-                              pabbrev
-                              pacmacs
-                              paredit
-                              pcre2el
-                              pdf-tools
-                              perl6-mode
-                              php-mode
-                              pkgbuild-mode
-                              poly-R
-                              polymode
-                              preproc-font-lock
-                              pretty-sha-path
-                              projectile
-                              propfont-mixed
-                              proportional
-                              protobuf-mode
-                              python-info
-                              racer
-                              rainbow-delimiters
-                              rainbow-mode
-                              robe
-                              rust-mode
-                              rustic
-                              sage-shell-mode
-                              sass-mode
-                              scala-mode
-                              scrooge
-                              shm
-                              shut-up
-                              simple-call-tree
-                              skewer-mode
-                              slime-company
-                              smart-compile
-                              smart-tab
-                              smartrep
-                              sml-mode
-                              solarized-theme
-                              sourcemap
-                              speech-tagger
-                              strace-mode
-                              sysctl
-                              thrift
-                              toml-mode
-                              typescript-mode
-                              udev-mode
-                              undo-tree
-                              unicode-fonts
-                              unicode-math-input
-                              unicode-progress-reporter
-                              unicode-whitespace
-                              use-package
-                              use-ttf
-                              vimrc-mode
-                              visual-fill-column
-                              w3m
-                              web-beautify
-                              web-mode
-                              wgrep
-                              wgrep-ag
-                              wgrep-helm
-                              xterm-color
-                              yaml-mode
-                              yaml-mode))
+ '(package-selected-packages
+   '(idris-mode 0blayout 2048-game ag aggressive-fill-paragraph all-the-icons-dired all-the-icons-gnus all-the-icons-ibuffer all-the-icons-ivy all-the-icons-ivy-rich auctex bart-mode better-defaults cider cl-lib cloc cmake-font-lock cmake-mode color-theme color-theme-approximate color-theme-modern company company-ghci company-nixos-options csv-mode cuda-mode dhall-mode dired-sidebar diredfl diredful dockerfile-mode dynamic-fonts ein emoji-fontset enh-ruby-mode epresent espuds ess-R-data-view ess-r-insert-obj ess-smart-equals ess-smart-underscore ess-view ess-view-data evil f3 faceup flycheck-package flycheck-rust font-lock-profiler font-lock-studio fontawesome fontify-face ggtags git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode graphql-mode grip-mode groovy-mode helm-R helm-ag helm-gtags helm-nixos-options helm-rg helm-swoop helpful highlight-parentheses highlight-quoted highlight-refontification highlight-stages ibuffer-sidebar info-buffer info-colors info-rename-buffer inform jq-mode js2-mode kotlin-mode less-css-mode linum-relative lisp-extra-font-lock lisp-local literate-coffee-mode lsp-mode lua-mode magic-latex-buffer magit-popup markdown-mode matlab-mode mediawiki minibuffer-line minimap mmm-mode modern-cpp-font-lock modern-fringes modern-sh morlock multiple-cursors nhexl-mode niceify-info nim-mode nix-buffer nix-env-install nix-mode nix-sandbox nix-update nixpkgs-fmt ob-coffeescript ob-rust org org-agenda-property org-beautify-theme org-edna org-pdftools org-pretty-tags org-radiobutton org-random-todo org-randomnote org-ref org-sync org-table-comment org-transform-tree-table org-translate org-tree-slide org-treeusage orgit orgnav origami-predef ox-gfm pabbrev pacmacs paredit pcre2el pdf-tools php-mode pkgbuild-mode poly-R polymode preproc-font-lock pretty-sha-path projectile propfont-mixed proportional protobuf-mode python-info racer rainbow-delimiters rainbow-mode robe rust-mode sage-shell-mode sass-mode scala-mode scrooge shm shut-up simple-call-tree skewer-mode slime-company smart-compile smart-tab smartrep sml-mode solarized-theme sourcemap speech-tagger strace-mode sysctl thrift toml-mode typescript-mode udev-mode undo-tree unicode-fonts unicode-math-input unicode-progress-reporter unicode-whitespace use-package use-ttf vimrc-mode visual-fill-column w3m web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode yaml-mode))
  '(perl6-indent-offset 2)
  '(python-indent-def-block-scale 1)
  '(racer-command-timeout 0.001)
@@ -401,7 +220,8 @@
  '(rust-indent-offset 2)
  '(safe-local-variable-values
    '((markdown-list-indent-width . 4)
-   '((highlight-80+-columns . 88)
+     (highlight-80+-columns . 80)
+     (highlight-80+-columns . 88)
      (org-todo-keyword-faces quote
                              (("IDEA" . turqoise)
                               ("RESEARCH" . yellow)
