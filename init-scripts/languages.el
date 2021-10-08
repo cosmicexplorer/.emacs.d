@@ -706,6 +706,7 @@ See URL `https://github.com/ndmitchell/hlint'."
 ;; (add-hook 'rustic-mode-hook #'add-pipes-to-local-electric-pairs)
 (add-hook 'rust-mode-hook (z (setq comment-start "/* "
                                    comment-end " */")))
+(add-hook 'rust-mode-hook #'add-pipes-to-local-electric-pairs)
 ;; (add-hook 'rustic-mode-hook (z (setq comment-start "/* "
 ;;                                      comment-end " */")))
 
