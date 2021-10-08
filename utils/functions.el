@@ -2663,8 +2663,7 @@ by another percent."
 
 (defun git-gutter:diff-and-switch ()
   (interactive)
-  (select-window
-   (get-buffer-window (call-interactively #'git-gutter:popup-hunk))))
+  (select-window (call-interactively #'git-gutter:popup-hunk)))
 
 (defun push-buffer-to-kill-ring ()
   (interactive)
