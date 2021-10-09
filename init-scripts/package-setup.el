@@ -264,6 +264,17 @@
       (setq ad-return-value (magit-list-local-branch-names))
     ad-do-it))
 
+(defun make-magit-completing-read-multiple-not-break-come-on
+    (prompt table &optional predicate require-match initial-input
+            hist def inherit-input-method
+            no-split)
+  (--> (completing-read-multiple
+        prompt table predicate require-match initial-input
+        hist def inherit-input-method)
+       (if no-split (mapconcat #'identity it " ") it)))
+
+(advice-add 'magit-completing-read-multiple* :override #'make-magit-completing-read-multiple-not-break-come-on)
+
 ;;; git-gutter
 (defconst git-gutter-fringe-hack-hooks git-gutter:update-hooks)
 

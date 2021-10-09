@@ -2771,7 +2771,7 @@ by another percent."
          (save-window-excursion (shell nil))))
     (if pfx (pop-to-buffer buf) (switch-to-buffer buf))))
 
-(defun completing-read-multiple
+(defun completing-read-make-it-work-with-helm
     (prompt table &optional predicate require-match initial-input
             hist def inherit-input-method)
   (loop
@@ -2784,6 +2784,8 @@ by another percent."
      (quit nil))
    while res
    collect res))
+
+(advice-add 'completing-read-multiple :override #'completing-read-make-it-work-with-helm)
 
 (defvar start-varname-regexp
   "\\(['[:alnum:]-+!$\",_./:;?<=>#%&*@\\\\|^~]\\)")
