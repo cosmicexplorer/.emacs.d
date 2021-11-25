@@ -4,14 +4,14 @@
 
 ;;; set font size and type
 (defcustom best-text-sizes-alist
-  `((best . 3.0)
-    (massive . 10.0)
-    (big . 5.0)
-    (alright-its-a-little-a-big . 4.0)
-    (not-that-big . 3.0)
+  `((best . 2.5)
+    (massive . 10)
+    (big . 5)
+    (alright-its-a-little-a-big . 4)
+    (not-that-big . 3)
     (somewhat-bigger . 2.5)
-    (medium . 2.0)                      ; good for a small 1920x1080 screen
-    (little . 1.0)                      ; good for a large 1360x768 screen
+    (medium . 2)                      ; good for a small 1920x1080 screen
+    (little . 1)                      ; good for a large 1360x768 screen
     (just-a-tad-tinier . 0.9)
     (smaller . 0.8)
     (pretty-small . 0.7)
@@ -26,11 +26,11 @@
 
 (defmacro generate-specific-text-size-method (default-size spec)
   (pcase-exhaustive `(,default-size . ,spec)
-    ((and `(,(helm-rg-cl-typep integer float)
+    ((and `(,(helm-rg-cl-typep integer)
             .
             (,(and (helm-rg-cl-typep symbol) prefix)
              .
-             ,(and (helm-rg-cl-typep float) size)))
+             ,(and (helm-rg-cl-typep integer float) size)))
           (let dilated-points (-> (* default-size size) (round))))
      `(defun ,(->> prefix (symbol-name) (format "%s-text-size") (intern)) ()
           ,(format "Set the `default' font size to use a %dx multiplier." size)
