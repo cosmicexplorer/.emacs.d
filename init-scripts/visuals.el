@@ -4,9 +4,12 @@
 
 ;;; set font size and type
 (defcustom best-text-sizes-alist
-  `((best . 1.0)
+  `((best . 3.0)
     (massive . 10.0)
     (big . 5.0)
+    (alright-its-a-little-a-big . 4.0)
+    (not-that-big . 3.0)
+    (somewhat-bigger . 2.5)
     (medium . 2.0)                      ; good for a small 1920x1080 screen
     (little . 1.0)                      ; good for a large 1360x768 screen
     (just-a-tad-tinier . 0.9)
@@ -21,45 +24,46 @@
                 :value-type (float :tag "The font size as a multiple of the default height."))
   :group 'display)
 
-;;; TODO: develop SOME sort of pcase hackery to write methods like this.
-;;; NB: the separate use of `eval' was illuminating. "macros" are perhaps MUCH less important than
-;;; "metaprogramming" in general.
-(defun generate-specific-text-size-method (prefix size)
-  (check-whatever-type-it-may-be prefix symbol)
-  (check-whatever-type-it-may-be size integer)
-  `(defun ,(->> prefix (symbol-name) (format "%s-text-size") (intern)) ()
-     ,(format "Set the `default' font size to %d points." size)
-     (interactive)
-     (set-face-attribute ','default nil :height ,size)))
+(defmacro generate-specific-text-size-method (default-size spec)
+  (pcase-exhaustive `(,default-size . ,spec)
+    ((and `(,(helm-rg-cl-typep integer float)
+            .
+            (,(and (helm-rg-cl-typep symbol) prefix)
+             .
+             ,(and (helm-rg-cl-typep float) size)))
+          (let dilated-points (-> (* default-size size) (round))))
+     `(defun ,(->> prefix (symbol-name) (format "%s-text-size") (intern)) ()
+          ,(format "Set the `default' font size to use a %dx multiplier." size)
+        (interactive)
+        (set-face-attribute ', 'default nil :height ,dilated-points)))))
+
+(defconst emacs-startup-font-size (face-attribute 'default :height)
+  "The font size that emacs starts up with.")
+
+(defmacro generate-all-text-sizes ()
+  `(progn
+     ,@(--map
+        `(generate-specific-text-size-method ,emacs-startup-font-size ,it)
+        best-text-sizes-alist)))
 
 ;;; Once the first window has been created, generate the window sizing methods.
-(add-hook
- 'window-setup-hook
- (z (cl-loop
-     with default-size = (face-attribute 'default :height)
-     for (prefix . size) in best-text-sizes-alist
-     for dilated-points = (round (* default-size size))
-     do (eval (generate-specific-text-size-method prefix dilated-points)))))
+(add-hook 'window-setup-hook (z (generate-all-text-sizes)))
 
 (defun increase-font-size ()
   (interactive)
-  (let ((attr (face-attribute 'default :height)))
-    (set-face-attribute 'default nil :height (+ attr 10))))
+  (-> (face-attribute 'default :height) (+ 10)))
 
 (defun increase-font-size-a-little ()
   (interactive)
-  (let ((attr (face-attribute 'default :height)))
-    (set-face-attribute 'default nil :height (+ attr 5))))
+  (-> (face-attribute 'default :height) (+ 5)))
 
 (defun decrease-font-size ()
   (interactive)
-  (let ((attr (face-attribute 'default :height)))
-    (set-face-attribute 'default nil :height (- attr 10))))
+  (-> (face-attribute 'default :height) (- 10)))
 
 (defun decrease-font-size-a-little ()
   (interactive)
-  (let ((attr (face-attribute 'default :height)))
-    (set-face-attribute 'default nil :height (- attr 5))))
+  (-> (face-attribute 'default :height) (- 5)))
 
 (define-minor-mode change-font-size-mode
   "Change font size interactively!" nil "FontSize"
