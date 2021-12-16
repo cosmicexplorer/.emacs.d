@@ -210,13 +210,18 @@
   (setq sh-basic-offset 2)
   (setq sh-indentation 2))
 (add-hook 'sh-mode-hook #'setup-sh-indentation)
+(add-hook 'shell-mode-hook #'turn-off-auto-fill)
+
+;;; add sh-mode auto-mode-alist hooks
+(add-to-list 'auto-mode-alist '("APKBUILD\\'" . sh-mode))
+
+;;; add support for zsh
 (defun zsh-mode ()
   (interactive)
   (set (make-local-variable 'sh-shell) 'zsh)
   (sh-mode))
 (add-to-list 'auto-mode-alist '("\\.zsh\\'" . zsh-mode))
 (add-to-list 'auto-mode-alist '("\\`\\.zshrc\\'" . zsh-mode))
-(add-hook 'shell-mode-hook #'turn-off-auto-fill)
 
 ;;; lisp and related
 (defmacro add-fun-to-hooks (fun &rest hooks)
