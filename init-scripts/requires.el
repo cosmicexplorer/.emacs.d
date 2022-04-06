@@ -56,6 +56,7 @@
 (require 'helpful)
 (require 'minibuffer-line)
 (require 'company)
+(require 'rmail)
 
 ;;; my stuff
 (require 'utilities)
