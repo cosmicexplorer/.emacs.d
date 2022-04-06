@@ -66,8 +66,8 @@
 (require 'ob-coffee)
 (require 'jison-mode)
 
-(let ((slime-helper
-       (expand-file-name "~/quicklisp/slime-helper.el")))
-  (when (file-exists-p slime-helper)
-    (load slime-helper)))
+;(let ((slime-helper
+;       (expand-file-name "~/quicklisp/slime-helper.el")))
+;  (when (file-exists-p slime-helper)
+;    (load slime-helper)))
 (setq inferior-lisp-program "sbcl")

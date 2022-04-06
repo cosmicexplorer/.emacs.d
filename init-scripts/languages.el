@@ -248,14 +248,14 @@ Lisp code." t)
 
 (setq inferior-lisp-program "sbcl")
 
- (eval-after-load "slime"
-  '(define-key slime-autodoc-mode-map (kbd "SPC")
-     (lambda (arg) (interactive "p")
-       (if (use-region-p)
-           (progn
-             (delete-region (region-beginning) (region-end))
-             (insert " "))
-         (slime-autodoc-space arg)))))
+;; (eval-after-load "slime"
+;;   '(define-key slime-autodoc-mode-map (kbd "SPC")
+;;     (lambda (arg) (interactive "p")
+;;       (if (use-region-p)
+;;           (progn
+;;             (delete-region (region-beginning) (region-end))
+;;             (insert " "))
+;;         (slime-autodoc-space arg)))))
 
 ;;; python
 ;;; use python-mode for scons files
@@ -326,7 +326,7 @@ Lisp code." t)
             (load "dired-x")))
 
 ;;; slime
-(load-my-script "slime-setup" "init-scripts")
+;(load-my-script "slime-setup" "init-scripts")
 
 ;;; clojure
 (load-my-script "cider-setup" "init-scripts")
