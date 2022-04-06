@@ -473,9 +473,14 @@
 ;;; npm executables
 (defvar npm-bin-dir nil
   "Location of npm binary files.")
+
+(defconst do-npm-install (internet-connected-p)
+  "Whether to run npm install to obtain js utilities.")
 (when (executable-find "npm")
+  ;; TODO: this `cd' mutates global state!
   (cd init-home-folder-dir)
-  (call-process "npm" nil nil nil "install")
+  (when do-npm-install
+    (call-process "npm" nil nil nil "install"))
   (setq npm-bin-dir
         ;; destroy trailing newline
         (let ((str (shell-command-to-string "npm bin")))
@@ -489,6 +494,8 @@
     `(progn
        (setq coffee-command (concat ,npm-bin-dir "/coffee"))
        (setq js2coffee-command (concat ,npm-bin-dir "/js2coffee")))))
+
+
 (eval-after-load 'sourcemap
   '(progn
      (defun coffee-goto-sourcemap-and-delete (props)
