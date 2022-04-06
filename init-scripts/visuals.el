@@ -4,7 +4,7 @@
 
 ;;; set font size and type
 (defcustom best-text-sizes-alist
-  `((best . 2.5)
+  `((best . 0.6)
     (massive . 10)
     (big . 5)
     (alright-its-a-little-a-big . 4)
@@ -76,3 +76,6 @@
     (define-key map (kbd "<right>") #'increase-font-size-a-little)
     (define-key map (kbd "q") #'change-font-size-mode)
     map))
+
+;;; highlight glyphless chars that can be used for text watermarking
+(set-face-background 'glyphless-char "red")
