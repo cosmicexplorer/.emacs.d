@@ -322,6 +322,8 @@
 
 ;;; keep dired in sync
 (add-hook 'dired-mode-hook #'auto-revert-mode)
+;;; Don't offer to save dired buffers on recompile.
+(add-hook 'dired-mode-hook (z (setq-local buffer-offer-save nil)))
 
 (when-let ((zsh-exe (executable-find "zsh")))
   (setq explicit-shell-file-name zsh-exe))
