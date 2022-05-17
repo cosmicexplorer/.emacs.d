@@ -1204,6 +1204,8 @@
   (define-key ensime-mode-map (kbd "M-p") #'mc/mark-previous-like-this))
 
 (define-key prog-mode-map (kbd "C-c C-f") #'center-function)
+(define-key prog-mode-map (kbd "C-M-q") #'beginning-of-defun)
+(define-key prog-mode-map (kbd "C-M-S-q") #'end-of-defun)
 
 (global-set-key (kbd "C-v") #'delete-whole-line)
 
