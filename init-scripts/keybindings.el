@@ -1303,6 +1303,9 @@ Return nil if there isn't one."
 
 (define-key java-mode-map (kbd "C-c C-k") #'smart-compile)
 
+(with-eval-after-spec protobuf-mode
+  (add-hook 'protobuf-mode-hook (z (setq-local comment-start "/*" comment-end "*/"))))
+
 
 ;;; TODO: not until we can make it all declarative like defcustom with `set-keys-in'!!!
 ;; (provide 'keybindings)
