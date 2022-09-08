@@ -26,11 +26,11 @@
 
 (defmacro generate-specific-text-size-method (default-size spec)
   (pcase-exhaustive `(,default-size . ,spec)
-    ((and `(,(helm-rg-cl-typep integer)
+    ((and `(,(pred integerp)
             .
-            (,(and (helm-rg-cl-typep symbol) prefix)
+            (,(and (pred symbolp) prefix)
              .
-             ,(and (helm-rg-cl-typep integer float) size)))
+             ,(and (or (pred integerp) (pred floatp)) size)))
           (let dilated-points (-> (* default-size size) (round))))
      `(defun ,(->> prefix (symbol-name) (format "%s-text-size") (intern)) ()
           ,(format "Set the `default' font size to use a %dx multiplier." size)
