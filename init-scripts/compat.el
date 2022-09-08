@@ -11,8 +11,6 @@
 (xterm-mouse-mode)
 ;; for interacting with clipboard
 (setq x-select-enable-clipboard t)
-(with-system 'gnu/linux
-  (setq interprogram-paste-function 'x-cut-buffer-or-selection-value))
 
 (with-system 'windows-nt
   (setq explicit-shell-file-name (or (executable-find "zsh")
