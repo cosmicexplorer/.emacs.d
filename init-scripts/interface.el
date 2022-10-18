@@ -154,7 +154,7 @@
    t))
 
 ;;; output eshell buffers to file
-(defvar eshell-user-output-file (concat init-home-folder-dir "eshell-output")
+(defvar eshell-user-output-file (home-dir-path "eshell-output")
   "File containing all eshell I/O from all eshell buffers.")
 (add-hook 'eshell-pre-command-hook #'eshell-send-input-to-history)
 (add-hook 'eshell-post-command-hook #'eshell-send-output-to-history)
@@ -165,7 +165,7 @@
   (add-hook 'comint-output-filter-functions
             #'shell-send-output-to-history nil t))
 
-(defvar shell-user-output-file (concat init-home-folder-dir "shell-output"))
+(defvar shell-user-output-file (home-dir-path "shell-output"))
 (add-hook 'shell-mode-hook #'shell-record-history-filters)
 
 ;;; TODO: would be nice if we could split these cases off into an alist -- this
