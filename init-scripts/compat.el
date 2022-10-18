@@ -31,4 +31,5 @@
   (add-to-list 'exec-path "/usr/local/bin"))
 
 
-(provide 'compat)
+;;; TODO: expose these methods like a normal package!
+;; (provide 'compat)

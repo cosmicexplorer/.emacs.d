@@ -29,6 +29,7 @@
         camel-case-right-word
         coffee-dedent-line-backspace
         coffee-newline-and-indent
+        coffeescript-comment-do-what-i-really-mean
         comment-dwim
         compile-goto-error
         completion-at-point

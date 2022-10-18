@@ -1,7 +1,7 @@
 ;;; -* lexical-binding: t -*-
 
 
-;;;;; Define `defcustom' base groups for other init code to attach to.
+;;;;; (1) Define `defcustom' base groups for other init code to attach to.
 
 (defgroup my-customizations nil "all `defcustom' forms in my own init scripts")
 
@@ -12,9 +12,9 @@
 (define-error 'my-errors "Errors in my own emacs lisp code.")
 
 
-;;;;; Define convenience functions to access and load files in `init-scripts/'.
-;;;;; TODO: If we rewrite all `init-scripts/' files to "(provide 'xxx)", we can avoid having special
-;;;;; load methods for that code!
+;;;;; (2) Define convenience functions to access and load files in `init-scripts/'.
+;;;;;     TODO: If we rewrite all `init-scripts/' files to "(provide 'xxx)", we can avoid having
+;;;;;     special load methods for that code!
 
 (defconst init-home-folder-dir (file-truename user-emacs-directory)
   "The absolute and canonical path to the directory containing .emacs and `init-scripts/'.")
@@ -53,7 +53,7 @@ Uses `ensure-single-trailing-slash' to treat PREFIX, if provided."
 
 
 
-;;;;; Define locations for backup of various emacs state.
+;;;;; (3) Define locations for backup of various emacs state.
 
 (defconst backup-base (home-dir-path (ensure-single-trailing-slash "backup-files"))
   "Directory to store emacs backups in.")
@@ -62,36 +62,38 @@ Uses `ensure-single-trailing-slash' to treat PREFIX, if provided."
   "Directory to store `undo-tree' history persistently.")
 
 
-;;;;; Load init-scripts one by one, in the mysterious correct order,.
+;;;;; (4) Load init-scripts one by one, in the mysterious correct order.
+;;;;;     TODO: rewrite all of `init-scripts/' as packages, and simply load then via `require'!
 
-;;; load the packages i like
+;;; Run `package-initialize' and configure `package-archives' for elpa and melpa.
 (load-file (resolve-init-scripts-script "packages"))
 
-;;; load elisp
-;;; TODO: should be /after/ byte-recompilation (why???)
+;;; Bring our own as well as installed m?elpa packages into scope.
 ;;; This adds `utils/', `integrations/' and `lisp/' to the `load-path'.
 (load-file (resolve-init-scripts-script "requires"))
 
-;;; for compatibility between different operating environments
+;;; Some quick checks for compatibility between different operating environments.
 (load-file (resolve-init-scripts-script "compat"))
 
-;;; Interact with package variables outside of `defcustom's.
+;;; Configure package variables and `defadvice' some functions. Make sure that customizable settings
+;;; go in `.emacs' or `danny-theme'!
 (load-file (resolve-init-scripts-script "package-setup"))
 
-;;; enforce my strong opinions on the default emacs ui
+;;; Configure everything I don't like about the emacs API and built-in packages.
 (load-file (resolve-init-scripts-script "interface"))
-;;; do some additional work to setup packages
-(load-file (resolve-init-scripts-script "package-setup"))
-;;; load (programming) language-specific settings
+
+;;; Configure hooks and workaround logic for specific languages.
 (load-file (resolve-init-scripts-script "languages"))
-;;; cause what else is emacs for
+
+;;; REBIND ALL THE THINGS!!!! EVERYTHING IS OFF THE DEFAULT!!!! MY KEYS ARE MINE!!!!
 (load-file (resolve-init-scripts-script "keybindings"))
 
-;;; make it look nice
+;;; Non-Custom configuration (and overrides) of how emacs displays things.
 (load-file (resolve-init-scripts-script "visuals"))
 
 
-;;;;; Setup tasks that rely on state that was built up in the prior section.
+;;;;; (5) Setup tasks that rely on state that was built up in the prior section.
+;;;;;     TODO: make a megafunction that does this all and call it here instead?
 
 ;;; Seems like this would be a good time to GC, not that the GC ever really bothers me...
 (add-hook 'after-init-hook #'garbage-collect)
@@ -102,7 +104,8 @@ Uses `ensure-single-trailing-slash' to treat PREFIX, if provided."
 ;;; Setup the emacs server!
 (double-checked-server-init)
 
-;;; load submodules!!!! this is a mildly complex function, but it seems mostly reliable.
+;;; load submodules!!!! this is a mildly complex function that interacts with git and the
+;;; filesystem, but it seems mostly reliable somehow.
 (setup-submodules-load)
 
 ;;; Remove any buffers e.g. for files that don't exist, or many process buffers. This reduces the
@@ -111,8 +114,8 @@ Uses `ensure-single-trailing-slash' to treat PREFIX, if provided."
 (advice-add 'save-buffers-kill-emacs :before #'clean-nonvisiting-buffers)
 
 
-;;;;; Custom settings, which is hand- and machine-edited. This one is sparse so that the
-;;;;; customization in `danny-theme' can decouple customization entries from our init scripts.
+;;;;; (6) Custom settings, which is hand- and machine-edited. This one is sparse so that the
+;;;;;     customization in `danny-theme' can decouple customization entries from our init scripts.
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

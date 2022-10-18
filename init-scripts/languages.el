@@ -246,7 +246,15 @@ Lisp code." t)
   (enable-paredit-mode)
   (eldoc-mode))
 
+
+;;;;; SLIME support. Currently not working.
+
 (setq inferior-lisp-program "sbcl")
+
+;(let ((slime-helper
+;       (expand-file-name "~/quicklisp/slime-helper.el")))
+;  (when (file-exists-p slime-helper)
+;    (load slime-helper)))
 
 ;; (eval-after-load "slime"
 ;;   '(define-key slime-autodoc-mode-map (kbd "SPC")
