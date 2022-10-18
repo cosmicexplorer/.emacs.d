@@ -167,8 +167,10 @@ solarized-theme
 sourcemap
 speech-tagger
 strace-mode
+swift-mode
 sysctl
 thrift
+tidal
 toml-mode
 typescript-mode
 udev-mode
@@ -179,6 +181,7 @@ unicode-progress-reporter
 unicode-whitespace
 use-package
 use-ttf
+uuid
 vimrc-mode
 visual-fill-column
 w3m

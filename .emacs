@@ -122,8 +122,7 @@ Uses `ensure-single-trailing-slash' to treat PREFIX, if provided."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- `(backup-directory-alist '(("" . ,backup-base)))
- `(undo-tree-history-directory-alist '(("" . ,undo-tree-history-base)))
+ '(backup-directory-alist '(("" . "/home/cosmicexplorer/.emacs.d/backup-files/")))
  '(copyright-query t)
  '(default-justification 'left)
  '(global-undo-tree-mode t)
@@ -417,7 +416,9 @@ Uses `ensure-single-trailing-slash' to treat PREFIX, if provided."
                             time))
      (destroy-whitespace)
      (nil)
-     (flycheck-mode))))
+     (flycheck-mode)))
+ '(undo-tree-history-directory-alist
+   '(("" . "/home/cosmicexplorer/.emacs.d/undo-tree-history/"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
