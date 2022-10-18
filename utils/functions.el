@@ -383,7 +383,7 @@ annoying. This fixes that."
       (when (and (not (char-is-capitalized-p (char-after)))
                  (not go-forth))
         (return-from out (forward-char)))
-      (loop do (forward-char)
+      (cl-loop do (forward-char)
             while (and (< (point) fin-pt)
                        (or (and go-forth
                                 (not (char-is-capitalized-p (char-before))))
@@ -406,7 +406,7 @@ annoying. This fixes that."
     ;; check if string is all caps; if so, skip
     (when (not (string-is-capitalized-p (buffer-substring cur-point fin-point)))
       (progn
-        (loop for letter-index from -1 downto (- fin-point cur-point)
+        (cl-loop for letter-index from -1 downto (- fin-point cur-point)
               while (= cap-letter-index (- fin-point cur-point))
               do (if (and (char-after (+ cur-point letter-index))
                           (char-is-capitalized-p
@@ -491,7 +491,7 @@ parentheses. CURRENTLY BROKEN"
         (setq sel-beg (point))))
     (goto-char sel-beg)
     (let ((paren-counter 0))
-      (loop until (and (char-equal (preceding-char) 40) ; 40 is open parenthesis
+      (cl-loop until (and (char-equal (preceding-char) 40) ; 40 is open parenthesis
                        (= paren-counter 0))
             do (progn
                  (if (char-equal (preceding-char) 41) ; 41 is closed parenthesis
@@ -502,7 +502,7 @@ parentheses. CURRENTLY BROKEN"
                  (decf sel-end))))
     (goto-char sel-end)
     (let ((paren-counter 0))
-      (loop until (and (char-equal (following-char) 41) ; closed paren
+      (cl-loop until (and (char-equal (following-char) 41) ; closed paren
                        (= paren-counter 0))
             do (progn
                  (if (char-equal (following-char) 40)   ; open paren
@@ -514,7 +514,7 @@ parentheses. CURRENTLY BROKEN"
 
 (defun replace-char-in-range (from-char to-char beg end)
   (let ((was-char-replaced nil))
-    (loop for index from beg upto end
+    (cl-loop for index from beg upto end
           do (when (< index (point-max))
                (if
                    (char-equal (char-after index) from-char)
@@ -529,13 +529,12 @@ parentheses. CURRENTLY BROKEN"
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (loop for line-index from 1 upto (count-num-lines-in-buffer)
+    (cl-loop for line-index from 1 upto (count-num-lines-in-buffer)
           do (progn
                (if (string-equal (get-current-line-as-string) "")
                    (delete-forward-char 1)
                  (forward-line 1))))))
 
-(defgroup my-customizations nil "My personal `defcustom' set.")
 (defcustom kill-buffer-trash-alist nil
   "alist for other files to delete in `kill-buffer-and-move-file-to-trash'"
   :group 'my-customizations
@@ -586,7 +585,7 @@ it goes away."
   "Determines whether file is in directory specified in ~/.emacs.d/no-beautify,
   and if so, only beautifies the current line instead of the entire
   file."
-  (loop with is-covered-in-file = nil
+  (cl-loop with is-covered-in-file = nil
         for line in (json-read-file (concat init-home-folder-dir "no-beautify"))
         do (when (string/starts-with buf-name (cdr line))
              (setq is-covered-in-file t))
@@ -608,7 +607,7 @@ it goes away."
 
 (defun yank-push ()
   (interactive)
-  (loop for i from 1 to 2               ; twice
+  (cl-loop for i from 1 to 2               ; twice
         do (if (= (length kill-ring-yank-pointer) 0)
                nil
              (setq kill-ring-yank-pointer (cdr kill-ring-yank-pointer))))
@@ -616,7 +615,7 @@ it goes away."
 
 (defun paredit-yank-push ()
   (interactive)
-  (loop for i from 1 to 2               ; twice
+  (cl-loop for i from 1 to 2               ; twice
         do (if (= (length kill-ring-yank-pointer) 0)
                nil
              (setq kill-ring-yank-pointer (cdr kill-ring-yank-pointer))))
@@ -1217,7 +1216,7 @@ range is not marked. Cuts off whitespace from the ends of lines if
 TRIM-WHITESPACE is non-nil."
   (let ((orig-pos (point)))
     (goto-char beg)
-    (loop with num-insertions-before-point = 0
+    (cl-loop with num-insertions-before-point = 0
           with total-insertion-length = 0
           and cur-end = end
           and str-length = (length str)
@@ -1244,7 +1243,7 @@ nor 'right is given as an argument, assumes right."
       (if (eq left-or-right 'left)
           (end-of-line)
         (beginning-of-line))
-      (loop with final-text-char = -1
+      (cl-loop with final-text-char = -1
             with first-text-char = -1
             with was-final-char = nil
             until was-final-char
@@ -1307,7 +1306,7 @@ the line containing `region-end'."
         (star-insertions 0)
         (trim-deletions 0)
         (one-line nil))
-    (setq one-line (loop for char across (buffer-substring reg-beg reg-end)
+    (setq one-line (cl-loop for char across (buffer-substring reg-beg reg-end)
                          do (when (char-equal char (str2char "\n"))
                               (return nil))
                          finally (return t)))
@@ -1675,7 +1674,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 (defun kill-buf-and-all-visiting (pfx)
   (interactive "P")
-  (loop
+  (cl-loop
    with dir = (if pfx (ido-read-directory-name "directory to kill: ")
                 default-directory)
    with dir-reg = (concat "\\`" (regexp-quote (expand-file-name dir)))
@@ -1688,7 +1687,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 
 (defun dired-kill-marked-files ()
   (interactive)
-  (loop for file in (mapcar #'expand-file-name (dired-get-marked-files))
+  (cl-loop for file in (mapcar #'expand-file-name (dired-get-marked-files))
         do (let ((buf (find-buffer-visiting file)))
              (when buf (kill-buffer buf)))))
 
@@ -1877,7 +1876,7 @@ that."
       (goto-char (aref context 3))
       (let ((close-context
              (save-excursion
-               (loop with ctx = (car (save-excursion (sgml-get-context)))
+               (cl-loop with ctx = (car (save-excursion (sgml-get-context)))
                      until (and (> (point) (aref ctx 2))
                                 (< (point) (aref ctx 3)))
                      do (progn
@@ -1904,19 +1903,19 @@ that."
                 ;; TODO: make this actually parse stuff, a space within quotes
                 ;; doesn't matter to us
                 (if (whitespacep (char-after))
-                    (loop while (whitespacep (char-after))
+                    (cl-loop while (whitespacep (char-after))
                           do (forward-char))
-                  (loop until (or (whitespacep (char-before))
+                  (cl-loop until (or (whitespacep (char-before))
                                   (= (point) (aref context 2)))
                         do (backward-char)
                         finally (when (= (point) (aref context 2))
                                   (camel-case-right-word)
-                                  (loop while (not (whitespacep (char-after)))
+                                  (cl-loop while (not (whitespacep (char-after)))
                                         do (forward-char)))))
                 (if append-arg
                     (kill-append (buffer-substring (point) final-point) nil)
                   (kill-region (point) final-point))
-                (loop while (whitespacep (char-before))
+                (cl-loop while (whitespacep (char-before))
                       do (delete-backward-char 1))))
           (ignore-errors (backward-char))
           (re-search-forward "<")
@@ -1965,7 +1964,7 @@ that."
     (indent-according-to-mode)
     (let* ((new-pt (point))
            (next-pt (progn (sgml-skip-tag-forward 1) (point))))
-      (loop while (whitespacep (char-after))
+      (cl-loop while (whitespacep (char-after))
             do (delete-char 1))
       (insert "\n")
       (indent-according-to-mode)
@@ -1992,7 +1991,7 @@ that."
     (insert "\n")
     (indent-according-to-mode)
     (sgml-skip-tag-backward 1)
-    (loop while (whitespacep (char-before))
+    (cl-loop while (whitespacep (char-before))
           do (delete-backward-char 1))
     (insert "\n")
     (let* ((new-pt-begin (point))
@@ -2002,15 +2001,15 @@ that."
 
 (defun destroy-whitespace-around-me ()
   (interactive)
-  (loop while (whitespacep (char-before)) do (delete-backward-char 1))
-  (loop while (whitespacep (char-after)) do (delete-char 1)))
+  (cl-loop while (whitespacep (char-before)) do (delete-backward-char 1))
+  (cl-loop while (whitespacep (char-after)) do (delete-char 1)))
 
 (defun destroy-all-whitespace-nearby ()
   (interactive)
-  (loop while (let ((c (char-after)))
+  (cl-loop while (let ((c (char-after)))
                 (when c (string-match-p "[[:space:]\n]" (string c))))
         do (delete-char 1))
-  (loop while (let ((c (char-before)))
+  (cl-loop while (let ((c (char-before)))
                 (when c (string-match-p "[[:space:]\n]" (string c))))
         do (delete-backward-char 1)))
 
@@ -2029,8 +2028,8 @@ that."
       (insert "\n" tag-str)
       (indent-region (- (point) (length tag-str)) (point))
       (goto-char beg-tag-pt)
-      (loop while (whitespacep (char-before)) do (delete-backward-char 1))
-      (loop while (whitespacep (char-after)) do (delete-char 1))
+      (cl-loop while (whitespacep (char-before)) do (delete-backward-char 1))
+      (cl-loop while (whitespacep (char-after)) do (delete-char 1))
       (insert "\n")
       (indent-according-to-mode))
     (goto-char pt)
@@ -2067,9 +2066,9 @@ that."
     (backward-char)
     (html-inner-tag)
     (delete-region (point) end-pt)
-    (loop while (whitespacep (char-after))
+    (cl-loop while (whitespacep (char-after))
           do (delete-char 1))
-    (loop while (whitespacep (char-before))
+    (cl-loop while (whitespacep (char-before))
           do (delete-backward-char 1))
     (insert "\n")
     (indent-according-to-mode)
@@ -2080,14 +2079,14 @@ that."
       (html-inner-tag)
       (let ((reg-len (- (point) begin-pt)))
         (delete-region begin-pt (point))
-        (loop while (whitespacep (char-before))
+        (cl-loop while (whitespacep (char-before))
               do (progn (delete-backward-char 1) (decf reg-len)))
-        (loop while (whitespacep (char-after))
+        (cl-loop while (whitespacep (char-after))
               do (progn (delete-char 1) (decf reg-len)))
         (insert "\n")
         (incf reg-len)
         (indent-region (point) (+ end-pt reg-len))
-        (loop while (whitespacep (char-after)) do (forward-char))))))
+        (cl-loop while (whitespacep (char-after)) do (forward-char))))))
 
 (defun html-raise-tag ()
   (interactive)
@@ -2097,8 +2096,8 @@ that."
          (beg-outer-tag (progn (html-beginning-of-tag) (point)))
          (end-outer-tag (progn (sgml-skip-tag-forward 1) (point))))
     (delete-region beg-outer-tag end-outer-tag)
-    (loop while (whitespacep (char-before)) do (delete-backward-char 1))
-    (loop while (whitespacep (char-after)) do (delete-char 1))
+    (cl-loop while (whitespacep (char-before)) do (delete-backward-char 1))
+    (cl-loop while (whitespacep (char-after)) do (delete-char 1))
     (insert "\n")
     (indent-according-to-mode)
     (forward-line -1)
@@ -2145,7 +2144,7 @@ by another percent."
 
 (defun strip-multiple-chars-from-format-string (chars fmt-str)
   (let ((cur-str fmt-str))
-    (loop for char in chars
+    (cl-loop for char in chars
           do (setq cur-str (strip-char-from-format-string char cur-str))
           finally (return cur-str))))
 
@@ -2173,10 +2172,10 @@ by another percent."
   (interactive)
   (let ((cur-indent 0))
     (beginning-of-line)
-    (loop while (and (char-after) (whitespacep (char-after)))
+    (cl-loop while (and (char-after) (whitespacep (char-after)))
           do (progn (delete-char 1) (incf cur-indent)))
     (when (< cur-indent 4)
-      (loop for i from 1 to 4 do (insert " ")))))
+      (cl-loop for i from 1 to 4 do (insert " ")))))
 
 (defun open-in-browser (pfx)
   (interactive "P")
@@ -2245,7 +2244,7 @@ by another percent."
       (message "%s" out))))
 
 (defun replace-regexp-string-from-alist (str alist &rest replace-args)
-  (loop for pair in alist
+  (cl-loop for pair in alist
         do (setq str
                  (apply #'replace-regexp-in-string
                         (append (list (first pair) (second pair) str)
@@ -2316,7 +2315,7 @@ by another percent."
    (buffer-list)))
 
 (defun get-range-of-list (beg end l)
-  (loop
+  (cl-loop
    for el in l
    with cur-count = 0
    while (<= cur-count end)
@@ -2368,7 +2367,7 @@ by another percent."
 (defun delete-whole-line (n)
   (interactive "p")
   (when (use-region-p) (delete-region (region-beginning) (region-end)))
-  (loop for i from 1 upto n
+  (cl-loop for i from 1 upto n
         do (progn
              (delete-region (line-beginning-position) (line-end-position))
              (unless (eobp) (delete-char 1)))))
@@ -2532,7 +2531,7 @@ by another percent."
 
 (defun cleanup-ag-buffers ()
   (interactive)
-  (loop for buf in (buffer-list)
+  (cl-loop for buf in (buffer-list)
         do (with-current-buffer buf
              (when (eq major-mode 'ag-mode)
                (kill-buffer)))))
@@ -2622,7 +2621,7 @@ by another percent."
                           ((eq direction 'backward) -1)
                           (t (error "invalid direction")))))
       (goto-char start)
-      (loop for i from 1 to num-lines
+      (cl-loop for i from 1 to num-lines
             do (progn
                  (call-interactively cmd)
                  (forward-line movement))))))
@@ -2672,7 +2671,7 @@ by another percent."
 
 (defun remove-diff-errata (str)
   "Removes leading -/+/=, and removes conflict markers."
-  (loop
+  (cl-loop
    for reg-pair in '(("^\\(?:\\+\\+\\)?>\\{7,\\}[^\n]*\\(?:\n\\|\\'\\)" . "")
                      ("^\\(?:\\+\\+\\)?<\\{7,\\}[^\n]*\\(?:\n\\|\\'\\)" . "")
                      ("^\\(?:\\+\\+\\)?|\\{7,\\}[^\n]*\\(?:\n\\|\\'\\)" . "")
@@ -2709,7 +2708,7 @@ by another percent."
 
 (defun my-magit-get-head-back (num)
   (cons "HEAD"
-        (loop for n from 1 upto (1- num)
+        (cl-loop for n from 1 upto (1- num)
               collect (concat "HEAD~" (number-to-string n)))))
 
 (defcustom my-magit-num-commits-back-to-search 50
@@ -2748,7 +2747,7 @@ by another percent."
 
 (defun factorial (n)
   "Make sure the result isn't greater than `most-positive-fixnum'!"
-  (loop for i from 1 upto n
+  (cl-loop for i from 1 upto n
         with base = 1
         do (setq base (* base i))
         finally return base))
@@ -2774,7 +2773,7 @@ by another percent."
 (defun completing-read-make-it-work-with-helm
     (prompt table &optional predicate require-match initial-input
             hist def inherit-input-method)
-  (loop
+  (cl-loop
    for i from 1
    for res =
    (condition-case nil
