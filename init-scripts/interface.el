@@ -168,6 +168,12 @@
 (defvar shell-user-output-file (home-dir-path "shell-output"))
 (add-hook 'shell-mode-hook #'shell-record-history-filters)
 
+;;; This lets us use TAB in the minibuffer for <M-!> :DDD
+(defadvice pcomplete-completions (around no-read-only-on-tab activate)
+  (cl-assert (minibufferp (current-buffer)) t "NO! MINIBUFFER ONLY!!!")
+  (let ((inhibit-read-only t))
+    ad-do-it))
+
 ;;; TODO: would be nice if we could split these cases off into an alist -- this
 ;;; seems to be a lot easier to follow for now
 ;;; same for info and help
