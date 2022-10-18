@@ -1,5 +1,8 @@
 ;;; -*- lexical-binding: t -*-
 
+;;; Make the concept of packages available!
+(package-initialize)
+
 (defconst internet-check-url "8.8.8.8")
 
 (defun internet-connected-p ()

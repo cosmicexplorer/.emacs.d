@@ -101,7 +101,7 @@
        popup :actions
        (cond ((null after) (append actions (list action)))
              ((eq after t) (cons action actions))
-             (t (loop with found = nil
+             (t (cl-loop with found = nil
                       for el in actions
                       with results = nil
                       do (progn
@@ -316,10 +316,10 @@
   (ignore-errors
     (if git-gutter-fringe-hack-mode
         (progn
-          (loop for hook in git-gutter-fringe-hack-hooks
+          (cl-loop for hook in git-gutter-fringe-hack-hooks
                 do (add-hook hook #'git-gutter-refresh-ignore-errors t t))
           (git-gutter))
-      (loop for hook in git-gutter-fringe-hack-hooks
+      (cl-loop for hook in git-gutter-fringe-hack-hooks
             do (remove-hook hook #'git-gutter-refresh-ignore-errors t))
       (git-gutter:clear))))
 (defun git-gutter-fringe-hack-turn-on ()
@@ -332,7 +332,7 @@
 (defadvice magit-run-git (around run-git-gutter activate)
   (let ((prev-mod-files (magit-unstaged-files)))
     ad-do-it
-    (loop
+    (cl-loop
      for file in (union prev-mod-files (magit-unstaged-files)
                         :test #'equal)
      for buf = (get-file-buffer file) when buf
@@ -341,8 +341,8 @@
 ;;; rainbow delimiters!
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 (defvar rainbow-delims-modes '(LaTeX-mode-hook))
-(loop for mode-hook in rainbow-delims-modes
-      do (add-hook mode-hook #'rainbow-delimiters-mode))
+(cl-loop for mode-hook in rainbow-delims-modes
+         do (add-hook mode-hook #'rainbow-delimiters-mode))
 
 ;;;;; ibuffer stuff
 ;;;; re: http://martinowen.net/blog/2010/02/03/tips-for-emacs-ibuffer.html

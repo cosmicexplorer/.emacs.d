@@ -383,6 +383,8 @@
 
 (define-key emacs-lisp-mode-map (kbd "C-c C-c") #'eval-defun)
 (define-key emacs-lisp-mode-map (kbd "C-M-x") #'eval-buffer-and-message)
+;;; C-M-* is not registered on an asus rog laptop keyboard (why??).
+(define-key emacs-lisp-mode-map (kbd "M-X") #'eval-buffer-and-message)
 (define-key emacs-lisp-mode-map (kbd "<return>") #'newline)
 (define-key paredit-mode-map (kbd "M-q") #'comment-fill-paragraph)
 (define-key paredit-mode-map (kbd "M-C") #'paredit-convolute-sexp)
@@ -713,8 +715,6 @@
 ;;    (let ((new-file (find-file-noselect (ffap-guesser))))
 ;;      (if pfx (switch-to-buffer new-file)
 ;;        (pop-to-buffer new-file)))))
-
-(require 'functions)
 
 (defconst function-help-keys-alist
   `((:map (nil)
@@ -1304,7 +1304,8 @@ Return nil if there isn't one."
 (define-key java-mode-map (kbd "C-c C-k") #'smart-compile)
 
 (with-eval-after-spec protobuf-mode
-  (add-hook 'protobuf-mode-hook (z (setq-local comment-start "/*" comment-end "*/"))))
+  (add-hook 'protobuf-mode-hook (z (setq-local comment-start "/*" comment-end "*/")))
+  (define-key protobuf-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby))
 
 
 ;;; TODO: not until we can make it all declarative like defcustom with `set-keys-in'!!!

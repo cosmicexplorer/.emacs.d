@@ -4,6 +4,9 @@
 ;;; in general, functions go in `functions.el', and `interface.el' calls them in
 ;;; some way, shape, or form
 
+
+;;;;; Make idiosyncratic interface changes...
+
 ;;; prompts for (yes/no) -> (y/n)
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -785,4 +788,5 @@ Use (process-buffer `my-rw-process') instead."
 (setq company-lighter '(" " company-lighter-base))
 (add-hook 'org-mode-hook (z (company-mode 0)))
 
-(provide 'interface)
+;;; TODO: init-scripts are not yet exposed as packages!
+;; (provide 'interface)

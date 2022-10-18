@@ -264,6 +264,7 @@ Lisp code." t)
 (setq auto-mode-alist
       (cons '("SConscript" . python-mode) auto-mode-alist))
 (add-hook 'python-mode-hook #'eldoc-mode)
+;; (add-hook 'python-mode-hook (z (setq-local comment-padding "  ")))
 
 (add-to-list 'auto-mode-alist '("\\.aurora\\'" . python-mode))
 
@@ -326,10 +327,10 @@ Lisp code." t)
             (load "dired-x")))
 
 ;;; slime
-;(load-my-script "slime-setup" "init-scripts")
+;(load-file (resolve-init-scripts-script "slime-setup"))
 
 ;;; clojure
-(load-my-script "cider-setup" "init-scripts")
+(load-file (resolve-init-scripts-script "cider-setup"))
 
 (defcustom no-gfm nil "Turn off gfm mode."
   :type 'boolean

@@ -57,6 +57,7 @@
 (require 'minibuffer-line)
 (require 'company)
 (require 'rmail)
+(require 'server)
 
 ;;; my stuff
 (require 'utilities)
@@ -65,6 +66,7 @@
 (require 'unix-find)
 (require 'ob-coffee)
 (require 'jison-mode)
+(require 'mutable-state-init)
 
 ;(let ((slime-helper
 ;       (expand-file-name "~/quicklisp/slime-helper.el")))

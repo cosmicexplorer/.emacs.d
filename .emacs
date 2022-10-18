@@ -1,95 +1,126 @@
 ;;; -* lexical-binding: t -*-
 
-(require 'package)
-(require 'cl-lib)
-
-(defun do-not-offer-to-save-this-buffer ()
-  (setq-local buffer-offer-save nil))
-
-(with-current-buffer (messages-buffer)
-  (do-not-offer-to-save-this-buffer))
-
-(defun do-not-offer-to-save-any-special-buffers ()
-  (cl-loop for buf in (buffer-list)
-           for name = (buffer-name buf)
-           when (string-match-p "\\`\\(?: \\|magit-process\\)" name)
-           do (with-current-buffer buf
-                (do-not-offer-to-save-this-buffer))))
-
-(do-not-offer-to-save-any-special-buffers)
-
-(add-hook 'buffer-list-update-hook #'do-not-offer-to-save-any-special-buffers)
-
-(package-initialize)
+
+;;;;; Define `defcustom' base groups for other init code to attach to.
 
 (defgroup my-customizations nil "all `defcustom' forms in my own init scripts")
-
-(defconst init-home-folder-dir (file-truename user-emacs-directory))
-
-(setq backup-directory-alist `(("." . ,(concat init-home-folder-dir "backup-files/")))
-      undo-tree-history-directory-alist `(("." . ,(concat init-home-folder-dir "undo-tree-history/"))))
 
 (defgroup my-errors nil
   "`defcustom' group for error handling in my own emacs lisp code."
   :group 'my-customizations)
 
 (define-error 'my-errors "Errors in my own emacs lisp code.")
-(define-error
-  'my-init-error "Error in my personal emacs initialization." 'my-errors)
 
-;; starts emacs in server form so i can use emacsclient to add files
-;; but only if server isn't already started
-(require 'server)
-(when (fboundp 'server-running-p)
-  (unless (server-running-p)
-    (server-start)))
+
+;;;;; Define convenience functions to access and load files in `init-scripts/'.
+;;;;; TODO: If we rewrite all `init-scripts/' files to "(provide 'xxx)", we can avoid having special
+;;;;; load methods for that code!
 
-(defun load-my-script (fname &optional dir)
-  (load-file (expand-file-name
-              (format "%s/%s.el" (or dir ".") fname)
-              init-home-folder-dir)))
+(defconst init-home-folder-dir (file-truename user-emacs-directory)
+  "The absolute and canonical path to the directory containing .emacs and `init-scripts/'.")
+
+(defun home-dir-path (relative-path)
+  "Wrapper for `expand-file-name' acting on RELATIVE-PATH within `init-home-folder-dir'.
+
+The constructed path is not checked to exist, but is probably expected to exist."
+  (expand-file-name relative-path init-home-folder-dir))
+
+(defun ensure-single-trailing-slash (dir-path)
+  "Remove any trailing slashes from DIR-PATH to insert a single trailing slash.
+
+This ensures we can concatenate any other path component to its right side to get a valid path."
+  (cl-assert (not (string-empty-p dir-path)) t
+             "Empty strings are rejected to avoid producing a filesystem root '/' by accident.")
+  (replace-regexp-in-string "/*\\'" "/" dir-path))
+
+(cl-defun home-dir-resolve (fname &key (prefix nil) (suffix nil))
+  "Concatenate PREFIX to FNAME to SUFFIX.
+
+Uses `ensure-single-trailing-slash' to treat PREFIX, if provided."
+  (let ((prefix (if (stringp prefix)
+                    (ensure-single-trailing-slash prefix)
+                  ""))
+        (suffix (if (stringp suffix)
+                    suffix
+                  "")))
+    (format "%s%s%s" prefix fname suffix)))
+
+(defun resolve-init-scripts-script (fname)
+  "Resolve FNAME to a `.el' file within the `init-scripts/' subdir."
+  (let ((relative-path (home-dir-resolve fname :prefix "init-scripts" :suffix ".el")))
+    (home-dir-path relative-path)))
+
+
+
+
+;;;;; Define locations for backup of various emacs state.
+
+(defconst backup-base (home-dir-path (ensure-single-trailing-slash "backup-files"))
+  "Directory to store emacs backups in.")
+
+(defconst undo-tree-history-base (home-dir-path (ensure-single-trailing-slash "undo-tree-history"))
+  "Directory to store `undo-tree' history persistently.")
+
+
+;;;;; Load init-scripts one by one, in the mysterious correct order,.
 
 ;;; load the packages i like
-(load-my-script "packages" "init-scripts")
+(load-file (resolve-init-scripts-script "packages"))
 
 ;;; load elisp
-;;; should be /after/ byte-recompilation
-(load-my-script "requires" "init-scripts")
-
-;;; load all my cool functions!!!
-(load-my-script "functions" "utils")
+;;; TODO: should be /after/ byte-recompilation (why???)
+;;; This adds `utils/', `integrations/' and `lisp/' to the `load-path'.
+(load-file (resolve-init-scripts-script "requires"))
 
 ;;; for compatibility between different operating environments
-(load-my-script "compat" "init-scripts")
+(load-file (resolve-init-scripts-script "compat"))
 
 ;;; Interact with package variables outside of `defcustom's.
-(load-my-script "package-setup" "init-scripts")
+(load-file (resolve-init-scripts-script "package-setup"))
 
 ;;; enforce my strong opinions on the default emacs ui
-(load-my-script "interface" "init-scripts")
+(load-file (resolve-init-scripts-script "interface"))
 ;;; do some additional work to setup packages
-(load-my-script "package-setup" "init-scripts")
+(load-file (resolve-init-scripts-script "package-setup"))
 ;;; load (programming) language-specific settings
-(load-my-script "languages" "init-scripts")
+(load-file (resolve-init-scripts-script "languages"))
 ;;; cause what else is emacs for
-(load-my-script "keybindings" "init-scripts")
+(load-file (resolve-init-scripts-script "keybindings"))
 
 ;;; make it look nice
-(load-my-script "visuals" "init-scripts")
+(load-file (resolve-init-scripts-script "visuals"))
 
-;;; load submodules!!!!
-(setup-submodules-load)
+
+;;;;; Setup tasks that rely on state that was built up in the prior section.
 
-;;; This just seems like a nice idea.
+;;; Seems like this would be a good time to GC, not that the GC ever really bothers me...
 (add-hook 'after-init-hook #'garbage-collect)
 
+;;; Make process buffers stop whining when I quit emacs.
+(setup-buffer-save-prompts)
+
+;;; Setup the emacs server!
+(double-checked-server-init)
+
+;;; load submodules!!!! this is a mildly complex function, but it seems mostly reliable.
+(setup-submodules-load)
+
+;;; Remove any buffers e.g. for files that don't exist, or many process buffers. This reduces the
+;;; chance that such a buffer will prompt you when you exit this emacs session!
+;;; See `setup-buffer-save-prompts' for more background on this prompting problem.
 (advice-add 'save-buffers-kill-emacs :before #'clean-nonvisiting-buffers)
+
+
+;;;;; Custom settings, which is hand- and machine-edited. This one is sparse so that the
+;;;;; customization in `danny-theme' can decouple customization entries from our init scripts.
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ `(backup-directory-alist '(("" . ,backup-base)))
+ `(undo-tree-history-directory-alist '(("" . ,undo-tree-history-base)))
  '(copyright-query t)
  '(default-justification 'left)
  '(global-undo-tree-mode t)
@@ -173,7 +204,7 @@
  '(magit-display-buffer-function 'magit-display-buffer-traditional)
  '(magit-no-confirm '(kill-process stage-all-changes unstage-all-changes))
  '(magit-push-always-verify nil)
- '(magit-remote-add-set-remote\.pushDefault 'ask)
+ '(magit-remote-add-set-remote.pushDefault 'ask)
  '(magit-revert-buffers 5 t)
  '(markdown-export-async t)
  '(markdown-gfm-additional-languages nil)
@@ -205,7 +236,7 @@
  '(org-startup-folded t)
  '(org-support-shift-select 'always)
  '(package-selected-packages
-   '(idris-mode 0blayout 2048-game ag aggressive-fill-paragraph all-the-icons-dired all-the-icons-gnus all-the-icons-ibuffer all-the-icons-ivy all-the-icons-ivy-rich auctex bart-mode better-defaults cider cl-lib cloc cmake-font-lock cmake-mode color-theme color-theme-approximate color-theme-modern company company-ghci company-nixos-options csv-mode cuda-mode dhall-mode dired-sidebar diredfl diredful dockerfile-mode dynamic-fonts ein emoji-fontset enh-ruby-mode epresent espuds ess-R-data-view ess-r-insert-obj ess-smart-equals ess-smart-underscore ess-view ess-view-data evil f3 faceup flycheck-package flycheck-rust font-lock-profiler font-lock-studio fontawesome fontify-face ggtags git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode graphql-mode grip-mode groovy-mode helm-R helm-ag helm-gtags helm-nixos-options helm-rg helm-swoop helpful highlight-parentheses highlight-quoted highlight-refontification highlight-stages ibuffer-sidebar info-buffer info-colors info-rename-buffer inform jq-mode js2-mode kotlin-mode less-css-mode linum-relative lisp-extra-font-lock lisp-local literate-coffee-mode lsp-mode lua-mode magic-latex-buffer magit-popup markdown-mode matlab-mode mediawiki minibuffer-line minimap mmm-mode modern-cpp-font-lock modern-fringes modern-sh morlock multiple-cursors nhexl-mode niceify-info nim-mode nix-buffer nix-env-install nix-mode nix-sandbox nix-update nixpkgs-fmt ob-coffeescript ob-rust org org-agenda-property org-beautify-theme org-edna org-pdftools org-pretty-tags org-radiobutton org-random-todo org-randomnote org-ref org-sync org-table-comment org-transform-tree-table org-translate org-tree-slide org-treeusage orgit orgnav origami-predef ox-gfm pabbrev pacmacs paredit pcre2el pdf-tools php-mode pkgbuild-mode poly-R polymode preproc-font-lock pretty-sha-path projectile propfont-mixed proportional protobuf-mode python-info racer rainbow-delimiters rainbow-mode robe rust-mode sage-shell-mode sass-mode scala-mode scrooge shm shut-up simple-call-tree skewer-mode slime-company smart-compile smart-tab smartrep sml-mode solarized-theme sourcemap speech-tagger strace-mode sysctl thrift toml-mode typescript-mode udev-mode undo-tree unicode-fonts unicode-math-input unicode-progress-reporter unicode-whitespace use-package use-ttf vimrc-mode visual-fill-column w3m web-beautify web-mode wgrep wgrep-ag wgrep-helm xterm-color yaml-mode yaml-mode))
+   '(tidal auctex swift-mode uuid idris-mode 0blayout 2048-game ag aggressive-fill-paragraph all-the-icons-dired all-the-icons-gnus all-the-icons-ibuffer all-the-icons-ivy all-the-icons-ivy-rich bart-mode better-defaults cider cl-lib cloc cmake-font-lock cmake-mode color-theme color-theme-approximate color-theme-modern company company-ghci company-nixos-options csv-mode cuda-mode dhall-mode dired-sidebar diredfl diredful dockerfile-mode dynamic-fonts ein emoji-fontset enh-ruby-mode epresent espuds ess-R-data-view ess-r-insert-obj ess-smart-equals ess-smart-underscore ess-view ess-view-data evil f3 faceup flycheck-package flycheck-rust font-lock-profiler font-lock-studio fontawesome fontify-face ggtags git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode graphql-mode groovy-mode helm-R helm-ag helm-gtags helm-nixos-options helm-rg helm-swoop helpful highlight-parentheses highlight-quoted highlight-refontification highlight-stages ibuffer-sidebar info-buffer info-colors info-rename-buffer inform jq-mode js2-mode kotlin-mode less-css-mode linum-relative lisp-extra-font-lock lisp-local literate-coffee-mode lua-mode magic-latex-buffer magit-popup mediawiki minibuffer-line minimap mmm-mode modern-cpp-font-lock modern-fringes modern-sh morlock nhexl-mode niceify-info nim-mode nix-buffer nix-env-install nix-sandbox nix-update nixpkgs-fmt ob-coffeescript ob-rust org org-agenda-property org-beautify-theme org-edna org-pdftools org-pretty-tags org-radiobutton org-random-todo org-randomnote org-ref org-sync org-table-comment org-transform-tree-table org-translate org-tree-slide org-treeusage orgit orgnav origami-predef ox-gfm pabbrev pacmacs paredit pcre2el pdf-tools php-mode poly-R polymode preproc-font-lock pretty-sha-path projectile propfont-mixed proportional protobuf-mode python-info racer rainbow-delimiters rainbow-mode robe rust-mode sage-shell-mode sass-mode scala-mode scrooge shm shut-up simple-call-tree skewer-mode slime-company smart-compile smart-tab smartrep sml-mode solarized-theme sourcemap speech-tagger strace-mode sysctl thrift toml-mode udev-mode undo-tree unicode-fonts unicode-math-input unicode-progress-reporter unicode-whitespace use-package use-ttf vimrc-mode visual-fill-column web-beautify wgrep wgrep-ag wgrep-helm xterm-color yaml-mode yaml-mode))
  '(perl6-indent-offset 2)
  '(python-indent-def-block-scale 1)
  '(racer-command-timeout 0.001)
@@ -219,7 +250,10 @@
  '(read-file-name-completion-ignore-case t)
  '(rust-indent-offset 2)
  '(safe-local-variable-values
-   '((markdown-list-indent-width . 4)
+   '((highlight-80+-columns . 99)
+     (diff-add-log-use-relative-names . t)
+     (comment-end)
+     (markdown-list-indent-width . 4)
      (highlight-80+-columns . 80)
      (highlight-80+-columns . 88)
      (org-todo-keyword-faces quote
