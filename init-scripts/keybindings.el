@@ -22,6 +22,8 @@
 (global-set-key (kbd "C-s-b") #'backward-sexp)
 (global-set-key (kbd "M-.") nil)
 (global-set-key (kbd "M-?") nil)
+;; FIXME: M-; suddenly stopped being recognized? Possibly a KDE shortcut thing?
+(global-set-key (kbd "C-;") #'comment-dwim)
 (global-set-key (kbd "C-x M-w") #'cycle-window-configuration)
 (global-set-key (kbd "C-x M-s") #'save-current-window-configuration)
 
