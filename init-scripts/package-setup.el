@@ -348,8 +348,6 @@
 (add-hook 'ibuffer-mode-hook
           ;; Automatically updates buffer list!
           (z (ibuffer-auto-mode t)))
-(defadvice ibuffer-toggle-filter-group (after center activate)
-  (recenter))
 
 ;;; personal color theme initialization
 (eval-after-load "color-theme-danny"
