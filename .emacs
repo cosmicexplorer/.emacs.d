@@ -115,12 +115,18 @@ Uses `ensure-single-trailing-slash' to treat PREFIX, if provided."
 ;;;;; (6) Custom settings, which is hand- and machine-edited. This one is sparse so that the
 ;;;;;     customization in `danny-theme' can decouple customization entries from our init scripts.
 
+(defconst my-backup-dir (ensure-single-trailing-slash (home-dir-path "backup-files"))
+  "Where to place backup files.")
+
+(defconst my-undo-tree-dir (ensure-single-trailing-slash (home-dir-path "undo-tree-history"))
+  "Where to place undo-tree files.")
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(backup-directory-alist '(("" . "/home/cosmicexplorer/.emacs.d/backup-files/")))
+ `(backup-directory-alist '(("" . ,my-backup-dir)))
  '(copyright-query t)
  '(default-justification 'left)
  '(global-undo-tree-mode t)
@@ -275,9 +281,7 @@ Uses `ensure-single-trailing-slash' to treat PREFIX, if provided."
      (highlight-80+-mode)
      (TeX-auto-untabify . t)
      (comment-start . //)
-     (f3-default-directory . /home/cosmicexplorer/projects/active/ping-pong)
      (f3-before-args "-not" "(" "-ipath" "*.git/*" "-or" "-ipath" "*.pants.d/*" "-or" "-iname" "*.pyc" ")")
-     (f3-default-directory . project)
      (c-file-offsets
       (block-close . 0)
       (brace-list-close . 0)
@@ -415,8 +419,8 @@ Uses `ensure-single-trailing-slash' to treat PREFIX, if provided."
      (destroy-whitespace)
      (nil)
      (flycheck-mode)))
- '(undo-tree-history-directory-alist
-   '(("" . "/home/cosmicexplorer/.emacs.d/undo-tree-history/"))))
+ `(undo-tree-history-directory-alist
+   '(("" . ,my-undo-tree-dir))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
