@@ -1312,3 +1312,6 @@ Return nil if there isn't one."
 
 ;;; TODO: not until we can make it all declarative like defcustom with `set-keys-in'!!!
 ;; (provide 'keybindings)
+
+(with-eval-after-spec rst
+  (define-key rst-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby))
