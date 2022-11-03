@@ -188,7 +188,7 @@
 (global-set-key (kbd "C-x f") #'my-multi-swoop-all)
 ;;; find buffer by name
 (global-set-key (kbd "C-x b") #'helm-buffers-list)
-(global-set-key (kbd "C-x C-b") #'helm-buffers-list)
+(global-set-key (kbd "C-x C-b") #'ibuffer)
 
 ;; after killing C-x o with helm,
 ;; let's make sure we do have buffer switching in the event of non-graphical
