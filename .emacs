@@ -121,6 +121,10 @@ Uses `ensure-single-trailing-slash' to treat PREFIX, if provided."
 (defconst my-undo-tree-dir (ensure-single-trailing-slash (home-dir-path "undo-tree-history"))
   "Where to place undo-tree files.")
 
+;;; Most variables are set in the theme `danny-theme' instead of here. Settings in .emacs should
+;;; strictly refer to settings related to initialization, including any references to the
+;;; init directory. `package-selected-packages' is modified automatically when a new package is
+;;; installed, so we let it stay here as well.
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
