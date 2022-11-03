@@ -138,6 +138,7 @@ php-mode
 pkgbuild-mode
 poly-R
 polymode
+powershell
 preproc-font-lock
 pretty-sha-path
 projectile
