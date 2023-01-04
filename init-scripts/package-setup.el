@@ -496,3 +496,9 @@ If SUBMODE is not provided, use `LANG-mode' by default."
 ;;; TODO: upstream this, this should be a defcustom!
 (setq-default org-indent-local nil)
 (put 'org-self-insert-command 'pabbrev-expand-after-command t)
+
+;;; paredit
+(defadvice paredit-RET (around bubble-up-minibuffer-exit activate)
+  (if (minibufferp)
+      (call-interactively #'exit-minibuffer)
+    ad-do-it))
