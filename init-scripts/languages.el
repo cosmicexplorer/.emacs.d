@@ -78,36 +78,9 @@
   (when my-ess-switch-to-process (ess-switch-to-end-of-ESS))
   (when current-prefix-arg ))
 
-;;; knitr support
-(require 'poly-R)
-(require 'poly-markdown)
-
-(add-to-list 'auto-mode-alist '("\\.[rR]md\\'" . poly-markdown+r-mode))
+;;; general R script support
 (add-to-list 'auto-mode-alist '("\\.[rR]\\'" . R-mode))
 (add-to-list 'auto-mode-alist '("\\.[rR]script\\'" . R-mode))
-
-(defconst rmd-export-cmd-fmt-str
-  "Rscript - && pandoc \"%s\" -o \"%s\"")
-(defconst rmd-knitr-fmt-str
-  "require(knitr); require(markdown); knit(\"%s\",\"%s\")")
-
-(defun rmd-export-sentinel (proc _)
-  (message "%s" (with-current-buffer (process-buffer proc) (buffer-string))))
-
-(defun rmd-export-pdf (infile)
-  (interactive (list (buffer-file-name)))
-  (let* ((interfile (replace-regexp-in-string "\\.[rR]md\\'" ".md" infile))
-         (outfile (replace-regexp-in-string "\\.[rR]md\\'" ".pdf" infile))
-         (proc
-          (make-process
-           :command (list shell-file-name shell-command-switch
-                          (format rmd-export-cmd-fmt-str interfile outfile))
-           :name "*rmd-export*"
-           :buffer (generate-new-buffer "rmd-export")
-           :connection-type 'pipe
-           :sentinel #'rmd-export-sentinel)))
-    (process-send-string proc (format rmd-knitr-fmt-str infile interfile))
-    (process-send-eof proc)))
 
 ;;; highlight cursor and auto-fill when over 80 chars in certain modes
 (with-eval-after-spec highlight-80+
@@ -345,8 +318,6 @@ Lisp code." t)
   :safe t)
 
 ;;; markdown
-(autoload 'markdown-mode "markdown-mode"
-  "Major mode for editing Markdown files" t)
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
