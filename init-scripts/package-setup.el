@@ -3,12 +3,10 @@
 ;;; setup done for large packages which need a kick in the pants to get going
 
 ;;; ein
-(require 'ein)
-(eval-after-load 'ein
-  '(progn
-     (setq ein:use-auto-complete-superpack t)
-     (require 'smartrep)
-     (setq ein:use-smartrep t)))
+(with-eval-after-spec ein
+  (setq ein:use-auto-complete-superpack t)
+  (require 'smartrep)
+  (setq ein:use-smartrep t))
 
 ;;; helm
 (add-hook 'eshell-mode-hook
