@@ -1060,13 +1060,11 @@
   (define-key inferior-ess-mode-map (kbd "RET") #'my-inf-ess-end-send-input)
   (define-key ess-help-mode-map (kbd "C-h f") #'ess-display-help-on-object)
   (define-key ess-mode-map (kbd "C-c '") #'ess-show-traceback)
-  (define-key ess-tracebug-map  (kbd "C-c '") #'ess-show-traceback)
   (define-key inferior-ess-mode-map  (kbd "C-c '") #'ess-show-traceback)
 
   ;; TODO: ess eval!!!
   ;; (define-key ess-mode-map (kbd "M-:") #'my-ess-eval-this)
   ;; TODO: use some r package functions, maybe?
-  (define-key ess-r-package-mode-map (kbd "C-c C-w") nil)
   (define-key ess-mode-map (kbd "C-M-h") nil))
 
 (global-set-key (kbd "C-:") #'eval-expression)
