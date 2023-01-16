@@ -1376,11 +1376,18 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 ;;; todo: try creating a namespace, then a class, in an empty file, see what
 ;;; happens. fix that.
 
+(cl-defmacro with-read-only-disabled (&rest body)
+  "Set `buffer-read-only' to nil, execute BODY, then set `buffer-read-only' to t."
+  `(progn
+     ;; NB: `toggle-read-only' is deprecated in newer emacs!
+     (setq-local buffer-read-only nil)
+     ,@body
+     (setq-local buffer-read-only t)))
+
 ;;; compilation-mode
 (defun colorize-compilation-buffer ()
-  (toggle-read-only)
-  (ansi-color-apply-on-region (point-min) (point-max))
-  (toggle-read-only))
+  (with-read-only-disabled
+   (ansi-color-apply-on-region (point-min) (point-max))))
 
 ;;; basic utilities
 (defvar trailing-whitespace-regexp "\\([\t \u00A0]+\\)$")
