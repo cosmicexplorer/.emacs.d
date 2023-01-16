@@ -111,16 +111,6 @@ Uses `ensure-single-trailing-slash' to treat PREFIX, if provided."
 ;;; See `setup-buffer-save-prompts' for more background on this prompting problem.
 (advice-add 'save-buffers-kill-emacs :before #'clean-nonvisiting-buffers)
 
-
-;;;;; (6) Custom settings, which is hand- and machine-edited. This one is sparse so that the
-;;;;;     customization in `danny-theme' can decouple customization entries from our init scripts.
-
-(defconst my-backup-dir (ensure-single-trailing-slash (home-dir-path "backup-files"))
-  "Where to place backup files.")
-
-(defconst my-undo-tree-dir (ensure-single-trailing-slash (home-dir-path "undo-tree-history"))
-  "Where to place undo-tree files.")
-
 ;;; Most variables are set in the theme `danny-theme' instead of here. Settings in .emacs should
 ;;; strictly refer to settings related to initialization, including any references to the
 ;;; init directory. `package-selected-packages' is modified automatically when a new package is
@@ -130,8 +120,13 @@ Uses `ensure-single-trailing-slash' to treat PREFIX, if provided."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ `(backup-directory-alist '(("" . ,backup-base)))
+ `(undo-tree-history-directory-alist '(("" . ,undo-tree-history-base)))
  '(package-selected-packages
-   '(powershell grip-mode lsp-mode markdown-mode matlab-mode multiple-cursors nix-mode pkgbuild-mode typescript-mode w3m web-mode tidal auctex swift-mode uuid idris-mode 0blayout 2048-game ag aggressive-fill-paragraph all-the-icons-dired all-the-icons-gnus all-the-icons-ibuffer all-the-icons-ivy all-the-icons-ivy-rich bart-mode better-defaults cider cl-lib cloc cmake-font-lock cmake-mode color-theme color-theme-approximate color-theme-modern company company-ghci company-nixos-options csv-mode cuda-mode dhall-mode dired-sidebar diredfl diredful dockerfile-mode dynamic-fonts ein emoji-fontset enh-ruby-mode epresent espuds ess-R-data-view ess-r-insert-obj ess-smart-equals ess-smart-underscore ess-view ess-view-data evil f3 faceup flycheck-package flycheck-rust font-lock-profiler font-lock-studio fontawesome fontify-face ggtags git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode graphql-mode groovy-mode helm-R helm-ag helm-gtags helm-nixos-options helm-rg helm-swoop helpful highlight-parentheses highlight-quoted highlight-refontification highlight-stages ibuffer-sidebar info-buffer info-colors info-rename-buffer inform jq-mode js2-mode kotlin-mode less-css-mode linum-relative lisp-extra-font-lock lisp-local literate-coffee-mode lua-mode magic-latex-buffer magit-popup mediawiki minibuffer-line minimap mmm-mode modern-cpp-font-lock modern-fringes modern-sh morlock nhexl-mode niceify-info nim-mode nix-buffer nix-env-install nix-sandbox nix-update nixpkgs-fmt ob-coffeescript ob-rust org org-agenda-property org-beautify-theme org-edna org-pdftools org-pretty-tags org-radiobutton org-random-todo org-randomnote org-ref org-sync org-table-comment org-transform-tree-table org-translate org-tree-slide org-treeusage orgit orgnav origami-predef ox-gfm pabbrev pacmacs paredit pcre2el pdf-tools php-mode poly-R polymode preproc-font-lock pretty-sha-path projectile propfont-mixed proportional protobuf-mode python-info racer rainbow-delimiters rainbow-mode robe rust-mode sage-shell-mode sass-mode scala-mode scrooge shm shut-up simple-call-tree skewer-mode slime-company smart-compile smart-tab smartrep sml-mode solarized-theme sourcemap speech-tagger strace-mode sysctl thrift toml-mode udev-mode undo-tree unicode-fonts unicode-math-input unicode-progress-reporter unicode-whitespace use-package use-ttf vimrc-mode visual-fill-column web-beautify wgrep wgrep-ag wgrep-helm xterm-color yaml-mode yaml-mode))
- `(backup-directory-alist '(("" . ,my-backup-dir)))
- `(undo-tree-history-directory-alist
-   '(("" . ,my-undo-tree-dir))))
+   '(morlock org-ref markdown-mode helm-core powershell grip-mode lsp-mode matlab-mode pkgbuild-mode w3m tidal auctex swift-mode uuid idris-mode 0blayout 2048-game ag aggressive-fill-paragraph all-the-icons-dired all-the-icons-gnus all-the-icons-ibuffer all-the-icons-ivy all-the-icons-ivy-rich bart-mode better-defaults cider cl-lib cloc cmake-font-lock cmake-mode color-theme color-theme-approximate color-theme-modern company company-ghci company-nixos-options csv-mode cuda-mode dhall-mode dired-sidebar diredfl diredful dockerfile-mode dynamic-fonts ein emoji-fontset enh-ruby-mode epresent espuds ess-R-data-view ess-r-insert-obj ess-smart-equals ess-smart-underscore ess-view ess-view-data evil f3 faceup flycheck-package flycheck-rust font-lock-profiler font-lock-studio fontawesome fontify-face ggtags git-gutter git-gutter-fringe gnuplot gnuplot-mode go-mode graphql-mode groovy-mode helm-R helm-ag helm-gtags helm-nixos-options helm-rg helm-swoop highlight-quoted highlight-refontification highlight-stages ibuffer-sidebar info-buffer info-colors info-rename-buffer inform jq-mode js2-mode less-css-mode lisp-extra-font-lock lisp-local literate-coffee-mode magic-latex-buffer magit-popup mediawiki minibuffer-line minimap modern-cpp-font-lock modern-sh nhexl-mode niceify-info nim-mode nix-buffer nix-env-install nix-sandbox nix-update nixpkgs-fmt ob-coffeescript ob-rust org org-agenda-property org-beautify-theme org-edna org-pretty-tags org-radiobutton org-random-todo org-randomnote org-sync org-table-comment org-transform-tree-table org-treeusage orgnav origami-predef ox-gfm pabbrev pacmacs paredit poly-R polymode preproc-font-lock pretty-sha-path projectile propfont-mixed proportional python-info racer rainbow-delimiters robe sass-mode scrooge shm shut-up simple-call-tree skewer-mode slime-company smart-compile smart-tab smartrep sml-mode solarized-theme sourcemap speech-tagger strace-mode sysctl thrift toml-mode udev-mode unicode-fonts unicode-progress-reporter unicode-whitespace use-package use-ttf vimrc-mode web-beautify wgrep wgrep-ag wgrep-helm xterm-color)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
