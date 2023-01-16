@@ -26,10 +26,13 @@ early exit mechanism e.g. when traveling without wifi."
                  internet-check-url "-c1")))
 
 ;;; Add ELPA and MELPA.
-(add-to-list 'package-archives
-             '("gnu" . "https://elpa.gnu.org/packages/") t)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
+(defcustom ping-melpa t
+  "Whether to add MELPA to `package-archives' when searching for new packages."
+  :type 'boolean
+  :group 'package-connections)
+
+(when ping-melpa
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
 (defcustom ping-org-elpa t
   "Whether to add org elpa to `package-archives' when searching for new packages."
@@ -38,8 +41,7 @@ early exit mechanism e.g. when traveling without wifi."
 
 (when ping-org-elpa
   ;; This archive will occasionally time out! >='[
-  (add-to-list 'package-archives
-               '("org" . "https://orgmode.org/elpa/") t))
+  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t))
 
 
 ;;;;; Persist the installed packages data to a customizable file path.
