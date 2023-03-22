@@ -18,6 +18,7 @@
 ;;; are from more dubious sources (an old professor??).
 (add-to-list 'load-path (home-dir-path "lisp"))
 
+;;; FIXME: ...what does this fix?
 (defun org-babel-make-language-alias (&rest args))
 
 ;;; ESS is done in `./package-setup.el'
