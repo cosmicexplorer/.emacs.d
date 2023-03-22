@@ -19,6 +19,7 @@ color-theme
 color-theme-approximate
 color-theme-modern
 company
+company-coq
 company-ghci
 company-nixos-options
 csv-mode
@@ -56,6 +57,7 @@ gnuplot
 gnuplot-mode
 go-mode
 graphql-mode
+graphviz-dot-mode
 grip-mode
 groovy-mode
 helm-R
@@ -127,6 +129,7 @@ powershell
 preproc-font-lock
 pretty-sha-path
 projectile
+proof-general
 propfont-mixed
 proportional
 python-info
