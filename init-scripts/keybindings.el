@@ -1041,8 +1041,8 @@
        (define-key LaTeX-mode-map (kbd "C-c e") #'LaTeX-environment)
        (define-key LaTeX-mode-map (kbd "C-x C-x") #'latex-double-cash))))
 
-(eval-after-load 'sh-script
-  '(define-key sh-mode-map (kbd "C-c C-w") nil))
+(with-eval-after-spec sh-script
+  (define-key sh-mode-map (kbd "C-c C-w") nil))
 
 ;; (eval-after-load 'ein-notebook
 ;;   '(define-key ein:notebook-mode-map (kbd ".") #'self-insert-command))
@@ -1069,6 +1069,10 @@
   ;; (define-key ess-mode-map (kbd "M-:") #'my-ess-eval-this)
   ;; TODO: use some r package functions, maybe?
   (define-key ess-mode-map (kbd "C-M-h") nil))
+
+(with-eval-after-spec coq-mode
+  (define-key coq-mode-map (kbd "C-M-<up>") nil)
+  (define-key coq-mode-map (kbd "C-M-<down>") nil))
 
 (global-set-key (kbd "C-:") #'eval-expression)
 (global-set-key (kbd "C-S-h f") #'helpful-callable)
