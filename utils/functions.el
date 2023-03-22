@@ -1008,6 +1008,12 @@ details."
         (save-buffer)))
     (kill-buffer saved-buf)))
 
+(defun save-without-hooks ()
+  "Call `save-buffer' while binding `before-save-hook' to nil!"
+  (interactive)
+  (let (before-save-hook)
+    (save-buffer)))
+
 ;;; checking for features
 (defmacro with-feature (feature-sym &rest body)
   ,(when (featurep ,feature-sym) ,@body))

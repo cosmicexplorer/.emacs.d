@@ -27,6 +27,9 @@
 (global-set-key (kbd "C-x M-w") #'cycle-window-configuration)
 (global-set-key (kbd "C-x M-s") #'save-current-window-configuration)
 
+;(global-set-key (kbd "C-x C-x s") #'save-without-hooks)
+;(global-set-key (kbd "C-x C-x C-s") #'save-without-hooks)
+
 ;;; TODO: a command to wrap parentheses around region
 
 (defvar prev-keymaps nil)
