@@ -37,6 +37,7 @@
 (require 'ido)
 (require 'linum-relative)
 (require 'magit)
+(require 'magit-popup)
 (require 'misc-cmds)                    ; i forget what uses this lol
 (require 'multiple-cursors)
 (require 'rainbow-delimiters)

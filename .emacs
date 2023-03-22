@@ -1,5 +1,7 @@
 ;;; -* lexical-binding: t -*-
 
+(require 'cl-lib)
+
 
 ;;;;; (1) Define `defcustom' base groups for other init code to attach to.
 
