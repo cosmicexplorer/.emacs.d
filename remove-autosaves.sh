@@ -7,4 +7,4 @@ find undo-tree-history/ \
      -type f \
      -exec rm -v {} '+'
 
-rm -f .emacs.desktop
+./drop-opened-buffers.sh
