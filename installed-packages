@@ -78,6 +78,7 @@ info-rename-buffer
 inform
 jq-mode
 js2-mode
+kotlin-mode
 less-css-mode
 lisp-extra-font-lock
 lisp-local
@@ -132,6 +133,7 @@ projectile
 proof-general
 propfont-mixed
 proportional
+protobuf-mode
 python-info
 racer
 rainbow-delimiters
