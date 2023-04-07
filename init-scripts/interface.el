@@ -170,7 +170,6 @@
 
 ;;; This lets us use TAB in the minibuffer for <M-!> :DDD
 (defadvice pcomplete-completions (around no-read-only-on-tab activate)
-  (cl-assert (minibufferp (current-buffer)) t "NO! MINIBUFFER ONLY!!!")
   (let ((inhibit-read-only t))
     ad-do-it))
 
