@@ -3925,4 +3925,7 @@ documentation for `paredit-space-for-delimiter-predicates'."
       (when do-jump-to-messages
         (switch-to-messages)))))
 
+;;; abbreviate the fullscreen switch
+(defalias 'tff 'toggle-frame-fullscreen)
+
 (provide 'functions)
