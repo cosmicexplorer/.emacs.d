@@ -4,13 +4,14 @@
 
 ;;; set font size and type
 (defcustom best-text-sizes-alist
-  `((best . 0.6)
+  `((best . 1.5)
     (massive . 10)
     (big . 5)
     (alright-its-a-little-a-big . 4)
     (not-that-big . 3)
     (somewhat-bigger . 2.5)
     (medium . 2)                      ; good for a small 1920x1080 screen
+    (aleph-naught . 1.5)              ; good for a large 3840x2160 screen
     (little . 1)                      ; good for a large 1360x768 screen
     (just-a-tad-tinier . 0.9)
     (smaller . 0.8)
