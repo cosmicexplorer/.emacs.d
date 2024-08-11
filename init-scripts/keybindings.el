@@ -27,8 +27,8 @@
 (global-set-key (kbd "C-x M-w") #'cycle-window-configuration)
 (global-set-key (kbd "C-x M-s") #'save-current-window-configuration)
 
-(global-set-key (kbd "C-x C-x s") #'save-without-hooks)
-(global-set-key (kbd "C-x C-x C-s") #'save-without-hooks)
+;(global-set-key (kbd "C-x C-x s") #'save-without-hooks)
+;(global-set-key (kbd "C-x C-x C-s") #'save-without-hooks)
 
 ;;; TODO: a command to wrap parentheses around region
 
@@ -1247,11 +1247,17 @@
 (global-set-key (kbd "M-=") #'count-chars-words-lines-buffer)
 (global-set-key (kbd "M-T") #'transpose-lines)
 
-(with-eval-after-spec yaml-mode
-  (define-key yaml-mode-map (kbd "<backspace>") #'delete-backward-char))
+(defconst yaml-keys-alist
+  '((:load yaml-mode
+     :map yaml-mode-map
+     :assign (("<backspace>" delete-backward-char)))))
+(set-keys-in yaml-keys-alist)
 
-(with-eval-after-spec conf-mode
-  (define-key conf-colon-mode-map (kbd "C-c C-w") nil))
+(defconst conf-keys-alist
+  '((:load conf-mode
+     :map (conf-mode-map conf-colon-mode-map)
+     :kill ("C-c C-w"))))
+(set-keys-in conf-keys-alist)
 
 (define-key helm-map (kbd "<right>") #'helm-next-source)
 (define-key helm-map (kbd "<left>") #'helm-previous-source)
