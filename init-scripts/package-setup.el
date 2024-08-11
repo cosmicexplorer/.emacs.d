@@ -220,7 +220,7 @@
   (interactive "P")
   (let ((cur-branch (magit-get-current-branch))
         (other-branch
-         (if pfx (magit-read-branch-or-commit "other branch") "master")))
+         (if pfx (magit-read-branch-or-commit "other branch") "main")))
     (magit-diff
      (format "%s..%s"
              (replace-regexp-in-string
