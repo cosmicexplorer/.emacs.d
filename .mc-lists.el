@@ -108,7 +108,9 @@
         toggle-letter-case
         transpose-words
         wgrep-finish-edit
+        xref-go-back
         yaml-electric-backspace
+        yaml-electric-dash-and-dot
         ))
 
 (setq mc/cmds-to-run-once
@@ -136,6 +138,7 @@
         latex-compile
         mc/mark-next-not-cider
         mc/mark-prev-not-cider
+        menu-bar-open
         mouse-drag-mode-line
         mouse-drag-vertical-line
         mouse-select-window
