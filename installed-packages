@@ -9,6 +9,7 @@ all-the-icons-ivy
 all-the-icons-ivy-rich
 auctex
 bart-mode
+bazel
 better-defaults
 cider
 cl-lib
@@ -84,6 +85,7 @@ lisp-extra-font-lock
 lisp-local
 literate-coffee-mode
 lsp-mode
+lua-mode
 magic-latex-buffer
 magit-popup
 markdown-mode
@@ -171,4 +173,6 @@ web-beautify
 wgrep
 wgrep-ag
 wgrep-helm
+xr
 xterm-color
+yaml-mode
