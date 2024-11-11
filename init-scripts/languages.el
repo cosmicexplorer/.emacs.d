@@ -151,16 +151,18 @@
 ;;; doesn't work, hence camel-case-{left,right}-word in functions.el
 (subword-mode)
 (setq c-electric-flag nil)
-(defconst cc-mode-maps (list c-mode-map c++-mode-map java-mode-map))
-(add-hook
- 'c-initialization-hook
- '(lambda ()
-    (add-keybinding-to-mode-maps
-     "RET" #'newline-and-indent-fix-cc-mode cc-mode-maps)))
-(defconst c-namespace-style
-  '("cc-mode"
-    (c-offsets-alist . ((innamespace . [0])))))
-(c-add-style "better-c++-mode" c-namespace-style)
+
+(with-eval-after-spec cc-mode
+  (defconst cc-mode-maps (list c-mode-map c++-mode-map java-mode-map))
+  (add-hook
+    'c-initialization-hook
+    '(lambda ()
+      (add-keybinding-to-mode-maps
+      "RET" #'newline-and-indent-fix-cc-mode cc-mode-maps)))
+  (defconst c-namespace-style
+    '("cc-mode"
+      (c-offsets-alist . ((innamespace . [0])))))
+  (c-add-style "better-c++-mode" c-namespace-style))
 
 (make-variable-buffer-local 'comment-region-function)
 (make-variable-buffer-local 'comment-insert-comment-function)
@@ -252,7 +254,7 @@ Lisp code." t)
 ;;; js/css/html
 (setq js-indent-level 2)
 (setq css-indent-offset 2)
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+;; (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.cshtml\\'" . html-mode))
 (add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode))
 
@@ -361,7 +363,7 @@ Lisp code." t)
   (setq mode-name "CJSX")
   (setq major-mode 'cjsx-mode))
 (add-to-list 'auto-mode-alist '("\\.cjsx\\'" . cjsx-mode))
-(add-to-list 'auto-mode-alist '("\\.jsx\\'" . js2-mode))
+;; (add-to-list 'auto-mode-alist '("\\.jsx\\'" . js2-mode))
 (add-hook 'litcoffee-mode-hook
           (lambda ()
             (set (make-local-variable 'coffee-args-compile)

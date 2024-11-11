@@ -49,7 +49,7 @@
 (require 'tramp)
 (require 'undo-tree)
 (require 'web-beautify)
-(require 'js2-mode)
+;; (require 'js2-mode)
 (require 'highlight-parentheses)
 (require 'wgrep)
 (require 'sourcemap)

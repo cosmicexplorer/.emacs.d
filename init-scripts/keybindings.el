@@ -308,7 +308,8 @@
 (defconst java-keys-alist
   '((:load cc-mode
      :map java-mode-map
-     :kill ("(" "{" "C-c C-w"))))
+     :kill ("(" "{" "C-c C-w")
+     :assign (("C-c C-k" smart-compile)))))
 (set-keys-in java-keys-alist)
 
 (defconst rust-keys-alist
@@ -363,8 +364,8 @@
             (user-error "no function defined for comint mode for C-c R! TODO!!!"))))))
 
 ;;; js
-(defconst js-mode-maps (list js-mode-map js2-mode-map))
 (with-eval-after-spec (js-mode js2-mode)
+  (defconst js-mode-maps (list js-mode-map js2-mode-map))
   (define-key js2-mode-map (kbd "C-c C-w") nil)
   (add-keybinding-to-mode-maps "C-<tab>" #'web-beautify-js js-mode-maps)
   (add-keybinding-to-mode-maps
@@ -1313,8 +1314,6 @@ Return nil if there isn't one."
 
 (global-set-key (kbd "C-x M-d") #'final-directory-component)
 (global-set-key (kbd "C-x M-p") #'repo-relative-path)
-
-(define-key java-mode-map (kbd "C-c C-k") #'smart-compile)
 
 (with-eval-after-spec protobuf-mode
   (add-hook 'protobuf-mode-hook (z (setq-local comment-start "/*" comment-end "*/")))
