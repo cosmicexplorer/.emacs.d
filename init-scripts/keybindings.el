@@ -1073,6 +1073,13 @@
   ;; TODO: use some r package functions, maybe?
   (define-key ess-mode-map (kbd "C-M-h") nil))
 
+(defconst ess-julia-keys-alist
+  `((:load ess-julia
+     :map ess-julia-mode-map
+     :assign
+     (("C-c C-o" ,(cmd (insert "∘")))))))
+(set-keys-in ess-julia-keys-alist)
+
 (with-eval-after-spec coq-mode
   (define-key coq-mode-map (kbd "C-M-<up>") nil)
   (define-key coq-mode-map (kbd "C-M-<down>") nil))

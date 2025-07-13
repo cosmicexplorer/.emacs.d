@@ -25,6 +25,7 @@
 
 (require 'ess)
 (require 'ess-help)
+(require 'ess-site)
 (require 'ansi-color)
 (require 'clang-format)
 (require 'comint)
