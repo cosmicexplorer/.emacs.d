@@ -136,7 +136,8 @@
 (defun kill-this-buffer-and-all-visiting (pfx)
   (interactive "P")
   (let ((current-prefix-arg nil))
-    (if pfx (kill-buf-and-all-visiting nil) (kill-this-buffer))))
+    (if pfx (kill-buf-and-all-visiting nil)
+      (kill-current-buffer))))
 (global-set-key (kbd "C-x k") #'kill-this-buffer-and-all-visiting)
 ;;; quit-window is more useful than i previously thought
 (global-set-key (kbd "C-c q") 'quit-window)

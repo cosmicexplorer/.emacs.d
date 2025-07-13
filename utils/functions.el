@@ -234,7 +234,8 @@ list:	map KBDS over all elements of the list as described above."
 also."
   (interactive "P")
   (let ((current-prefix-arg nil))
-    (if pfx (kill-buf-and-all-visiting nil) (kill-this-buffer))
+    (if pfx (kill-buf-and-all-visiting nil)
+      (kill-current-buffer))
     (if (not (one-window-p))
         (delete-window))))
 
