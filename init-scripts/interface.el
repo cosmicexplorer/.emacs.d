@@ -778,7 +778,7 @@ Use (process-buffer `my-rw-process') instead."
   (if ido-read-directory-name-toggle ad-do-it
     (setq ad-return-value
           (let ((ido-read-directory-name-toggle t))
-            (apply #'ido-read-directory-name (ad-get-args 0))))))
+            (apply #'ido-read-directory-name (cl-subseq (ad-get-args 0) 0 5))))))
 
 (add-hook 'debugger-mode-hook #'buffer-enable-undo -5)
 (add-hook 'debugger-mode-hook #'undo-tree-mode 5)
