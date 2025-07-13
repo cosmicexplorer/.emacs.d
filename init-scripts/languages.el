@@ -154,11 +154,11 @@
 
 (with-eval-after-spec cc-mode
   (defconst cc-mode-maps (list c-mode-map c++-mode-map java-mode-map))
-  (add-hook
-    'c-initialization-hook
-    '(lambda ()
-      (add-keybinding-to-mode-maps
-      "RET" #'newline-and-indent-fix-cc-mode cc-mode-maps)))
+  ;; (add-hook
+  ;;   'c-initialization-hook
+  ;;   '(lambda ()
+  ;;     (add-keybinding-to-mode-maps
+  ;;     "RET" #'newline-and-indent-fix-cc-mode cc-mode-maps)))
   (defconst c-namespace-style
     '("cc-mode"
       (c-offsets-alist . ((innamespace . [0])))))
