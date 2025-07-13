@@ -481,62 +481,62 @@ There is some whitespace trickery, then point is inserted at: ###: |point|###."
     ("Error" . error)))
 
 ;;; makes hlint able to correct with intero!
-(defun hlint-checker-fun (output _ buffer)
-  (with-temp-buffer
-    (insert output)
-    (goto-char (point-min))
-    (cl-remove-if
-     #'null
-     (cl-loop
-      while (re-search-forward hlint-output-start-regexp nil t)
-      collect (let ((file (match-string 1))
-                    (line (string-to-number (match-string 2)))
-                    (col (string-to-number (match-string 3)))
-                    (type (match-string 4))
-                    (name (match-string 5))
-                    (pt (point)))
-                (re-search-forward "\n\n")
-                (let ((txt (replace-regexp-in-string
-                            hlint-trim-ws-regexp ""
-                            (buffer-substring-no-properties pt (1- (point)))))
-                      (level (or (cdr (assoc type hlint-error-type-alist))
-                                 'info)))
-                  (when (string-match hlint-typo-regexp txt)
-                    (let ((found (match-string 1 txt))
-                          (rep (match-string 2 txt)))
-                      (with-current-buffer buffer
-                        (add-to-list
-                         'intero-suggestions
-                         (list :type 'fix-typo
-                               :typo found
-                               :replacement rep
-                               :column col
-                               :line line) t))))
-                  (flycheck-error-new-at
-                   line col level (format "%s\n%s" name txt)
-                   :checker 'haskell-hlint-better
-                   :id type
-                   :filename (buffer-file-name buffer)
-                   :buffer buffer)))))))
+;; (defun hlint-checker-fun (output _ buffer)
+;;   (with-temp-buffer
+;;     (insert output)
+;;     (goto-char (point-min))
+;;     (cl-remove-if
+;;      #'null
+;;      (cl-loop
+;;       while (re-search-forward hlint-output-start-regexp nil t)
+;;       collect (let ((file (match-string 1))
+;;                     (line (string-to-number (match-string 2)))
+;;                     (col (string-to-number (match-string 3)))
+;;                     (type (match-string 4))
+;;                     (name (match-string 5))
+;;                     (pt (point)))
+;;                 (re-search-forward "\n\n")
+;;                 (let ((txt (replace-regexp-in-string
+;;                             hlint-trim-ws-regexp ""
+;;                             (buffer-substring-no-properties pt (1- (point)))))
+;;                       (level (or (cdr (assoc type hlint-error-type-alist))
+;;                                  'info)))
+;;                   (when (string-match hlint-typo-regexp txt)
+;;                     (let ((found (match-string 1 txt))
+;;                           (rep (match-string 2 txt)))
+;;                       (with-current-buffer buffer
+;;                         (add-to-list
+;;                          'intero-suggestions
+;;                          (list :type 'fix-typo
+;;                                :typo found
+;;                                :replacement rep
+;;                                :column col
+;;                                :line line) t))))
+;;                   (flycheck-error-new-at
+;;                    line col level (format "%s\n%s" name txt)
+;;                    :checker 'haskell-hlint-better
+;;                    :id type
+;;                    :filename (buffer-file-name buffer)
+;;                    :buffer buffer)))))))
 
-(require 'flycheck)
-(flycheck-define-command-checker 'haskell-hlint-better
-  "A Haskell style checker using hlint.
-See URL `https://github.com/ndmitchell/hlint'."
-  :command '("hlint"
-             (option-list "-X" flycheck-hlint-language-extensions concat)
-             (option-list "-i=" flycheck-hlint-ignore-rules concat)
-             (option-list "-h" flycheck-hlint-hint-packages concat)
-             (config-file "-h" flycheck-hlintrc)
-             (eval flycheck-hlint-args)
-             source-inplace)
-  :error-parser #'hlint-checker-fun
-  :modes '(haskell-mode literate-haskell-mode))
+;; (require 'flycheck)
+;; (flycheck-define-command-checker 'haskell-hlint-better
+;;   "A Haskell style checker using hlint.
+;; See URL `https://github.com/ndmitchell/hlint'."
+;;   :command '("hlint"
+;;              (option-list "-X" flycheck-hlint-language-extensions concat)
+;;              (option-list "-i=" flycheck-hlint-ignore-rules concat)
+;;              (option-list "-h" flycheck-hlint-hint-packages concat)
+;;              (config-file "-h" flycheck-hlintrc)
+;;              (eval flycheck-hlint-args)
+;;              source-inplace)
+;;   :error-parser #'hlint-checker-fun
+;;   :modes '(haskell-mode literate-haskell-mode))
 
-(add-to-list 'flycheck-checkers 'haskell-hlint-better)
+;; (add-to-list 'flycheck-checkers 'haskell-hlint-better)
 
-(eval-after-load 'intero
-  '(flycheck-add-next-checker 'intero 'haskell-hlint-better t))
+;; (eval-after-load 'intero
+;;   '(flycheck-add-next-checker 'intero 'haskell-hlint-better t))
 
 (defvar-local stack-project-root nil)
 
@@ -554,21 +554,21 @@ See URL `https://github.com/ndmitchell/hlint'."
 
 (add-hook 'haskell-mode-hook #'stack-set-project-root)
 
-(defadvice intero-parse-errors-warnings-splices
-    (around set-errors-for-hlint activate)
-  (let* ((buf (ad-get-arg 1))
-         (fname
-          (with-current-buffer buf
-            (file-relative-name (buffer-file-name) stack-project-root)))
-         (tmp-file (intero-temp-file-name buf)))
-    ad-do-it
-    (cl-loop with ret = ad-return-value
-             with file-literal = (regexp-quote tmp-file)
-             for err in ret
-             for err-msg = (flycheck-error-message err)
-             for fixed-msg = (replace-regexp-in-string
-                              file-literal fname err-msg nil t)
-             do (setf (flycheck-error-message err) fixed-msg))))
+;; (defadvice intero-parse-errors-warnings-splices
+;;     (around set-errors-for-hlint activate)
+;;   (let* ((buf (ad-get-arg 1))
+;;          (fname
+;;           (with-current-buffer buf
+;;             (file-relative-name (buffer-file-name) stack-project-root)))
+;;          (tmp-file (intero-temp-file-name buf)))
+;;     ad-do-it
+;;     (cl-loop with ret = ad-return-value
+;;              with file-literal = (regexp-quote tmp-file)
+;;              for err in ret
+;;              for err-msg = (flycheck-error-message err)
+;;              for fixed-msg = (replace-regexp-in-string
+;;                               file-literal fname err-msg nil t)
+;;              do (setf (flycheck-error-message err) fixed-msg))))
 
 (defun say-yes (&rest args) t)
 

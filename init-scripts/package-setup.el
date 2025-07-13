@@ -354,8 +354,8 @@
      (color-theme-danny)))
 
 ;;; flycheck lol
-(eval-after-load 'flycheck-package
-  '(flycheck-package-setup))
+;; (eval-after-load 'flycheck-package
+;;   '(flycheck-package-setup))
 
 ;;; npm executables
 (defvar npm-bin-dir nil
