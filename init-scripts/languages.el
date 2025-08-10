@@ -713,7 +713,10 @@ There is some whitespace trickery, then point is inserted at: ###: |point|###."
   (insert "	"))
 (add-hook 'makefile-mode-hook
           (z (setq-local indent-line-function #'makefile-insert-tab)))
-(add-to-list 'auto-mode-alist '("\\(\\`\\|\\<\\)Makefile\\(\\.[a-zA-Z]+\\)?\\'" . makefile-mode))
+(add-to-list 'auto-mode-alist
+             '("\\(\\`\\|\\<\\)Makefile\\(\\.[a-zA-Z]+\\)?\\'" . makefile-mode))
+(add-to-list 'auto-mode-alist
+             '("\\(\\.include\\)\\'" . makefile-mode))
 
 (defconst pants-cur-year-header-fmt-leading-whitespace "
 # coding=utf-8
