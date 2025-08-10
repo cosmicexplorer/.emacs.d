@@ -734,3 +734,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
   (save-excursion
     (goto-char (point-min))
     (insert (pants-python-header))))
+
+;;; mkinitcpio presets!
+(add-to-list 'auto-mode-alist '("\\.preset\\'" . conf-mode))
