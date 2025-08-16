@@ -1,3 +1,4 @@
+; -*- lexical-binding: t; -*-
 ;;; Clang-format emacs integration for use with C/Objective-C/C++.
 
 ;; This defines a function clang-format-region that you can bind to a key.
