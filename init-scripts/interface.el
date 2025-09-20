@@ -1,14 +1,13 @@
 ;; -*- lexical-binding: t -*-
 
+(require 'functions)
+
 ;;; just a grab bag of stuff to change lol
 ;;; in general, functions go in `functions.el', and `interface.el' calls them in
 ;;; some way, shape, or form
 
 
 ;;;;; Make idiosyncratic interface changes...
-
-;;; prompts for (yes/no) -> (y/n)
-(fset 'yes-or-no-p 'y-or-n-p)
 
 ;; Remove trailing whitespace from a line
 (setq-default nuke-trailing-whitespace-p t)
@@ -154,7 +153,7 @@
    t))
 
 ;;; output eshell buffers to file
-(defvar eshell-user-output-file (home-dir-path "eshell-output")
+(defvar eshell-user-output-file (locate-user-emacs-file "eshell-output")
   "File containing all eshell I/O from all eshell buffers.")
 (add-hook 'eshell-pre-command-hook #'eshell-send-input-to-history)
 (add-hook 'eshell-post-command-hook #'eshell-send-output-to-history)
@@ -165,7 +164,7 @@
   (add-hook 'comint-output-filter-functions
             #'shell-send-output-to-history nil t))
 
-(defvar shell-user-output-file (home-dir-path "shell-output"))
+(defvar shell-user-output-file (locate-user-emacs-file "shell-output"))
 (add-hook 'shell-mode-hook #'shell-record-history-filters)
 
 ;;; This lets us use TAB in the minibuffer for <M-!> :DDD
@@ -302,7 +301,7 @@
   (cl-mapc
    (lambda (dir)
      (add-to-list
-      'load-path (expand-file-name dir init-home-folder-dir)))
+      'load-path (locate-user-emacs-file dir)))
    submodule-dirs)
   (require 'danny-theme)
   (danny-setup)
@@ -793,5 +792,4 @@ Use (process-buffer `my-rw-process') instead."
 (setq company-lighter '(" " company-lighter-base))
 (add-hook 'org-mode-hook (z (company-mode 0)))
 
-;;; TODO: init-scripts are not yet exposed as packages!
-;; (provide 'interface)
+(provide 'interface)

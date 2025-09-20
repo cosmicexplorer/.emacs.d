@@ -587,7 +587,7 @@ it goes away."
   and if so, only beautifies the current line instead of the entire
   file."
   (cl-loop with is-covered-in-file = nil
-        for line in (json-read-file (concat init-home-folder-dir "no-beautify"))
+        for line in (json-read-file (locate-user-emacs-file "no-beautify"))
         do (when (string/starts-with buf-name (cdr line))
              (setq is-covered-in-file t))
         finally (return (not is-covered-in-file))))
@@ -1507,7 +1507,7 @@ way I prefer, and regards `comment-padding', unlike the standard version."
 (defun actual-setup-submodules ()
   (when (and (internet-connected-p) (executable-find "git"))
     (-let* ((git-submodule-buf-name "*git-submodule-errors*")
-            (default-directory init-home-folder-dir)
+            (default-directory user-emacs-directory)
             (submodule-out-buf
              (get-buffer-create git-submodule-buf-name))
             ((all-dirs failed)

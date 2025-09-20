@@ -11,8 +11,8 @@
   "Package listing and internet connection settings."
   :group 'my-customizations)
 
-(defcustom internet-check-url "8.8.8.8"
-  "Defaults to Google's DNS server. They might track me, but it will definitely be online."
+(defcustom internet-check-url "https://codeberg.org/cosmicexplorer/helm-rg"
+  "Defaults to my own project URL on Codeberg."
   :type 'string
   :group 'package-connections)
 
@@ -45,36 +45,6 @@ early exit mechanism e.g. when traveling without wifi."
 
 
 ;;;;; Persist the installed packages data to a customizable file path.
-
-(defcustom installed-packages-file (home-dir-path "installed-packages")
-  "File path to write a list of installed packages to on shutdown. Used in
-`write-packages-to-file' and `install-packages-from-file'."
-  :type 'file
-  :group 'my-customizations)
-
-(defun write-packages-to-file ()
-  "Extract the names of `package-selected-packages' and write them to `installed-packages-file'"
-  (with-temp-buffer
-    (let* ((names (cl-mapcar #'symbol-name package-selected-packages))
-           (sorted (cl-sort names #'string-lessp)))
-      (cl-loop for s in sorted
-               do (insert s "\n"))
-      (write-file installed-packages-file))))
-
-;;; do the install (slow upon startup, but only for the first time)
-(defun install-packages-from-file ()
-  "Install everything in the `installed-packages-file' that we don't already have."
-  (save-window-excursion
-    (let* ((inst-buf (find-file-existing installed-packages-file))
-           (inst-file (with-current-buffer inst-buf (buffer-string)))
-           (names (split-string inst-file "\n" t))
-           (sorted (cl-sort names #'string-lessp))
-           (syms (cl-mapcar #'intern sorted))
-           (real-syms (cl-remove-if #'package-installed-p syms)))
-      (cl-mapc #'package-install real-syms)
-      (kill-buffer inst-buf))))
-
-
 ;;;;; Do a package refresh, if possible!
 
 (defcustom package-sync-on-init t
@@ -84,8 +54,4 @@ early exit mechanism e.g. when traveling without wifi."
 
 ;;; When we initialize, ensure we have all the packages from this file installed.
 (when (and package-sync-on-init (internet-connected-p))
-  (package-refresh-contents)
-  (install-packages-from-file))
-
-;;; When we die, ensure we note all the packages we used.
-(add-hook 'kill-emacs-hook #'write-packages-to-file)
+  (package-refresh-contents))

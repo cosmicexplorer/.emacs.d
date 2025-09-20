@@ -30,7 +30,7 @@
 
 (defun fix-info-rename-buffer ()
   "Rename current Info buffer to match the `Info-breadcrumbs' it uses to orient itself."
-  (interactive)
+  (interactive () Info-mode)
   (unless (derived-mode-p 'Info-mode)
     (error "`fix-info-rename-buffer' expects to be run within an `Info-mode' buffer"))
   (let* ((crumbs (fix-info--normalize-breadcrumbs))

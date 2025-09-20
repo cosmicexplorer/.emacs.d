@@ -1,6 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
 ;;; setup done for large packages which need a kick in the pants to get going
+(require 'git-gutter-fringe)
 
 ;;; ein
 (with-eval-after-spec ein
@@ -12,12 +13,12 @@
 (add-hook 'eshell-mode-hook
           ;; add pcomplete with helm support to eshell
           (lambda ()
-              (define-key eshell-mode-map
-                [remap eshell-pcomplete]
-                'helm-esh-pcomplete)))
+            (define-key eshell-mode-map
+                        [remap eshell-pcomplete]
+                        'helm-esh-pcomplete)))
 
 ;; ESS
-(let ((ess-lisp (expand-file-name "ESS/lisp" init-home-folder-dir)))
+(let ((ess-lisp (locate-user-emacs-file "ESS/lisp")))
   (when (file-directory-p ess-lisp)
     (add-to-list 'load-path ess-lisp)
     (require 'ess-site)
@@ -46,16 +47,6 @@
         (call-interactively #'magit-section-toggle)
       (push-mark)
       (magit-section-goto (magit-get-section sec-diff)))))
-
-(defadvice substring-no-properties (around allow-nil-for-magit-status activate)
-  (when (null (ad-get-arg 0))
-    (ad-set-arg 0 ""))
-  ad-do-it)
-
-(defadvice propertize (around allow-nil-for-magit-status activate)
-  (when (null (ad-get-arg 0))
-    (ad-set-arg 0 ""))
-  ad-do-it)
 
 (defcustom run-kinit-magit-creds nil
   "Whether to run kinit before magit credential operations."
@@ -262,101 +253,6 @@
       (setq ad-return-value (magit-list-local-branch-names))
     ad-do-it))
 
-(defun make-magit-completing-read-multiple-not-break-come-on
-    (prompt table &optional predicate require-match initial-input
-            hist def inherit-input-method
-            no-split)
-  (--> (completing-read-multiple
-        prompt table predicate require-match initial-input
-        hist def inherit-input-method)
-       (if no-split (mapconcat #'identity it " ") it)))
-
-(advice-add 'magit-completing-read-multiple* :override #'make-magit-completing-read-multiple-not-break-come-on)
-
-;;; git-gutter
-(defconst git-gutter-fringe-hack-hooks git-gutter:update-hooks)
-
-(defun git-gutter:refresh ()
-  (git-gutter:clear)
-  (git-gutter))
-
-(defun my-git-gutter-fr:clear ()
-  (dolist (ov (overlays-in (point-min) (point-max)))
-    (when (or (overlay-get ov 'git-gutter)
-              (let* ((prop (overlay-get ov 'before-string))
-                     (val (when prop (get-text-property 0 'display prop))))
-                (cl-some (lambda (sym) (memq sym val))
-                         '(git-gutter-fr:added
-                           git-gutter-fr:modified
-                           git-gutter-fr:deleted))))
-      (delete-overlay ov)))
-  (setq git-gutter-fr:bitmap-references nil))
-(eval-after-load 'git-gutter-fringe
-  '(fset 'git-gutter-fr:clear (symbol-function #'my-git-gutter-fr:clear)))
-
-(defun git-gutter-refresh-ignore-errors ()
-  (ignore-errors (git-gutter:refresh)))
-
-;;; NB: kill everything from `vc' -- we can't control what it calls.
-(defadvice vc-before-save (around do-not-call-status activate)
-  nil)
-(defadvice vc-after-save (around do-not-call-status activate)
-  nil)
-(defadvice vc-refresh-state (around do-not-call-status activate)
-  nil)
-
-(define-minor-mode git-gutter-fringe-hack-mode
-  "hack to make git gutter work"
-  :group 'git-gutter
-  :init-value nil
-  :global nil
-  :lighter git-gutter:lighter
-  (ignore-errors
-    (if git-gutter-fringe-hack-mode
-        (progn
-          (cl-loop for hook in git-gutter-fringe-hack-hooks
-                do (add-hook hook #'git-gutter-refresh-ignore-errors t t))
-          (git-gutter))
-      (cl-loop for hook in git-gutter-fringe-hack-hooks
-            do (remove-hook hook #'git-gutter-refresh-ignore-errors t))
-      (git-gutter:clear))))
-(defun git-gutter-fringe-hack-turn-on ()
-  (git-gutter-fringe-hack-mode +1))
-(define-globalized-minor-mode global-git-gutter-fringe-hack-mode
-  git-gutter-fringe-hack-mode git-gutter-fringe-hack-turn-on)
-(global-git-gutter-fringe-hack-mode)
-
-;;; make git-gutter run on magit actions
-(defadvice magit-run-git (around run-git-gutter activate)
-  (let ((prev-mod-files (magit-unstaged-files)))
-    ad-do-it
-    (cl-loop
-     for file in (union prev-mod-files (magit-unstaged-files)
-                        :test #'equal)
-     for buf = (get-file-buffer file) when buf
-     do (with-current-buffer buf (git-gutter)))))
-
-;;; rainbow delimiters!
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-(defvar rainbow-delims-modes '(LaTeX-mode-hook))
-(cl-loop for mode-hook in rainbow-delims-modes
-         do (add-hook mode-hook #'rainbow-delimiters-mode))
-
-;;; ibuffer stuff
-(add-hook 'ibuffer-mode-hook
-          ;; Automatically updates buffer list!
-          (z (ibuffer-auto-mode t)))
-
-;;; personal color theme initialization
-(eval-after-load "color-theme-danny"
-  '(progn
-     (color-theme-initialize)
-     (color-theme-danny)))
-
-;;; flycheck lol
-;; (eval-after-load 'flycheck-package
-;;   '(flycheck-package-setup))
-
 ;;; npm executables
 (defvar npm-bin-dir nil
   "Location of npm binary files.")
@@ -364,24 +260,22 @@
 (defconst do-npm-install (internet-connected-p)
   "Whether to run npm install to obtain js utilities.")
 (when (executable-find "npm")
-  ;; TODO: this `cd' mutates global state!
-  (cd init-home-folder-dir)
-  (when do-npm-install
-    (call-process "npm" nil nil nil "install"))
-  (setq npm-bin-dir
-        ;; destroy trailing newline
-        (let ((str (shell-command-to-string "npm bin")))
-          (substring str 0 (1- (length str)))))
-  (eval-after-load "web-beautify"
-    `(progn
-       (setq web-beautify-html-program (concat ,npm-bin-dir "/html-beautify"))
-       (setq web-beautify-css-program (concat ,npm-bin-dir "/css-beautify"))
-       (setq web-beautify-js-program (concat ,npm-bin-dir "/js-beautify"))))
-  (eval-after-load "coffee-mode"
-    `(progn
-       (setq coffee-command (concat ,npm-bin-dir "/coffee"))
-       (setq js2coffee-command (concat ,npm-bin-dir "/js2coffee")))))
-
+  (let ((default-directory user-emacs-directory))
+    (when do-npm-install
+      (call-process "npm" nil nil nil "install"))
+    (setq npm-bin-dir
+          ;; destroy trailing newline
+          (let ((str (shell-command-to-string "npm bin")))
+            (substring str 0 (1- (length str)))))
+    (eval-after-load "web-beautify"
+      `(progn
+        (setq web-beautify-html-program (concat ,npm-bin-dir "/html-beautify"))
+        (setq web-beautify-css-program (concat ,npm-bin-dir "/css-beautify"))
+        (setq web-beautify-js-program (concat ,npm-bin-dir "/js-beautify"))))
+    (eval-after-load "coffee-mode"
+      `(progn
+        (setq coffee-command (concat ,npm-bin-dir "/coffee"))
+        (setq js2coffee-command (concat ,npm-bin-dir "/js2coffee"))))))
 
 (eval-after-load 'sourcemap
   '(progn
@@ -500,3 +394,22 @@ If SUBMODE is not provided, use `LANG-mode' by default."
   (if (minibufferp)
       (call-interactively #'exit-minibuffer)
     ad-do-it))
+
+
+;;; rainbow delimiters!
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+(defvar rainbow-delims-modes '(LaTeX-mode-hook))
+(cl-loop for mode-hook in rainbow-delims-modes
+         do (add-hook mode-hook #'rainbow-delimiters-mode))
+
+;;; ibuffer stuff
+(add-hook 'ibuffer-mode-hook
+          ;; Automatically updates buffer list!
+          (z (ibuffer-auto-mode t)))
+
+;;; personal color theme initialization
+(with-eval-after-spec color-theme-danny
+  (color-theme-initialize)
+  (color-theme-danny))
+
+(provide 'package-setup)

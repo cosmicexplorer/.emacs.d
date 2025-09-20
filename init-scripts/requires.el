@@ -9,20 +9,21 @@
 ;;;;; Make our own packages visible!
 
 ;;; NB: my own stuff matters too!!! <33333333 ^_^_^_^_^!
-
+(add-to-list 'load-path (locate-user-emacs-file "init-scripts"))
 ;;; "utils": reusable functions and macros go here.
-(add-to-list 'load-path (home-dir-path "utils"))
+(add-to-list 'load-path (locate-user-emacs-file "utils"))
 ;;; "integrations": a breeding ground for new MELPA packages!
-(add-to-list 'load-path (home-dir-path "integrations"))
+(add-to-list 'load-path (locate-user-emacs-file "integrations"))
 ;;; "lisp": packages that don't exist on MELPA; typically from emacswiki, but some
 ;;; are from more dubious sources (an old professor??).
-(add-to-list 'load-path (home-dir-path "lisp"))
+(add-to-list 'load-path (locate-user-emacs-file "lisp"))
 
 ;;; FIXME: ...what does this fix?
 (defun org-babel-make-language-alias (&rest args))
 
 ;;; ESS is done in `./package-setup.el'
 
+(require 'dash)
 (require 'ess)
 (require 'ess-help)
 (require 'ess-site)

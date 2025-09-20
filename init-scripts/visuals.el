@@ -1,3 +1,5 @@
+; -*- lexical-binding: t; -*-
+
 ;;; modifications to ui only
 
 (require 'cl-lib)
@@ -80,3 +82,5 @@
 
 ;;; highlight glyphless chars that can be used for text watermarking
 (set-face-background 'glyphless-char "red")
+
+(provide 'visuals)

@@ -1,4 +1,4 @@
-;;; -* lexical-binding: t -*-
+;;; -*- lexical-binding: t; -*-
 
 ;;; cider sux (eh)
 (defun setup-cider-stuff ()

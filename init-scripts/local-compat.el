@@ -1,5 +1,8 @@
+;; -*- lexical-binding: t; -*-
+
 ;;; modifications done for compatibility across various interfaces
 ;;; this will see some changes when i start working with windows this summer
+(require 'functions)
 
 ;; fix input issues in xterm (can't hold down shift and up arrow to
 ;; highlight stuff)
@@ -32,4 +35,4 @@
 
 
 ;;; TODO: expose these methods like a normal package!
-;; (provide 'compat)
+(provide 'local-compat)

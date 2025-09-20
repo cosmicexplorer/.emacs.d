@@ -1288,7 +1288,8 @@ With prefix arg, clear also the simple search history."
 ;;;###autoload
 (defun revert-buffer-no-confirm ()
   "Revert buffer without confirmation."
-  (interactive) (revert-buffer t t))
+  (interactive)
+  (revert-buffer-with-fine-grain t t))
 
 ;; Suggested: rebind `undo' keys to `undo-repeat'.
 ;; (global-set-key [remap undo] 'undo-repeat)

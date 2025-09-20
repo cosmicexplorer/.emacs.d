@@ -32,8 +32,6 @@
 
 ;;; TODO: a command to wrap parentheses around region
 
-(defvar prev-keymaps nil)
-
 (defun set-key-dwim (map key cmd)
   (cl-check-type key string)
   (cl-check-type cmd (or command null))
@@ -264,7 +262,7 @@
 (global-set-key (kbd "C-x C-k") 'close-and-kill-this-pane)
 
 ;; smart-compile stuff!!!!
-(global-set-key (kbd "C-c C-k") 'smart-compile)
+(define-key prog-mode-map (kbd "C-c C-k") #'smart-compile)
 
 ;;; w3m
 (with-eval-after-spec w3m
@@ -723,44 +721,59 @@
 ;;      (if pfx (switch-to-buffer new-file)
 ;;        (pop-to-buffer new-file)))))
 
-(defconst function-help-keys-alist
-  `((:map (nil)
-     :kill ("C-M-h")
-     :assign
-     (("C-h f" ,(find-function-switch-pfx #'helpful-callable :invert t))
-      ("C-h v" ,(find-function-switch-pfx #'helpful-variable :invert t))
-      ("C-h k" ,(find-function-switch-pfx #'helpful-key :invert t))
-      ("C-h C-k" ,(find-function-switch-pfx #'helpful-key :invert t))
-      ("C-h d" ,(find-function-switch-pfx #'describe-function-or-variable :invert t))
-      ("C-M-h d" ,(find-function-switch-pfx #'describe-function-or-variable-at-point :invert t))
-      ("C-h C-d" ,(find-function-switch-pfx #'find-function-or-variable))
-      ("C-M-h C-d"
-       ,(find-function-switch-pfx #'find-function-or-variable-at-point))
-      ("C-M-h f"
-       ,(find-function-switch-pfx #'describe-function-at-point))
-      ("C-M-h v"
-       ,(find-function-switch-pfx #'describe-variable-at-point))
-      ("C-h C-f" ,(find-function-switch-pfx #'find-function))
-      ("C-M-h C-f" ,(find-function-switch-pfx #'find-function-at-point))
-      ("C-h C-v" ,(find-function-switch-pfx #'find-variable))
-      ("C-M-h C-v" ,(find-function-switch-pfx #'find-variable-at-point))
-      ("C-h b" ,(find-function-switch-pfx #'describe-bindings :invert t))
-      ("C-h l"
-       ,(find-function-switch-pfx #'view-lossage :invert t))))))
-(set-keys-in function-help-keys-alist)
+(defun helpful$extension$-read-map (prompt default-val predicate)
+  "Read a keymap symbol from the minibuffer, with completion.
 
-;;; c-h a -> apropos in help map
-(define-key help-map "a"
-  (find-function-switch-pfx #'apropos
-    :then-do (lambda (win buf)
-               (with-selected-window win
-                 (with-current-buffer buf
-                   (set-window-buffer win buf)
-                   (set-window-point win (point-min)))))))
+Returns the symbol."
+  (when (and default-val
+             (not (funcall predicate default-val)))
+    (setq default-val nil))
+  (when default-val
+    ;; `completing-read' expects a string.
+    (setq default-val (symbol-name default-val))
 
-;;; TODO:
-;; (require 'helpful)
-;; (define-key )
+    ;; TODO: Only modify the prompt when we don't have ido/ivy/helm,
+    ;; because the default is obvious for them.
+    (setq prompt
+          (replace-regexp-in-string
+           (rx ": " eos)
+           (format " (default: %s): " default-val)
+           prompt)))
+  (intern (completing-read
+           prompt obarray
+           predicate t nil nil default-val))
+  )
+
+(defun helpful$extension$-map (map)
+  "Show help for keymap MAP.
+
+See also `helpful$extension$-mode'."
+  (let ((buf (helpful--buffer 'helm-rg-map nil)))
+    (with-current-buffer buf
+      (helpful--summary 'helm-rg-map nil buf (point-min))
+      (helpful-update)
+      )
+    (funcall helpful-switch-buffer-function buf))
+  )
+
+(defvar-keymap function-help-map
+  :doc "Help modes."
+  :keymap help-map
+  "f" (find-function-switch-pfx #'helpful-callable :invert t)
+  "C-f" (find-function-switch-pfx #'find-function)
+  "v" (find-function-switch-pfx #'helpful-variable :invert t)
+  "C-v" (find-function-switch-pfx #'find-variable)
+  "r" (find-function-switch-pfx #'helpful-at-point :invert t)
+  "C-r" (find-function-switch-pfx #'find-function-or-variable-at-point)
+  "b" (find-function-switch-pfx #'describe-bindings :invert t)
+  "l" (find-function-switch-pfx #'view-lossage :invert t)
+  "a" (find-function-switch-pfx #'apropos
+        :then-do (lambda (win buf)
+                   (with-selected-window win
+                     (with-current-buffer buf
+                       (set-window-buffer win buf)
+                       (set-window-point win (point-min)))))))
+(global-set-key (kbd "C-M-h") nil)
 
 ;;; FIXME: this doesn't work at all and it's stupid
 ;; (with-eval-after-spec help
@@ -1173,20 +1186,331 @@
 (with-eval-after-load 'git-rebase-mode
   (define-key git-rebase-mode-map (kbd "C-z") #'git-rebase-undo))
 
-(global-set-key (kbd "C-M-h i") #'helm-info)
+
+(with-eval-after-spec helm
+  (global-set-key (kbd "C-M-h i") #'helm-info))
+
+
 (define-key Info-mode-map (kbd "b") #'Info-history-back)
 (define-key Info-mode-map (kbd "f") #'Info-history-forward)
 
-(defun generate-info-address ()
-  (format "(%s)%s" Info-current-file Info-current-node))
-(defun my-Info-new-tab ()
-  (interactive)
-  ;; Using the existing (buffer-name) *should* take advantage of `info-rename-buffer-mode'.
-  (let ((new-buffer (generate-new-buffer (buffer-name)))
-        (info-address (generate-info-address)))
-    (info info-address new-buffer)))
-(define-key Info-mode-map (kbd "M-b") #'my-Info-new-tab)
+(defun controlled-clone (pfx)
+  (interactive "P" Info-mode helpful-mode Man-mode)
+  (let ((use-time (window-use-time))
+        (cloned-buf (save-window-excursion (clone-buffer))))
+    (if pfx
+        (select-window
+         (display-buffer-use-least-recent-window
+          cloned-buf `((lru-time . ,use-time))))
+      (switch-to-buffer cloned-buf nil t))))
 
+
+(with-eval-after-spec man
+  (define-key Man-mode-map (kbd "M-c") #'controlled-clone))
+
+(define-key Info-mode-map (kbd "M-c") #'controlled-clone)
+(define-key helpful-mode-map (kbd "M-c") #'controlled-clone)
+
+(define-key Info-mode-map (kbd "P") #'Info-prev-reference)
+(define-key Info-mode-map (kbd "N") #'Info-next-reference)
+
+(require 'pcase)
+
+(pcase-defmacro plist (key)
+  "Matches if EXPVAL has key KEY."
+  `(and (and (let key ,key) (guard (symbolp key)))
+        (app (lambda (exp) (plist-get exp key)) val)
+        (guard (not (null val)))))
+
+
+(defun --parse-helpful-button (props)
+  (when (plist-get props 'button)
+    `(:cmd ,#'push-button :interactively t)))
+
+(defun --parse-info-button (props)
+  "
+  NB: this is retroactively parsing the output of both:
+  (1) The Info package, (which is built in),
+  (2) The (very good) \"helpful\" package from wilred hughes, who is a fantastic programmer.
+  Therefore, it will likely break at some point, and it will be entirely my fault :)
+
+  However, note that at least that wilfred uses the canonical 'button' class-based abstraction from
+  the stdlib. So hopefully the right way to solve this long term is to converge around the button."
+  (cond
+   ((let ((face (plist-get props 'font-lock-face)))
+      ;; TODO: is there a more idiomatic way to optimize membership like this?
+      ;; ......and tbh, it's almost definitely worth revising how Info generates its output.
+      (or (eq face 'info-xref)
+          (eq face 'info-xref-visited)))
+    `(:cmd ,#'Info-follow-nearest-node :interactively t))
+   ((plist-get props 'button)
+    ;;; inform-args (message), [type=inform-function, inform-function=describe-function]
+    ;;; inform-args (format-message), [type=inform-symbol, inform-function=describe-symbol]
+    ;;; inform-args (...), [type=inform-variable, inform-function=describe-variable]
+    (let* ((category (plist-get props 'category))
+           (args (plist-get props 'inform-args))
+           (sym-props (symbol-plist category))
+           (type (plist-get sym-props 'type))
+           (fn (plist-get sym-props 'inform-function)))
+      (cl-check-type type symbol)
+      (cl-check-type fn symbol)
+      (cl-assert (symbol-function fn))
+      (pcase-exhaustive `(,type ,fn . ,args)
+        (`(inform-function describe-function . ,args)
+         `(:cmd ,#'helpful-callable :args ,args))
+        (`(inform-variable describe-variable . ,args)
+         `(:cmd ,#'helpful-variable :args ,args))
+        (`(inform-symbol describe-symbol . ,args)
+         `(:cmd ,#'helpful-symbol :args ,args)))))))
+
+
+(defun --do-push-button-raw ()
+  "Parse it if we can understand it, or return nil."
+  (let ((props (text-properties-at (point))))
+    (cl-ecase major-mode
+      (helpful-mode (--parse-helpful-button props))
+      (Info-mode (--parse-info-button props))
+      (debugger-mode
+       `(:cmd ,#'help-button-action :args (,(button-at (point)))))
+      (help-mode
+       `(:cmd ,#'help-button-action :args (,(button-at (point))))))))
+
+
+(defun --real-buffer-p (buf)
+  "You can tell that this is the Good Code because of the optimization flags that don't make sense
+  yet until you see what the optimization is attempting to justify. A form of foreshadowing."
+  (declare (ftype (function (buffer) boolean)))
+  ;; NB: This would seem to bolster my earlier idea that emacs needs a big regex engine with
+  ;;     precompilation, but I actually think it still demonstrates the opposite: we want small
+  ;;     matchers that users can understand deeply and don't impose scary/annoying build reqs.
+  ;;
+  ;;     Matching initial space characters can absolutely be done more efficiently!
+  ;;     But it behooves us to consider where there could be a better language than regex to
+  ;;     do justice to the complex relationships we have with text and what it's used to represent.
+  ;;     After lots of work optimizing pip, I have come to believe that CPython would benefit as
+  ;;     well from a broader appreciation for the problems text search is currently used to solve.
+  ;;     And like emacs, CPython is still autotools, so SIMD can be made actually portable!
+  ;;
+  ;;     I personally think identifying a language like `rx' for users to play with the rules of
+  ;;     language is cool enough. But there's an entire other half of that we're still missing:
+  ;;
+  ;;       > *What are we doing with the results of the search?*
+  ;;
+  ;;     As in,the manipulations performed to text *after* we get the search results are another
+  ;;     language we could codify. And in this case, we would be able to identify:
+  ;;     "well, stripping spaces could be optimized a lot more than running a single-threaded
+  ;;     finite automaton through the entire string every time, right?"
+  ;;
+  ;;     Notably, while CPython has an attempt to describe text codecs[^1], they don't actually
+  ;;     use it for %quoting URLs[^2]! What they do is actually incredibly difficult to figure out
+  ;;     from reading the source code[^3], although I do commend them for stating quite clearly
+  ;;     in the docstring that it's not at all minimal.
+  ;;
+  ;;     [^1]: https://docs.python.org/3/library/codecs.html#standard-encodings
+  ;;     [^2]: https://docs.python.org/3/library/urllib.parse.html
+  ;;     [^3]: https://github.com/python/cpython/blob/3e06cfcaeee31c2a6e9befe5ea54d9beaa2c0434/Lib/urllib/parse.py#L872-L952
+  ;;
+  ;;     If you want a fun challenge question, trying figuring out which individual line in the
+  ;;     section highlighted in [^3] achieves the greatest performance for the case of URL quoting
+  ;;     and why?
+  ;;
+  ;;     The answer is here[^1]: it's because calling `.rstrip()'[^2] uses widely-available SIMD
+  ;;     builtins, in particular `memchr()' and `memrchr()' to filter out URL strings that don't
+  ;;     need to be %encoded at all. The jump to that logic goes through the hilariously-named
+  ;;     "fastsearch.h"[^3].
+  ;;
+  ;;     [^1]: https://github.com/python/cpython/blob/3e06cfcaeee31c2a6e9befe5ea54d9beaa2c0434/Lib/urllib/parse.py#L991
+  ;;     [^2]: https://github.com/python/cpython/blob/3e06cfcaeee31c2a6e9befe5ea54d9beaa2c0434/Objects/bytesobject.c#L2004-L2135
+  ;;     [^3]: https://github.com/python/cpython/blob/3e06cfcaeee31c2a6e9befe5ea54d9beaa2c0434/Objects/stringlib/fastsearch.h#L115-L177
+  ;;
+  ;;     fastsearch.h also has a few very interesting deployments of probabilistic sets
+  ;;     ("bloom filters")! But one point that leaves me wanting a lot more is how those
+  ;;     performance guarantees aren't codified into the end user API, so Python programmers are
+  ;;     stuck with performance that almost seems stochastic because it's not codified into e.g. a
+  ;;     PEP, or something we post on emacs-devel, that the end user can employ using the stdlib.
+  ;;
+  ;;     I have spent a lot of time recently rearchitecting the basic comparison logic[^3] from
+  ;;     the Python reference implementation[^2] of Python's *extremely* thoughtful
+  ;;     version/requirement/compatility protocols[^1] for package dependencies that pip and pex
+  ;;     and the rest of the Python ecosystem relies on. But "recently" is just the rejuvenation of
+  ;;     my like half a decade long effort[^4] to upstream the tooling changes I needed to make what I
+  ;;     built for Twitter data scientists[^5] available to everyone. In particular I was able to
+  ;;     convince PyPI to finally start serving *metadata as a protocol[^6]*.
+  ;;
+  ;;     [^1]: https://packaging.python.org/en/latest/specifications/
+  ;;     [^2]: https://packaging.pypa.io/en/stable/
+  ;;     [^3]: https://codeberg.org/cosmicexplorer/pip/src/commit/3bde75faebeae014e05b0c818b450a798a62a9a9/src/pip/_internal/utils/packaging/specifiers.py#L374-L402
+  ;;     [^4]: https://github.com/pypa/pip/issues/12921
+  ;;     [^5]: https://github.com/pantsbuild/pants/pull/8793
+  ;;     [^6]: https://packaging.python.org/en/latest/specifications/simple-repository-api/#serve-distribution-metadata-in-the-simple-repository-api
+  ;;
+  ;;
+  ;;
+  ;;
+  ;;
+  ;;
+  ;;      {
+  ;;        "meta": {
+  ;;          "api-version": "1.4",
+  ;;          "project-status": "active",
+  ;;          "project-status-reason": "this project is not yet haunted"
+  ;;        },
+  ;;        "name": "holygrail",
+  ;;        "files": [
+  ;;          {
+  ;;            "filename": "holygrail-1.0.tar.gz",
+  ;;            "url": "https://example.com/files/holygrail-1.0.tar.gz",
+  ;;            "hashes": {"sha256": "...", "blake2b": "..."},
+  ;;            "requires-python": ">=3.7",
+  ;;            "yanked": "Had a vulnerability",
+  ;;            "size": 123456
+  ;;          },
+  ;;          {
+  ;;            "filename": "holygrail-1.0-py3-none-any.whl",
+  ;;            "url": "https://example.com/files/holygrail-1.0-py3-none-any.whl",
+  ;;            "hashes": {"sha256": "...", "blake2b": "..."},
+  ;;            "requires-python": ">=3.7",
+  ;;            "dist-info-metadata": true,
+  ;;            "provenance": "https://example.com/files/holygrail-1.0-py3-none-any.whl.provenance",
+  ;;            "size": 1337
+  ;;          }
+  ;;        ],
+  ;;        "versions": ["1.0"]
+  ;;      }
+  ;;
+  ;;     > the above is my and pip's reinterpretation of what we specifically built with coursier
+  ;;     > at twitter for pants and the jvm ecosystem (yi was my very close mentor and i began work
+  ;;     > at twitter precisely when he was developing this:
+  ;;
+  ;;
+  ;;      {
+  ;;        "conflict_resolution": {
+  ;;          "org:name:version" (requested): "org:name:version" (reconciled)
+  ;;        },
+  ;;        "dependencies": [
+  ;;          {
+  ;;            "coord": "orgA:nameA:versionA",
+  ;;            "files": [
+  ;;              [
+  ;;                <classifier>,
+  ;;                <path>
+  ;;              ]
+  ;;            ],
+  ;;            "dependencies": [ // coodinates for its transitive dependencies
+  ;;              <orgX:nameX:versionX>,
+  ;;              <orgY:nameY:versionY>,
+  ;;            ]
+  ;;          },
+  ;;          {
+  ;;            "coord": "orgB:nameB:versionB",
+  ;;            "files": [
+  ;;              [
+  ;;                <classifier>,
+  ;;                <path>
+  ;;              ]
+  ;;            ],
+  ;;            "dependencies": [ // coodinates for its transitive dependencies
+  ;;              <orgX:nameX:versionX>,
+  ;;              <orgZ:nameZ:versionZ>,
+  ;;            ]
+  ;;          },
+  ;;        ]
+  ;;      }
+  ;;
+  ;;
+  ;;     https://github.com/coursier/coursier/pull/692
+  ;;     https://codeberg.org/cosmicexplorer/pip
+  ;;
+  ;;     https://github.com/coursier/coursier/issues/659
+  ;;     https://github.com/pypa/pip/issues/7819
+  ;;
+  ;;     https://web.archive.org/web/20250425181258/https://cfp.packaging-con.org/2023/talk/hpuhu7/
+  ;;
+  ;;
+  ;;     > parallel extract
+  ;;     https://github.com/zip-rs/zip2/pull/236
+  ;;     > packed wheel cache for parallel creation via merging (a la medusa-zip)
+  ;;     https://github.com/pex-tool/pex/pull/2175
+  ;;
+  ;;
+  ;;
+  ;;     Th One very significant and underappreciated
+  ;;     result about parsing and caching is th
+  ;;
+  ;;
+  (not (string-match-p "\\`[[:space:]]"
+                       (buffer-name buf))))
+
+(defun controlled-push-button (pfx)
+  (interactive "P" Info-mode helpful-mode)
+
+  (cl-block ret
+    (let ((keys (this-command-keys-vector)))
+      (cl-tagbody
+       (let ((parsed (--do-push-button-raw)))
+         (unless parsed
+           (go fallback))
+         (cl-destructuring-bind (&key cmd args interactively) parsed
+           (cl-check-type cmd symbol)
+           (cl-assert (symbol-function cmd))
+
+           (let* ((lru-time (window-use-time))
+                  (display-buffer-overriding-action
+                   (if pfx
+                       `(display-buffer-use-least-recent-window
+                         ((lru-time . ,lru-time)
+                          (post-command-select-window . t)))
+                     `(display-buffer-same-window
+                       ((inhibit-same-window . nil)
+                        (post-command-select-window . t)))))
+                  (danny-theme-overriding-buffer-switch t)
+                  (info-lookup-other-window-flag nil)
+                  (ret-buf
+                   (if interactively
+                       (call-interactively cmd nil keys)
+                     (apply #'funcall-interactively (cons cmd args)))))
+             (->> (cond
+                   ((listp danny-theme-overriding-buffer-switch)
+                    (cl-destructuring-bind (&key config buf) danny-theme-overriding-buffer-switch
+                      (set-window-configuration config)
+                      (select-window
+                       (if pfx
+                           (display-buffer-use-least-recent-window
+                            buf `((lru-time . ,lru-time)
+                                  (post-command-select-window . t)))
+                         (display-buffer-same-window
+                          buf `((inhibit-same-window . nil)
+                                (post-command-select-window . t)))))
+                      buf))
+                   (t ret-buf))
+                  (cl-return-from ret)))))
+       fallback
+       (message "no button to click here for key sequence %s"
+                (key-description keys))))))
+
+(define-key helpful-mode-map (kbd "RET") #'controlled-push-button)
+(define-key button-map (kbd "RET") #'controlled-push-button)
+(define-key Info-mode-map (kbd "RET") #'controlled-push-button)
+
+
+(defun --disable-auto-save ()
+  (setq-local create-lockfiles nil
+              version-control nil
+              auto-save-mode nil
+              auto-save-default nil
+              make-backup-files nil
+              save-place-mode nil
+              auto-revert-mode nil
+              magit-auto-revert-mode nil
+              undo-tree-mode nil))
+
+(add-hook 'special-mode-hook #'--disable-auto-save 0)
+
+(defun Info$extension$-kill-all ()
+  (interactive)
+  (cl-loop for buf in (buffer-list)
+           if (with-current-buffer buf (derived-mode-p 'Info-mode))
+           do (kill-buffer buf)))
 
 (global-set-key (kbd "<M-home>") #'beginning-of-buffer)
 (global-set-key (kbd "<M-end>") #'end-of-buffer)
@@ -1328,9 +1652,7 @@ Return nil if there isn't one."
   (add-hook 'protobuf-mode-hook (z (setq-local comment-start "/*" comment-end "*/")))
   (define-key protobuf-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby))
 
-
-;;; TODO: not until we can make it all declarative like defcustom with `set-keys-in'!!!
-;; (provide 'keybindings)
-
 (with-eval-after-spec rst
   (define-key rst-mode-map (kbd "C-c C-w") #'destroy-all-whitespace-nearby))
+
+(provide 'keybindings)

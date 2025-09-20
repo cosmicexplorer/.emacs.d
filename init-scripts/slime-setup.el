@@ -1,11 +1,11 @@
+(require 'languages)
+
 ;;; slime sux (jk)
-(let ((sbcl-binary (executable-find "sbcl"))
-      ;; yes, this assumes your quicklisp is installed in ~/quicklisp/
-      (slime-helper-file
-       (expand-file-name
-        (concat "~/quicklisp/slime-helper.el")))
-      (this-directory (if load-file-name (file-name-directory load-file-name)
-                        default-directory)))
+(when-let ((slime-helper-file
+            (expand-file-name
+             (concat "~/quicklisp/slime-helper.el")))
+           (this-directory (if load-file-name (file-name-directory load-file-name)
+                             default-directory)))
   (when sbcl-binary
     (setq inferior-lisp-program sbcl-binary)
     (setq slime-contribs '(slime-fancy))
@@ -34,3 +34,5 @@
                           "Check out "
                 "http://www.mohiji.org/2011/01/31/modern-common-lisp-on-linux/."
                      "\nFeel free to contribute your changes back (lol)!")))))))
+
+(provide 'slime-setup)

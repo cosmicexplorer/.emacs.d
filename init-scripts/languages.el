@@ -1,12 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-;;; configuration for various language modes
-(add-hook #'prog-mode-hook #'display-fill-column-indicator-mode)
-
-;;; indentation silliness
-(setq-default indent-tabs-mode nil)     ;; use spaces not tabs
-(setq tab-width 2)                      ; 4-spacers get at me
-
 ;;; commenting
 (defun make-comments-like-c ()
   (setq comment-start "/*" comment-end "*/" comment-padding " "))
@@ -180,11 +173,6 @@
 (add-to-list 'auto-mode-alist '("\\.cxx\\'" . c++-mode))
 
 ;;; shell
-(defun setup-sh-indentation ()
-  (ignore-errors (warning-highlights-mode-activate))
-  (setq sh-basic-offset 2)
-  (setq sh-indentation 2))
-(add-hook 'sh-mode-hook #'setup-sh-indentation)
 (add-hook 'shell-mode-hook #'turn-off-auto-fill)
 
 ;;; add sh-mode auto-mode-alist hooks
@@ -224,7 +212,8 @@ Lisp code." t)
 
 ;;;;; SLIME support. Currently not working.
 
-(setq inferior-lisp-program "sbcl")
+(when-let ((sbcl (executable-find "sbcl")))
+  (setq inferior-lisp-program sbcl))
 
 ;(let ((slime-helper
 ;       (expand-file-name "~/quicklisp/slime-helper.el")))
@@ -252,8 +241,6 @@ Lisp code." t)
 (add-to-list 'auto-mode-alist '("\\.aurora\\'" . python-mode))
 
 ;;; js/css/html
-(setq js-indent-level 2)
-(setq css-indent-offset 2)
 ;; (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.cshtml\\'" . html-mode))
 (add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode))
@@ -309,11 +296,8 @@ Lisp code." t)
           (lambda ()
             (load "dired-x")))
 
-;;; slime
-;(load-file (resolve-init-scripts-script "slime-setup"))
-
 ;;; clojure
-(load-file (resolve-init-scripts-script "cider-setup"))
+(require 'cider-setup)
 
 (defcustom no-gfm nil "Turn off gfm mode."
   :type 'boolean
@@ -741,3 +725,5 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 ;;; mkinitcpio presets!
 (add-to-list 'auto-mode-alist '("\\.preset\\'" . conf-mode))
+
+(provide 'languages)
